@@ -1,0 +1,281 @@
+html,body,textarea{
+	padding:0;
+	margin:0;
+	height: 100%;
+	font-family: monospace;
+	font-size: 13px;
+	font-style: normal;
+}
+
+button,input,select {
+	font:normal 13px Verdana, Geneva, sans-serif;
+	font-style:normal;
+	color:#ffffff;
+	background:#516399;
+	border:1px solid #bbb;
+	height:1.8em;
+}
+
+input[type=file] {
+	height:1.6em;
+	width: 18em;
+}
+
+textarea:focus{
+	outline: none;
+}
+
+#container {
+    position: relative;
+    height: 41.5em;
+    overflow: hidden;
+}
+
+#wrap-left{
+	width:54em;
+	height:41em;
+	float: left;
+	padding: 2px;
+}
+
+#wrap-right{
+	margin-left: 54em;
+	height: 41em;
+	padding: 2px;
+}
+
+#monitor{
+	display: inline-block;
+	width: 53em;
+	border: 1px solid #516399;
+}
+
+#monitor:focus{
+	outline: 3px solid #516399;
+}
+
+#monitor b{
+	color:#516399;
+	background-color:#eee;
+}
+
+#editBlock{
+	width:95%;
+	height:34em;
+	padding-left: 2px;
+	color:#516399;
+	border: 1px solid #516399;
+	overflow: auto;
+}
+
+#edit-table{
+	width:100%;
+	overflow:hidden;
+	border:none;
+	border-spacing:0;
+	margin:0;
+	padding:0;
+}
+
+#input{
+	width:100%;
+	border:none;
+	resize: none;
+	overflow: hidden;
+	font-family: monospace;
+	tab-size: 1em;
+}
+
+#line-count{
+	width:2em;
+	height: auto;
+	min-height:10em;
+	padding:0.5em;
+	overflow:hidden;
+	text-align:right;
+	resize: none;
+}
+
+#hint{
+	width:95%;
+	height:1em;
+	color:#516399;
+}
+
+#hint b{
+	color:#90C695;
+}
+
+#hint i{
+	color:#777;
+}
+
+#menu{
+	width:62em;
+	height: 2em;
+	margin: auto;
+}
+
+#ram{
+	width:53em;
+	height:15em;
+	resize: none;
+	color:#516399;
+	border: 1px solid #516399;
+}
+
+#debug{
+	width:17em;
+	height:23em;
+	float:left;
+}
+
+#output{
+	image-rendering: pixelated;
+	width:23em;
+	float:left;
+}
+
+#codePreviev{
+	width:13em;
+	height:21em;
+	float:left;
+}
+
+#alert {
+	width:97%;
+	min-height:2em;
+	max-height:8em;
+	border: 1px solid #516399;
+	word-wrap: break-word;
+	overflow: auto;
+}
+
+#alert>b{
+	color: #F11;
+}
+
+#consoleInput{
+	display: block;
+    width: 97%;
+	border: 1px solid #516399;
+	padding-top: 0.3em;
+	padding-bottom: 0.2em;
+}
+
+#consoleInput>input{
+	width:90%;
+	height:1.5em;
+}
+
+#disasm{
+	position:fixed;
+	width:20em;
+	height:30em;
+	top:10em;
+	left:50%;
+	margin-left:-10em;
+	padding:0.5em;
+	background-color:#eee;
+	display:none;
+	overflow:auto;
+	border: 1px solid #516399;
+	resize: none;
+	color:#516399;
+}
+
+#disasm:focus{
+	outline: 3px solid #516399;
+}
+
+#close {
+  	position:fixed;
+	width:3em;
+	height:1.5em;
+	top:8.5em;
+	left:50%;
+	margin-left:8em;
+	line-height:1.5;
+	text-align:center;
+	color:#FFF;
+	background-color:#A95151;
+	display:none;
+	border: 1px solid #516399;
+	cursor: pointer;
+}
+
+#spriteEditior, #tutorial{
+	position:fixed;
+	width:20em;
+	height:30em;
+	top:10em;
+	left:50%;
+	margin-left:-10em;
+	padding:0.5em;
+	background-color:#eee;
+	display:none;
+	overflow:hidden;
+	border: 1px solid #516399;
+	resize: none
+}
+
+#tutorial{
+	overflow:auto;
+}
+
+#tutorial b{
+	color:#90C695;
+}
+
+#tutorial i{
+	color:#777;
+}
+
+#pixelearea{
+	image-rendering: pixelated;
+	width:20em;
+}
+
+#spriteArea{
+	margin-top:0.2em;
+	resize: none;
+	width:19.9em;
+	height:6.8em;
+	color:#516399;
+}
+
+.header{
+	width: 10em;
+	margin-right: 9em;
+	display: inline-block;
+	border: 1px solid #516399;
+	border-bottom: none;
+	text-align:center;
+}
+
+.column{
+	width:3.2em;
+	float:left;
+}
+
+.thisip,.change{
+	background-color:#516399;
+	color:#FFF;
+}
+
+@media screen and (max-width: 60em) {
+	#menu{
+		width:100%;
+		height:6em;
+	}
+	
+	#container{
+		overflow:auto;
+	}
+	
+	#wrap-right{
+		margin-left: 0;
+		height: 41em;
+		padding: 2px;
+	}
+}
