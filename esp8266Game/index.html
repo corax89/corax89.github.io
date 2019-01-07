@@ -17,6 +17,7 @@
 		<button onclick="spriteEditor.edit()">sprite</button>
 		<button onclick="listing();">listing</button>
 		<button onclick="debugVars();">debug</button>
+		<button onclick="viewHelp();">help</button>
 	</div>
 	<div id="container">
 		<div id="wrap-left">
@@ -118,6 +119,7 @@ putimage(over, 70, 70, 14, 5);
 while(getkey() == 0){};
 }
 }	
+					
 					</textArea>	
 			</td></tr>
 			</table>
@@ -135,7 +137,7 @@ while(getkey() == 0){};
 	<div id="div_wind1" class="div_wind">
         <div id="drag_wind1" class="div_drag_wind" onmouseover="setup_mouse('div_wind1', 'drag_wind1');">
             <div>
-               listing<div class="close" onclick="closewindow1()">X</div>
+               listing<div class="close" onclick="closewindow('div_wind1')">X</div>
             </div>
         </div>
         <div class="content_wind">
@@ -145,7 +147,7 @@ while(getkey() == 0){};
 	<div id="div_wind2" class="div_wind">
         <div id="drag_wind2" class="div_drag_wind" onmouseover="setup_mouse('div_wind2', 'drag_wind2');">
             <div>
-               sprite editor<div class="close" onclick="closewindow2()">X</div>
+               sprite editor<div class="close" onclick="closewindow('div_wind2')">X</div>
             </div>
         </div>
         <div class="content_wind">
@@ -154,6 +156,8 @@ while(getkey() == 0){};
 			<button onclick="spriteEditor.clear();">clear</button>
 			<button onclick="spriteEditor.selectAll();">select</button>
 			<button onclick="spriteEditor.loadSprite();">load</button>
+			<input type="checkbox" id="checkRle" onclick="spriteEditor.setRle(this.checked)">
+			<label for="checkRle" id="checkRleLabel">RLE 100%</label>
 			<b id="selectColor">[]</b>
 			<b id="spriteInfo"></b>
 			<textarea id="spriteArea">{0,0,0}</textarea>
@@ -163,14 +167,46 @@ while(getkey() == 0){};
 	<div id="div_wind3" class="div_wind">
         <div id="drag_wind3" class="div_drag_wind" onmouseover="setup_mouse('div_wind3', 'drag_wind3');">
             <div>
-               debug<div class="close" onclick="closewindow3()">X</div>
+               debug<div class="close" onclick="closewindow('div_wind3')">X</div>
             </div>
         </div>
         <div class="content_wind">
            <textarea id="debugVariable" disabled="disabled"></textarea>
         </div>
     </div>
-	
+	<div id="div_wind4" class="div_wind" style="display:none">
+        <div id="drag_wind4" class="div_drag_wind" onmouseover="setup_mouse('div_wind4', 'drag_wind4');">
+            <div>
+               help<div class="close" onclick="closewindow('div_wind4')">X</div>
+            </div>
+        </div>
+        <div class="content_wind">
+<pre style='color:#000020;background:#f6f8ff;margin:0;border: 1px solid #516399;'><span style='color:#0070de; font-weight:bold; '>char</span> <span style='color:#003060; '>putchar</span><span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>char</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> <span style='color:#003060; '>puts</span><span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>char</span><span style='color:#308080; '>[</span><span style='color:#308080; '>]</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> putn<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> <span style='color:#003060; '>printf</span><span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>char</span><span style='color:#308080; '>[</span><span style='color:#308080; '>]</span><span style='color:#308080; '>,</span> arg<span style='color:#308080; '>-</span>list<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> random<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> <span style='color:#003060; '>getchar</span><span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> getkey<span style='color:#308080; '>(</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>int</span> gettimer<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> settimer<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> clearscreen<span style='color:#308080; '>(</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> setcolor<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> putpixel<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> x<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> y<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> getsprite<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> n<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> address<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> putsprite<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> n<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> x<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> y<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> setimagesize<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> gotoxy<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> x<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> y<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> line<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> x<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> y<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> x1<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> y1<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> putimage<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> address<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> x<span style='color:#308080; '>,</span>
+ <span style='color:#0070de; font-weight:bold; '>int</span> y<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> w<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> h<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> putimagerle<span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span> address<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> x<span style='color:#308080; '>,</span>
+ <span style='color:#0070de; font-weight:bold; '>int</span> y<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> w<span style='color:#308080; '>,</span> <span style='color:#0070de; font-weight:bold; '>int</span> h<span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#308080; '>*</span><span style='color:#0070de; font-weight:bold; '>int</span> <span style='color:#003060; '>malloc</span><span style='color:#308080; '>(</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+<span style='color:#0070de; font-weight:bold; '>void</span> <span style='color:#003060; '>free</span><span style='color:#308080; '>(</span><span style='color:#308080; '>*</span><span style='color:#0070de; font-weight:bold; '>int</span><span style='color:#308080; '>)</span><span style='color:#406080; '>;</span>
+</pre>
+        </div>
+    </div>
 	<script type="text/javascript" src="asm.js"></script>
 	<script type="text/javascript" src="cpu.js"></script>
 	<script type="text/javascript" src="spriteEditor.js"></script>
