@@ -695,8 +695,8 @@ function asm(s) {
 			}
 		}
 	}
-	info("размер программы " + out.length + " байт");
-	info("переменные занимают " + variableAdress + " байт");
+	info("program size "+ out.length +" bytes");
+	info("variables occupy "+ variableAdress +" bytes");
 	display.reset();
 	cpu.init();
 	cpu.load(out);
