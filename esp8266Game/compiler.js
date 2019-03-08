@@ -511,7 +511,8 @@ function compile(t) {
 		var longArg = false;
 		var operandsCount = 0;
 		var pushOnStack = 0;
-		localStackLength = 0;
+		//localStackLength = 0;
+		var copyLocalStackLength = localStackLength;
 		for (var i = 0; i < functionTable.length; i++) {
 			if (functionTable[i].name == t){
 				func = functionTable[i];
@@ -613,6 +614,7 @@ function compile(t) {
 			localStackLength = 0;
 		}
 		registerCount++;
+		localStackLength = copyLocalStackLength;
 		getToken();
 		if (getRangOperation(thisToken) > 0)
 			execut();
@@ -647,7 +649,7 @@ function compile(t) {
 	}
 	//обрабатываем переменные, данные которых содержатся на стеке
 	function localVarToken() {
-		var type,l;
+		var type,l,op;
 		var point = false;
 		if(lastToken == '*' && registerCount == 1)
 			point = true;
@@ -726,7 +728,7 @@ function compile(t) {
 			}
 		}
 		//получить значение переменной
-		else if (thisToken != '=') {
+		else if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/=') {
 			previousToken();
 			if (type == 'char')
 				asm.push(' LDC R' + registerCount + ',(' + l + '+R0) ;' + token);
@@ -736,12 +738,35 @@ function compile(t) {
 		}
 		//присвоить значение переменной
 		else {
+			op = thisToken;
 			getToken();
 			execut();
+			if (getRangOperation(thisToken) > 0)
+				execut();
 			getToken();
 			if (getRangOperation(thisToken) > 0)
 				execut();
 			registerCount--;
+			//---------
+			if(op == '+='){
+				asm.push(' LDI R' + (registerCount + 1) + ',(' + l + '+R0) ;' + token);
+				asm.push(' ADD R' + registerCount + ',R' + (registerCount + 1));
+			}
+			else if(op == '-='){
+				asm.push(' LDI R' + (registerCount + 1) + ',(' + l + '+R0) ;' + token);
+				asm.push(' SUB R' + (registerCount + 1) + ',R' + registerCount);
+				asm.push(' MOV R' + registerCount + ',R' + (registerCount + 1));
+			}
+			else if(op == '*='){
+				asm.push(' LDI R' + (registerCount + 1) + ',(' + l + '+R0) ;' + token);
+				asm.push(' MUL R' + registerCount + ',R' + (registerCount + 1));
+			}
+			else if(op == '/='){
+				asm.push(' LDI R' + (registerCount + 1) + ',(' + l + '+R0) ;' + token);
+				asm.push(' DIV R' + (registerCount + 1) + ',R' + registerCount);
+				asm.push(' MOV R' + registerCount + ',R' + (registerCount + 1));
+			}
+			//---------
 			if (type == 'char')
 				asm.push(' STC (' + l + '+R0),R' + registerCount + ' ;' + token);
 			else
@@ -1056,6 +1081,7 @@ function compile(t) {
 			}
 			asm.push(' STI (_' + variable + '),R' + registerCount);
 		}
+		previousToken();
 	}
 	//обработка сложения/вычитания/декремента/инкремента
 	function addSub() {
@@ -1066,58 +1092,60 @@ function compile(t) {
 		if (thisToken == '+' && operation == '+') {
 			//если инкремент следует за переменной (var++)
 			if (isVar(variable) || localVarTable.indexOf(variable) > -1 || functionVarTable.indexOf(variable) > -1) {
-				if (isVar(variable))
-					asm.push(' INC _' + variable);
-				else if (localVarTable.indexOf(variable)) {
+				if (localVarTable.indexOf(variable) > -1) {
 					if (registerCount == 1) {
-						asm.push(' LDI R' + registerCount + ',(' + (localVarTable.indexOf(variable) + 1) + '+R0)');
+						asm.push(' LDI R' + registerCount + ',(' + (localStackLength * 2 + localVarTable.indexOf(variable) + 1) + '+R0)');
 						registerCount++;
 					}
 					asm.push(' MOV R' + registerCount + ',R' + (registerCount - 1));
 					asm.push(' INC R' + registerCount);
-					asm.push(' STI (' + (localVarTable.indexOf(variable) + 1) + '+R0),R' + registerCount);
+					asm.push(' STI (' + (localStackLength * 2 + localVarTable.indexOf(variable) + 1) + '+R0),R' + registerCount);
 				}
+				else if (isVar(variable))
+					asm.push(' INC _' + variable);
 			}
 			//если переменная следует за инкрементом (++var)
 			else {
 				getToken();
-				if (isVar(thisToken)) {
-					asm.push(' INC _' + thisToken);
-					execut();
-				} else if (localVarTable.indexOf(thisToken)) {
-					asm.push(' LDI R' + registerCount + ',(' + (localVarTable.indexOf(thisToken) + 1) + '+R0)');
+				if (localVarTable.indexOf(thisToken) > -1) {
+					asm.push(' LDI R' + registerCount + ',(' + (localStackLength * 2 + localVarTable.indexOf(thisToken) + 1) + '+R0)');
 					asm.push(' INC R' + registerCount);
-					asm.push(' STI (' + (localVarTable.indexOf(thisToken) + 1) + '+R0),R' + registerCount);
+					asm.push(' STI (' + (localStackLength * 2 + localVarTable.indexOf(thisToken) + 1) + '+R0),R' + registerCount);
 					registerCount++;
 				}
+				else if (isVar(thisToken)) {
+					asm.push(' INC _' + thisToken);
+					execut();
+				} 
 			}
 			getToken();
 		}
 		//если декремент
 		else if (thisToken == '-' && operation == '-') {
 			if (isVar(variable) || localVarTable.indexOf(variable) > -1 || functionVarTable.indexOf(variable) > -1) {
-				if (isVar(variable))
-					asm.push(' DEC _' + variable);
-				else if (localVarTable.indexOf(variable)) {
+				if (localVarTable.indexOf(variable) > -1) {
 					if (registerCount == 1) {
-						asm.push(' LDI R' + registerCount + ',(' + (localVarTable.indexOf(variable) + 1) + '+R0)');
+						asm.push(' LDI R' + registerCount + ',(' + (localStackLength * 2 + localVarTable.indexOf(variable) + 1) + '+R0)');
 						registerCount++;
 					}
 					asm.push(' MOV R' + registerCount + ',R' + (registerCount - 1));
 					asm.push(' DEC R' + registerCount);
-					asm.push(' STI (' + (localVarTable.indexOf(variable) + 1) + '+R0),R' + registerCount);
+					asm.push(' STI (' + (localStackLength * 2 + localVarTable.indexOf(variable) + 1) + '+R0),R' + registerCount);
 				}
+				else if (isVar(variable))
+					asm.push(' DEC _' + variable);
 			} else {
 				getToken();
-				if (isVar(thisToken)) {
-					asm.push(' DEC _' + thisToken);
-					execut();
-				} else if (localVarTable.indexOf(thisToken)) {
-					asm.push(' LDI R' + registerCount + ',(' + (localVarTable.indexOf(thisToken) + 1) + '+R0)');
+				if (localVarTable.indexOf(thisToken) > -1) {
+					asm.push(' LDI R' + registerCount + ',(' + (localStackLength * 2 + localVarTable.indexOf(thisToken) + 1) + '+R0)');
 					asm.push(' DEC R' + registerCount);
-					asm.push(' STI (' + (localVarTable.indexOf(thisToken) + 1) + '+R0),R' + registerCount);
+					asm.push(' STI (' + (localStackLength * 2 + localVarTable.indexOf(thisToken) + 1) + '+R0),R' + registerCount);
 					registerCount++;
 				}
+				else if (isVar(thisToken)) {
+					asm.push(' DEC _' + thisToken);
+					execut();
+				} 
 			}
 			getToken();
 		} else {
@@ -1565,6 +1593,7 @@ function compile(t) {
 			execut();
 		}
 		removeNewLine();
+		
 	}
 	//выполняем блок фигурных скобок
 	function skipBrace() {
@@ -1704,6 +1733,7 @@ function compile(t) {
 	registerFunction('line', 'void', ['int', 'x', 'int', 'y', 'int', 'x1', 'int', 'y1'], 1, '_line: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n DLINE R1 \n RET', false, 0);
 	registerFunction('spritespeed', 'void', ['int', 'n', 'int', 'speed', 'int', 'dir'], 1, '_spritespeed: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n SPRSDS R1 \n RET', false, 0);
 	registerFunction('delayredraw', 'void', [], 1, '_delayredraw: \n LDF R1,6\n CMP R1,0\n JZ _delayredraw \n RET', false, 0);
+	registerFunction('distance', 'int', ['int', 'x1', 'int', 'y1', 'int', 'x2', 'int' , 'y2'], 1, '_distance: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n DISTPP R1 \n RET', false, 0);
 	dataAsm = [];
 	dataAsm.push('_putimage: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n DRWIM R1 \n RET');
 	registerFunction('putimage', 'void', ['int', 'a', 'int', 'x', 'int', 'y', 'int', 'w', 'int', 'h'], 1, dataAsm, false, 0);
