@@ -593,7 +593,7 @@ function compile(t) {
 			asm.push(' LDC R1,' + (operandsCount * 2));
 		//освобождаем место на стеке для переменных
 		if(func.varLength == 0 && thisFunction == func.name)
-			func.varLength = functionVarTable.length;
+			func.varLength = localVarTable.length;
 		if (func.varLength > 0) {
 			if (func.varLength < 15)
 				asm.push(' DEC R0,' + func.varLength);
