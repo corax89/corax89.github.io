@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<title>esp8266gameEngine User Guide</title>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+<p>Esp Little game engine by igor</p>
+<p><a href="https://hackaday.io/project/164205-esp-little-game-engine">https://hackaday.io/project/164205-esp-little-game-engine</a></p>
+<br>
+<h1 style="text-align: center;background-color: #eee;">User Guide</h1>
+<div style="width: 90%;text-align: right;margin-top: 5em;margin-bottom: 5em;">
+<p>This guide is written<strong> shando69</strong></p>
+<p><a href="https://hackaday.io/Shando"><strong>https://hackaday.io/Shando</strong></a></p>
+</div>
+Download this manual
+<a style="display: inline-block;margin: 1em;padding: 1em;background: #ffc107;background: linear-gradient(135deg, transparent 5px, #ffc107 0);width: 2em;" href="esp_little_game_engine_user_guide.pdf">.pdf</a> 
+<a style="display: inline-block;margin: 1em;padding: 1em;background: #ffc107;background: linear-gradient(135deg, transparent 5px, #ffc107 0);width: 2em;" href="esp_little_game_engine_user_guide.docx">.docx</a> 
+<h1><p><a name="_Toc10368966"></a> Introduction</p></h1>
+</div>
+<p>Welcome to this User Guide for the ESP Little Game Engine by Igor. This engine is for the esp8266 processor and can be found at <a href="https://github.com/corax89/esp8266_game_engine">https://github.com/corax89/esp8266_game_engine</a></p>
+<p>The engine has a virtual screen resolution of 128x128 pixels, allows 16 colours, 1 background layer, 32 soft sprites with collision tracking and rotation and a maximum of 20kb for the game and variables. It is capable of approximately 900,000 operations per second at a drawing rate of 20 frames per second. It can also control up to eight buttons.</p>
+<p>This guide is mainly for the online compiler and debugger, which can be found at <a href="https://corax89.github.io/esp8266Game/index.html">https://corax89.github.io/esp8266Game/index.html</a></p>
+<p><img src="8337651559441642105_html_1238eb62.png" alt="" width="512" height="273" name="Picture 4" border="0" /></p>
+<p>The Virtual Machine is written in JavaScript and has access to 65,534 bytes of memory (though only 20,000 bytes are available on the device itself, since the remaining memory goes to the screen buffer and library). The compiler supports int and unsigned char types, one-dimensional arrays &amp; debugging.</p>
+<p>The base palette of 16 colours looks like this and is changeable by use of the <strong>setpallette</strong> <strong>Function</strong>:</p>
+<p><img src="8337651559441642105_html_47ef4bca.png" alt="" width="500" height="60" name="Picture 1" border="0" /></p>
+<p>Over the next few pages, I&rsquo;ll go through each part of the <strong>Code Editor</strong> in more detail, starting with the Buttons.</p>
+<p><strong>NB:</strong> This engine is still under development and features may be added, or removed by the developers. This manual is correct as at June 2019.</p>
+<h1><a name="_Toc10368967"></a>Buttons</h1>
+<p>At the top of the screen are 8 buttons:</p>
+<p><img src="8337651559441642105_html_24d2d1bd.png" alt="" width="476" height="27" name="Picture 2" border="0" /></p>
+<p>From left to right, these buttons are:</p>
+<ol>
+<li>
+<p><strong>asm</strong> this button updates the <strong>memory</strong> window (see below) of the page based on the code in the <strong>source</strong> window. <strong>NB:</strong> this will display <strong>$00</strong> if the code in the <strong>source</strong> window is anything other than pure Assembler code.</p>
+</li>
+<li>
+<p><strong>compile</strong> this button compiles C code in the <strong>source</strong> window and updates the <strong>memory</strong> window of the page. It will also display any compile errors in the <strong>information</strong> window. For example, trying to use an undefined variable, results in this message:</p>
+</li>
+</ol>
+<p><strong>1 unknown token i</strong></p>
+<p>Which lets you know both the error message and the line number where the error occurs. I will provide a complete listing of error messages later.</p>
+<ol start="3">
+<li>
+<p><strong>save</strong> this button will save the current code as <strong>rom.bin</strong> and download it to the directory usually associated with the internet browser you are currently using.</p>
+</li>
+<li>
+<p><strong>sprite</strong> this button opens the <strong>sprite editor</strong> (see later for more information on how to use it):</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_1ef8f8a5.png" alt="" width="338" height="455" name="Picture 5" border="0" /></p>
+<ol start="5">
+<li>
+<p><strong>listing</strong> this button opens the <strong>listing</strong> window to show the assembler version of the code in the <strong>source</strong> window:</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_5fc1a32e.png" alt="" width="301" height="441" name="Picture 9" border="0" /></p>
+<ol start="6">
+<li>
+<p><strong>debug</strong> this button opens the <strong>debug</strong> window (see later for more information on how to use it):</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_784adeae.png" alt="" width="303" height="441" name="Picture 10" border="0" /></p>
+<ol start="7">
+<li>
+<p><strong>help</strong> this button opens the <strong>help</strong> window which displays a list of the C <strong>Functions</strong> available for use in the <strong>source</strong> window (see later for explanations of each <strong>Function</strong>):</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_b611548b.png" alt="" width="305" height="442" name="Picture 11" border="0" /></p>
+<ol start="8">
+<li>
+<p><strong>ENG</strong> this button is a drop-down that changes the UI language of the <strong>Code Editor</strong> between the two available languages (<strong>ENG</strong> = English &amp; <strong>RUS</strong> = Russian)</p>
+</li>
+</ol>
+<h1><a name="_Toc10368968"></a> memory</h1>
+<p>The top left section displays the contents of the <strong>Memory</strong> of the <strong>Virtual Machine</strong>:</p>
+<p><img src="8337651559441642105_html_e9af4ddc.png" alt="" width="513" height="157" name="Picture 3" border="0" /></p>
+<p>This window will only be populated once a program has been compiled, or you have written Assembler code and clicked the <strong>asm</strong> button, and it displays the <strong>Memory</strong> contents as a comma separated list of hexadecimal values.</p>
+<h1><a name="_Toc10368969"></a> monitor</h1>
+<p>The bottom left section displays the <strong>monitor</strong>:</p>
+<p><img src="8337651559441642105_html_b0abf746.png" alt="" width="513" height="236" name="Picture 6" border="0" /></p>
+<p>This section is split into 3 distinct parts:</p>
+<ol>
+<li>
+<p>LEFT this area displays a hexadecimal listing of the <strong>memory</strong>, split into 16 byte rows. Using the &lsquo;<strong>+</strong>&rsquo; and &lsquo;<strong>-</strong>&lsquo; buttons, you can move through the displayed listing row by row. You can also enter a row number in the box between the &lsquo;<strong>+</strong>&rsquo; and &lsquo;<strong>-</strong>&lsquo; buttons to jump directly to that row in memory.</p>
+</li>
+<li>
+<p>MIDDLE this area displays the <strong>Screen</strong> of the <strong>Virtual Machine</strong>. The available display area (128x128 pixels) starts approximately 2 lines down from the top and ends approximately 3 lines up from the bottom.</p>
+</li>
+</ol>
+<ol start="3">
+<li>
+<p>RIGHT this area displays the values of the various <strong>Registers</strong> (<strong>pc </strong>= Program Counter, <strong>op</strong> = Operation (this details the <strong>memory</strong> contents of the <strong>Program Counter</strong>, along with the <strong>Carry</strong>, <strong>Zero</strong> &amp; <strong>Negative</strong> Flags, where a <strong>0</strong> = <strong>False</strong> &amp; a <strong>1 </strong>= <strong>True</strong>), <strong>R0 </strong>&ndash; <strong>R15</strong> = the 16 available <strong>Registers</strong>). Each <strong>Register</strong> is displayed as a 2 byte hexadecimal value and the <strong>R0</strong> &ndash; <strong>R15</strong> <strong>Registers</strong> also have the equivalent decimal value in brackets next to the hex value. Above the <strong>Register</strong> window is a drop-down that allows you to select the relevant <strong>CPU Speed</strong> in hertz (the available values are: <strong>100, 500, 1,000, 5,000, 10,000, 25,000, 50,000, 100,000, 200,000, 500,000</strong>). Finally, above the <strong>CPU Speed </strong>drop-down are 3 buttons:</p>
+<ol type="a">
+<li>
+<p><strong>step</strong> this button allows you to step through your code by incrementing the <strong>Program Counter</strong>. The line currently being executed will be highlighted in dark blue in the <strong>source</strong> window.</p>
+</li>
+<li>
+<p><strong>run</strong> this button starts your code running as long as you have remembered to <strong>compile</strong> it first.</p>
+</li>
+<li>
+<p><strong>stop</strong> this button stops your running code. It will also highlight (again in dark blue) the line in the <strong>source</strong> window where your code has stopped.</p>
+</li>
+</ol>
+</li>
+</ol>
+<h1><a name="_Toc10368970"></a> source</h1>
+<p>The right hand section displays your C, or Assembler, code:</p>
+<p><img src="8337651559441642105_html_a0a89a6.png" alt="" width="513" height="445" name="Picture 7" border="0" /></p>
+<p>This is a fairly simple <strong>Code Editor</strong> that shows the line number in the right-hand margin and the code in the rest of the window. Whilst there is no autocomplete functionality, the <strong>Code Editor</strong> will automatically set tab spacing in your code. Below the <strong>Code Editor</strong> are a drop-down that allows you to select a sample program (see below for list) and a button (<strong>load example</strong>) to load the selected sample program into the <strong>Code Editor</strong>. <strong>NB:</strong> you can create code in either C or Assembler.</p>
+<p><strong>List of Sample Programs</strong></p>
+<ol>
+<li>
+<p>asteroids an Asteroids clone</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_ff2b27d1.png" alt="" width="241" height="241" name="Picture 15" border="0" /></p>
+<ol start="2">
+<li>
+<p>breakout a Breakout clone</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_a01761bd.png" alt="" width="241" height="241" name="Picture 16" border="0" /></p>
+<ol start="3">
+<li>
+<p>flappybird a Flappy Bird clone</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_cf41e7a4.png" alt="" width="241" height="242" name="Picture 12" border="0" /></p>
+<ol start="4">
+<li>
+<p>dragon a fractals generator</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_418231c8.png" alt="" width="241" height="241" name="Picture 19" border="0" /></p>
+<ol start="5">
+<li>
+<p>maze generate a simple maze generator</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_9d149f53.png" alt="" width="241" height="241" name="Picture 20" border="0" /></p>
+<ol start="6">
+<li>
+<p>mines a minesweeper clone</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_19696b40.png" alt="" width="241" height="241" name="Picture 21" border="0" /></p>
+<ol start="7">
+<li>
+<p>particle a simple particle generator</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_a62f2136.png" alt="" width="241" height="241" name="Picture 22" border="0" /></p>
+<ol start="8">
+<li>
+<p>pi a generator that prints PI</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_86035cd9.png" alt="" width="241" height="241" name="Picture 23" border="0" /></p>
+<ol start="9">
+<li>
+<p>platform a simple platformer</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_fffa7d62.png" alt="" width="241" height="242" name="Picture 13" border="0" /></p>
+<ol start="10">
+<li>
+<p>snake a snake clone (like on the old Nokia phones!)</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_b416dbc5.png" alt="" width="241" height="242" name="Picture 14" border="0" /></p>
+<ol start="11">
+<li>
+<p>space a simple space game</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_e9d8ba6c.png" alt="" width="241" height="241" name="Picture 18" border="0" /></p>
+<ol start="12">
+<li>
+<p>sprite a demonstration of sprites</p>
+</li>
+</ol>
+<p><img src="8337651559441642105_html_c480b783.png" alt="" width="241" height="241" name="Picture 17" border="0" /></p>
+<h1><a name="_Toc10368971"></a> information</h1>
+<p>Finally, at the bottom of the screen, is the Information Section. This displays information about your <strong>Program</strong>:</p>
+<p><img src="8337651559441642105_html_9582575b.png" alt="" width="394" height="62" name="Picture 8" border="0" /></p>
+<p>As shown above, this is currently displaying the following:</p>
+<ol>
+<li>
+<p><strong>program size</strong> the size of your <strong>Program</strong> (in bytes)</p>
+</li>
+<li>
+<p><strong>variables</strong> the size of <strong>memory</strong> required for your <strong>Variables</strong> (in bytes)</p>
+</li>
+<li>
+<p><strong>total occupied memory</strong> this is basically the sum of &lsquo;<strong>program size</strong>&rsquo; &amp; &lsquo;<strong>variables</strong>&rsquo; (in bytes)</p>
+</li>
+</ol>
+<p>The contents of this window will change depending on what action you are currently undertaking. For example, if compiling, any errors will be displayed here.</p>
+<h1><a name="_Toc10368972"></a> sprite editor window</h1>
+<p>this window allows you to create <strong>Sprites</strong>, using a few simple tools:</p>
+<p><img src="8337651559441642105_html_d170ec51.png" alt="" width="335" height="454" name="Picture 24" border="0" /></p>
+<p>At the top right of the main window are two buttons (a <strong>pen</strong> and a <strong>blob</strong>). The <strong>pen</strong> tool is used to draw (using the <strong>mouse</strong>) in the colour selected (by clicking on the <strong>colour palette</strong> at the bottom of the main window). The <strong>blob</strong> tool is used to colour the whole of the main window in the selected colour.</p>
+<p>At the bottom of the main window is the <strong>colour palette</strong>. Clicking on any colour in the <strong>palette</strong> will change the colour shown in the display (immediately to the left of the <strong>Sprite size</strong> value &ndash; <strong>22x19</strong> above)</p>
+<p>Immediately below the main window are several buttons and other settings. From left to right, these are:</p>
+<p><strong>cls</strong> this clears the main window, but will leave the colour selected by using the <strong>blob</strong> button. It will also update the <strong>text area</strong> at the bottom of the window.</p>
+<p>&rarr; this moves the <strong>cursor</strong> one pixel to the right.</p>
+<p>&uarr; this moves the <strong>cursor</strong> one pixel up.</p>
+<p>&larr; this moves the <strong>cursor</strong> one pixel to the left.</p>
+<p>&darr; this moves the <strong>cursor</strong> one pixel down.</p>
+<p><strong>1 BIT </strong>this check box allows the selection of <strong>1-Bit</strong> pixels.</p>
+<p><strong>RLE </strong>this check box allows you to select whether Run Length Encoding (<strong>RLE</strong>) applies to the <strong>Sprite</strong>. Basically, this will shorten the <strong>Sprite</strong> data using an in-built <strong>RLE</strong> algorithm and will usually save some space, which can be extremely useful if you are writing a large game. For example, I created a simple blue cloud on a black background and <strong>RLE</strong> reduced the <strong>Sprite</strong> data by approx. 45%, saving 300+ bytes.</p>
+<p><strong>[] </strong>this displays the currently selected colour.</p>
+<p><strong>22x19 </strong>this displays the size of the <strong>Sprite</strong> (in pixels)</p>
+<p>Immediately below these buttons etc. is the <strong>text area</strong> that displays the <strong>Sprite</strong> as a comma separated list of hexadecimal values. You use <strong>copy</strong> and <strong>paste</strong> to transfer this data into your code.</p>
+<p>For example (the <strong>Sprite</strong> code is highlighted in the code below):</p>
+<p>char wall1[] = <strong>{0xaa,0xba,0xaa,0xaa,0xbb,0xbb,0xbb,0xbb,0xaa,0xaa,0xab,0xaa,0xaa,0xaa,0xab,0xaa,0xbb,0xbb,0xbb,0xbb,0xaa,0xba,0xaa,0xca,0xaa,0xbc,0xcc,0xca,0xaa,0xba,0xaa,0xca}</strong>;</p>
+<h1><a name="_Toc10368973"></a> debug window</h1>
+<p><a name="_Toc35154910"></a><a name="_Toc35154387"></a> This window will only display data if your program is running. Then it will display the details of your <strong>Variables</strong> and your <strong>Sprites</strong>:</p>
+<p>If you select the <strong>variable</strong> tab, you will see a list of all the <strong>Variables</strong> in your game and the current value assigned to each of them. As you can see above, this game has 4 <strong>Variables</strong> (#END will always be displayed as it shows the end of your code). The data displayed, from left to right, is:</p>
+<p><strong>Variable</strong> name (as a string)</p>
+<p><strong>Variable</strong> location in <strong>Memory </strong>(in hexadecimal)</p>
+<p><strong>Variable</strong> value (depends on how the <strong>Variable</strong> was declared)</p>
+<p><img src="8337651559441642105_html_cb9edc94.png" alt="" width="299" height="436" name="Picture 25" border="0" /></p>
+<p>If you select the <strong>sprites</strong> tab, you will see a list of all of your <strong>Sprites</strong>, complete with details of all of the <strong>type</strong> data:</p>
+<p><img src="8337651559441642105_html_b0cfd14c.png" alt="" width="297" height="437" name="Picture 26" border="0" /></p>
+<p>The best way to use the <strong>debug</strong> window is whilst <strong>step</strong>ping through your code one line at a time, as, this way, you can see exactly what each line of code is doing to both your <strong>Variables</strong> and your <strong>Sprites</strong>. Though it can also be useful just to watch the changes whilst playing the game normally, as you may be able to see any issues as they arise and not have to <strong>step</strong> through the code hundreds of times.</p>
+<h1><a name="_Toc10368974"></a> Functions</h1>
+<p>There are over 35 game-specific <strong>Functions</strong> available for writing your programs in the <strong>Code Editor</strong>: As a general rule, most <strong>Functions</strong> will operate on the current <strong>x</strong> &amp; <strong>y</strong> co-ordinates. Not also that the <strong>Screen</strong> co-ordinates start at <strong>0</strong>, <strong>0</strong> at the <strong>Top Left</strong> and end at <strong>127</strong>, <strong>127</strong> at the <strong>Bottom Right</strong>. For chars, coordinates start at <strong>0</strong>, <strong>0 </strong> at the <strong>Top Left</strong> and end at <strong>20</strong>, <strong>15</strong> at the <strong>Bottom Right</strong>. One char is 6x8 pixels.</p>
+<p>char putchar(char)</p>
+<p>prints a character to the <strong>Screen</strong> at the current <strong>x</strong> &amp; <strong>y</strong> co-ordinates.</p>
+<p><em>putchar(10);</em></p>
+<p>int puts(char[])</p>
+<p>prints a 1-D char array to the <strong>Screen</strong> at the current <strong>x</strong> &amp; <strong>y</strong> co-ordinates, complete with a New Line character.</p>
+<p><em>puts(&ldquo;Press any key&rdquo;);</em></p>
+<p>int putn(int);</p>
+<p>prints an integer to the <strong>Screen</strong> at the current <strong>x</strong> &amp; <strong>y</strong> co-ordinates.</p>
+<p><em>putn(time);</em></p>
+<p>int printf(char[], arg-list);</p>
+<p>Prints a string to the <strong>Screen</strong> at the current <strong>x</strong> &amp; <strong>y</strong> co-ordinates. See the following website for more information regarding this <strong>Function</strong>:</p>
+<p><a href="https://www.tutorialspoint.com/c_standard_library/c_function_printf.htm">https://www.tutorialspoint.com/c_standard_library/c_function_printf.htm</a></p>
+<p><em>printf(&ldquo;Press a key&rdquo;);</em></p>
+<p>int random(int max);</p>
+<p>returns a pseudo-random number between <strong>0</strong> and <strong>max</strong>. <strong>NB:</strong> This Function will only return Integer values.</p>
+<p><em>x = random(15);</em></p>
+<p>int getchar();</p>
+<p>returns the character located at the current <strong>x</strong> &amp; <strong>y</strong> co-ordinates.</p>
+<p><em>x = getchar();</em></p>
+<p>int getkey();</p>
+<p>returns the value of the <strong>key</strong> currently being pressed on the keyboard. The value returned will be one of the following (the number in brackets is the integer value representing the <strong>key</strong>):</p>
+<p>KEY_UP (1), KEY_LEFT (4), KEY_DOWN (2), KEY_RIGHT (8), KEY_A (16), KEY_B (32)</p>
+<p><strong>NB: </strong>UP, DOWN, LEFT &amp; RIGHT map to the <strong>Arrow</strong> keys, <strong>A</strong> is the <strong>Space</strong> key and <strong>B</strong> is the <strong>z</strong> key.</p>
+<p><em>key = getkey();</em></p>
+<p>int getpixel(int x, int y);</p>
+<p>returns the contents of the <strong>Pixel</strong> at the co-ordinates denoted by <strong>x</strong> &amp; <strong>y</strong>.</p>
+<p><em>redraw = getpixel(x * 2, offset + y * 2);</em></p>
+<p>int spritegetvalue(int n, int type);</p>
+<p>returns the value for the <strong>Sprite</strong> specified in <strong>n</strong>, according to the <strong>type</strong>.</p>
+<p>The available values for <strong>type</strong> are:</p>
+<p>S_X the <strong>x</strong> co-ordinate</p>
+<p>S_Y the <strong>y</strong> co-ordinate</p>
+<p>S_SPEEDX the <strong>Speed</strong> in the <strong>x</strong> direction</p>
+<p>S_SPEEDY the <strong>Speed</strong> in the <strong>y</strong> direction</p>
+<p>S_WIDTH the <strong>Width</strong></p>
+<p>S_HEIGHT the <strong>Height</strong></p>
+<p>S_IS_ONEBIT whether the <strong>Sprite</strong> is <strong>1 bit</strong>, or not. <strong>1</strong> = <strong>True</strong>, <strong>0</strong> = <strong>False</strong></p>
+<p>S_ANGLE the <strong>Angle</strong> of the <strong>Sprite</strong> (<strong>0-360</strong>)</p>
+<p>S_LIVES number of <strong>Lives </strong>for the <strong>Sprite</strong></p>
+<p>S_COLLISION the <strong>ID</strong> of the <strong>Sprite</strong> that this <strong>Sprite</strong> is currently colliding with</p>
+<p>S_SOLID whether the <strong>Sprite</strong> is <strong>Solid</strong>, or not.<strong> 1</strong> = <strong>True</strong>, <strong>0</strong> = <strong>False</strong></p>
+<p>S_GRAVITY whether the <strong>Sprite</strong> is affected by <strong>Gravity</strong>, or not. <strong>1</strong> = <strong>True</strong>, <strong>0</strong> = <strong>False</strong></p>
+<p>S_ON_COLLISION the <strong>Function</strong> to execute when the <strong>Sprite</strong> collides with another <strong>Sprite</strong>. <strong>NB: </strong>when entering the name of the <strong>Function</strong>, just use the name, not the brackets. For example, use <strong>bombcollision</strong>, not <strong>bombcollision()</strong>.</p>
+<p>S_ON_EXIT_SCREEN the <strong>Function</strong> to execute when the Sprite moves off Screen. <strong>NB: </strong>when entering the name of the <strong>Function</strong>, just use the name, not the brackets. For example, use <strong>exit</strong>, not <strong>exit()</strong>.</p>
+<p>S_IS_SCROLLED whether the <strong>Sprite</strong> is scrolled with the <strong>Screen</strong>, or not.<strong> 1</strong> = <strong>True</strong>, <strong>0</strong> = <strong>False</strong></p>
+<p><em>x = spritegetvalue(1, S_LIVES);</em></p>
+<p>int angbetweenspr(int n1, int n2);</p>
+<p>returns the angle, in degrees, between the two <strong>Sprites</strong> denoted by <strong>n1</strong> &amp; <strong>n2</strong>.</p>
+<p><em>x = angbetweenspr(1, 2);</em></p>
+<p>int gettimer(int n);</p>
+<p>returns the current value of the <strong>Timer</strong>, in milliseconds, denoted by <strong>n</strong>. Total 8 timers from 0 to 7</p>
+<p><em>x = gettimer(0);</em></p>
+<p>void settimer(int n, int time);</p>
+<p>sets the <strong>Timer</strong> denoted by <strong>n</strong> to the time, in milliseconds, denoted by <strong>time</strong>.</p>
+<p><em>settimer(0, 1000);</em></p>
+<p>void delayredraw();</p>
+<p>delays the redrawing of the <strong>Screen</strong> for a small period of time.</p>
+<p><em>delayredraw();</em></p>
+<p>void clearscreen();</p>
+<p>clears the <strong>Screen</strong></p>
+<p><em>clearscreen();</em></p>
+<p>void setpallette(int n, int r5g6b5);</p>
+<p>changes the<strong> Palette</strong> colour denoted by <strong>n</strong> to the colour denoted by <strong>r5g6b5</strong> (as an <strong>RGB</strong> value).</p>
+<p><em>setpallette(14, 0xE718);</em></p>
+<p>void setcolor(int col);</p>
+<p>sets the current <strong>Pen</strong> colour to the colour from the <strong>Palette</strong> denoted by <strong>col</strong> (i.e. a value between <strong>0</strong> &amp; <strong>15</strong>).</p>
+<p><em>setcolor(0);</em></p>
+<p>void scroll(int dir);</p>
+<p>scrolls the <strong>Screen</strong> in the direction indicated by <strong>dir</strong>.</p>
+<p>2 = x &ndash; 1 (i.e. <strong>Left</strong>)</p>
+<p>1 = y &ndash; 1 (i.e. <strong>Up</strong>)</p>
+<p>0 = x+ 1 (i.e. <strong>Right</strong>)</p>
+<p>any other number = y + 1 (i.e. <strong>Down</strong>)</p>
+<p><em>scroll(2);</em></p>
+<p>void putpixel(int x, int y);</p>
+<p>puts a <strong>Pixel</strong> at the co-ordinates on the <strong>Screen</strong> denoted by <strong>x</strong> &amp;<strong> y</strong>.</p>
+<p><em>putpixel(stars[i + 32],stars[i]);</em></p>
+<p>void getsprite(int n, int address);</p>
+<p>gets the <strong>Sprite</strong> denoted by <strong>address</strong> (i.e. the <strong>name</strong> of the <strong>Sprite</strong> in its definition) and assigns it to the <strong>Sprite</strong> denoted by <strong>n</strong>.</p>
+<p><em>getsprite(1, bird);</em></p>
+<p>void putsprite(int n, int x, int y);</p>
+<p>puts the <strong>Sprite</strong> denoted by <strong>n</strong> at the co-ordinates on the <strong>Screen</strong> denoted by <strong>x </strong>&amp; <strong>y</strong>.</p>
+<p><em>putsprite(1, 5, 60);</em></p>
+<p>void spritesetvalue(int n, int type, int value);</p>
+<p>sets the <strong>value</strong> denoted by <strong>value</strong> of the <strong>type</strong> denoted by <strong>type</strong> for the <strong>Sprite</strong> denoted by <strong>n</strong>.</p>
+<p>(see <strong>spritegetvalue</strong> for details of <strong>type</strong>)</p>
+<p><em>spritesetvalue(i, S_WIDTH, 8);</em></p>
+<p>int getspriteinxy(int x, int y);</p>
+<p>gets the <strong>Sprite</strong> at the co-ordinates on the <strong>Screen</strong> denoted by <strong>x</strong> &amp; <strong>y</strong>.</p>
+<p><em>x = getspriteinxy(x1, y1);</em></p>
+<p>int gettileinxy(int x, int y);</p>
+<p>gets the <strong>Tile</strong> at the co-ordinates on the <strong>Screen</strong> denoted by <strong>x</strong> &amp; <strong>y</strong>.</p>
+<p><em>x = gettileinxy(x1, y1);</em></p>
+<p>void setimagesize(int size);</p>
+<p>sets the size of the <strong>Image</strong> using the multiplier denoted by <strong>size</strong>.</p>
+<p><em>setimagesize(2);</em></p>
+<p>void gotoxy(int x, int y);</p>
+<p>moves the <strong>Cursor</strong> to the <strong>Text screen</strong> co-ordinates denoted by <strong>x</strong> &amp; <strong>y</strong>.</p>
+<p><em>gotoxy(6,6);</em></p>
+<p>void line(int x, int y, int x1, int y1);</p>
+<p>draws a <strong>Line</strong> on the <strong>Screen</strong> between the co-ordinates denoted by <strong>x</strong>, <strong>y</strong> and <strong>x1</strong>, <strong>y1</strong>.</p>
+<p><em>line(x1, y1, x2, y2);</em></p>
+<p>void putimage(int address, int x, int y, int w, int h);</p>
+<p>puts an image on the <strong>Screen</strong>. The image is denoted by <strong>address</strong>. The <strong>Screen</strong> co-ordinates by <strong>x</strong> &amp; <strong>y</strong>, and the image width &amp; height by <strong>w</strong> &amp; <strong>h</strong>.</p>
+<p><em>putimage(eat_spr, eatx * 3, eaty * 3, 3, 3);</em></p>
+<p>void putimage1bit(int address, int x, int y, int w, int h);</p>
+<p>puts a 1bit image on the <strong>Screen</strong>. The image is denoted by <strong>address</strong>. The <strong>Screen</strong> co-ordinates by <strong>x</strong> &amp; <strong>y</strong>, and the image width &amp; height by <strong>w</strong> &amp; <strong>h</strong>.</p>
+<p><em>putimage1bit(startscreen, 0, 16, 64, 32);</em></p>
+<p>void putimagerle(int address, int x, int y, int w, int h);</p>
+<p>puts an RLE image on the <strong>Screen</strong>. The image is denoted by <strong>address</strong>. The <strong>Screen</strong> co-ordinates by <strong>x</strong> &amp; <strong>y</strong>, and the image width &amp; height by <strong>w</strong> &amp; <strong>h</strong>.</p>
+<p><em>putimagerle(earth, 0, 0, 16, 16);</em></p>
+<p>*int malloc(int i);</p>
+<p>this is a <strong>C Function</strong> that allocates the <strong>Memory</strong> denoted by <strong>i</strong> and returns a pointer to it</p>
+<p>For more information see:</p>
+<p><a href="https://www.tutorialspoint.com/c_standard_library/c_function_malloc.htm">https://www.tutorialspoint.com/c_standard_library/c_function_malloc.htm</a></p>
+<p><em>str </em><em>=</em><em> malloc</em><em>(</em><em>15</em><em>);</em></p>
+<p>void free(*i);</p>
+<p>this is a <strong>C Function</strong> that deallocates the <strong>Memory</strong> denoted by <strong>i</strong> previously allocated by a call to <strong>malloc</strong></p>
+<p>For more information see:</p>
+<p><a href="https://www.tutorialspoint.com/c_standard_library/c_function_free.htm">https://www.tutorialspoint.com/c_standard_library/c_function_free.htm</a></p>
+<p><em>free</em><em>(</em><em>str</em><em>);</em></p>
+<p>void setparticle(int gravity, int count, int time);</p>
+<p>creates a <strong>Particle</strong>. The <strong>Gravity</strong> value is denoted by <strong>gravity</strong>, where a value of 0 denotes no Gravity and an integer value denotes the amount of Gravity (Added to the speed along the y axis every frame). The number of <strong>Particles</strong> to be displayed is set by <strong>count</strong> and the length of <strong>Time</strong> that the <strong>Particle</strong> should run for is set by <strong>time</strong> (in milliseconds).</p>
+<p><em>setparticle(0, 4, 1000);</em></p>
+<p>void setemitter(int time, int dir, int dir1, int speed);</p>
+<p>sets the <strong>Emitter</strong> for the <strong>Particle</strong>. The time for the <strong>Emitter</strong> to run is denoted by <strong>time</strong> (in milliseconds), the <strong>x</strong> direction is denoted by <strong>dir</strong>, the <strong>y</strong> direction is denoted by <strong>dir1</strong> and the speed of the <strong>Particles</strong> is denoted by <strong>speed</strong>.</p>
+<p><em>setemitter(50, angle - 10, angle + 10, 9);</em></p>
+<p>void drawparticle(int x, int y, int color);</p>
+<p>draws the <strong>Particle</strong> at the co-ordinates denoted by <strong>x </strong>&amp; <strong>y</strong> and in the colour denoted by <strong>color</strong>.</p>
+<p><em>drawparticle(64, 64, 6);</em></p>
+<p>void loadtile(int address, int imgwidth, int imgheight, int width, int height);</p>
+<p>loads a <strong>Tile</strong> denoted by <strong>address</strong>, setting the required <strong>width</strong> &amp; <strong>height</strong>, based on the original width &amp; height of the <strong>Tile</strong> (<strong>imgwidth</strong> &amp; <strong>imgheight</strong>).</p>
+<p><em>loadtile(maze, 8, 8, 15, 15);</em></p>
+<p>void drawtile(int x, int y);</p>
+<p>draws a <strong>Tile</strong> at the <strong>Screen</strong> co-ordinates denoted by <strong>x</strong> &amp; <strong>y</strong>.</p>
+<p><em>drawtile(4 ,4);</em></p>
+<p>int gettileinxy(int x, int y);</p>
+<p>gets the <strong>Tile</strong> at the <strong>Screen</strong> co-ordinates denoted by <strong>x</strong> &amp; <strong>y</strong>.</p>
+<p><em>x = gettileinxy(x1, y1);</em></p>
+<p>If you are new to programming, don&rsquo;t worry as I&rsquo;ll take you through one of the sample games in the next section. Also, check out a few of these more general resources on learning C programming:</p>
+<p><a href="https://www.learn-c.org/">https://www.learn-c.org/</a></p>
+<p><a href="https://www.tutorialspoint.com/cprogramming/">https://www.tutorialspoint.com/cprogramming/</a></p>
+<p><a href="https://www.guru99.com/c-programming-tutorial.html">https://www.guru99.com/c-programming-tutorial.html</a></p>
+<p><br />This compiler is written in javascript. It takes less than 2000 lines of code. It only supports the features listed here.</p>
+<h1><a name="_Toc10368975"></a> Walkthrough of the breakout sample game</h1>
+<p>In this section I&rsquo;ll go through the <strong>breakout</strong> sample game line by line to explain how it works and give you an idea on how to use some of the available <strong>Functions</strong>.</p>
+<p>One thing I will point out before we begin is that you should probably lay out your code as follows:</p>
+<ol>
+<li>
+<p>define your <strong>Variables</strong></p>
+</li>
+<li>
+<p>write your <strong>Functions</strong> (in an order that makes sense to you &ndash; for example, having all the button handling code together)</p>
+</li>
+<li>
+<p>write your <strong>main()</strong> function</p>
+</li>
+</ol>
+<p>Whilst it&rsquo;s not compulsory, I think it&rsquo;s a good idea to structure your code as shown above. This sort of structure makes it a lot easier to find sections of your code (helpful for adding new features to your game), as well as helping you debug when things don&rsquo;t quite work correctly!</p>
+<p>One last thing, while I&rsquo;m on the subject, remember to fully document your code, using a liberal smattering of <strong>Comments</strong> (see below). These not only explain, to yourself and others, what each of your <strong>Functions</strong> actually does, but can also help tremendously when debugging.</p>
+<p>C <strong>Comments</strong> can be single-line like this (using <strong>//</strong> at the beginning):</p>
+<p>// This is a single line C Comment</p>
+<p>or, multi-line, like this (using <strong>/*</strong> at the beginning and <strong>*/</strong> at the end):</p>
+<p>/* This C Comment</p>
+<p>goes over more than</p>
+<p>one line */</p>
+<p>So, below is the Breakout code along with my comments regarding each line (I will be using the <strong>/* </strong>comment to show my explanations and they will be in <em>italics</em> as well):</p>
+<p><em>/* this line defines a </em><em><strong>Variable</strong></em><em> called </em><em><strong>BALL_SPEED</strong></em><em> and sets its initial value to </em><em><strong>3</strong></em><em> */</em></p>
+<p>#define BALL_SPEED 3</p>
+<p><em>/* these next 3 create </em><em><strong>Sprites</strong></em><em> called &lsquo;</em><em><strong>brick</strong></em><em>&rsquo;, &lsquo;</em><em><strong>ball</strong></em><em>&rsquo; and &lsquo;</em><em><strong>deck</strong></em><em>&rsquo;, where </em><em><strong>brick</strong></em><em> is a 12x8 pixel </em><em><strong>Sprite</strong></em><em>, </em><em><strong>ball</strong></em><em> is an 8x9 pixel </em><em><strong>Sprite</strong></em><em> and </em><em><strong>deck</strong></em><em> is a 26x8 pixel </em><em><strong>Sprite</strong></em><em> */</em></p>
+<p>//12x8</p>
+<p>char brick[] = {0xc,0xcc,0xcc,0xcc,0xcc,0xc0,0xeb,0x66,0x66,0x6c,0x6c,0xfc,0xeb,0x66,0x66,0xe6,0xe6,0x9c,0xeb,0x66,0x6e,0x6e,0x69,0xfc,0xeb,0x66,0xe6,0xe6,0x96,0xfc,0xeb,0x6e,0x6e,0x69,0x66,0xfc,0xeb,0xe6,0xe6,0x96,0x66,0xfc,0xe,0xee,0xee,0xee,0xee,0xe0};</p>
+<p>//8x9</p>
+<p>char ball[] = {0x0,0xb2,0x2b,0x0,0x4,0x22,0x22,0x40,0xb2,0x2a,0xa2,0x2b,0x22,0xa2,0x22,0x22,0x22,0xa2,0x22,0x22,0xb2,0x22,0x22,0x2b,0x4,0x22,0x22,0x40,0x0,0xb2,0x2b,0x0};</p>
+<p>//26x8</p>
+<p>char deck[] = {0xa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xa0,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0xf,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xf0};</p>
+<p><em>/* this line creates an integer </em><em><strong>Variable</strong></em><em> &lsquo;</em><em><strong>x</strong></em><em>&rsquo; with an initial value of </em><em><strong>60 </strong></em><em>*/</em></p>
+<p>int x = 60;</p>
+<p><em>/* this line creates 3 char </em><em><strong>Variables</strong></em><em>, &lsquo;</em><em><strong>game</strong></em><em>&rsquo;, &lsquo;</em><em><strong>count</strong></em><em>&rsquo; &amp; &lsquo;</em><em><strong>key</strong></em><em>&rsquo; */</em></p>
+<p>char game, count, key;</p>
+<p><em>/* this is the start of the user-defined </em><em><strong>Functions</strong></em><em>* /</em></p>
+<p><em>/* this </em><em><strong>Function</strong></em><em> checks for a </em><em><strong>Sprite</strong></em><em> collision. It has one input </em><em><strong>Parameter</strong></em><em> (an integer called &lsquo;</em><em><strong>n</strong></em><em>&rsquo;) and no </em><em><strong>Return</strong></em><em> value (the </em><em><strong>void</strong></em><em> keyword) */</em></p>
+<p>void balloncollision(int n){</p>
+<p><em> /* check if </em><em><strong>Sprite 31</strong></em><em> (the </em><em><strong>ball</strong></em><em>) has collided with </em><em><strong>Sprite 30</strong></em><em> (the </em><em><strong>deck</strong></em><em>) */</em></p>
+<p>if(spritegetvalue(31, S_COLLISION) == 30){</p>
+<p><em> /* if there is such a collision, then set the </em><em><strong>X Speed</strong></em><em> of the </em><em><strong>ball</strong></em> <em><strong>Sprite</strong></em><em> using a mathematical calculation (basically it takes the current </em><em><strong>X Speed</strong></em><em> and subtracts </em><em><strong>8</strong></em><em> and also subtracts the current value of </em><em><strong>x</strong></em><em>, all of which is then divided by </em><em><strong>2</strong></em><em>) */</em></p>
+<p>spritesetvalue(31, S_SPEEDX, (spritegetvalue(31, S_X) - 8 - x) / 2);</p>
+<p><em> /* next, draw the </em><em><strong>Particles</strong></em><em> at the </em><em><strong>Screen</strong></em><em> co-ordinates denoted by the x value of the </em><em><strong>ball</strong></em><em> plus 4 and the y value of the </em><em><strong>ball</strong></em><em>, using the </em><em><strong>Palette</strong></em><em> colour 2. */</em></p>
+<p>drawparticle(spritegetvalue(31, S_X) + 4, spritegetvalue(31, S_Y), 2);</p>
+<p><em> /* check if the </em><em><strong>ball</strong></em><em> has gone below the </em><em><strong>deck</strong></em><em> and, if so, set the </em><em><strong>Y Speed</strong></em><em> of the </em><em><strong>ball</strong></em><em> to the negative </em><em><strong>Y Speed</strong></em><em> of the </em><em><strong>ball</strong></em><em> (i.e. it will start moving back up the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>if(spritegetvalue(31, S_Y) &lt; 108)</p>
+<p>spritesetvalue(31, S_SPEEDY, 0 - spritegetvalue(31, S_SPEEDY));</p>
+<p>}</p>
+<p>else{</p>
+<p><em> /* if there is no such collision then set both the </em><em><strong>X Speed</strong></em><em> &amp; </em><em><strong>Y Speed</strong></em><em> of the </em><em><strong>ball</strong></em><em> to their respective negative values */</em></p>
+<p>spritesetvalue(31, S_SPEEDX, 0 - spritegetvalue(31, S_SPEEDX));</p>
+<p>spritesetvalue(31, S_SPEEDY, 0 - spritegetvalue(31, S_SPEEDY));</p>
+<p>/* finally, <em>draw the </em><em><strong>Particles</strong></em><em> at the </em><em><strong>Screen</strong></em><em> co-ordinates denoted by the x value of the </em><em><strong>ball</strong></em><em> plus 4 and the y value of the </em><em><strong>ball</strong></em><em>, using the </em><em><strong>Palette</strong></em><em> colour 3. */</em></p>
+<p>drawparticle(spritegetvalue(31, S_X) + 4, spritegetvalue(31, S_Y), 3);</p>
+<p>}</p>
+<p>}</p>
+<p><em>/* this </em><em><strong>Function</strong></em><em> is called when the </em><em><strong>ball</strong></em><em> collides with a </em><em><strong>brick</strong></em><em>. It has one input </em><em><strong>Parameter</strong></em><em> (an integer called &lsquo;</em><em><strong>n</strong></em><em>&rsquo;, which denotes the </em><em><strong>brick</strong></em><em> that has been collided with) and no </em><em><strong>Return</strong></em><em> value */</em></p>
+<p>void brickoncollision(int n){</p>
+<p><em> /* check that it is a </em><em><strong>brick</strong></em><em> (i.e. </em><em><strong>0</strong></em><em> &ndash; </em><em><strong>23</strong></em><em> = </em><em><strong>bricks</strong></em><em>) */</em></p>
+<p>if(n &lt; 24){</p>
+<p><em> /* if so, then set the number of </em><em><strong>Lives</strong></em><em> of that </em><em><strong>brick</strong></em><em> to </em><em><strong>0</strong></em><em> (so that it won&rsquo;t be drawn to the </em><em><strong>Screen</strong></em><em>) and reduce the value of </em><em><strong>count</strong></em><em> by </em><em><strong>1</strong></em><em> */</em></p>
+<p>spritesetvalue(n, S_LIVES, 0);</p>
+<p>count--;</p>
+<p>}</p>
+<p>}</p>
+<p><em>/* this </em><em><strong>Function</strong></em><em> is called to initialise the game. It has no input </em><em><strong>Parameters</strong></em><em> and no </em><em><strong>Return</strong></em><em> value */</em></p>
+<p>void init(){</p>
+<p><em> /* clear the </em><em><strong>Screen</strong></em><em> */</em></p>
+<p>clearscreen();</p>
+<p><em> /* set the </em><em><strong>game</strong></em> <em><strong>Variable</strong></em><em> to </em><em><strong>1</strong></em><em> and the </em><em><strong>Count</strong></em> <em><strong>Variable</strong></em><em> to </em><em><strong>24</strong></em><em> (the number of </em><em><strong>bricks</strong></em><em>) */</em></p>
+<p>game = 1;</p>
+<p>count = 24;</p>
+<p><em> /* set up the </em><em><strong>Particle</strong></em><em> and its </em><em><strong>Emitter</strong></em><em>. The </em><em><strong>Particle</strong></em><em> is set using a value of </em><em><strong>2</strong></em><em> for </em><em><strong>Gravity</strong></em><em>, a run </em><em><strong>Time</strong></em><em> of </em><em><strong>10</strong></em><em> milliseconds and a count of </em><em><strong>500</strong></em> <em><strong>Particles</strong></em><em>. The </em><em><strong>Emitter</strong></em><em> is set using a value of </em><em><strong>100</strong></em><em> for </em><em><strong>Time</strong></em><em> (in milliseconds), a value of </em><em><strong>1</strong></em><em> for the </em><em><strong>X direction</strong></em><em>, a value of </em><em><strong>259</strong></em><em> for </em><em><strong>Y direction</strong></em><em> and a </em><em><strong>Speed</strong></em><em> value of </em><em><strong>6</strong></em><em>. */</em></p>
+<p>setparticle(2, 10, 500);</p>
+<p>setemitter(100, 1, 259,6);</p>
+<p><em> /* loop through the </em><em><strong>bricks</strong></em><em>, setting their </em><em><strong>Width</strong></em><em> to </em><em><strong>12</strong></em><em>, their </em><em><strong>X Speed</strong></em><em> to </em><em><strong>0</strong></em><em>, their </em><em><strong>Y Speed</strong></em><em> to </em><em><strong>0</strong></em><em>, their </em><em><strong>On_Collision</strong></em><em> to the </em><em><strong>brickoncollision() Function</strong></em><em> and finally place the </em><em><strong>brick</strong></em><em> on the </em><em><strong>Screen</strong></em><em> at the co-ordinate denoted by the calculation in the </em><em><strong>putSprite() Function</strong></em><em> */</em></p>
+<p>for(char i = 0; i &lt; 24; i++){</p>
+<p>getsprite(i, brick);</p>
+<p>spritesetvalue(i, S_WIDTH, 12);</p>
+<p>spritesetvalue(i, S_SPEEDX, 0);</p>
+<p>spritesetvalue(i, S_SPEEDY, 0);</p>
+<p>spritesetvalue(i, S_ON_COLLISION, brickoncollision);</p>
+<p>putsprite(i, (i / 3) * 16, 8 + (i % 3) * 10));</p>
+<p>}</p>
+<p><em> /* set the </em><em><strong>ball</strong></em><em> values. </em><em><strong>X Speed</strong></em><em> to the negative of the current speed plus a random amount (maximum of double current speed). Set the </em><em><strong>Y Speed</strong></em><em> to the negative of the current speed. Set the </em><em><strong>S_ON_COLLISION Function</strong></em><em> to </em><em><strong>balloncolision</strong></em><em> and finally, place the </em><em><strong>ball</strong></em><em> on the </em><em><strong>Screen</strong></em><em> at the co-ordinates denoted by </em><em><strong>x</strong></em><em> and </em><em><strong>102</strong></em><em>. */</em></p>
+<p>getsprite(31, ball);</p>
+<p>spritesetvalue(31, S_SPEEDX, -BALL_SPEED + random(BALL_SPEED * 2));</p>
+<p>spritesetvalue(31, S_SPEEDY, -BALL_SPEED);</p>
+<p>spritesetvalue(31, S_ON_COLLISION, balloncollision);</p>
+<p>putsprite(31, x, 102);</p>
+<p><em> /* set the </em><em><strong>deck</strong></em><em> values. </em><em><strong>Width</strong></em><em> to </em><em><strong>24</strong></em><em>, </em><em><strong>X Speed</strong></em><em> to </em><em><strong>0</strong></em><em> &amp; </em><em><strong>Y Speed</strong></em><em> to </em><em><strong>0</strong></em><em>. Finally, place the </em><em><strong>deck</strong></em><em> on the </em><em><strong>Screen</strong></em><em> at the </em><em><strong>x</strong></em><em> co-ordinate denoted by the value of the </em><em><strong>x Variable</strong></em><em> &amp; the </em><em><strong>y</strong></em><em> co-ordinate of </em><em><strong>110</strong></em><em> */</em></p>
+<p>getsprite(30, deck);</p>
+<p>spritesetvalue(30, S_WIDTH, 24);</p>
+<p>spritesetvalue(30, S_SPEEDX, 0);</p>
+<p>spritesetvalue(30, S_SPEEDY, 0);</p>
+<p>putsprite(30, x, 110);</p>
+<p>}</p>
+<p><em>/* this </em><em><strong>Function</strong></em><em> is called when the game is finished. It has no input </em><em><strong>Parameters</strong></em><em> and no </em><em><strong>Return</strong></em><em> value */</em></p>
+<p>void gameover(){</p>
+<p><em> /* this line moves the </em><em><strong>cursor</strong></em><em> to </em><em><strong>x </strong></em><em>= 6, </em><em><strong>y</strong></em><em> = 7 */</em></p>
+<p>gotoxy(6, 7);</p>
+<p><em> /* does </em><em><strong>Variable</strong></em><em> &lsquo;</em><em><strong>count</strong></em><em>&rsquo; equal </em><em><strong>0</strong></em><em>? (i.e. no more </em><em><strong>bricks</strong></em><em> left) */</em></p>
+<p>if(count == 0)</p>
+<p><em> /* if </em><em><strong>count</strong></em><em> equals </em><em><strong>0</strong></em><em> then output the text &ldquo;</em><em><strong>you win!</strong></em><em>&rdquo; to the cursor position */</em></p>
+<p>puts("you win!!");</p>
+<p>else</p>
+<p><em>/* if </em><em><strong>count</strong></em><em> does not equal </em><em><strong>0</strong></em><em> then output the text &ldquo;</em><em><strong>game over</strong></em><em>&rdquo; to the cursor position */</em></p>
+<p>puts("game over");</p>
+<p><em> /* wait for the </em><em><strong>0</strong></em> <em><strong>key</strong></em><em> to be pressed */</em></p>
+<p>while(getkey() != 0){}</p>
+<p><em> /* wait for the </em><em><strong>0</strong></em> <em><strong>key</strong></em><em> to be released */</em></p>
+<p>while(getkey() == 0){}</p>
+<p><em> /* call the </em><em><strong>init Function</strong></em><em> to initialize the game. */</em></p>
+<p>init();</p>
+<p>}</p>
+<p><em>/* this </em><em><strong>Function</strong></em><em> is called by the </em><em><strong>main() Function</strong></em><em> to check for game over. It has no input </em><em><strong>Parameters</strong></em><em> and no </em><em><strong>Return</strong></em><em> value */</em></p>
+<p>void onexit(){</p>
+<p><em> /* check if the </em><em><strong>Y</strong></em><em> value of the </em><em><strong>ball Sprite</strong></em><em> is greater than </em><em><strong>120</strong></em><em> */</em></p>
+<p>if(spritegetvalue(31, S_Y) &gt; 120)</p>
+<p><em> /* if it is then call the </em><em><strong>gameover() Function</strong></em><em> (i.e. the </em><em><strong>ball</strong></em><em> has gone below the </em><em><strong>deck</strong></em><em>) */</em></p>
+<p>gameover();</p>
+<p><em> /* else, check if the </em><em><strong>Y</strong></em><em> value of the </em><em><strong>ball</strong></em><em> is less than </em><em><strong>0</strong></em><em> (i.e. at the top of the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>else if(spritegetvalue(31, S_Y) &lt; 0)</p>
+<p><em> /* if it is then set the </em><em><strong>Y Speed</strong></em><em> of the </em><em><strong>ball</strong></em><em> to </em><em><strong>BALL_SPEED</strong></em><em> (i.e. a positive value to move it away from the top of the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>spritesetvalue(31, S_SPEEDY, BALL_SPEED);</p>
+<p><em> /* check if the </em><em><strong>X</strong></em><em> value of the </em><em><strong>ball</strong></em><em> is greater than </em><em><strong>120</strong></em><em> (i.e. at the right of the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>if(spritegetvalue(31, S_X) &gt; 120)</p>
+<p><em> /* if it is then set the </em><em><strong>X Speed</strong></em><em> of the </em><em><strong>ball</strong></em><em> to </em><em><strong>-BALL_SPEED</strong></em><em> (i.e. a negative value to move it away from the right of the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>spritesetvalue(31, S_SPEEDX, -BALL_SPEED);</p>
+<p><em> /* else, check if the </em><em><strong>X</strong></em><em> value of the </em><em><strong>ball</strong></em><em> is less than </em><em><strong>0</strong></em><em> (i.e. at the left of the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>else if(spritegetvalue(31, S_X) &lt; 0)</p>
+<p><em> /* if it is then set the </em><em><strong>X Speed</strong></em><em> of the </em><em><strong>ball</strong></em><em> to </em><em><strong>BALL_SPEED</strong></em><em> (i.e. a positive value to move it away from the left of the </em><em><strong>Screen</strong></em><em>) */</em></p>
+<p>spritesetvalue(31, S_SPEEDX, BALL_SPEED);</p>
+<p>}</p>
+<p><em>/* this is the </em><em><strong>main</strong></em><em> loop of the game. </em><em><strong>EVERY</strong></em><em> game </em><em><strong>MUST</strong></em><em> have this </em><em><strong>Function</strong></em><em>, or the </em><em><strong>Compiler</strong></em><em> will </em><em><strong>NOT</strong></em><em> compile the game. */</em></p>
+<p>void main(){</p>
+<p><em> /* this line keeps the </em><em><strong>main</strong></em><em> loop of the game running forever. It works because the value </em><em><strong>1</strong></em><em> will </em><em><strong>ALWAYS</strong></em><em> return </em><em><strong>True</strong></em><em> */</em></p>
+<p>while(1){</p>
+<p><em> /* call the </em><em><strong>init() Function</strong></em><em> to initialize the game*/</em></p>
+<p>init();</p>
+<p><em> /* this line keeps running the loop below all the time that the </em><em><strong>game</strong></em> <em><strong>Variable</strong></em><em> is </em><em><strong>True</strong></em><em>. The loop will stop when </em><em><strong>game</strong></em><em> becomes </em><em><strong>False</strong></em><em> */</em></p>
+<p>while(game){</p>
+<p><em> /* </em><em><strong>read</strong></em><em> the </em><em><strong>keyboard</strong></em><em> and store the returned value in the </em><em><strong>key</strong></em> <em><strong>variable</strong></em><em> */</em></p>
+<p>key = getkey();</p>
+<p><em> /* if the returned value is the </em><em><strong>LEFT</strong></em><em> key </em><em><strong>AND</strong></em><em> the value of the </em><em><strong>x</strong></em><em> Variable is greater than </em><em><strong>0</strong></em><em> then take </em><em><strong>3</strong></em><em> from the value of </em><em><strong>x</strong></em><em> (i.e. move the </em><em><strong>deck</strong></em><em> left). The greater than check stops the </em><em><strong>deck</strong></em><em> moving off the left edge of the </em><em><strong>Screen</strong></em><em> */</em></p>
+<p>if(key == KEY_LEFT &amp;&amp; x &gt; 0)</p>
+<p>x -= 3;</p>
+<p><em> /* if the returned value is the </em><em><strong>RIGHT</strong></em><em> key </em><em><strong>AND</strong></em><em> the value of the </em><em><strong>x</strong></em><em> Variable is less than </em><em><strong>96</strong></em><em> then add </em><em><strong>3</strong></em><em> to the value of </em><em><strong>x</strong></em><em> (i.e. move the </em><em><strong>deck</strong></em><em> right). The less than check stops the </em><em><strong>deck</strong></em><em> moving off the right edge of the </em><em><strong>Screen</strong></em><em> */</em></p>
+<p>else if(key == KEY_RIGHT &amp;&amp; x &lt; 96)</p>
+<p>x += 3;</p>
+<p><em> /* if the returned value is neither the </em><em><strong>LEFT</strong></em><em> key, nor the </em><em><strong>RIGHT</strong></em><em> key then set the </em><em><strong>X Speed</strong></em><em> of the </em><em><strong>deck</strong></em><em> to </em><em><strong>0</strong></em><em> (i.e. not moving) */</em></p>
+<p>else</p>
+<p>spritesetvalue(30, S_SPEEDX, 0);</p>
+<p><em> /* put the </em><em><strong>deck</strong></em><em> (</em><em><strong>Sprite 30</strong></em><em>) at the co-ordinate denoted by the </em><em><strong>x Variable</strong></em><em> and a </em><em><strong>y</strong></em><em> value of </em><em><strong>110</strong></em><em> */</em></p>
+<p>putsprite(30, x, 110);</p>
+<p><em> /* call the </em><em><strong>onexit() Function</strong></em><em> */</em></p>
+<p>onexit();</p>
+<p><em> /* if the </em><em><strong>count</strong></em> <em><strong>Variable</strong></em><em> equals </em><em><strong>0</strong></em><em> (i.e. no more </em><em><strong>bricks</strong></em><em> are left) then call the </em><em><strong>gameover() Function</strong></em><em> */</em></p>
+<p>if(count == 0)</p>
+<p>gameover();</p>
+<p><em> /* delay the drawing of the </em><em><strong>Screen</strong></em><em> for a short period of time */</em></p>
+<p>delayredraw();</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>That&rsquo;s it! Hopefully, I have explained the code above so you can understand it. If not, feel free to comment at (<strong>TODO: Need somewhere for comments</strong>).</p>
+<h1><a name="_Toc10368976"></a>How to load .bin files onto your esp8266</h1>
+<p>The website below will help you to load your <strong>.bin</strong> files onto your actual esp8266-based device:</p>
+<p><a href="https://hackaday.com/2019/03/11/esp8266-gets-its-game-on-with-open-source-engine/">https://hackaday.com/2019/03/11/esp8266-gets-its-game-on-with-open-source-engine/</a></p>
+<h1><a name="_Toc10368977"></a> Error Messages</h1>
+<p><a name="_Hlk10228735"></a>Below is a complete list of all <strong>Error Messages</strong> generated by the <strong>Compiler</strong> (English versions):</p>
+<p>"the "+ par +" function has already been declared"</p>
+<p>this message is displayed if you try to declare a <strong>Function</strong> using a name that has already been used. <strong>par</strong> gives you the name of the <strong>Function</strong>.</p>
+<p>"the function "+ par +" does not match the prototype"</p>
+<p>this message is displayed if you try to use a <strong>Function</strong> that does not have the same number and type of parameters and output as the <strong>Function</strong> definition. <strong>par</strong> gives you the name of the <strong>Function</strong>.</p>
+<p>"expected type definition"</p>
+<p>this message is displayed if you try to use a <strong>Function</strong> that has <strong>Variables</strong>, but at least one of the <strong>Variables</strong> does not have a <strong>type</strong> definition.</p>
+<p>"expected comma or closing bracket"</p>
+<p>this message is displayed if your code is missing either a comma or a closing bracket.</p>
+<p>"expected curly opening bracket"</p>
+<p>this message is displayed if your code is missing an opening curly bracket (<strong>{</strong>).</p>
+<p>"expected closing bracket in function " + par</p>
+<p>this message is displayed if you one of your <strong>Functions</strong> is missing a closing bracket. <strong>par</strong> gives you the name of the <strong>Function</strong>.</p>
+<p>"expected argument in function " + par</p>
+<p>this message is displayed if you try to use a previously declared <strong>Function</strong> without the required arguments. <strong>par</strong> gives you the name of the <strong>Function</strong>.</p>
+<p>"expected opening bracket in function " + par</p>
+<p>this message is displayed if one of your <strong>Functions</strong> is missing an opening bracket. <strong>par</strong> gives you the name of the <strong>Function</strong>.</p>
+<p>"the function "+ par +" cannot return a value"</p>
+<p>this message is displayed if you try to use a <strong>Function</strong> and expect it to return a value, but the declared <strong>Function</strong> does not return a value. <strong>par</strong> gives you the name of the <strong>Function</strong>.</p>
+<p>"working with local arrays is not supported"</p>
+<p>this message is displayed if you try to use a local array.</p>
+<p>"array length not specified"</p>
+<p>this message is displayed if you try to use an array without specifying its length.</p>
+<p>"invalid array declaration"</p>
+<p>this message is displayed if your array is not declared correctly.</p>
+<p>"invalid number of arguments"</p>
+<p>this message is displayed if you try to use a <strong>Function</strong>, but do not use the correct number of arguments.</p>
+<p>"expected opening bracket in construction " + par</p>
+<p>this message is displayed if you are trying to use a construction (<strong>if</strong>, <strong>while</strong>, <strong>for</strong> or <strong>switch</strong>) and have not included the opening bracket.</p>
+<p>"no switch design"</p>
+<p>this message is displayed if you try to use a <strong>case</strong> statement, but have not created the <strong>switch</strong> construction.</p>
+<p>"colon is expected"</p>
+<p>this message is displayed if your code is missing a colon.</p>
+<p>"expected number"</p>
+<p>this message is displayed if you try to use a non-numeric value when the code expects a numeric value.</p>
+<p>"unsupported variable declaration"</p>
+<p>this message is displayed if you have used an invalid <strong>Variable </strong>declaration.</p>
+<p>"expected brace"</p>
+<p>this message is displayed if you have not correctly applied the closing brace (<strong>)</strong>), following an opening brace (<strong>(</strong>).</p>
+<p>"warning, unsigned not implemented"</p>
+<p>this message is displayed if you try to use an unsigned <strong>Variable</strong>.</p>
+<p>"unknown token " + par</p>
+<p>this message is displayed if you have used an invalid token.</p>
+<p>"main function entry point not found"</p>
+<p>this message is displayed if your code does not contain a <strong>main ( ) Function</strong>.</p>
+<p><strong>NB:</strong> In the above <strong>Messages</strong>, &lsquo;<strong>par</strong>&rsquo; is a parameter passed in by the <strong>Compiler</strong> and usually refers to the <strong>Function</strong> name where the error occurs.</p>
+<p>Several of the above <strong>Messages</strong>, relate to the fact that not all C constructs etc. are usable by this engine.</p>
+</body>
+</html>
