@@ -1785,6 +1785,10 @@ function Cpu(){
 		}
 	}
 	
+	function clearStringFast(str) {
+		return str.length < 12 ? str : (' ' + str).slice(1);
+	}
+	
 	function debug(){
 		var d = '';
 		var s = 'pc:' + toHex4(pc) + '\t';
@@ -1817,6 +1821,7 @@ function Cpu(){
 			d += 'S_LIVES \t' + sprites[i].lives + '\n';
 		}
 		debugSprArea.value = d;
+		d = clearStringFast(d);
 		highliteLine();
 		return s;
 	}
