@@ -41,7 +41,6 @@ textarea:focus {
 #monitor {
 	border: 1px solid #516399;
 	background-color: rgb(235, 235, 228);
-	display: inline-block;
 	width: 53em;
 	height: 23.2em;
 }
@@ -330,7 +329,12 @@ textarea:focus {
 @media screen and (max-width: 60em) {
 	#menu {
 		height: 4em;
-		width: 100%;
+		width: 70%;
+	}
+	#ram {
+		height:2em;
+		width:30em;
+		margin-right: 5em;
 	}
 	#container {
 		overflow: auto;
@@ -339,5 +343,14 @@ textarea:focus {
 		height: 41em;
 		margin-left: 0;
 		padding: 2px;
+	}
+	#wrap-left {
+		height: 54em;
+	}
+	#monitor {
+		width:30em;
+	}
+	#memoryPreviev {
+		float:none;
 	}
 }
