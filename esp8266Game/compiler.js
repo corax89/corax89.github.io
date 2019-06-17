@@ -973,7 +973,7 @@ function compile(t) {
 					return;
 				}
 				execut();
-				if (getRangOperation(thisToken) == 0){
+				if (getRangOperation(thisToken) == 0 && thisToken != ']'){
 					getToken();
 					execut();
 				}
@@ -1723,6 +1723,8 @@ function compile(t) {
 		} else if (thisToken == '=' || thisToken == '+=' || thisToken == '-=' || thisToken == '*=' || thisToken == '/=') {
 			assigment();
 		} else if (thisToken == ';') {
+			return;
+		} else if (thisToken == ':') {
 			return;
 		} else if (thisToken == '{') {
 			skipBrace();
