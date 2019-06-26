@@ -1085,7 +1085,8 @@ function Cpu(){
 					case 0x53:
 						// SETLED R		530R
 						reg1 = op2 & 0xf;
-						console.log('New pixel color: ' + reg[reg1]);
+						display.drawLed(reg[reg1]);
+						//console.log('New pixel color: ' + reg[reg1]);
 						break;
 					case 0x54:
 						// LOADRT		540R

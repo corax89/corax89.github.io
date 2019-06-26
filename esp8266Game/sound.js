@@ -124,6 +124,14 @@ function loadRtttl(){
 	return 1;
 }
 
+function testEndRtttl(){
+	if(rtttl.startposition + rtttl.position >= rtttl.str.length){
+		if(!rtttl.loop)
+		  rtttl.play = 0;
+		rtttl.position = 0;
+	}
+}
+
 function playRtttl(){
 	var n,duration,note,scale,c;
 	//play single tone
@@ -138,13 +146,8 @@ function playRtttl(){
 		return 100;
 	//first, get note duration, if available
 	n = 0;
+	testEndRtttl();
 	c = rtttl.str[rtttl.startposition + rtttl.position];
-	if(!c){
-		if(!rtttl.loop)
-		  rtttl.play = 0;
-		rtttl.position = 0;
-		c = rtttl.str[rtttl.startposition + rtttl.position];
-	}
 	n = '';
 	while(isdigit(rtttl.str[rtttl.startposition + rtttl.position])) {
 		n += rtttl.str[rtttl.startposition + rtttl.position];

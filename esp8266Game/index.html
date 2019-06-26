@@ -35,7 +35,7 @@
 				</div>
 				<canvas id="screen" width="256" height="320"></canvas>
 				<button onclick="cpu.step();document.getElementById('debug').value = cpu.debug();clearTimeout(timerId);">step</button>
-				<button onclick="run()">run</button>
+				<button onclick="run();timerstart = new Date().getTime();soundTimer = 0;">run</button>
 				<button onclick="clearTimeout(timerId);document.getElementById('debug').value = cpu.debug();">stop</button>
 				<br>
 				cpu speed,Hz
