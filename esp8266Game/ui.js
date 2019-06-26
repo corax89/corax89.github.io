@@ -457,6 +457,8 @@ function setMemoryPage(n){
 }
 
 function run(){
+	//звук инициализируется только при нажатии на кнопку
+	initAudio();
 	//уменьшаем значение таймеров
 	for(var i = 0; i < 8; i++){
 		timers[i] -= 16;
