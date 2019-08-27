@@ -273,6 +273,7 @@ Download this manual
 <p>S_ON_COLLISION the <strong>Function</strong> to execute when the <strong>Sprite</strong> collides with another <strong>Sprite</strong>. <strong>NB: </strong>when entering the name of the <strong>Function</strong>, just use the name, not the brackets. For example, use <strong>bombcollision</strong>, not <strong>bombcollision()</strong>.</p>
 <p>S_ON_EXIT_SCREEN the <strong>Function</strong> to execute when the Sprite moves off Screen. <strong>NB: </strong>when entering the name of the <strong>Function</strong>, just use the name, not the brackets. For example, use <strong>exit</strong>, not <strong>exit()</strong>.</p>
 <p>S_IS_SCROLLED whether the <strong>Sprite</strong> is scrolled with the <strong>Screen</strong>, or not.<strong> 1</strong> = <strong>True</strong>, <strong>0</strong> = <strong>False</strong></p>
+<p>S_FLIP_HORIZONTAL flip <strong>Sprite</strong> horizontally <strong> 1</strong> = <strong>True</strong>, <strong>0</strong> = <strong>False</strong></p>
 <p><em>x = spritegetvalue(1, S_LIVES);</em></p>
 <p>int angbetweenspr(int n1, int n2);</p>
 <p>returns the angle, in degrees, between the two <strong>Sprites</strong> denoted by <strong>n1</strong> &amp; <strong>n2</strong>.</p>
@@ -339,6 +340,20 @@ Download this manual
 <p>void putimagerle(int address, int x, int y, int w, int h);</p>
 <p>puts an RLE image on the <strong>Screen</strong>. The image is denoted by <strong>address</strong>. The <strong>Screen</strong> co-ordinates by <strong>x</strong> &amp; <strong>y</strong>, and the image width &amp; height by <strong>w</strong> &amp; <strong>h</strong>.</p>
 <p><em>putimagerle(earth, 0, 0, 16, 16);</em></p>
+<p>void tone(int freq, int delay);</p>
+generates a square wave of the specified frequency. Frequency: the frequency of the tone in hertz. Allowed data types: unsigned int. Duration: the duration of the tone in milliseconds.
+<p>void loadrtttl(int address, int isLoop);</p>
+Loads a string containing a rtttl format melody. address: name of the array containing the string. isLoop: repeat the melody
+<p>void playrtttl();</p>
+start playback
+<p>void pausertttl();</p>
+pause playback
+<p>void stoprtttl();</p>
+stop playback
+<p>int savedata(int name, int array,  int count);</p>
+The function saves to the record with the name "name" the number of array elements equal to "count". Returns the number of items saved. If the returned number is less than the requested, then the save did not happen. Then the number of cells equal to the returned number remained in the store.
+<p>int loaddata(int name, int array);</p>
+Loads the array "array" from the entry "name", returns the number of loaded items, or 0 if the download failed.
 <p>*int malloc(int i);</p>
 <p>this is a <strong>C Function</strong> that allocates the <strong>Memory</strong> denoted by <strong>i</strong> and returns a pointer to it</p>
 <p>For more information see:</p>
