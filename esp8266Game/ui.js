@@ -886,7 +886,7 @@ function savebin() {
 	}
 	else if (fileType == 'html'){
 		if (file.length > 1) {
-			var newFile = saveAsHtml(file, fileIco);
+			var newFile = saveAsHtml(compress(file), fileIco);
 			var blob = new Blob([newFile], {type: "text/plain;charset=utf-8"});
 			if(fileName.length > 0)
 				saveAs(blob, fileName + '.html');
