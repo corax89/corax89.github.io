@@ -36,9 +36,14 @@ var colorHighliteTimer;
 var isHighliteColor = true;
 var timerstart = new Date().getTime(),
 timertime = 0;
+var lineCountTimer;
 
 sourceArea.addEventListener("click", testForImageArray, true);
-sourceArea.onscroll     = function(ev){ lineCount(); handleScroll();};
+sourceArea.onscroll     = function(ev){ 
+	handleScroll();
+	clearTimeout(lineCountTimer);
+	lineCountTimer = requestAnimationFrame(lineCount);
+};
 sourceArea.onmousedown  = function(ev){ this.mouseisdown = true; }
 sourceArea.onmouseup    = function(ev){ this.mouseisdown=false; lineCount()};
 sourceArea.onmousemove  = function(ev){ if (this.mouseisdown) lineCount()};
