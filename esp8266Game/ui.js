@@ -38,6 +38,7 @@ var colorHighliteTimer;
 var isHighliteColor = true;
 var timerstart = new Date().getTime(),
 timertime = 0;
+var screenTimeout;
 var lineCountTimer;
 var fontSizeInEditor = 13;
 var timeForRedraw = 48;
@@ -305,6 +306,7 @@ function save_delta_koor(obj_evt) {
 }
 
 function clear_delta_koor() {
+	obj_wind.style.opacity = '1';
 	document.onmousemove = null;
 }
 
@@ -323,6 +325,7 @@ function motion_wind(obj_event) {
 	else
 		obj_wind.style.top = (delta_y + y) + "px";
 	obj_wind.style.left = (delta_x + x) + "px";
+	obj_wind.style.opacity = '.9';
 	window.getSelection().removeAllRanges();
 }
 
@@ -746,7 +749,7 @@ function listing() {
 	d.style.top = "3em";
 	var d = document.getElementById("disasm");
 	d.value = asmSource;
-	d.scrollIntoView(true);
+	d.scrollIntoView(false);
 }
 
 function debugVars() {
@@ -755,7 +758,7 @@ function debugVars() {
 	d.style.left = window.innerWidth / 7 * 2 + 'px';
 	d.style.top = "3em";
 	isDebug = true;
-	d.scrollIntoView(true);
+	d.scrollIntoView(false);
 }
 
 function viewHelp() {
@@ -763,7 +766,7 @@ function viewHelp() {
 	d.style.display = "block";
 	d.style.left = window.innerWidth / 7 * 3 + 'px';
 	d.style.top = "3em";
-	d.scrollIntoView(true);
+	d.scrollIntoView(false);
 }
 
 function viewSettings() {
@@ -772,7 +775,7 @@ function viewSettings() {
 	d.style.left = window.innerWidth / 7 * 4 + 'px';
 	d.style.top = "3em";
 	loadSettings();
-	d.scrollIntoView(true);
+	d.scrollIntoView(false);
 }
 
 function closewindow(id) {
@@ -824,6 +827,7 @@ function startButton() {
 	timerstart = new Date().getTime();
 	timertime = 0;
 	soundTimer = 0;
+	redraw();
 	run();
 }
 
@@ -1123,7 +1127,8 @@ function Display() {
 }
 
 function redraw() {
-	setTimeout(function () {
+	clearTimeout(screenTimeout);
+	screenTimeout = setTimeout(function () {
 		requestAnimationFrame(redraw);
 		cpu.redrawParticle();
 		display.redraw();
