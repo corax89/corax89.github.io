@@ -281,9 +281,9 @@ function viewDebugPanel() {
 
 function setup_mouse(id_div_wind, id_div_drag) {
 	if (obj_wind)
-		obj_wind.style.zIndex = '0';
+		obj_wind.style.zIndex = '2';
 	obj_wind = document.getElementById(id_div_wind);
-	obj_wind.style.zIndex = '1';
+	obj_wind.style.zIndex = '3';
 	obj_drag_wind = document.getElementById(id_div_drag);
 	obj_drag_wind.onmousedown = save_delta_koor;
 	document.onmouseup = clear_delta_koor;
@@ -598,7 +598,7 @@ function lineCount() {
 	if (canvas.height != sourceArea.clientHeight)
 		canvas.height = sourceArea.clientHeight; // on resize
 	var ctx = canvas.getContext("2d");
-	ctx.fillStyle = "#ebebe4";
+	ctx.fillStyle = "#343434";
 	ctx.fillRect(0, 0, 52, sourceArea.scrollHeight + 1);
 	ctx.font = fontSizeInEditor + "px monospace"; // NOTICE: must match TextArea font-size(13px) and lineheight(16) !!!
 	var startIndex = Math.floor(sourceArea.scrollTop / (fontSizeInEditor + 3), 0);
@@ -607,7 +607,7 @@ function lineCount() {
 		if (i == thisDebugString) {
 			ctx.fillStyle = "#0f0";
 		} else {
-			ctx.fillStyle = "#516399";
+			ctx.fillStyle = "#fff";
 		}
 		var ph = fontSizeInEditor - 1 - sourceArea.scrollTop + (i * (fontSizeInEditor + 3));
 		var text = '' + (0 + i); // line number
@@ -904,7 +904,7 @@ function Display() {
 		var rect = canvas.getBoundingClientRect();
 		var x = Math.floor((e.offsetX == undefined ? e.layerX : e.offsetX) / (rect.width / 128));
 		var y = Math.floor((e.offsetY == undefined ? e.layerY : e.offsetY) / (rect.height / 256)) - 16;
-		ctx.fillStyle = "rgb(170, 170, 170)";
+		ctx.fillStyle = "#516399";
 		ctx.fillRect(0, 0, pixelSize * 128, pixelSize * 16);
 		ctx.fillStyle = "#111";
 		ctx.fillText('x ' + x + ';y ' + y + ';charX ' + Math.floor(x / 6) + ';charY ' + Math.floor(y / 8), 1, 1);
@@ -918,7 +918,7 @@ function Display() {
 		ctx.textAlign = "start";
 		ctx.textBaseline = "hanging";
 		ctx.font = pixelSize * 8 + "px monospace";
-		ctx.fillStyle = "rgb(170, 170, 170)";
+		ctx.fillStyle = "#516399";
 		ctx.fillRect(0, 0, width + 20, height + 20);
 		for (var i = 0; i < 20480; i++) {
 			displayArray[i] = 0;
@@ -926,10 +926,8 @@ function Display() {
 			canvasArray2[i] = 0;
 		}
 		cpuLostCycle += 2000;
-		ctx.fillStyle = "rgb(170, 170, 170)";
+		ctx.fillStyle = "#516399";
 		ctx.fillRect(0, (128 + 16) * pixelSize, pixelSize * 128, pixelSize * 16);
-		ctx.fillStyle = "#111";
-		ctx.fillText("KEYS:A-z,B-x,select-c,start-v", 1, (128 + 16) * pixelSize);
 		ctx.fillStyle = "rgb(0, 0, 0)";
 		ctx.fillRect(0, 16 * pixelSize, pixelSize * 128, pixelSize * 128);
 		for (var i = 0; i < 16; i++) {
@@ -1042,12 +1040,13 @@ function Display() {
 
 	function drawJoy() {
 		var coordinate = [8, 143, 24, 130, 24, 156, 40, 143, 90, 150, 110, 135];
-		ctx.beginPath();
-		ctx.strokeStyle = '#fff';
+		
+		ctx.fillStyle = '#8FAA63';
 		for (var i = 0; i < 8; i++) {
-			ctx.rect(coordinate[i * 2] * pixelSize, 30 * pixelSize + coordinate[i * 2 + 1] * pixelSize, pixelSize * 12, pixelSize * 12);
+			ctx.beginPath();
+			ctx.arc((5 + coordinate[i * 2]) * pixelSize, 30 * pixelSize + (5 + coordinate[i * 2 + 1] * pixelSize), 7 * pixelSize, 0, 2 * Math.PI, false);
+			ctx.fill();
 		}
-		ctx.stroke();
 	}
 
 	function redraw() {
