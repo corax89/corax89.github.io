@@ -14,6 +14,7 @@ var cpuLostCycle = 0; //сколько циклов должно быть пот
 var timerId; //таймер для вызова выполнения процессора
 var asmSource; //код, полученный при компиляции
 var debugVar = []; //таблица данных о именах и расположении в памяти переменных
+var debugVarArr = [];
 var numberDebugString = []; //таблица, указывающая соответствие строк кода исполняемым инструкциям
 var numberLine = 0; //количество линий исходного кода
 var thisDebugString = 0; //строка, которая в данный момент выполняется процессором
@@ -887,7 +888,7 @@ function run() {
 		isRedraw = false;
 		//выводим отладочную информацию
 		debugCallCount++;
-		if (debugCallCount >= 10 && viewDebugV) {
+		if (debugCallCount >= 10 && (viewDebugV || isDebug)) {
 			document.getElementById('debug').value = cpu.debug();
 			debugCallCount = 0;
 		}
