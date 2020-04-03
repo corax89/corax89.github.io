@@ -119,7 +119,7 @@ function Cpu() {
 			charwidth: 6,
 			charheight: 8,
 			columns: 0
-		}
+		};
 		for (i = 0; i < 420; i++)
 			charArray[i] = '';
 		for (i = 0; i < 8; i++)
