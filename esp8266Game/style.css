@@ -244,10 +244,11 @@ textarea:focus {
 	display:inline-block;
 	width:9em;
 	position: absolute;
-	right: 0;
+	right: 11em;
 	height: 3em;
 	line-height: 5em;
 	color: #ffffff;
+	text-shadow: 1px 1px 2px black;
 }
 #ram {
 	border: 1px solid #516399;
@@ -751,6 +752,9 @@ textarea:focus {
 		top: 3.8em;
 		height: 1em;
 		line-height: 1em;
+	}
+	#gameListLink>img{
+		display: none;
 	}
 }
 @media all and (display-mode: fullscreen) {
