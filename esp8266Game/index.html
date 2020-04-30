@@ -53,6 +53,7 @@
 			<ul class="sub-menu">
 				<li><button onclick="savebin(1);">export .html5</button></li>
 				<li><button onclick="savebin(2);">export .lge</button></li>
+				<li><button onclick="savebin(3);">export .h</button></li>
 			</ul>
 		</div>
 		<div class="drop-menu hrefb">
@@ -459,6 +460,13 @@
 				<canvas id="icon"  width="24" height="16"></canvas>
 				<br>
 				24x16
+				<br>
+				<br>
+				memory array type <br><br>
+				<select id="arrayType" onchange="memoryType=parseInt(this.value)">
+				  <option value="0">ASM</option>
+				  <option value="1">C</option>
+				</select>
 			</div>
 			<button style="position:relative;bottom:-0.1em;left:18.6em;width:3.5em;height:2.5em;" 
 				onclick="saveSettings()">apply</button>
