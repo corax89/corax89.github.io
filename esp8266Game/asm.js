@@ -255,6 +255,10 @@ function asm(s) {
 				out.push(0x00);
 				out.push(0x00);
 				return;
+			case 'PAUSE':
+				out.push(0x50);
+				out.push(0x01);
+				return;
 			case 'LDI':
 				if (a[i + 3] != '(') { //LDI R,int		01 0R XXXX
 					out.push(0x01);

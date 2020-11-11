@@ -603,7 +603,7 @@ function main() {
 	document.getElementById("alert").innerHTML = '';
 	var src = document.getElementById('input').value;
 	var t = tokenize(src);
-	console.log(t);
+	//console.log(t);
 	var c = compile(t);
 	asmSource = '\n' + c.join('\n') + '\n';
 	file = asm(asmSource);
@@ -906,6 +906,12 @@ function run() {
 	timerId = setTimeout(function () {
 			run()
 		}, 16 - diff);
+}
+
+function stopCpu(){
+	isRun=false;
+	clearTimeout(timerId);
+	document.getElementById('debug').value=cpu.debug();
 }
 //функция вывода на экран
 function Display() {
