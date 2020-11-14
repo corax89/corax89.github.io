@@ -1785,6 +1785,10 @@ function compile(t) {
 						asm.push(' STI (' + (localStackLength * 2 + localVarTable.indexOf(thisToken) - 1) + '+R0),R' + registerCount);
 					}
 					registerCount++;
+				} else if (functionVarTable.indexOf(variable) > -1){
+					var number = localStackLength * 2 + functionVarTable.length + localVarTable.length - functionVarTable.indexOf(variable) + 1;
+					asm.push(' INC R' + (registerCount - 1));
+					asm.push(' STI (' + number + '+R0),R' + (registerCount - 1) + ' ;' + variable);
 				} else if (isVar(thisToken)) {
 					asm.push(' INC _' + thisToken);
 					execut();
@@ -1838,6 +1842,12 @@ function compile(t) {
 			getToken();
 		} else {
 			execut();
+			if((variable == '=' || variable == '(' || variable == ',') && operation == '-'){
+				asm.push(' LDC R' + registerCount + ',0');
+				asm.push(' SUB R' + registerCount + ',R' + (registerCount - 1));
+				asm.push(' MOV R' + (registerCount - 1)+ ',R' + registerCount);
+				return;
+			}
 			if (getRangOperation(thisToken) == 0)
 				if (!(thisToken == ',' || thisToken == ')' || thisToken == ';'))
 					getToken();
