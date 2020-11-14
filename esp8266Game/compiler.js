@@ -550,19 +550,16 @@ function compile(t) {
 		var labelPos = labelNumber;
 		var savedDataAsm = dataAsm.length;
 		var savedLineCount = lineCount;
-		var	savedlastNewLine = lastNewLine;
+		var savedlastNewLine = lastNewLine;
 		var savedfindLoopCompile = findLoopCompile;
 		var savedlastLoopToken = lastLoopToken;
 		varInRegister = optimizationVar;
 		callInFunction = 0;
 		thisFunction = name;
-		if(!isSecondPass)
+		if (!isSecondPass)
 			localVarTable = [];
 		functionVarTable = [];
 		registerCount = 1;
-		//main вызывается всегда, так что пока что просто ее перепрыгиваем
-		//if (name == 'main')
-		//	asm.push(' JMP _end_main');
 		getToken();
 		getToken();
 		//добавляем в таблицу переменные функции, сразу тип, затем имя, подряд для упрощения поиска (имя все равно не может соответствовать типу
@@ -577,7 +574,7 @@ function compile(t) {
 			if (!thisToken)
 				return;
 			if (thisToken == ')' && lastToken == 'void' && functionVarTable.length == 1) {
-				if(!isSecondPass)
+				if (!isSecondPass)
 					functionVarTable = [];
 			} else {
 				functionVarTable.push(thisToken);
@@ -637,7 +634,7 @@ function compile(t) {
 				lockAddLocalVar = true;
 				lineCount = savedLineCount;
 				addFunction(type, 1, true);
-			}else if(localVarTable.length > 0 && !isSecondPass){
+			} else if (localVarTable.length > 0 && !isSecondPass) {
 				thisTokenNumber = inCodePos;
 				thisToken = t[thisTokenNumber++];
 				asm.splice(start, asm.length - start);
@@ -816,7 +813,7 @@ function compile(t) {
 	//добавляем новую переменную в таблицу
 	function addVar(type) {
 		if (isIntoFunction) {
-			if(!lockAddLocalVar){
+			if (!lockAddLocalVar) {
 				localVarTable.push(type);
 				localVarTable.push(thisToken);
 			}
@@ -963,7 +960,7 @@ function compile(t) {
 				if (numberVarInRegister > -1) {
 					asm.push(' MOV R' + registerCount + ',R' + numberVarInRegister + ' ;' + token);
 				} else {
-					if(l == 0)
+					if (l == 0)
 						asm.push(' LDI R' + registerCount + ',(R0) ;' + token);
 					else
 						asm.push(' LDI R' + registerCount + ',(' + l + '+R0) ;' + token);
@@ -1024,7 +1021,7 @@ function compile(t) {
 				if (numberVarInRegister > -1) {
 					asm.push(' MOV R' + numberVarInRegister + ',R' + registerCount + ' ;' + token);
 				} else {
-					if(l == 0)
+					if (l == 0)
 						asm.push(' STI (R0),R' + registerCount + ' ;' + token);
 					else
 						asm.push(' STI (' + l + '+R0),R' + registerCount + ' ;' + token);
@@ -1403,8 +1400,8 @@ function compile(t) {
 				return;
 			}
 			getToken();
-			if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/=' 
-				&& thisToken != '&=' && thisToken != '|=' && thisToken != '^=') {
+			if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/='
+				 && thisToken != '&=' && thisToken != '|=' && thisToken != '^=') {
 				previousToken();
 				structLoad(v, s, m[3], n, false);
 			}
@@ -1468,10 +1465,10 @@ function compile(t) {
 				}
 				getToken();
 				//загрузка ячейки массива
-				if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/=' 
-					&& thisToken != '&=' && thisToken != '|=' && thisToken != '^=') {
-						previousToken();
-						structLoad(v, s, m[3], n, true);
+				if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/='
+					 && thisToken != '&=' && thisToken != '|=' && thisToken != '^=') {
+					previousToken();
+					structLoad(v, s, m[3], n, true);
 				}
 				//сохранение ячейки массива
 				else
@@ -1762,7 +1759,7 @@ function compile(t) {
 						asm.push(' INC R' + registerCount);
 						asm.push(' STI (' + (localStackLength * 2 + number - 1) + '+R0),R' + registerCount);
 					}
-				} else if (functionVarTable.indexOf(variable) > -1){
+				} else if (functionVarTable.indexOf(variable) > -1) {
 					var number = localStackLength * 2 + functionVarTable.length + localVarTable.length - functionVarTable.indexOf(variable) + 1;
 					asm.push(' MOV R' + registerCount + ',R' + (registerCount - 1));
 					asm.push(' INC R' + registerCount);
@@ -1785,7 +1782,7 @@ function compile(t) {
 						asm.push(' STI (' + (localStackLength * 2 + localVarTable.indexOf(thisToken) - 1) + '+R0),R' + registerCount);
 					}
 					registerCount++;
-				} else if (functionVarTable.indexOf(variable) > -1){
+				} else if (functionVarTable.indexOf(variable) > -1) {
 					var number = localStackLength * 2 + functionVarTable.length + localVarTable.length - functionVarTable.indexOf(variable) + 1;
 					asm.push(' INC R' + (registerCount - 1));
 					asm.push(' STI (' + number + '+R0),R' + (registerCount - 1) + ' ;' + variable);
@@ -1813,7 +1810,7 @@ function compile(t) {
 						asm.push(' DEC R' + registerCount);
 						asm.push(' STI (' + (localStackLength * 2 + number - 1) + '+R0),R' + registerCount);
 					}
-				} else if (functionVarTable.indexOf(variable) > -1){
+				} else if (functionVarTable.indexOf(variable) > -1) {
 					var number = localStackLength * 2 + functionVarTable.length + localVarTable.length - functionVarTable.indexOf(variable) + 1;
 					asm.push(' MOV R' + registerCount + ',R' + (registerCount - 1));
 					asm.push(' DEC R' + registerCount);
@@ -1842,10 +1839,10 @@ function compile(t) {
 			getToken();
 		} else {
 			execut();
-			if((variable == '=' || variable == '(' || variable == ',') && operation == '-'){
+			if ((variable == '=' || variable == '(' || variable == ',') && operation == '-') {
 				asm.push(' LDC R' + registerCount + ',0');
 				asm.push(' SUB R' + registerCount + ',R' + (registerCount - 1));
-				asm.push(' MOV R' + (registerCount - 1)+ ',R' + registerCount);
+				asm.push(' MOV R' + (registerCount - 1) + ',R' + registerCount);
 				return;
 			}
 			if (getRangOperation(thisToken) == 0)
@@ -2409,8 +2406,6 @@ function compile(t) {
 			if (lastToken == ';')
 				registerCount = 1;
 			if (thisTokenNumber - lastEndString > 1) {
-				//добавляем информацию для отладки
-				numberDebugString.push([asm.length, lineCount, 0]);
 				//добавляем комментарии в таблицу asm для отладки
 				s = ';' + lineCount + ' ' + t.slice(lastEndString, thisTokenNumber - 1).join(' ').replace(/\r|\n/g, '');
 				if (s.length > 40)
@@ -2763,6 +2758,13 @@ function compile(t) {
 	}
 	//объеденяем код с данными
 	asm = asm.concat(dataAsm);
+	//добавим данные для отладки
+	var ds = asm.join('\n').split('\n');
+	for (var i = 0; i < ds.length; i++) {
+		if (ds[i][0] == ';' && isNumber(ds[i][1])) {
+			numberDebugString.push([i, parseInt(ds[i].slice(1), 10), 0]);
+		}
+	}
 	console.timeEnd("compile");
 
 	return asm;
