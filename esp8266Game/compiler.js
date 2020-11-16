@@ -1270,9 +1270,13 @@ function compile(t) {
 		return !isNaN(parseFloat(t)) && isFinite(t);
 	}
 	//сохраняем значение структуры
-	function structAssigment(thisVar, struct, pos, nVar, isArray) {
+	function structAssigment(thisVar, struct, pos, nVar, isArray, incdec) {
 		var op = thisToken;
 		getToken();
+		if (thisToken == '+' && op == '+')
+			op = '++';
+		if (thisToken == '-' && op == '-')
+			op = '--';
 		if (thisToken == '{') {
 			if (isArray) {
 				asm.push(' LDC R' + (registerCount + 2) + ',' + pos[1]);
@@ -1316,21 +1320,27 @@ function compile(t) {
 			}
 			asm.pop();
 		} else {
-			execut();
-			if (getRangOperation(thisToken) > 0)
+			if (!(op == '++' || op == '--' || (incdec && (op == ';' || op == ',' || op == ')')))) {
 				execut();
-			getToken();
-			if (getRangOperation(thisToken) > 0)
-				execut();
-			registerCount--;
-			typeCastToFirst(registerCount, struct[3][nVar][0]);
+				if (getRangOperation(thisToken) > 0)
+					execut();
+				getToken();
+				if (getRangOperation(thisToken) > 0)
+					execut();
+				registerCount--;
+				typeCastToFirst(registerCount, struct[3][nVar][0]);
+			}
+			if (incdec && (op == ';' || op == ',' || op == ')')) {
+				previousToken();
+			}
 			asm.push(' LDC R' + (registerCount + 1) + ',' + pos);
 			if (isArray) {
 				asm.push(' LDC R' + (registerCount + 2) + ',' + struct[1]);
 				asm.push(' MUL R' + (registerCount - 1) + ',R' + (registerCount + 2));
 				asm.push(' ADD R' + (registerCount + 1) + ',R' + (registerCount - 1));
 			}
-			if (op == '+=' || op == '-=' || op == '*=' || op == '/=' || op == '&=' || op == '|=' || op == '^=') {
+			if (op == '+=' || op == '-=' || op == '*=' || op == '/=' || op == '&=' || op == '|=' || op == '^='
+				 || op == '++' || op == '--') {
 				if (struct[3][nVar][0] == 'char')
 					asm.push(' LDC R' + (registerCount + 2) + ',(_' + thisVar.name + ' + R' + (registerCount + 1) + ')');
 				else
@@ -1351,12 +1361,47 @@ function compile(t) {
 					asm.push(' OR R' + (registerCount) + ',R' + (registerCount + 2));
 				} else if (op == '^=') {
 					asm.push(' XOR R' + (registerCount) + ',R' + (registerCount + 2));
+				} else if (op == '++') {
+					asm.push(' MOV R' + (registerCount) + ',R' + (registerCount + 2));
+					asm.push(' INC R' + (registerCount + 2) + ',1');
+				} else if (op == '--') {
+					asm.push(' MOV R' + (registerCount) + ',R' + (registerCount + 2));
+					asm.push(' DEC R' + (registerCount + 2) + ',1');
 				}
+			} else if (incdec && (incdec == '++' || incdec == '--')) {
+				if (struct[3][nVar][0] == 'char')
+					asm.push(' LDC R' + (registerCount + 2) + ',(_' + thisVar.name + ' + R' + (registerCount + 1) + ')');
+				else
+					asm.push(' LDI R' + (registerCount + 2) + ',(_' + thisVar.name + ' + R' + (registerCount + 1) + ')');
 			}
-			if (struct[3][nVar][0] == 'char')
-				asm.push(' STC (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + registerCount);
-			else {
-				asm.push(' STI (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + registerCount);
+			if (!(op == '++' || op == '--')) {
+				if (!(incdec && (incdec == '++' || incdec == '--'))) {
+					if (struct[3][nVar][0] == 'char')
+						asm.push(' STC (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + registerCount);
+					else {
+						asm.push(' STI (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + registerCount);
+					}
+				}
+			} else {
+				if (struct[3][nVar][0] == 'char')
+					asm.push(' STC (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + (registerCount + 2));
+				else {
+					asm.push(' STI (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + (registerCount + 2));
+				}
+				getToken();
+				registerCount++;
+			}
+			if (incdec && (incdec == '++' || incdec == '--')) {
+				if (incdec == '++') {
+					asm.push(' INC R' + (registerCount + 2) + ',1');
+				}
+				if (struct[3][nVar][0] == 'char')
+					asm.push(' STC (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + (registerCount + 2));
+				else {
+					asm.push(' STI (_' + thisVar.name + ' + R' + (registerCount + 1) + '),R' + (registerCount + 2));
+				}
+				asm.push(' MOV R' + registerCount + ',R' + (registerCount + 2));
+				registerCount++;
 			}
 		}
 	}
@@ -1378,11 +1423,12 @@ function compile(t) {
 		registerCount++;
 	}
 	//обрабатываем структуру
-	function structToken() {
+	function structToken(incdec) {
 		var v = getVar(thisToken);
 		var s = [];
 		var m = [];
 		var n;
+		var nextop;
 		s = structArr[newType.indexOf(v.type)];
 		var members = s[3];
 		getToken();
@@ -1400,8 +1446,14 @@ function compile(t) {
 				return;
 			}
 			getToken();
-			if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/='
-				 && thisToken != '&=' && thisToken != '|=' && thisToken != '^=') {
+			getToken();
+			nextop = thisToken;
+			previousToken();
+			if (incdec && (incdec == '++' || incdec == '--')) {
+				structAssigment(v, s, m[3], n, false, incdec);
+			} else if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/='
+				 && thisToken != '&=' && thisToken != '|=' && thisToken != '^=' && !(thisToken == '+' && nextop == '+')
+				 && !(thisToken == '-' && nextop == '-')) {
 				previousToken();
 				structLoad(v, s, m[3], n, false);
 			}
@@ -1464,9 +1516,15 @@ function compile(t) {
 					return;
 				}
 				getToken();
+				getToken();
+				nextop = thisToken;
+				previousToken();
 				//загрузка ячейки массива
-				if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/='
-					 && thisToken != '&=' && thisToken != '|=' && thisToken != '^=') {
+				if (incdec && (incdec == '++' || incdec == '--')) {
+					structAssigment(v, s, m[3], n, true, incdec);
+				} else if (thisToken != '=' && thisToken != '+=' && thisToken != '-=' && thisToken != '*=' && thisToken != '/='
+					 && thisToken != '&=' && thisToken != '|=' && thisToken != '^=' && !(thisToken == '+' && nextop == '+')
+					 && !(thisToken == '-' && nextop == '-')) {
 					previousToken();
 					structLoad(v, s, m[3], n, true);
 				}
@@ -1787,7 +1845,10 @@ function compile(t) {
 					asm.push(' INC R' + (registerCount - 1));
 					asm.push(' STI (' + number + '+R0),R' + (registerCount - 1) + ' ;' + variable);
 				} else if (isVar(thisToken)) {
-					asm.push(' INC _' + thisToken);
+					if (isStruct(getVar(thisToken).type))
+						structToken('++');
+					else
+						asm.push(' INC _' + thisToken);
 					execut();
 				}
 			}
@@ -1839,7 +1900,7 @@ function compile(t) {
 			getToken();
 		} else {
 			execut();
-			if ((variable == '=' || variable == '(' || variable == ',') && operation == '-') {
+			if ((variable == '=' || variable == '(' || variable == ',' || variable == '?' || variable == ':') && operation == '-') {
 				asm.push(' LDC R' + registerCount + ',0');
 				asm.push(' SUB R' + registerCount + ',R' + (registerCount - 1));
 				asm.push(' MOV R' + (registerCount - 1) + ',R' + registerCount);
