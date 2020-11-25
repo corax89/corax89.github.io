@@ -2252,6 +2252,7 @@ function compile(t) {
 		getToken();
 		if (thisToken != '(')
 			putError(lineCount, 13, 'switch'); //info("" + lineCount + " ожидалась открывающая скобка в конструкции switch");
+		bracketCount++;
 		skipBracket();
 		registerCount--;
 		//оставляем пустую ячейку в таблице asm и запоминаем ее позицию, сюда будем добавлять весь код, сгенерированный case
