@@ -79,6 +79,7 @@ function tokenize(s) {
 	s = define(s);
 	s = s.replace(/#include[^\n]*/g, ''); //удаление инклюдов, дабы не мешали
 	s = s.replace(/\r/g, ''); //удаление возврата каретки
+	s = s + '\n';
 	l = s.length;
 	tokens[0] = '';
 	for (var i = 0; i < l; i++) {
@@ -130,7 +131,7 @@ function tokenize(s) {
 		case '/':
 			//если комментарии, то убираем, оставляя переводы строк
 			if (s[i + 1] == '/') {
-				while (s[i + 1] != '\n')
+				while (s[i + 1] != '\n' || i + 1 > l)
 					i++;
 				break;
 			}
