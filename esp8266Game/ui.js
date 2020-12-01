@@ -231,7 +231,6 @@ function snapshotTable(){
 }
 
 function addSnapshotManually(){
-	var i = snapshots.length;
 	snapshots.push({date: new Date().toUTCString(), name: 'Manually', source: sourceArea.value});
 	localStorage.setItem('save_snapshots', JSON.stringify(snapshots));
 	snapshotTable();
