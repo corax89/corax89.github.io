@@ -216,10 +216,12 @@ function snapshotTable(){
 	var s;
 	try {
 		s = JSON.parse(localStorage.getItem('save_snapshots'));
-		snapshots = s;
+		if(s && s.length > 0)
+			snapshots = s;
 	}
 	catch(e){
 		localStorage.setItem('save_snapshots', '');
+		snapshots = [];
 	}
 	sdiv.innerHTML = '<button onclick="addSnapshotManually()">save snapsot</button><br>';
 	if (s && s.length > 0) {
