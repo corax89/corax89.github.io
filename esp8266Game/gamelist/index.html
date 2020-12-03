@@ -76,206 +76,202 @@ button:active {
 	outline: none;
 	top:1px;
 }
+.arrow::after {
+    content: "";
+    display: inline-block;
+    border: 12px solid #fff;
+    border-right-width: 6px;
+    border-left-width: 6px;
+    border-right-color: transparent;
+    border-left-color: transparent;
+	margin-left: 10px;
+}
+
+.arrow-up::after {
+    border-top-width: 0;
+}
+
+.arrow-down::after {
+    border-bottom-width: 0;
+}
 </style>
 <h1 align="center">List of games for esp8266 little game engine</h1>
 <div class="center">
-	<button onclick="sortListDir('name')">sort by name</button>
-	<button onclick="sortListDir('author')">sort by author</button>
+	<button id="bname" onclick="sortListDir('name', this)">sort by name</button>
+	<button id="bauthor" onclick="sortListDir('author', this)">sort by author</button>
+	<button id="bdate" onclick="sortListDir('date', this)" class="arrow arrow-up">sort by date</button>
 </div>
+<br>
 <div class="center" id="gamelist">
-	<div class="block" data-name="1916" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=7bb0c9be2c0e25ae2486fe7bff1863ff">
-			<img src="1916.gif" width="241" height="241" alt="game 1916" />
-			<span>1916</span>
-		</a>
-	</div>
-	<div class="block" data-name="fourinarow" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=2aa481d0b7511c7c22d8faa971475b6f">
-			<img src="fourinarow.gif" width="241" height="241" alt="game four in a row" />
-			<span>four in a row</span>
-		</a>
-	</div>
-	<div class="block" data-name="tankcity" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=8a1a7364aaea25625eadc971dc383644">
-		  <img src="tankcity.gif" width="241" height="242" alt="game tank city" />
-		  <span>tank city</span>
-		</a>
-	</div>
-	<div class="block" data-name="space fighter" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=6e1dd10c730e52c6d13bdf361db1c6fe">
-			<img src="spacefighter.gif" width="241" height="242" alt="game space fighter" />
-			<span>space fighter</span>
-		</a>
-	</div>
-	<div class="block" data-name="mini fisherman" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=3f19fdcd6055e210bc14992488512c61">
-			<img src="fisherman.gif" width="241" height="242" alt="game mini fisherman" />
-			<span>mini fisherman</span>
-		</a>
-	</div>
-	<div class="block" data-name="black jack" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=3df6f51b6bb06f472bf6beb839a1f57d">
-			<img src="blackjack.gif" width="241" height="242" alt="game black jack" />
-			<span>black jack</span>
-		</a>
-	</div>
-	<div class="block" data-name="columns" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=ff9900f564775ddda422d28958b737c0">
-		  <img src="columns.gif" width="241" height="242" alt="game columns" />
-		  <span>columns</span>
-		</a>
-	</div>
-	<div class="block" data-name="esp rogue" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=a6f1966fef4e388240743121f228570b">
-			<img src="esprogue.gif" width="241" height="242" alt="game esp rogue" />
-			<span>esp rogue</span>
-		</a>
-	</div>
-	<div class="block" data-name="ninja escape" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=d7ddb9590c429f3f5818cd99be6588aa">
-			<img src="ninja.gif" width="241" height="242" alt="game ninja escape" />
-			<span>ninja escape</span>
-		</a>
-	</div>
-	<div class="block" data-name="worm blast" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=e6615c103455495539efa5e0fc71bbd9">
-			<img src="wormblast.gif" width="241" height="242" alt="game worm blast" />
-			<span>worm blast</span>
-		</a>
-	</div>
-	<div class="block" data-name="fish life" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=10229352aa5d8061251ef1ab9c4e6e2c">
-		  <img src="fishlife.gif" width="241" height="242" alt="game fish life" />
-		  <span>fish life</span>
-		</a>
-	</div>
-	<div class="block" data-name="tower defense" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=6d26cfe7c9a3518fdf3bfacc81884a4e">
-			<img src="towerdef.gif" width="241" height="242" alt="game tower defense" />
-			<span>tower defense</span>
-		</a>
-	</div>
-	<div class="block" data-name="mars attack" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=fa37869a6fad2bf9e098ee34f621ba97">
-			<img src="mars_attack.gif" width="241" height="242" alt="game mars attack" />
-			<span>mars attack</span>
-		</a>
-	</div>
-	<div class="block" data-name="dwarf clicker" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=3a428b5cf4409cb87a9e59e08d74d3bb">
-			<img src="clicker.gif" width="241" height="242" alt="game dwarf clicker" />
-			<span>dwarf clicker</span>
-		</a>
-	</div>
-	<div class="block" data-name="chip8 emu" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=aa2d9acc3cdfbba763c1bb7b3c1d8535">
-		  <img src="chip8.gif" width="241" height="242" alt="emulator chip8" />
-		  <span>chip8 emu</span>
-		</a>
-	</div>
-	<div class="block" data-name="city runner" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=925a90021015e874ef0c9655e8a06733">
-			<img src="cityrunner.gif" width="241" height="242" alt="game city runner" />
-			<span>city runner</span>
-		</a>
-	</div>
-	<div class="block" data-name="micro race" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=9d1af8e3aac1d6616c990ff52503abf7">
-			<img src="microrace.gif" width="241" height="242" alt="game micro race" />
-			<span>micro race</span>
-		</a>
-	</div>
-	<div class="block" data-name="memories" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=ffd28104053fceef2e597fc67ce5bee0">
-			<img src="memories.gif" width="241" height="242" alt="game memories" />
-			<span>memories</span>
-		</a>
-	</div>
-	<div class="block" data-name="hangman" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=dd3ca78c5ded0d28455a5fcf63702ddf">
-			<img src="hangman.gif" width="241" height="242" alt="game hangman" />
-			<span>hangman</span>
-		</a>
-	</div>
-	<div class="block" data-name="hangman" data-author="Jicehel">
+	<div class="block" data-name="hangman" data-author="Jicehel" data-date="2020-12-2">
 		<a href="https://corax89.github.io/esp8266Game/index.html?src=2b20c30fd6a529a9342ac382831a3ece">
-			<img src="hangmanfr.gif" width="241" height="242" alt="game hangman" />
+			<img src="hangmanfr.gif" width="241" height="242" alt="game hangman">
 			<span>hangman by Jicehel</span>
 		</a>
-	</div>
-	<div class="block" data-name="sudoku" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=fabe74aa6e3d15a4b4287fa30344ebac">
-			<img src="sudoku.gif" width="241" height="242" alt="game sudoku" />
-			<span>sudoku</span>
+	</div><div class="block" data-name="ESPtris" data-author="corax" data-date="2020-12-01">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=398002b70a9a35970810b355d44eb941">
+			<img src="esptris.gif" width="241" height="242" alt="game ESPtris">
+			<span>ESPtris</span>
 		</a>
-	</div>
-	<div class="block" data-name="twosnakes" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=57d4204fda31e4d1b0e4f3396237e8fc">
-			<img src="twosnakes.gif" width="241" height="242" alt="game twosnakes" />
-			<span>twosnakes</span>
+	</div><div class="block" data-name="fourinarow" data-author="corax" data-date="2020-12-1">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=2aa481d0b7511c7c22d8faa971475b6f">
+			<img src="fourinarow.gif" width="241" height="241" alt="game four in a row">
+			<span>four in a row</span>
 		</a>
-	</div>
-	<div class="block" data-name="olympusmons" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=0e221bfc03d98d06455d3a064861ba53">
-			<img src="olympusmons.gif" width="241" height="242" alt="game olympusmons" />
-			<span>olympusmons</span>
-		</a>
-	</div>
-	<div class="block" data-name="frozenworld" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=fc67d3e528a0ff9c602f70a9bc252669">
-			<img src="frozenworld.gif" width="241" height="242" alt="game frozenworld" />
-			<span>frozenworld</span>
-		</a>
-	</div>
-	<div class="block" data-name="capman" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=af44a0b1673a8778e6ecd1d0129eda44">
-			<img src="capman.gif" width="241" height="242" alt="game capman" />
-			<span>capman</span>
-		</a>
-	</div>
-	<div class="block" data-name="flatracing" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=f0b7dcf283ce2bac502b7bb0e18011da">
-			<img src="flatracing.gif" width="241" height="242" alt="game flatracing" />
-			<span>flatracing</span>
-		</a>
-	</div>
-	<div class="block" data-name="oldtower" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=0c7201eb2b70aa88907882888b8f5931">
-			<img src="oldtower.gif" width="241" height="242" alt="game oldtower" />
-			<span>oldtower</span>
-		</a>
-	</div>
-	<div class="block" data-name="plagueoutbreak" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=6b09f2756708ac490b39db8927be93d3">
-			<img src="plagueoutbreak.gif" width="241" height="242" alt="game plagueoutbreak" />
-			<span>plagueoutbreak</span>
-		</a>
-	</div>
-	<div class="block" data-name="JumpingDevil" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=63423eb87836b11d36a27b76c3cc80a5">
-			<img src="JumpingDevil.gif" width="241" height="242" alt="game JumpingDevil" />
-			<span>JumpingDevil</span>
-		</a>
-	</div>
-	<div class="block" data-name="Space_Invad" data-author="Jicehel">
+	</div><div class="block" data-name="Space_Invad" data-author="Jicehel" data-date="2020-11-29">
 		<a href="https://corax89.github.io/esp8266Game/index.html?src=23501dc0142ed224787d040ba1be97aa">
-			<img src="spaceinvad.gif" width="241" height="242" alt="game Space_Invad" />
+			<img src="spaceinvad.gif" width="241" height="242" alt="game Space_Invad">
 			<span>Space_Invad by Jicehel</span>
 		</a>
-	</div>
-	<div class="block" data-name="ESPtris" data-author="corax">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=398002b70a9a35970810b355d44eb941">
-			<img src="esptris.gif" width="241" height="242" alt="game ESPtris" />
-			<span>ESPtris</span>
+	</div><div class="block" data-name="JumpingDevil" data-author="corax" data-date="2020-11-20">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=63423eb87836b11d36a27b76c3cc80a5">
+			<img src="JumpingDevil.gif" width="241" height="242" alt="game JumpingDevil">
+			<span>JumpingDevil</span>
+		</a>
+	</div><div class="block" data-name="plagueoutbreak" data-author="corax" data-date="2020-5-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=6b09f2756708ac490b39db8927be93d3">
+			<img src="plagueoutbreak.gif" width="241" height="242" alt="game plagueoutbreak">
+			<span>plagueoutbreak</span>
+		</a>
+	</div><div class="block" data-name="oldtower" data-author="corax" data-date="2020-5-9">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=0c7201eb2b70aa88907882888b8f5931">
+			<img src="oldtower.gif" width="241" height="242" alt="game oldtower">
+			<span>oldtower</span>
+		</a>
+	</div><div class="block" data-name="hangman" data-author="corax" data-date="2020-5-3">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=dd3ca78c5ded0d28455a5fcf63702ddf">
+			<img src="hangman.gif" width="241" height="242" alt="game hangman">
+			<span>hangman</span>
+		</a>
+	</div><div class="block" data-name="capman" data-author="corax" data-date="2020-5-2">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=af44a0b1673a8778e6ecd1d0129eda44">
+			<img src="capman.gif" width="241" height="242" alt="game capman">
+			<span>capman</span>
+		</a>
+	</div><div class="block" data-name="flatracing" data-author="corax" data-date="2020-5-1">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=f0b7dcf283ce2bac502b7bb0e18011da">
+			<img src="flatracing.gif" width="241" height="242" alt="game flatracing">
+			<span>flatracing</span>
+		</a>
+	</div><div class="block" data-name="twosnakes" data-author="corax" data-date="2020-2-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=57d4204fda31e4d1b0e4f3396237e8fc">
+			<img src="twosnakes.gif" width="241" height="242" alt="game twosnakes">
+			<span>twosnakes</span>
+		</a>
+	</div><div class="block" data-name="frozenworld" data-author="corax" data-date="2020-1-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=fc67d3e528a0ff9c602f70a9bc252669">
+			<img src="frozenworld.gif" width="241" height="242" alt="game frozenworld">
+			<span>frozenworld</span>
+		</a>
+	</div><div class="block" data-name="olympusmons" data-author="corax" data-date="2020-1-23">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=0e221bfc03d98d06455d3a064861ba53">
+			<img src="olympusmons.gif" width="241" height="242" alt="game olympusmons">
+			<span>olympusmons</span>
+		</a>
+	</div><div class="block" data-name="sudoku" data-author="corax" data-date="2020-1-9">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=fabe74aa6e3d15a4b4287fa30344ebac">
+			<img src="sudoku.gif" width="241" height="242" alt="game sudoku">
+			<span>sudoku</span>
+		</a>
+	</div><div class="block" data-name="space fighter" data-author="corax" data-date="2019-11-12">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=6e1dd10c730e52c6d13bdf361db1c6fe">
+			<img src="spacefighter.gif" width="241" height="242" alt="game space fighter">
+			<span>space fighter</span>
+		</a>
+	</div><div class="block" data-name="memories" data-author="corax" data-date="2019-11-9">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=ffd28104053fceef2e597fc67ce5bee0">
+			<img src="memories.gif" width="241" height="242" alt="game memories">
+			<span>memories</span>
+		</a>
+	</div><div class="block" data-name="micro race" data-author="corax" data-date="2019-10-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=9d1af8e3aac1d6616c990ff52503abf7">
+			<img src="microrace.gif" width="241" height="242" alt="game micro race">
+			<span>micro race</span>
+		</a>
+	</div><div class="block" data-name="city runner" data-author="corax" data-date="2019-10-25">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=925a90021015e874ef0c9655e8a06733">
+			<img src="cityrunner.gif" width="241" height="242" alt="game city runner">
+			<span>city runner</span>
+		</a>
+	</div><div class="block" data-name="chip8 emu" data-author="corax" data-date="2019-10-20">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=aa2d9acc3cdfbba763c1bb7b3c1d8535">
+		  <img src="chip8.gif" width="241" height="242" alt="emulator chip8">
+		  <span>chip8 emu</span>
+		</a>
+	</div><div class="block" data-name="tankcity" data-author="corax" data-date="2019-10-17">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=8a1a7364aaea25625eadc971dc383644">
+		  <img src="tankcity.gif" width="241" height="242" alt="game tank city">
+		  <span>tank city</span>
+		</a>
+	</div><div class="block" data-name="fish life" data-author="corax" data-date="2019-8-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=10229352aa5d8061251ef1ab9c4e6e2c">
+		  <img src="fishlife.gif" width="241" height="242" alt="game fish life">
+		  <span>fish life</span>
+		</a>
+	</div><div class="block" data-name="worm blast" data-author="corax" data-date="2019-8-27">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=e6615c103455495539efa5e0fc71bbd9">
+			<img src="wormblast.gif" width="241" height="242" alt="game worm blast">
+			<span>worm blast</span>
+		</a>
+	</div><div class="block" data-name="1916" data-author="corax" data-date="2019-8-21">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=7bb0c9be2c0e25ae2486fe7bff1863ff">
+			<img src="1916.gif" width="241" height="241" alt="game 1916">
+			<span>1916</span>
+		</a>
+	</div><div class="block" data-name="mini fisherman" data-author="corax" data-date="2019-7-22">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=3f19fdcd6055e210bc14992488512c61">
+			<img src="fisherman.gif" width="241" height="242" alt="game mini fisherman">
+			<span>mini fisherman</span>
+		</a>
+	</div><div class="block" data-name="ninja escape" data-author="corax" data-date="2019-6-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=d7ddb9590c429f3f5818cd99be6588aa">
+			<img src="ninja.gif" width="241" height="242" alt="game ninja escape">
+			<span>ninja escape</span>
+		</a>
+	</div><div class="block" data-name="esp rogue" data-author="corax" data-date="2019-6-27">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=a6f1966fef4e388240743121f228570b">
+			<img src="esprogue.gif" width="241" height="242" alt="game esp rogue">
+			<span>esp rogue</span>
+		</a>
+	</div><div class="block" data-name="columns" data-author="corax" data-date="2019-6-25">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=ff9900f564775ddda422d28958b737c0">
+		  <img src="columns.gif" width="241" height="242" alt="game columns">
+		  <span>columns</span>
+		</a>
+	</div><div class="block" data-name="black jack" data-author="corax" data-date="2019-6-20">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=3df6f51b6bb06f472bf6beb839a1f57d">
+			<img src="blackjack.gif" width="241" height="242" alt="game black jack">
+			<span>black jack</span>
+		</a>
+	</div><div class="block" data-name="dwarf clicker" data-author="corax" data-date="2019-2-29">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=3a428b5cf4409cb87a9e59e08d74d3bb">
+			<img src="clicker.gif" width="241" height="242" alt="game dwarf clicker">
+			<span>dwarf clicker</span>
+		</a>
+	</div><div class="block" data-name="mars attack" data-author="corax" data-date="2019-2-28">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=fa37869a6fad2bf9e098ee34f621ba97">
+			<img src="mars_attack.gif" width="241" height="242" alt="game mars attack">
+			<span>mars attack</span>
+		</a>
+	</div><div class="block" data-name="tower defense" data-author="corax" data-date="2019-2-27">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=6d26cfe7c9a3518fdf3bfacc81884a4e">
+			<img src="towerdef.gif" width="241" height="242" alt="game tower defense">
+			<span>tower defense</span>
 		</a>
 	</div>
 </div>
 <script>
-function sortListDir(type) {
+function sortListDir(type, element) {
   var list, i, switching, b, shouldSwitch, dir, switchcount = 0;
   list = document.getElementById("gamelist");
   switching = true;
-  dir = "asc"; 
+  dir = "asc";
+  document.getElementById("bname").classList.remove("arrow");
+  document.getElementById("bauthor").classList.remove("arrow");
+  document.getElementById("bdate").classList.remove("arrow");
+  element.classList.remove("arrow-up");
+  element.classList.remove("arrow-down");
+  element.classList.add("arrow");
   while (switching) {
     switching = false;
     b = list.getElementsByTagName("div");
@@ -309,18 +305,38 @@ function sortListDir(type) {
 				}
 			  }
 		  }
+		} else if (type == "date"){
+		  if(b[i].dataset.date && b[i + 1].dataset.date){
+			  if (dir == "asc") {
+				if (new Date(b[i].dataset.date) > new Date(b[i + 1].dataset.date)) {
+				  shouldSwitch = true;
+				  break;
+				}
+			  } else if (dir == "desc") {
+				if (new Date(b[i].dataset.date) < new Date(b[i + 1].dataset.date)) {
+				  shouldSwitch= true;
+				  break;
+				}
+			  }
+		  }
 		}
 	}
     if (shouldSwitch) {
       b[i].parentNode.insertBefore(b[i + 1], b[i]);
       switching = true;
-      switchcount ++;
+      switchcount++;
     } else {
       if (switchcount == 0 && dir == "asc") {
         dir = "desc";
         switching = true;
       }
     }
+  }
+  if (dir == "asc") {
+	element.classList.add("arrow-down");
+  }
+  else{
+	element.classList.add("arrow-up");
   }
 }
 </script>
