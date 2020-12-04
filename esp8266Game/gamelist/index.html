@@ -34,8 +34,15 @@ h1{
 .block:hover span{
 	padding: 0px;
 }
-img {
+img { 
 	display: block;
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
 }
 span {
 	display: block;
@@ -114,7 +121,7 @@ button:active {
 			<span>ESPtris</span>
 		</a>
 	</div><div class="block" data-name="fourinarow" data-author="corax" data-date="2020-12-1">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=2aa481d0b7511c7c22d8faa971475b6f">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=7bb0c9be2c0e25ae2486fe7bff1863ff">
 			<img src="fourinarow.gif" width="241" height="241" alt="game four in a row">
 			<span>four in a row</span>
 		</a>
@@ -214,7 +221,7 @@ button:active {
 			<span>worm blast</span>
 		</a>
 	</div><div class="block" data-name="1916" data-author="corax" data-date="2019-8-21">
-		<a href="https://corax89.github.io/esp8266Game/index.html?src=7bb0c9be2c0e25ae2486fe7bff1863ff">
+		<a href="https://corax89.github.io/esp8266Game/index.html?src=ac92a491cb80cf65b7741877bfb21e2a">
 			<img src="1916.gif" width="241" height="241" alt="game 1916">
 			<span>1916</span>
 		</a>
