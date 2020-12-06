@@ -1135,7 +1135,7 @@ function compile(t) {
 						putError(lineCount, 11, ''); //info("" + lineCount + " неправильное объявление массива");
 				}
 				if (arraylen2d)
-					arraylen2d--;
+					arraylen2d-=2;
 				if (type == 'int' || type == 'fixed') {
 					dataAsm.push('_' + name + ': \n DW ' + buf.substring(0, buf.length - 1));
 				} else if (type == 'char') {
@@ -1599,9 +1599,9 @@ function compile(t) {
 				typeCastToFirst(registerCount - 1, 'int');
 				if (v.length2) {
 					if ((v.length / v.length2) - 1 < 255)
-						asm.push(' LDC R' + registerCount + ',' + ((v.length / v.length2) - 1));
+						asm.push(' LDC R' + registerCount + ',' + (Math.ceil(v.length / v.length2) - 1));
 					else
-						asm.push(' LDI R' + registerCount + ',' + ((v.length / v.length2) - 1));
+						asm.push(' LDI R' + registerCount + ',' + (Math.ceil(v.length / v.length2) - 1));
 					asm.push(' MUL R' + (registerCount - 1) + ',R' + registerCount);
 				}
 				asm.push(' ADD R' + (registerCount - 2) + ',R' + (registerCount - 1));
