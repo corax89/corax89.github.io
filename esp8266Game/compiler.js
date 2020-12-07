@@ -1135,7 +1135,7 @@ function compile(t) {
 						putError(lineCount, 11, ''); //info("" + lineCount + " неправильное объявление массива");
 				}
 				if (arraylen2d)
-					arraylen2d-=2;
+					arraylen2d -= 2;
 				if (type == 'int' || type == 'fixed') {
 					dataAsm.push('_' + name + ': \n DW ' + buf.substring(0, buf.length - 1));
 				} else if (type == 'char') {
@@ -1306,7 +1306,7 @@ function compile(t) {
 				} else if (isVar(thisToken))
 					buf += '_' + thisToken;
 				asm.push(' LDI R' + registerCount + ',' + buf);
-				if (struct[3][nVar][0] == 'char') {
+				if (struct[spos][0] == 'char') {
 					asm.push(' STC (_' + thisVar.name + ' + R' + (registerCount - 1) + '),R' + registerCount);
 					asm.push(' INC R' + (registerCount - 1) + ',1');
 				} else {
