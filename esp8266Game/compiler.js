@@ -1285,6 +1285,8 @@ function compile(t) {
 				asm.push(' ADD R' + (registerCount + 1) + ',R' + (registerCount - 1));
 			}
 			var spos = 0;
+			var scount = 0;
+			var bcount = 0;
 			while (thisToken && thisToken != '}') {
 				var buf = '',
 				minus = false;
@@ -1292,9 +1294,19 @@ function compile(t) {
 				removeNewLine();
 				if (!thisToken)
 					return;
+				if (thisToken == '{') {
+					bcount++;
+					getToken();
+					removeNewLine();
+					spos = 0;
+				}
 				if (thisToken == '-') {
 					minus = true;
 					getToken();
+				}
+				if (spos >= struct.length) {
+					spos = 0;
+					putError(lineCount, 12, '');
 				}
 				if (isNumber(parseInt(thisToken))) {
 					if (minus)
@@ -1314,12 +1326,20 @@ function compile(t) {
 					asm.push(' INC R' + (registerCount - 1) + ',2');
 				}
 				spos++;
+				scount++;
 				getToken();
 				removeNewLine();
 				if (!(thisToken == '}' || thisToken == ','))
 					putError(lineCount, 11, ''); //info("" + lineCount + " неправильное объявление массива");
+				if (thisToken == '}' && bcount > 0) {
+					bcount--;
+					getToken();
+					removeNewLine();
+				}
 			}
 			asm.pop();
+			if ((thisVar.length - 1) * struct.length < scount)
+				putError(lineCount, 12, '');
 		} else {
 			if (!(op == '++' || op == '--' || (incdec && (op == ';' || op == ',' || op == ')')))) {
 				execut();
@@ -1433,7 +1453,11 @@ function compile(t) {
 		s = structArr[newType.indexOf(v.type)];
 		var members = s[3];
 		getToken();
-		if (thisToken == '.') {
+		if (thisToken == '=') {
+			asm.push(' LDI R' + registerCount + ',(_' + v.name + ')');
+			registerCount++;
+			structAssigment(v, members, s, n, false);
+		} else if (thisToken == '.') {
 			getToken();
 			for (var i = 0; i < members.length; i++) {
 				if (members[i][1] == thisToken) {
