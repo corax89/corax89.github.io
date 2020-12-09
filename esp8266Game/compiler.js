@@ -836,6 +836,7 @@ function compile(t) {
 					length2: false
 				});
 				asm.push(' _' + thisToken + ' byte ' + len + ' dup(?)');
+				
 			} else {
 				varTable.push({
 					name: thisToken,
@@ -1183,7 +1184,15 @@ function compile(t) {
 				length: length,
 				length2: length2
 			});
-			if (thisToken == '=') {
+			if (thisToken == '=' && isStruct(type)) {
+				var v = getVar(name);
+				var s = structArr[newType.indexOf(v.type)];
+				var members = s[3];
+				asm.push(' LDI R' + registerCount + ',(_' + v.name + ')');
+				registerCount++;
+				structAssigment(v, members, s, 0, false);
+			}
+			else if (thisToken == '=') {
 				getToken();
 				if (thisToken != '{')
 					putError(lineCount, 11, '');
