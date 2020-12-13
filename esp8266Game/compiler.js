@@ -2091,6 +2091,7 @@ function compile(t) {
 		removeNewLine();
 		//если открывающая фигурная скобка пропускаем блок этих скобок
 		if (thisToken == '{') {
+			registerCount = 1;
 			skipBrace();
 		}
 		//иначе просто выполняем до конца строки
@@ -2173,8 +2174,10 @@ function compile(t) {
 				getToken();
 				execut();
 			}
-			if (thisToken == ')')
+			if (thisToken == ')'){
 				getToken();
+				bracketCount--;
+			}
 		}
 		registerCount = 1;
 		getToken();
@@ -2184,6 +2187,7 @@ function compile(t) {
 		getToken();
 		if (thisToken != '(')
 			putError(lineCount, 13, 'while'); //info("" + lineCount + " ожидалась открывающая скобка в конструкции while");
+		bracketCount++;
 		skipBracket();
 		registerCount--;
 		asm.push(' CMP R' + registerCount + ',0 \n JZ end_dowhile_' + labe);
