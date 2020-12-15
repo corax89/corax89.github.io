@@ -310,6 +310,9 @@ function compile(t) {
 			case 22:
 				er = "тип " + par + " не поддерживается";
 				break;
+			case 23:
+				er = "неизвестная критическая ошибка компиляции " + par;
+				break;
 			}
 		else
 			switch (error) {
@@ -380,6 +383,9 @@ function compile(t) {
 				break;
 			case 22:
 				er = "type " + par + " not supported";
+				break;
+			case 23:
+				er = "unknown critical compilation error " + par;
 				break;
 			}
 		info("" + (line + 1) + " " + er);
@@ -2579,6 +2585,11 @@ function compile(t) {
 				}
 			}
 			registerCount++;
+			if(registerCount > 14){
+				previousToken();
+				putError(lineCount, 23, '' + lastToken + thisToken);
+				thisTokenNumber = 100000000;
+			}
 		} else if (getRangOperation(thisToken) > 0) {
 			//в этих условиях скорее всего работа с указателями, но это не всегда так, нужно улучшить
 			if (thisToken == '&' && (lastToken == '(' || lastToken == '=' || lastToken == ','))

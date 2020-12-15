@@ -950,6 +950,8 @@ function run() {
 	}
 	timertime += 16;
 	var diff = (new Date().getTime() - timerstart) - timertime;
+	if(diff > 12)
+		diff = 12;
 	clearTimeout(timerId);
 	timerId = setTimeout(function () {
 			run()
