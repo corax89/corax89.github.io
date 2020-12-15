@@ -223,7 +223,7 @@ function snapshotTable(){
 		localStorage.setItem('save_snapshots', '');
 		snapshots = [];
 	}
-	sdiv.innerHTML = '<button onclick="addSnapshotManually()">save snapsot</button><br>';
+	sdiv.innerHTML = '<button onclick="addSnapshotManually()">save snapshot</button><br>';
 	if (s && s.length > 0) {
 		for(var i = 0; i < s.length; i++){
 			sdiv.innerHTML += s[i].date + '<br>' + s[i].name + 
