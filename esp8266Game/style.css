@@ -301,6 +301,7 @@ textarea:focus {
 	padding: 0.5em 0 0.5em 0;
 	display: flex;
 	justify-content: space-around;
+	overflow: hidden;
 }
 #alert > b {
 	color: #F11;

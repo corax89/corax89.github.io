@@ -1355,6 +1355,28 @@ function Cpu() {
 			mem[to_adr++] = mem[from_adr++];
 		}
 	}
+	
+	function serialBegin(){
+		return 1;
+	}
+
+	function serialAvailable(){
+		popFromWindow();
+		if(serialBuffer && serialBuffer.length > 0)
+			return 1;
+		return 0;
+	}
+
+	function serialRead(){
+		if(serialBuffer && serialBuffer.length > 0)
+			return serialBuffer.pop();
+		return 0;
+	}
+
+	function serialWrite(n){
+		pushToWindow(n);
+		return 1;
+	}
 
 	function step() {
 		//все команды двухбайтные, за некоторыми следуют два байта данных
@@ -1587,6 +1609,25 @@ function Cpu() {
 				r1 = (o2 & 0xf0) >> 4;
 				r2 = o2 & 0xf;
 				reg[r1] = saveData(reg[r1], reg[r2]);
+				break;
+			case 0x59:
+				if (o2 < 0x10) {
+					// SERBEGIN R			59 0R
+					r2 = o2 & 0xf;
+					reg[r2] = serialBegin();
+				} else if (o2 < 0x20) {
+					// SERAVAIL R			59 1R
+					r2 = o2 & 0xf;
+					reg[r2] = serialAvailable();
+				} else if (o2 < 0x30) {
+					// SERREAD R			59 2R
+					r2 = o2 & 0xf;
+					reg[r2] = serialRead();
+				} else if (o2 < 0x40) {
+					// SERWRITE R			59 3R
+					r2 = o2 & 0xf;
+					serialWrite(reg[r2]);
+				}
 				break;
 			}
 			break;

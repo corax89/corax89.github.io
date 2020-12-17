@@ -801,6 +801,22 @@ function asm(s) {
 				out.push(0x58); // SDATA R,R			58 RR
 				out.push((getRegister(a[i + 1]) << 4) + (getRegister(a[i + 3])));
 				return;
+			case 'SERBEGIN':
+				out.push(0x59); // SERBEGIN R			59 0R
+				out.push(0x00 + (getRegister(a[i + 1])));
+				return;
+			case 'SERAVAIL':
+				out.push(0x59); // SERAVAIL R			59 1R
+				out.push(0x10 + (getRegister(a[i + 1])));
+				return;
+			case 'SERREAD':
+				out.push(0x59); // SERREAD R			59 2R
+				out.push(0x20 + (getRegister(a[i + 1])));
+				return;
+			case 'SERWRITE':
+				out.push(0x59); // SERWRITE R			59 3R
+				out.push(0x30 + (getRegister(a[i + 1])));
+				return;
 			case 'LDF': //load flag LDF R,F				C2 RF
 				out.push(0xC2);
 				out.push((getRegister(a[i + 1]) << 4) + (strToNum(a[i + 3]) & 0xf));
@@ -874,6 +890,9 @@ function asm(s) {
 	info("<i>program size " + out.length + " bytes</i>");
 	info("<i>variables occupy " + variableAdress + " bytes</i>");
 	info("<i>total occupied memory " + (out.length + variableAdress) + " bytes</i>");
+	if(out.length + variableAdress > 20000){
+		info("Warning! The program uses more than 20 kb of code and will not work on espBoy!");
+	}
 	display.reset();
 	cpu.init();
 	cpu.load(out);

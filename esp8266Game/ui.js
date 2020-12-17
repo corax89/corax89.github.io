@@ -51,6 +51,8 @@ var saveGifFrame = 0;
 var gif;
 var memoryType = 0;
 var snapshots = [];
+var secondWindow;
+var serialBuffer = [];
 
 sourceArea.addEventListener("click", testForImageArray, true);
 sourceArea.onscroll = function (ev) {
@@ -311,13 +313,18 @@ function loadSettings() {
 	if (fs) {
 		var sourceSettings = fs[1];
 		if (sourceSettings.length > 5) {
-			var settings = JSON.parse(sourceSettings);
-			fileName = settings.name;
-			fileAuthor = settings.author;
-			fileIco = saveIco(settings.image.join(','));
-			document.getElementById("fileName").value = fileName;
-			document.getElementById("fileAuthor").value = fileAuthor;
-			document.getElementById("fileIco").value = fileIco;
+			try {
+				var settings = JSON.parse(sourceSettings);
+				fileName = settings.name;
+				fileAuthor = settings.author;
+				fileIco = saveIco(settings.image.join(','));
+				document.getElementById("fileName").value = fileName;
+				document.getElementById("fileAuthor").value = fileAuthor;
+				document.getElementById("fileIco").value = fileIco;
+			}
+			catch(e){
+				info("settings loading error");
+			}
 		}
 	}
 }
@@ -329,6 +336,7 @@ function viewDebugPanel() {
 		document.getElementById("cpuPreview").style.width = "0";
 		document.getElementById("wrap-left").style.width = "256px";
 		document.getElementById("viewKeyboard").style.left = "6em";
+		document.getElementById("clone").style.display = "none";
 		viewDebugV = false;
 	} else {
 		document.getElementById("ram").style.display = "block";
@@ -336,9 +344,40 @@ function viewDebugPanel() {
 		document.getElementById("cpuPreview").style.width = "11em";
 		document.getElementById("wrap-left").style.width = "54em";
 		document.getElementById("viewKeyboard").style.left = "27em";
+		document.getElementById("clone").style.display = "inline-block";
 		viewDebugV = true;
 	}
 	pixelColorHighlight();
+}
+
+function clone(){
+	var newByteArr = [];
+	loadSettings();
+	main();
+	if (file.length > 1) {
+		var newFile = saveAsHtml(compress(file), fileIco);
+		if(secondWindow == null || secondWindow.closed)
+			secondWindow = window.open('','','left=0,top=0,width=450,height=370,toolbar=0,scrollbars=1,status=0');
+		if(secondWindow != null) {
+			secondWindow.document.write(newFile);
+			secondWindow.document.close();
+			secondWindow.focus();
+			secondWindow.serialBuffer = [];
+		}
+	}
+}
+
+function popFromWindow(){
+	if(secondWindow != null && !secondWindow.closed){
+		if(secondWindow.serialBuffer1 && secondWindow.serialBuffer1.length > 0){
+			serialBuffer.push(secondWindow.serialBuffer1.pop());
+		}
+	}
+}
+
+function pushToWindow(n){
+	if(secondWindow != null && !secondWindow.closed)
+		secondWindow.serialBuffer.push(n);
 }
 
 function setup_mouse(id_div_wind, id_div_drag) {

@@ -2732,6 +2732,10 @@ function compile(t) {
 	registerFunction('playrtttl', 'int', [], 1, 'PLAYRT', true, 0);
 	registerFunction('pausertttl', 'int', [], 1, 'PAUSERT', true, 0);
 	registerFunction('stoprtttl', 'int', [], 1, 'STOPRT', true, 0);
+	registerFunction('serialbegin', 'int', [], 1, 'SERBEGIN R%0', true, 0);
+	registerFunction('serialavailable', 'int', [], 1, 'SERAVAIL R%0', true, 0);
+	registerFunction('serialread', 'int', [], 1, 'SERREAD R%0', true, 0);
+	registerFunction('serialwrite', 'int', ['char', 'n'], 1, 'SERWRITE R%1', true, 0);
 	registerFunction('savedata', 'int', ['int', 'name', 'int', 'array', 'int', 'count'], 1, 'NDATA R%3 \n SDATA R%2,R%1 \n MOV R%3,R%2', true, 0);
 	registerFunction('loaddata', 'int', ['int', 'name', 'int', 'array'], 1, 'NDATA R%2 \n LDATA R%1 \n MOV R%2,R%1', true, 0);
 	registerFunction('drawtile', 'void', ['int', 'x', 'int', 'y'], 1, 'DRTILE R%2,R%1', true, 0);
