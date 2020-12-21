@@ -841,6 +841,10 @@ function asm(s) {
 				out.push(0xC3); // MEMCPY R				C3 4R
 				out.push(0x40 + (getRegister(a[i + 1])));
 				return;
+			case 'UNPKRLE':
+				out.push(0xC3); // UNPKRLE R			C3 5R
+				out.push(0x50 + (getRegister(a[i + 1])));
+				return;
 			case 'MULF':
 				out.push(0xC4); // MULF R,R				C4 RR
 				out.push((getRegister(a[i + 1]) << 4) + (getRegister(a[i + 3])));

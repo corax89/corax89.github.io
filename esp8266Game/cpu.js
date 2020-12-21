@@ -813,41 +813,41 @@ function Cpu() {
 		a++;
 		var color1 = (readMem(a) & 0xf0) >> 4;
 		var color2 = readMem(a) & 0xf
-			if (x1 > 0x7fff)
-				x1 -= 0xffff;
-			if (y1 > 0x7fff)
-				y1 -= 0xffff;
-			while (i < w * h) {
-				if (repeat > 0x81) {
-					if (color1 > 0)
-						display.plot(color1, x1 + i % w, y1 + Math.floor(i / w));
-					if (color2 > 0)
-						display.plot(color2, x1 + i % w + 1, y1 + Math.floor(i / w));
-					i += 2;
-					a++;
-					repeat--;
-					color1 = (readMem(a) & 0xf0) >> 4;
-					color2 = readMem(a) & 0xf;
-				} else if (repeat == 0x81) {
-					repeat = readMem(a);
-					a++;
-					color1 = (readMem(a) & 0xf0) >> 4;
-					color2 = readMem(a) & 0xf;
-				} else if (repeat > 0) {
-					if (color1 > 0)
-						display.plot(color1, x1 + i % w, y1 + Math.floor(i / w));
-					if (color2 > 0)
-						display.plot(color2, x1 + i % w + 1, y1 + Math.floor(i / w));
-					i += 2;
-					repeat--;
-				} else if (repeat == 0) {
-					a++;
-					repeat = readMem(a);
-					a++;
-					color1 = (readMem(a) & 0xf0) >> 4;
-					color2 = readMem(a) & 0xf;
-				}
+		if (x1 > 0x7fff)
+			x1 -= 0xffff;
+		if (y1 > 0x7fff)
+			y1 -= 0xffff;
+		while (i < w * h) {
+			if (repeat > 0x81) {
+				if (color1 > 0)
+					display.plot(color1, x1 + i % w, y1 + Math.floor(i / w));
+				if (color2 > 0)
+					display.plot(color2, x1 + i % w + 1, y1 + Math.floor(i / w));
+				i += 2;
+				a++;
+				repeat--;
+				color1 = (readMem(a) & 0xf0) >> 4;
+				color2 = readMem(a) & 0xf;
+			} else if (repeat == 0x81) {
+				repeat = readMem(a);
+				a++;
+				color1 = (readMem(a) & 0xf0) >> 4;
+				color2 = readMem(a) & 0xf;
+			} else if (repeat > 0) {
+				if (color1 > 0)
+					display.plot(color1, x1 + i % w, y1 + Math.floor(i / w));
+				if (color2 > 0)
+					display.plot(color2, x1 + i % w + 1, y1 + Math.floor(i / w));
+				i += 2;
+				repeat--;
+			} else if (repeat == 0) {
+				a++;
+				repeat = readMem(a);
+				a++;
+				color1 = (readMem(a) & 0xf0) >> 4;
+				color2 = readMem(a) & 0xf;
 			}
+		}
 	}
 	//рисование однобитной картинки
 	function drawImage1bit(a, x1, y1, w, h) {
@@ -1353,6 +1353,38 @@ function Cpu() {
 		num_bytes &= 0xffff;
 		for (var i = 0; i < num_bytes; i++) {
 			mem[to_adr++] = mem[from_adr++];
+		}
+	}
+	
+	function unpackingRLE(to_adr, a, num_bytes) {
+		to_adr &= 0xffff;
+		a &= 0xffff;
+		num_bytes &= 0xffff;
+		var i = 0;
+		var repeat = readMem(a);
+		a++;
+		var color = readMem(a);
+		while (i < num_bytes) {
+			if (repeat > 0x81) {
+				mem[to_adr++] = color;
+				i++;
+				a++;
+				repeat--;
+				color = readMem(a);
+			} else if (repeat == 0x81) {
+				repeat = readMem(a);
+				a++;
+				color = readMem(a);
+			} else if (repeat > 0) {
+				mem[to_adr++] = color;
+				i++;
+				repeat--;
+			} else if (repeat == 0) {
+				a++;
+				repeat = readMem(a);
+				a++;
+				color = readMem(a);
+			}
 		}
 	}
 	
@@ -2026,6 +2058,11 @@ function Cpu() {
 				else if (r2 == 0x40) {
 					adr = reg[r1];
 					copyMem(readInt(adr + 4), readInt(adr + 2), readInt(adr));
+				}
+				// UNPKRLE R	C3 5R
+				else if (r2 == 0x50) {
+					adr = reg[r1];
+					unpackingRLE(readInt(adr + 4), readInt(adr + 2), readInt(adr));
 				}
 				break;
 			case 0xC4:

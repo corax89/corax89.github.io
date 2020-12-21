@@ -19,7 +19,7 @@ function tokenize(s) {
 		while (lastDefine.length != 0) {
 			lastDefine = [];
 			s = s.replace(/#define\s*([^\n]*)/, function (str, def, offset, s) {
-					lastDefine = [def];
+					lastDefine = [def.replace(/\s+/, ' ')];
 					return ' ';
 				});
 			if (lastDefine.length > 0) {
@@ -69,7 +69,7 @@ function tokenize(s) {
 					}
 				} else {
 					d = d.split(' ');
-					s = s.replace(new RegExp(d[0], 'g'), d.slice(1).join(' '));
+					s = s.replace(new RegExp(d[0], 'g'), d.slice(1).join(' ').replace(/\/\/.*/g, ''));
 				}
 			}
 		}
@@ -2634,8 +2634,10 @@ function compile(t) {
 			return;
 		} else if (thisToken == 'true') {
 			asm.push(' LDC R' + registerCount + ',1');
+			registerCount++;
 		} else if (thisToken == 'false') {
 			asm.push(' LDC R' + registerCount + ',0');
+			registerCount++;
 		} else if (thisToken == 'return') {
 			returnToken();
 		} else if (thisToken == 'struct') {
@@ -2794,6 +2796,9 @@ function compile(t) {
 	dataAsm = [];
 	dataAsm.push('_memcpy: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n MEMCPY R1 \n RET');
 	registerFunction('memcpy', 'void', ['int', 'a1', 'int', 'a2', 'int', 'size'], 1, dataAsm, false, 0);
+	dataAsm = [];
+	dataAsm.push('_unpuckrle: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n UNPKRLE R1 \n RET');
+	registerFunction('unpuckrle', 'void', ['int', 'a1', 'int', 'a2', 'int', 'size'], 1, dataAsm, false, 0);
 	dataAsm = [];
 	dataAsm.push('_setparticle: \n_@prt: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n SPART R1 \n RET');
 	registerFunction('setparticle', 'void', ['int', 'gravity', 'int', 'count', 'int', 'time'], 1, dataAsm, false, 0);
