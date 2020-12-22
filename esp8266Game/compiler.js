@@ -313,6 +313,9 @@ function compile(t) {
 			case 23:
 				er = "неизвестная критическая ошибка компиляции " + par;
 				break;
+			case 24:
+				er = "переменная " + par + " не является массивом";
+				break;
 			}
 		else
 			switch (error) {
@@ -386,6 +389,9 @@ function compile(t) {
 				break;
 			case 23:
 				er = "unknown critical compilation error " + par;
+				break;
+			case 24:
+				er = "variable " + par + " is not an array";
 				break;
 			}
 		info("" + (line + 1) + " " + er);
@@ -839,7 +845,8 @@ function compile(t) {
 					name: thisToken,
 					type: type,
 					length: len,
-					length2: false
+					length2: false,
+					isArray: false
 				});
 				asm.push(' _' + thisToken + ' byte ' + len + ' dup(?)');
 				
@@ -848,7 +855,8 @@ function compile(t) {
 					name: thisToken,
 					type: type,
 					length: 1,
-					length2: false
+					length2: false,
+					isArray: false
 				});
 				asm.push(' _' + thisToken + ' word ? ');
 			}
@@ -1086,8 +1094,27 @@ function compile(t) {
 				putError(lineCount, 10, ''); //info("" + lineCount + " не указана длина массива");
 			else
 				getToken();
+			if (isStruct(type) && thisToken == '{'){
+				var l = structArr[newType.indexOf(type)][1];
+				varTable.push({
+					name: name,
+					type: type,
+					length: length,
+					length2: -1,
+					isArray: true
+				});
+				var v = getVar(name);
+				var s = structArr[newType.indexOf(v.type)];
+				var members = s[3];
+				asm.push(' LDI R' + registerCount + ',(_' + v.name + ')');
+				registerCount++;
+				previousToken();
+				l = structAssigment(v, members, s, 0, false);
+				newArr = (' _' + name + ' byte ' + l + ' dup(?)');
+				dataAsm.push(newArr);
+			}
 			//массив это строка символов
-			if (thisToken[0] == '"') {
+			else if (thisToken[0] == '"') {
 				length = thisToken.length - 2;
 				dataAsm.push('_' + name + ':');
 				pushString();
@@ -1095,7 +1122,8 @@ function compile(t) {
 					name: name,
 					type: type,
 					length: length,
-					length2: false
+					length2: false,
+					isArray: true
 				});
 			}
 			//массив уже заполнен, считаем количество элементов
@@ -1152,7 +1180,8 @@ function compile(t) {
 					name: name,
 					type: type,
 					length: length,
-					length2: arraylen2d
+					length2: arraylen2d,
+					isArray: true
 				});
 			}
 		}
@@ -1188,7 +1217,8 @@ function compile(t) {
 				name: name,
 				type: type,
 				length: length,
-				length2: length2
+				length2: length2,
+				isArray: true
 			});
 			if (thisToken == '=' && isStruct(type)) {
 				var v = getVar(name);
@@ -1237,7 +1267,8 @@ function compile(t) {
 					name: name,
 					type: type,
 					length: length,
-					length2: false
+					length2: false,
+					isArray: true
 				});
 			}
 			dataAsm.push(newArr);
@@ -1302,6 +1333,7 @@ function compile(t) {
 			var spos = 0;
 			var scount = 0;
 			var bcount = 0;
+			var acount;
 			while (thisToken && thisToken != '}') {
 				var buf = '',
 				minus = false;
@@ -1336,9 +1368,11 @@ function compile(t) {
 				if (struct[spos][0] == 'char') {
 					asm.push(' STC (_' + thisVar.name + ' + R' + (registerCount - 1) + '),R' + registerCount);
 					asm.push(' INC R' + (registerCount - 1) + ',1');
+					acount++;
 				} else {
 					asm.push(' STI (_' + thisVar.name + ' + R' + (registerCount - 1) + '),R' + registerCount);
 					asm.push(' INC R' + (registerCount - 1) + ',2');
+					acount += 2;
 				}
 				spos++;
 				scount++;
@@ -1353,8 +1387,9 @@ function compile(t) {
 				}
 			}
 			asm.pop();
-			if ((thisVar.length - 1) * struct.length < scount)
+			if ((thisVar.length - 1) * struct.length < scount && thisVar.length2 != -1)
 				putError(lineCount, 12, '');
+			return acount;
 		} else {
 			if (!(op == '++' || op == '--' || (incdec && (op == ';' || op == ',' || op == ')')))) {
 				execut();
@@ -1502,6 +1537,9 @@ function compile(t) {
 				structAssigment(v, s, m[3], n, false);
 		} else if (thisToken == '[') {
 			//вычисление номера ячейки массива
+			if(v.isArray == false){
+				putError(lineCount, 24, v.name);
+			}
 			getToken();
 			while (thisToken != ']') {
 				if (!thisToken || ('}]),:'.indexOf(thisToken) > -1)) {
