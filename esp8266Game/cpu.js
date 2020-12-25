@@ -884,10 +884,10 @@ function Cpu() {
 			x1 -= 0xffff;
 		if (y1 > 0x7fff)
 			y1 -= 0xffff;
-		for (var yi = 0; yi < ((h * s) >> MULTIPLY_FP_RESOLUTION_BITS); yi++) {
-			y2 = Math.floor(((yi << MULTIPLY_FP_RESOLUTION_BITS) + 1) / s);
-			for (var xi = 0; xi < ((w * s) >> MULTIPLY_FP_RESOLUTION_BITS); xi++) {
-				x2 = Math.floor(((xi << MULTIPLY_FP_RESOLUTION_BITS) + 1) / s);
+		for (var yi = 0; yi < ((h * s) >> 8); yi++) {
+			y2 = Math.floor(((yi << 8) + 1) / s);
+			for (var xi = 0; xi < ((w * s) >> 8); xi++) {
+				x2 = Math.floor(((xi << 8) + 1) / s);
 				hx2 = Math.floor(x2 / 2);
 				if (x2 & 1) {
 					p = readMem(a + hx2 + Math.floor((y2 * w) / 2));
@@ -904,7 +904,7 @@ function Cpu() {
 
 	function drawImageRLES(a, x1, y1, w, h) {
 		var i = 0;
-		var s = Math.floor(imageSize >> MULTIPLY_FP_RESOLUTION_BITS);
+		var s = Math.floor(imageSize >> 8);
 		var repeat = readMem(a);
 		a++;
 		var color1 = (readMem(a) & 0xf0) >> 4;
@@ -958,10 +958,10 @@ function Cpu() {
 			x -= 0xffff;
 		if (y > 0x7fff)
 			y -= 0xffff;
-		for (var yi = 0; yi < ((h * s) >> MULTIPLY_FP_RESOLUTION_BITS); yi++) {
-			y2 = Math.floor(((yi << MULTIPLY_FP_RESOLUTION_BITS) + 1) / s);
-			for (var xi = 0; xi < ((w * s) >> MULTIPLY_FP_RESOLUTION_BITS); xi++) {
-				x2 = Math.floor(((xi << MULTIPLY_FP_RESOLUTION_BITS) + 1) / s);
+		for (var yi = 0; yi < ((h * s) >> 8); yi++) {
+			y2 = Math.floor(((yi << 8) + 1) / s);
+			for (var xi = 0; xi < ((w * s) >> 8); xi++) {
+				x2 = Math.floor(((xi << 8) + 1) / s);
 				p = readMem(a + Math.floor(x2 / 8 + (y2 * w) / 8));
 				c = (1 << (7 - (Math.floor(x2 + y2 * w) & 7)));
 				if (p & c)
@@ -1363,27 +1363,54 @@ function Cpu() {
 		var i = 0;
 		var repeat = readMem(a);
 		a++;
-		var color = readMem(a);
+		var c = readMem(a);
 		while (i < num_bytes) {
 			if (repeat > 0x81) {
-				mem[to_adr++] = color;
+				mem[to_adr++] = c;
 				i++;
 				a++;
 				repeat--;
-				color = readMem(a);
+				c = readMem(a);
 			} else if (repeat == 0x81) {
 				repeat = readMem(a);
 				a++;
-				color = readMem(a);
+				c = readMem(a);
 			} else if (repeat > 0) {
-				mem[to_adr++] = color;
+				mem[to_adr++] = c;
 				i++;
 				repeat--;
 			} else if (repeat == 0) {
 				a++;
 				repeat = readMem(a);
 				a++;
-				color = readMem(a);
+				c = readMem(a);
+			}
+		}
+	}
+	
+	function unpackingLZ(to_adr, a, num_bytes) {
+		to_adr &= 0xffff;
+		a &= 0xffff;
+		num_bytes &= 0xffff;
+		var i = 0,
+		length,
+		position,
+		point;
+		while (i < num_bytes) {
+			if ((readMem(a) & 128) == 0) {
+				length = ((readMem(a++) & 127) << 8) + readMem(a++);
+				for (var j = 0; j < length; j++) {
+					mem[to_adr++] = readMem(a++);
+					i++;
+				}
+			} else {
+				length = (readMem(a) & 127) >> 1;
+				position = (((readMem(a++) & 1) << 8) + readMem(a++));
+				point = to_adr - position;
+				for (var j = 0; j < length; j++) {
+					mem[to_adr++] = readMem(point + j);
+					i++;
+				}
 			}
 		}
 	}
@@ -2064,6 +2091,15 @@ function Cpu() {
 					adr = reg[r1];
 					unpackingRLE(readInt(adr + 4), readInt(adr + 2), readInt(adr));
 				}
+				// UNPKLZ R	C3 6R
+				else if (r2 == 0x60) {
+					adr = reg[r1];
+					unpackingLZ(readInt(adr + 4), readInt(adr + 2), readInt(adr));
+				}
+				// FBITS n	C3 7n
+				else if (r2 == 0x70) {
+					MULTIPLY_FP_RESOLUTION_BITS = r1;
+				}
 				break;
 			case 0xC4:
 				// MULF R,R		C4 RR
@@ -2175,7 +2211,7 @@ function Cpu() {
 					r1 = (o2 & 0xf);
 					var s,
 					u;
-					var tb = [0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023];
+					//var tb = [0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023];
 					s = reg[r1];
 					if (s < 32768)
 						u = (Math.floor(s / (1 << MULTIPLY_FP_RESOLUTION_BITS))).toString(10);

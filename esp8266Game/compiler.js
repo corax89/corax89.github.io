@@ -1,4 +1,5 @@
 "use strict";
+var MULTIPLY_FP_RESOLUTION_BITS = 8; //point position in fixed point number
 //разбивка на токены
 function tokenize(s) {
 	var tokens = [];
@@ -78,6 +79,15 @@ function tokenize(s) {
 
 	s = define(s);
 	s = s.replace(/#include[^\n]*/g, ''); //удаление инклюдов, дабы не мешали
+	s = s.replace(/#pragma([^\n])*/g, function (str, def, offset, f) { //настройки компилятора
+		var n = f.match(/fixed\s*Q*\s*(\d*)/);
+		n = parseInt(n[1], 10);
+		if(n < 16 && n > 0)
+			MULTIPLY_FP_RESOLUTION_BITS = n;
+		else
+			info("#pragma is not correct");
+		return '';
+	});
 	s = s.replace(/\r/g, ''); //удаление возврата каретки
 	s = s + '\n';
 	l = s.length;
@@ -231,7 +241,6 @@ function compile(t) {
 	var blockStack = []; // stack for break and continue
 	var switchStack = []; //указывает на последний switch, необходимо для обработки break
 	var typeOnStack = []; //тип значения в регистре
-	var MULTIPLY_FP_RESOLUTION_BITS = 8; //point position in fixed point number
 	var bracketCount = 0; //счетчик скобок
 	var longArg = false;
 	var lastNewLine = -1;
@@ -2838,6 +2847,9 @@ function compile(t) {
 	dataAsm.push('_unpuckrle: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n UNPKRLE R1 \n RET');
 	registerFunction('unpuckrle', 'void', ['int', 'a1', 'int', 'a2', 'int', 'size'], 1, dataAsm, false, 0);
 	dataAsm = [];
+	dataAsm.push('_unpucklz: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n UNPKLZ R1 \n RET');
+	registerFunction('unpucklz', 'void', ['int', 'a1', 'int', 'a2', 'int', 'size'], 1, dataAsm, false, 0);
+	dataAsm = [];
 	dataAsm.push('_setparticle: \n_@prt: \n MOV R1,R0 \n LDC R2,2 \n ADD R1,R2 \n SPART R1 \n RET');
 	registerFunction('setparticle', 'void', ['int', 'gravity', 'int', 'count', 'int', 'time'], 1, dataAsm, false, 0);
 	registerFunction('@prt', 'void', ['int', 'gravity', 'int', 'count', 'int', 'time'], 1, dataAsm, false, 0);
@@ -2881,6 +2893,8 @@ function compile(t) {
 	dataAsm.push('ret_malloc:\n RET');
 	registerFunction('malloc', 'int', ['int', 'l'], 1, dataAsm, false, 0);
 	dataAsm = [];
+	if(MULTIPLY_FP_RESOLUTION_BITS != 8)
+		asm.push(' ;pragma fixed\n FBITS ' + (MULTIPLY_FP_RESOLUTION_BITS & 0xf));
 	//основной цикл компиляции, выполняется пока есть токены на входе
 	while (getToken()) {
 		execut();

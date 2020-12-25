@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title></title>
+		<style>
+		textarea{
+			color: #516399;
+			height: 10em;
+			margin-top: 0.2em;
+			resize: none;
+			width: 80%;
+		}
+		button,input,select {
+			background: #3C456C;
+			border: none;
+			color: #ffffff;
+			font: normal 13px Verdana, Geneva, sans-serif;
+			font-style: normal;
+			height: 1.8em;
+			padding-left: 5px;
+		}
+		</style>
+    </head>
+    
+    <body>
+        <script>
+
+var sourcelength, compresslength, arrtype = 0;		
+		
+function settype(t){
+	arrtype = t;
+}		
+		
+function toarray(a, t){
+	var out = [];
+	if(t == 0){
+		a = a.replace(/[{}]/g, '');
+		a = a.split(',');
+		for(var i = 0; i < a.length; i++){
+			out.push(parseInt(a[i], 16));
+		}
+	} else {
+		for(var i = 0; i < a.length; i++){
+			out.push(a.charCodeAt(i) & 0xff);
+		}
+	}
+	return out;
+}
+
+function compress(file) {
+	var fpos = 0,
+	epos = 0,
+	lopos = 0,
+	len = 0;
+	sourcelength = file.length;
+	var out = [];
+	var find = function (array, pos) {
+		for (var j = Math.max(0, pos - 511); j < pos; j++) {
+			if ((array[j] === array[pos]) && (array[j + 1] === array[pos + 1]) && (array[j + 2] === array[pos + 2]) && (array[j + 3] === array[pos + 3]))
+				return j;
+		}
+		return -1;
+	}
+
+	out = file.slice(0, 3);
+	out.splice(0, 0, 0, 3);
+	lopos = 0;
+	for (var i = 3; i < file.length; i++) {
+		fpos = find(file, i);
+		epos = i;
+		if (fpos > -1) {
+			while (i < file.length && file[fpos + len] === file[i] && len < 63) {
+				len++;
+				i++;
+			}
+			out.push(128 + (len << 1) + ((epos - fpos) >> 8));
+			out.push((epos - fpos) & 0xff);
+			lopos = out.length;
+			out.push(0);
+			out.push(0);
+			len = 0;
+			i--;
+		} else {
+			out.push(file[i]);
+			out[lopos + 1]++;
+			if (out[lopos + 1] > 255) {
+				out[lopos + 1] = 0;
+				out[lopos]++;
+			}
+		}
+	}
+	compresslength = out.length;
+	return out;
+}
+
+function decompress(file) {
+	var out = [];
+	var i = 0,
+	length,
+	position,
+	point;
+	compresslength = file.length;
+	while (i < file.length) {
+		if ((file[i] & 128) == 0) {
+			length = ((file[i] & 127) << 8) + file[i + 1];
+			i += 2;
+			for (var j = 0; j < length; j++) {
+				out.push(file[i]);
+				i++;
+			}
+		} else {
+			length = (file[i] & 127) >> 1;
+			position = (((file[i] & 1) << 8) + file[i + 1]);
+			i += 2;
+			point = out.length - position;
+			for (var j = 0; j < length; j++) {
+				out.push(out[point + j]);
+			}
+		}
+	}
+	sourcelength = out.length;
+	return out;
+}
+
+function printHEX(file){
+	out = '{';
+	for (var i = 0; i < file.length; i++) {
+		out += '0x' + (file[i] >> 4).toString(16) + '' + (file[i] & 0xf).toString(16);
+		if(i < file.length - 1)
+			out += ',';
+	}
+	out += '};';
+	return out;
+}
+
+function printString(file){
+	out = '';
+	for (var i = 0; i < file.length; i++) {
+		out += String.fromCharCode(file[i]);
+	}
+	return out;
+}
+
+function run(v){
+	if(v == 0){
+		var a = document.getElementById("t").value;
+		var b = compress(toarray(a, arrtype)); 
+		var c = decompress(b);
+		document.getElementById("d").value = printHEX(b);
+		document.getElementById("info").innerHTML = 'compressratio ' + Math.floor(compresslength / (sourcelength / 100))  + '%'
+			+ ' decompress size ' + sourcelength + 'byte' + ' compress size ' + compresslength + 'byte';
+	} else {
+		var a = document.getElementById("t").value;
+		var b = decompress(toarray(a, 0));
+		if(arrtype == 0)
+			document.getElementById("d").value = printHEX(b);
+		else if(arrtype == 1)
+			document.getElementById("d").value = printString(b);
+		document.getElementById("info").innerHTML = 'compressratio ' + Math.floor(compresslength / (sourcelength / 100))  + '%'
+			+ ' decompress size ' + sourcelength + 'byte' + ' compress size ' + compresslength + 'byte';
+	}
+  }
+</script>
+
+<textarea id="t"></textarea>
+<br>
+<input type=button onClick="run(0)" value="Compress">
+<input type=button onClick="run(1)" value="Decompress">
+<input type="radio" id="checkchar" checked onclick="settype(0)" name="arrt">
+<label for="checkchar" onclick="settype(0)" >char array</label>
+<input type="radio" id="checkstring" onclick="settype(1)" name="arrt">
+<label for="checkstring" onclick="settype(1)" >string</label>
+<div id="info" style="display:inline-block"></div>
+<br>
+<textarea id="d"></textarea>
+    </body>
+</html>

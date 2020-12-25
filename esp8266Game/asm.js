@@ -845,6 +845,14 @@ function asm(s) {
 				out.push(0xC3); // UNPKRLE R			C3 5R
 				out.push(0x50 + (getRegister(a[i + 1])));
 				return;
+			case 'UNPKLZ':
+				out.push(0xC3); // UNPKLZ R			C3 6R
+				out.push(0x60 + (getRegister(a[i + 1])));
+				return;
+			case 'FBITS':
+				out.push(0xC3); // FBITS n			C3 7n
+				out.push(0x70 + ((a[i + 1]) & 0xf));
+				return;
 			case 'MULF':
 				out.push(0xC4); // MULF R,R				C4 RR
 				out.push((getRegister(a[i + 1]) << 4) + (getRegister(a[i + 3])));

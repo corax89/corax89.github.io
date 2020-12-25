@@ -66,6 +66,7 @@
 			<ul class="sub-menu">
 				<li><a href="soundEditor.html"  target="_blank" class="hrefb">rtttl editor</a></li>
 				<li><a href="ImageConverter.html"  target="_blank" class="hrefb">image converter</a></li>
+				<li><a href="compressеToLZ.html"  target="_blank" class="hrefb">array compressor</a></li>
 				<li><a href="https://haroldo-ok.itch.io/bitsy-converter"  target="_blank" class="hrefb">bitsy converter</a></li>
 			</ul>
 		</div>
@@ -441,6 +442,8 @@
 			*int malloc(int size);
 			void free(*int array);
 			void memcpy(*int array1, *int array2, int size);
+			void unpuckrle(*int array1, *int array2, int size);
+			void unpucklz(*int array1, *int array2, int size);
 			
 			// connections
 			int serialbegin();
