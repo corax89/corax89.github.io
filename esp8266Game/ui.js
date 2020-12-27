@@ -53,6 +53,9 @@ var memoryType = 0;
 var snapshots = [];
 var secondWindow;
 var serialBuffer = [];
+var serialviewtype = 1;
+var serialarray1 = [];
+var serialarray2 = [];
 
 sourceArea.addEventListener("click", testForImageArray, true);
 sourceArea.onscroll = function (ev) {
@@ -367,17 +370,97 @@ function clone(){
 	}
 }
 
+function updateSerial1(){
+	if(serialarray1.length > 512)
+		serialarray1.shift();
+	if(serialviewtype == 0){
+		document.getElementById('serial1text').value = serialarray1;
+	}
+	else{
+		document.getElementById('serial1text').value = '';
+		for(var i = 0; i < serialarray1.length; i++){
+			document.getElementById('serial1text').value += String.fromCharCode(serialarray1[i]);
+		}
+	}
+}
+
+function updateSerial2(){
+	if(serialarray2.length > 512)
+		serialarray2.shift();
+	if(serialviewtype == 0){
+		document.getElementById('serial2text').value = serialarray2;
+	}
+	else{
+		document.getElementById('serial2text').value = '';
+		for(var i = 0; i < serialarray2.length; i++){
+			document.getElementById('serial2text').value += String.fromCharCode(serialarray2[i]);
+		}
+	}
+}
+
+function serialviewsettype(t){
+	serialviewtype = t;
+	updateSerial1();
+	updateSerial2();
+}
+
 function popFromWindow(){
+	var s;
 	if(secondWindow != null && !secondWindow.closed){
 		if(secondWindow.serialBuffer1 && secondWindow.serialBuffer1.length > 0){
-			serialBuffer.push(secondWindow.serialBuffer1.pop());
+			s = secondWindow.serialBuffer1.pop();
+			serialBuffer.push(s);
+			serialarray2.push(s);
+			updateSerial2();
 		}
 	}
 }
 
 function pushToWindow(n){
 	if(secondWindow != null && !secondWindow.closed)
-		secondWindow.serialBuffer.push(n);
+		secondWindow.serialBuffer.unshift(n);
+	serialarray1.push(n);
+	updateSerial1();
+}
+
+function sendToSerialManual(n){
+	var s = document.getElementById('serialInput').value;
+	document.getElementById('serialInput').value = '';
+	if(n == 1){
+		if (serialviewtype == 0){
+			var n = parseInt(s);
+			if(!isNaN(n)){
+				serialBuffer.push();
+				serialarray2.push(n);
+			}
+			else
+				document.getElementById('serialInput').value = 'isNaN';
+		}
+		else{
+			for(var i = 0; i < s.length; i++){
+				serialBuffer.push(s.charCodeAt(i));
+				serialarray2.push(parseInt(s.charCodeAt(i)));
+			}
+		}
+		updateSerial2();
+	} else if(secondWindow != null && !secondWindow.closed) {
+		if (serialviewtype == 0){
+			var n = parseInt(s);
+			if(!isNaN(n)){
+				secondWindow.serialBuffer.unshift.push();
+				serialarray1.push(n);
+			}
+			else
+				document.getElementById('serialInput').value = 'isNaN';
+		}
+		else{
+			for(var i = 0; i < s.length; i++){
+				secondWindow.serialBuffer.unshift(s.charCodeAt(i));
+				serialarray1.push(parseInt(s.charCodeAt(i)));
+			}
+		}
+		updateSerial1();
+	}	
 }
 
 function setup_mouse(id_div_wind, id_div_drag) {
@@ -476,8 +559,6 @@ function keyDownHandler(e) {
 	globalKey = e.keyCode;
 	if (globalKey == 13)
 		globalKey = 0xA;
-	if (isRun)
-		e.preventDefault();
 }
 
 function keyUpHandler(e) {
@@ -514,8 +595,6 @@ function keyUpHandler(e) {
 		globalJKey &= ~128;
 		break;
 	}
-	if (isRun)
-		e.preventDefault();
 }
 
 function testForImageArray(e) {

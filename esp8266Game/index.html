@@ -296,7 +296,7 @@
 				<path fill="white" d="M26 30l6-16h-26l-6 16zM4 12l-4 18v-26h9l4 4h13v4z"></path>
 				</svg>
 			</button>
-			<label for="spriteWidthChoice">width: </label>
+			<label for="spriteWidthChoice">width</label>
 			<input list="spriteWidthList" id="spriteWidthChoice" onchange="spriteEditor.setSize()" style="width: 3em;"/>
 			<datalist id="spriteWidthList">
 				<option value="8">
@@ -305,7 +305,7 @@
 				<option value="64">
 				<option value="128">
 			</datalist>
-			<label for="spriteHeightChoice">height: </label>
+			<label for="spriteHeightChoice">height</label>
 			<input list="spriteHeightList" id="spriteHeightChoice" onchange="spriteEditor.setSize()" style="width: 3em;"/>
 			<datalist id="spriteHeightList">
 				<option value="8">
@@ -315,9 +315,9 @@
 				<option value="128">
 			</datalist>
 			<input type="checkbox" id="check1bit" onclick="spriteEditor.set1bit(this.checked)">
-			<label for="check1bit" id="check1bitLabel"  style="font-size:11px;">1 BIT</label>
+			<label for="check1bit" id="check1bitLabel"  style="font-size:10px;">1 BIT</label>
 			<input type="checkbox" id="checkRle" onclick="spriteEditor.setRle(this.checked)">
-			<label for="checkRle" id="checkRleLabel"  style="font-size:11px;">RLE 100%</label>
+			<label for="checkRle" id="checkRleLabel"  style="font-size:10px;">RLE 100%</label>
 			<textarea id="spriteArea" onclick="this.focus();this.select()">{0,0,0}</textarea>
 			<button id="updateSprite" onclick="spriteEditor.updateSprite()">update sprite</button>
 		</div>
@@ -332,9 +332,24 @@
 			<div class="bar">
 			  <button onclick="viewDebug('debugVariable')">variable</button>
 			  <button onclick="viewDebug('debugSprite')">sprites</button>
+			  <button onclick="viewDebug('debugSerial')">serial</button>
 			</div>
-           <textarea id="debugVariable" class="debug" disabled="disabled" style="resize: horizontal;"></textarea>
-		   <textarea id="debugSprite" class="debug" disabled="disabled"></textarea>
+			<textarea id="debugVariable" class="debug" disabled="disabled" style="resize: horizontal;"></textarea>
+			<textarea id="debugSprite" class="debug" disabled="disabled"></textarea>
+			<div id="debugSerial" class="debug" disabled="disabled">
+				serial1
+				<textarea id="serial1text" disabled="disabled" style="resize: none;"></textarea>
+				serial2
+				<textarea id="serial2text" disabled="disabled" style="resize: none;"></textarea>
+				<input id="serialInput" style="width: 11em;" oninput="globalJKey=0;globalKey=0">
+				<button onclick="sendToSerialManual(2)">send from 1</button>
+				<br>
+				<input type="radio" id="serialchecknum" onclick="serialviewsettype(0)" name="arrt">
+				<label for="serialchecknum" onclick="serialviewsettype(0)" >number</label>
+				<input type="radio" id="serialcheckstring" onclick="serialviewsettype(1)" name="arrt" checked >
+				<label for="serialcheckstring" onclick="serialviewsettypee(1)" >string</label>
+				<button onclick="sendToSerialManual(1)">send from 2</button>
+			</div>
         </div>
     </div>
 	<div id="div_wind4" class="div_wind" style="display:none">

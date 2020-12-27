@@ -433,7 +433,7 @@ textarea:focus {
 	top: 3em;
 	display: none;
 }
-#disasm, #debugVariable, #debugSprite, #settings, #snapshots {
+#disasm, #debugVariable, #debugSerial, #debugSprite, #settings, #snapshots {
 	background-color: #eee;
 	border: 1px solid #516399;
 	color: #516399;
@@ -447,9 +447,14 @@ textarea:focus {
 #debugVariable {
 	height: 27.7em;
 }
-#debugSprite {
+#debugSprite, #debugSerial {
 	height: 27.7em;
 	display:none;
+}
+#serial1text, #serial2text{
+	height: 10em;
+	border: 1px solid #516399;
+	width: 20.8em;
 }
 #disasm:focus {
 	outline: 3px solid #516399;
