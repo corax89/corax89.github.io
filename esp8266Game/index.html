@@ -215,6 +215,7 @@
 			</div>
 			<canvas id="pixelarea" width="256" height="272"></canvas>
 			<canvas id="pixelimg" width="128" height="128"></canvas>
+			<canvas id="pixelimgshadow" width="128" height="128" style="display:none"></canvas>
 			<div id="colorpicker">
 				<div id="positionInfo" style="margin-bottom: 2px;">x 0, y 0</div>
 				<div onclick = "spriteEditor.backColor()" style = "background:#3C456C;width:2em;height:1.95em;float:right">
@@ -320,6 +321,8 @@
 			<label for="checkRle" id="checkRleLabel"  style="font-size:10px;">RLE 100%</label>
 			<textarea id="spriteArea" onclick="this.focus();this.select()">{0,0,0}</textarea>
 			<button id="updateSprite" onclick="spriteEditor.updateSprite()">update sprite</button>
+			<button id="useSpriteAsIcon" onclick="useSpriteAsIcon()">use as icon</button>
+			<button id="saveSpriteAsPng" onclick="saveSpriteAsPng()">save as png</button>
 		</div>
     </div>
 	<div id="div_wind3" class="div_wind">

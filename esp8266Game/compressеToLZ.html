@@ -35,6 +35,7 @@ function settype(t){
 function toarray(a, t){
 	var out = [];
 	if(t == 0){
+		a = a.replace(/\/\*(.*?)\*\//g, '');
 		a = a.replace(/[{}]/g, '');
 		a = a.split(',');
 		for(var i = 0; i < a.length; i++){

@@ -266,6 +266,22 @@ document.addEventListener("DOMContentLoaded", function () {
 	snapshotTable();
 });
 
+function useSpriteAsIcon(){
+	document.getElementById('spriteWidthChoice').value = '24';
+	document.getElementById('spriteHeightChoice').value = '16';
+	spriteEditor.setSize();
+	document.getElementById("fileIco").value = document.getElementById('spriteArea').value;
+	fileIco = saveIco(document.getElementById('spriteArea').value);
+	saveSettings();
+}
+
+function saveSpriteAsPng(){
+	var c = document.getElementById("pixelimgshadow");
+	c.toBlob(function(blob) {
+		saveAs(blob, "sprite.png");
+	});
+}
+
 function saveIco(a) {
 	var i = 0;
 	var out = [];
@@ -1085,6 +1101,7 @@ function stopCpu(){
 function Display() {
 	var displayArray = [];
 	var spriteArray = [];
+	var spriteArray2 = [];
 	var canvasArray = [];
 	var canvasArray2 = [];
 	var ctx;
@@ -1207,7 +1224,6 @@ function Display() {
 
 	function updatePixel(x, y) {
 		canvasArray[x * 128 + y] = displayArray[x * 128 + y];
-
 	}
 
 	function drawPixel(color, x, y) {
@@ -1277,13 +1293,16 @@ function Display() {
 					canvasArray2[x * 128 + y] = color;
 					ctx.fillStyle = sprtpalette[color & 0x0f];
 					ctx.fillRect(x * pixelSize, (y + 16) * pixelSize, pixelSize, pixelSize);
-				} else if (canvasArray[x * 128 + y] != canvasArray2[x * 128 + y] || isDebug || isChangePalette) {
+				} else if (canvasArray[x * 128 + y] != canvasArray2[x * 128 + y] || isDebug || isChangePalette || spriteArray2[x * 128 + y] > 0) {
 					canvasArray2[x * 128 + y] = canvasArray[x * 128 + y];
 					color = canvasArray[x * 128 + y];
 					ctx.fillStyle = palette[color & 0x0f];
 					ctx.fillRect(x * pixelSize, (y + 16) * pixelSize, pixelSize, pixelSize);
 				}
 			}
+		for (var i = 0; i < 128 * 128; i++){
+			spriteArray2[i] = spriteArray[i];
+		}
 		isDebug = false;
 		isChangePalette = false;
 		if(saveGifFrame > 1){

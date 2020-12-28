@@ -40,6 +40,8 @@ function SpriteEditor() {
 	var pixelareactx = pixelarea.getContext('2d');
 	var imgarea = document.getElementById("pixelimg");
 	var imgareactx = imgarea.getContext('2d');
+	var imgareashadow = document.getElementById("pixelimgshadow");
+	var imgareashadowctx = imgareashadow.getContext('2d');
 	var posInfo = document.getElementById("positionInfo");
 	function init() {
 		thiscolor = 0;
@@ -433,17 +435,27 @@ function SpriteEditor() {
 			changed = 0;
 			imgareactx.fillStyle = '#eee';
 			imgareactx.fillRect(0, 0, 128, 128);
+			imgareashadowctx.fillStyle = '#eee';
+			imgareashadowctx.fillRect(0, 0, 128, 128);
+			imgareashadow.width = width;
+			imgareashadow.height = height;
 			for (var y = 0; y < height; y++)
 				for (var x = 0; x < width; x++) {
 					if(is1bit){
-						if(sprite[x][y] == 0)
+						if(sprite[x][y] == 0){
 							imgareactx.fillStyle = palette[0];
-						else
+							imgareashadowctx.fillStyle = palette[0];
+						} else {
 							imgareactx.fillStyle = palette[1];
+							imgareashadowctx.fillStyle = palette[1];
+						}
 					}
-					else
+					else{
 						imgareactx.fillStyle = palette[sprite[x][y]];
+						imgareashadowctx.fillStyle = palette[sprite[x][y]];
+					}
 					imgareactx.fillRect(x * pixelsize, y * pixelsize, pixelsize, pixelsize);
+					imgareashadowctx.fillRect(x, y, 1, 1);
 				}
 			imgareactx.strokeStyle = '#A00';
 			imgareactx.beginPath();
