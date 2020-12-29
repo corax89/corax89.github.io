@@ -446,7 +446,7 @@ function sendToSerialManual(n){
 		if (serialviewtype == 0){
 			var n = parseInt(s);
 			if(!isNaN(n)){
-				serialBuffer.push();
+				serialBuffer.unshift();
 				serialarray2.push(n);
 			}
 			else
@@ -454,7 +454,7 @@ function sendToSerialManual(n){
 		}
 		else{
 			for(var i = 0; i < s.length; i++){
-				serialBuffer.push(s.charCodeAt(i));
+				serialBuffer.unshift(s.charCodeAt(i));
 				serialarray2.push(parseInt(s.charCodeAt(i)));
 			}
 		}
@@ -463,7 +463,7 @@ function sendToSerialManual(n){
 		if (serialviewtype == 0){
 			var n = parseInt(s);
 			if(!isNaN(n)){
-				secondWindow.serialBuffer.unshift.push();
+				secondWindow.serialBuffer.unshift();
 				serialarray1.push(n);
 			}
 			else
