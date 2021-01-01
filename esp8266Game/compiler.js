@@ -240,6 +240,8 @@ function compile(t) {
 	var localStackLength = 0; //используется в функциях для работы с локальными переменными относительно указателя стека
 	var blockStack = []; // stack for break and continue
 	var switchStack = []; //указывает на последний switch, необходимо для обработки break
+	var switchOptimizationArr = []; //оптимизация длинного switch
+	var switchDefaultLabe = '';
 	var typeOnStack = []; //тип значения в регистре
 	var bracketCount = 0; //счетчик скобок
 	var longArg = false;
@@ -2191,6 +2193,7 @@ function compile(t) {
 		getToken();
 		removeNewLine();
 		if (thisToken == '{') {
+			registerCount = 1;
 			skipBrace();
 		} else {
 			execut();
@@ -2339,6 +2342,9 @@ function compile(t) {
 
 	function switchToken() {
 		var labe = labelNumber;
+		var optimization = 1;
+		switchOptimizationArr.push([]);
+		switchDefaultLabe = '';
 		labelNumber++;
 		getToken();
 		if (thisToken != '(')
@@ -2351,6 +2357,7 @@ function compile(t) {
 			block: asm.length,
 			labe: labe
 		});
+		var pos = asm.length;
 		blockStack.push('switch_' + labe);
 		asm.push(' ');
 		asm.push(' JMP end_switch_' + labe);
@@ -2362,10 +2369,52 @@ function compile(t) {
 			putError(lineCount, 13, 'switch'); //info("" + lineCount + " ожидалась открывающая фигурная скобка в конструкции switch");
 		}
 		asm.push('end_switch_' + labe + ':');
+		var swOpAr = switchOptimizationArr[switchOptimizationArr.length - 1];
+		swOpAr.sort(function(a, b) {
+		  return a[0] - b[0];
+		});
+		if(swOpAr.length > 5 && (swOpAr[swOpAr.length - 1][0] - swOpAr[0][0])  <  swOpAr.length * 2){
+			for(var i = 0; i < swOpAr.length - 1; i++){
+				var a = swOpAr[i][0];
+				var b = swOpAr[i + 1][0];
+				if(b - a > 1){
+					if(switchDefaultLabe.length > 1)
+						swOpAr.splice(i + 1, 0, [a + 1, switchDefaultLabe]);
+					else
+						swOpAr.splice(i + 1, 0, [a + 1, 'end_switch_' + labe]);
+				}
+				if(i > 10000)
+					break;
+			}
+			asm[pos] = '';
+			if(switchDefaultLabe.length > 1){
+				asm[pos] += ' CMP R1,' + swOpAr[0][0] + '\n JNP ' + switchDefaultLabe + '\n';	
+				asm[pos] += ' CMP R1,' + (swOpAr[swOpAr.length - 1][0] + 1) + '\n JP ' + switchDefaultLabe + '\n';
+			} else {
+				asm[pos] += ' CMP R1,' + swOpAr[0][0] + '\n JNP end_switch_' + labe + '\n';
+				asm[pos] += ' CMP R1,' + (swOpAr[swOpAr.length - 1][0] + 1) + '\n JP end_switch_' + labe + '\n';				
+			}
+			if(swOpAr[0][0] > 0){
+				var l = swOpAr[0][0];
+				if( l < 255)
+					asm[pos] += ' LDC R2,' + l + '\n';
+				else
+					asm[pos] += ' LDI R2,' + l + '\n';
+				asm[pos] += ' SUB R1,R2\n';
+			}
+			asm[pos] += ' LDIAL R1,(_switch_' + labe + '_array+R1) \n PUSH R1 \n RET';
+			var dat = '_switch_' + labe + '_array:\n DW ';
+			for(var i = 0; i < swOpAr.length - 1; i++){
+				dat += swOpAr[i][1] + ',';
+			}
+			dat += swOpAr[swOpAr.length - 1][1];
+			dataAsm.push(dat);
+		}
 		switchStack.pop();
 		blockStack.pop();
 		getToken();
-		//removeNewLine();
+		switchOptimizationArr.pop;
+		switchDefaultLabe = '';
 	}
 
 	function caseToken() {
@@ -2383,6 +2432,7 @@ function compile(t) {
 		getToken();
 		if (isNumber(thisToken)) {
 			asm[lastSwitch.block] += 'CMP R1,' + parseInt(thisToken) + ' \n JZ case_' + labe + '\n ';
+			switchOptimizationArr[switchOptimizationArr.length - 1].push([parseInt(thisToken), 'case_' + labe]);
 			asm.push(' case_' + labe + ':');
 			getToken();
 			if (thisToken != ':')
@@ -2408,6 +2458,7 @@ function compile(t) {
 			putError(lineCount, 15, ''); //info("" + lineCount + " ожидалось двоеточие ");
 		asm[lastSwitch.block] += 'JMP default_' + labe + '\n ';
 		asm.push(' default_' + labe + ':');
+		switchDefaultLabe = ' default_' + labe;
 	}
 	//break в данный момент работает только для прерывания switch, нужно доработать
 	function breakToken() {

@@ -1196,16 +1196,16 @@ function Cpu() {
 			charLineUp(1);
 		}
 		if (c == '\n') {
-			for (var i = regx; i < 20; i++) {
+			for (var i = regx; i < 21; i++) {
 				display.char(' ', i * 6, regy * 8, fc, bc);
-				charArray[i + regy * 20] = ' ';
+				charArray[i + regy * 21] = ' ';
 			}
 			regy++;
 			regx = 0;
 		} else if (c == '\t') {
 			for (var i = 0; i <= regx % 5; i++) {
 				display.char(' ', regx * 6, regy * 8, fc, bc);
-				charArray[regx + regy * 20] = ' ';
+				charArray[regx + regy * 21] = ' ';
 				regx++;
 				if (regx > 20) {
 					i = 99;

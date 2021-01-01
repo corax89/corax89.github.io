@@ -492,7 +492,7 @@ function asm(s) {
 						out.push(0xB0 + getRegister(a[i + 1])); //CMP R,CHR		BR XX
 						pushChar(a[i + 3]);
 					} else {
-						out.push(0xC1);
+						out.push(0xC0);
 						out.push(getRegister(a[i + 1]) << 4); //CMP R,INT		C0 R0 XXXX
 						pushInt(a[i + 3]);
 					}
