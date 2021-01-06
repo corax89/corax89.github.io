@@ -2072,6 +2072,8 @@ function Cpu() {
 				// FTOI R		C3 1R
 				else if (r2 == 0x10) {
 					reg[r1] = Math.floor(reg[r1] / (1 << MULTIPLY_FP_RESOLUTION_BITS));
+					if(reg[r1] >= 128)
+						reg[r1] -= 255;
 				}
 				// SIN R		C3 2R
 				else if (r2 == 0x20) {
