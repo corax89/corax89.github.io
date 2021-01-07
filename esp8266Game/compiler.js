@@ -960,15 +960,15 @@ function compile(t) {
 					if (type == '*char' && !point) {
 						asm.push(' STC (R' + (registerCount + 1) + '+R' + (registerCount - 1) + '),R' + registerCount);
 					} else {
-						asm.push(' LDC R' + (registerCount + 2) + ',2\n MUL R' + (registerCount - 1) + ',R' + (registerCount + 2));
+						//asm.push(' LDC R' + (registerCount + 2) + ',2\n MUL R' + (registerCount - 1) + ',R' + (registerCount + 2));
 						asm.push(' STC (R' + (registerCount + 1) + '+R' + (registerCount - 1) + '),R' + registerCount);
 					}
 				} else {
 					if (type == '*int' && !point) {
 						asm.push(' STC (R' + (registerCount + 1) + '+R' + (registerCount - 1) + '),R' + registerCount);
 					} else {
-						asm.push(' LDC R' + (registerCount + 2) + ',2\n MUL R' + (registerCount - 1) + ',R' + (registerCount + 2));
-						asm.push(' STI (R' + (registerCount + 1) + '+R' + (registerCount - 1) + '),R' + registerCount);
+						//asm.push(' LDC R' + (registerCount + 2) + ',2\n MUL R' + (registerCount - 1) + ',R' + (registerCount + 2));
+						asm.push(' STIAL (R' + (registerCount + 1) + '+R' + (registerCount - 1) + '),R' + registerCount);
 					}
 				}
 				registerCount--;
