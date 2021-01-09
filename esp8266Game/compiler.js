@@ -1180,12 +1180,23 @@ function compile(t) {
 					if (!(thisToken == '}' || thisToken == ','))
 						putError(lineCount, 11, ''); //info("" + lineCount + " неправильное объявление массива");
 				}
-				if (arraylen2d)
-					arraylen2d -= 2;
+				if (arraylen2d){
+					arraylen2d--;
+					var a = buf.split(',');
+					var b = Math.floor((length - 1) / arraylen2d);
+					buf = '';
+					for (var j = 0; j < arraylen2d; j++){
+						for (var i = 0; i < b; i++){
+							buf += '' + a[i * arraylen2d + j] + ',';
+						}
+					}
+					//arraylen2d--;
+				}
+				buf = buf.substring(0, buf.length - 1);
 				if (type == 'int' || type == 'fixed') {
-					dataAsm.push('_' + name + ': \n DW ' + buf.substring(0, buf.length - 1));
+					dataAsm.push('_' + name + ': \n DW ' + buf);
 				} else if (type == 'char') {
-					dataAsm.push('_' + name + ': \n DB ' + buf.substring(0, buf.length - 1));
+					dataAsm.push('_' + name + ': \n DB ' + buf);
 				}
 				varTable.push({
 					name: name,
