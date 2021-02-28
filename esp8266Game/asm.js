@@ -724,6 +724,10 @@ function asm(s) {
 				out.push(0xD9); // GETPIX R,R		D9RR
 				out.push((getRegister(a[i + 1]) << 4) + (getRegister(a[i + 3])));
 				return;
+			case 'SPRSIZE':
+				out.push(0xDB); // SPRSIZE R,R			DB RR
+				out.push((getRegister(a[i + 1]) << 4) + (getRegister(a[i + 3])));
+				return;
 			case 'SPRGET':
 				out.push(0xDC); // SPRGET R,X		DC RX
 				out.push((getRegister(a[i + 1]) << 4) + (getRegister(a[i + 3])));

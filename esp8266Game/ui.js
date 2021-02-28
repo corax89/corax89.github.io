@@ -109,16 +109,16 @@ window.addEventListener('load', function () {
 
 }, false);
 
-function saveAsGif(){
+function saveAsGif() {
 	gif = new GIF({
-	  workers: 2,
-	  quality: 30,
-	  repeat: 0,
-	  width: 256,
-	  height: 256
-	});
-	gif.on('finished', function(blob) {
-	    saveAs(blob, fileName + '.gif');
+			workers: 2,
+			quality: 30,
+			repeat: 0,
+			width: 256,
+			height: 256
+		});
+	gif.on('finished', function (blob) {
+		saveAs(blob, fileName + '.gif');
 	});
 	saveGifFrame = 80;
 }
@@ -216,39 +216,42 @@ window.addEventListener("unload", function () {
 	localStorage.setItem('save_font_size', fontSizeInEditor);
 });
 
-function snapshotTable(){
+function snapshotTable() {
 	var sdiv = document.getElementById("snapshots");
 	var s;
 	try {
 		s = JSON.parse(localStorage.getItem('save_snapshots'));
-		if(s && s.length > 0)
+		if (s && s.length > 0)
 			snapshots = s;
-	}
-	catch(e){
+	} catch (e) {
 		localStorage.setItem('save_snapshots', '');
 		snapshots = [];
 	}
 	sdiv.innerHTML = '<button onclick="addSnapshotManually()">save snapshot</button><br>';
 	if (s && s.length > 0) {
-		for(var i = 0; i < s.length; i++){
-			sdiv.innerHTML += s[i].date + '<br>' + s[i].name + 
-				' <button onclick="loadSnapshot(' + i + ')">load</button> <button onclick="deliteSnapshot(' + i + ')">delite</button><br>';
+		for (var i = 0; i < s.length; i++) {
+			sdiv.innerHTML += s[i].date + '<br>' + s[i].name +
+			' <button onclick="loadSnapshot(' + i + ')">load</button> <button onclick="deliteSnapshot(' + i + ')">delite</button><br>';
 		}
 	}
 }
 
-function addSnapshotManually(){
-	snapshots.push({date: new Date().toUTCString(), name: 'Manually', source: sourceArea.value});
+function addSnapshotManually() {
+	snapshots.push({
+		date: new Date().toUTCString(),
+		name: 'Manually',
+		source: sourceArea.value
+	});
 	localStorage.setItem('save_snapshots', JSON.stringify(snapshots));
 	snapshotTable();
 }
 
-function loadSnapshot(n){
+function loadSnapshot(n) {
 	sourceArea.value = snapshots[n].source;
 	pixelColorHighlight();
 }
 
-function deliteSnapshot(n){
+function deliteSnapshot(n) {
 	snapshots.splice(n, 1);
 	localStorage.setItem('save_snapshots', JSON.stringify(snapshots));
 	snapshotTable();
@@ -266,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	snapshotTable();
 });
 
-function useSpriteAsIcon(){
+function useSpriteAsIcon() {
 	document.getElementById('spriteWidthChoice').value = '24';
 	document.getElementById('spriteHeightChoice').value = '16';
 	spriteEditor.setSize();
@@ -275,9 +278,9 @@ function useSpriteAsIcon(){
 	saveSettings();
 }
 
-function saveSpriteAsPng(){
+function saveSpriteAsPng() {
 	var c = document.getElementById("pixelimgshadow");
-	c.toBlob(function(blob) {
+	c.toBlob(function (blob) {
 		saveAs(blob, "sprite.png");
 	});
 }
@@ -340,8 +343,7 @@ function loadSettings() {
 				document.getElementById("fileName").value = fileName;
 				document.getElementById("fileAuthor").value = fileAuthor;
 				document.getElementById("fileIco").value = fileIco;
-			}
-			catch(e){
+			} catch (e) {
 				info("settings loading error");
 			}
 		}
@@ -369,15 +371,15 @@ function viewDebugPanel() {
 	pixelColorHighlight();
 }
 
-function clone(){
+function clone() {
 	var newByteArr = [];
 	loadSettings();
 	main();
 	if (file.length > 1) {
 		var newFile = saveAsHtml(compress(file), fileIco);
-		if(secondWindow == null || secondWindow.closed)
-			secondWindow = window.open('','','left=0,top=0,width=450,height=370,toolbar=0,scrollbars=1,status=0');
-		if(secondWindow != null) {
+		if (secondWindow == null || secondWindow.closed)
+			secondWindow = window.open('', '', 'left=0,top=0,width=450,height=370,toolbar=0,scrollbars=1,status=0');
+		if (secondWindow != null) {
 			secondWindow.document.write(newFile);
 			secondWindow.document.close();
 			secondWindow.focus();
@@ -386,44 +388,42 @@ function clone(){
 	}
 }
 
-function updateSerial1(){
-	if(serialarray1.length > 512)
+function updateSerial1() {
+	if (serialarray1.length > 512)
 		serialarray1.shift();
-	if(serialviewtype == 0){
+	if (serialviewtype == 0) {
 		document.getElementById('serial1text').value = serialarray1;
-	}
-	else{
+	} else {
 		document.getElementById('serial1text').value = '';
-		for(var i = 0; i < serialarray1.length; i++){
+		for (var i = 0; i < serialarray1.length; i++) {
 			document.getElementById('serial1text').value += String.fromCharCode(serialarray1[i]);
 		}
 	}
 }
 
-function updateSerial2(){
-	if(serialarray2.length > 512)
+function updateSerial2() {
+	if (serialarray2.length > 512)
 		serialarray2.shift();
-	if(serialviewtype == 0){
+	if (serialviewtype == 0) {
 		document.getElementById('serial2text').value = serialarray2;
-	}
-	else{
+	} else {
 		document.getElementById('serial2text').value = '';
-		for(var i = 0; i < serialarray2.length; i++){
+		for (var i = 0; i < serialarray2.length; i++) {
 			document.getElementById('serial2text').value += String.fromCharCode(serialarray2[i]);
 		}
 	}
 }
 
-function serialviewsettype(t){
+function serialviewsettype(t) {
 	serialviewtype = t;
 	updateSerial1();
 	updateSerial2();
 }
 
-function popFromWindow(){
+function popFromWindow() {
 	var s;
-	if(secondWindow != null && !secondWindow.closed){
-		if(secondWindow.serialBuffer1 && secondWindow.serialBuffer1.length > 0){
+	if (secondWindow != null && !secondWindow.closed) {
+		if (secondWindow.serialBuffer1 && secondWindow.serialBuffer1.length > 0) {
 			s = secondWindow.serialBuffer1.pop();
 			serialBuffer.push(s);
 			serialarray2.push(s);
@@ -432,51 +432,47 @@ function popFromWindow(){
 	}
 }
 
-function pushToWindow(n){
-	if(secondWindow != null && !secondWindow.closed)
+function pushToWindow(n) {
+	if (secondWindow != null && !secondWindow.closed)
 		secondWindow.serialBuffer.unshift(n);
 	serialarray1.push(n);
 	updateSerial1();
 }
 
-function sendToSerialManual(n){
+function sendToSerialManual(n) {
 	var s = document.getElementById('serialInput').value;
 	document.getElementById('serialInput').value = '';
-	if(n == 1){
-		if (serialviewtype == 0){
+	if (n == 1) {
+		if (serialviewtype == 0) {
 			var n = parseInt(s);
-			if(!isNaN(n)){
+			if (!isNaN(n)) {
 				serialBuffer.unshift();
 				serialarray2.push(n);
-			}
-			else
+			} else
 				document.getElementById('serialInput').value = 'isNaN';
-		}
-		else{
-			for(var i = 0; i < s.length; i++){
+		} else {
+			for (var i = 0; i < s.length; i++) {
 				serialBuffer.unshift(s.charCodeAt(i));
 				serialarray2.push(parseInt(s.charCodeAt(i)));
 			}
 		}
 		updateSerial2();
-	} else if(secondWindow != null && !secondWindow.closed) {
-		if (serialviewtype == 0){
+	} else if (secondWindow != null && !secondWindow.closed) {
+		if (serialviewtype == 0) {
 			var n = parseInt(s);
-			if(!isNaN(n)){
+			if (!isNaN(n)) {
 				secondWindow.serialBuffer.unshift();
 				serialarray1.push(n);
-			}
-			else
+			} else
 				document.getElementById('serialInput').value = 'isNaN';
-		}
-		else{
-			for(var i = 0; i < s.length; i++){
+		} else {
+			for (var i = 0; i < s.length; i++) {
 				secondWindow.serialBuffer.unshift(s.charCodeAt(i));
 				serialarray1.push(parseInt(s.charCodeAt(i)));
 			}
 		}
 		updateSerial1();
-	}	
+	}
 }
 
 function setup_mouse(id_div_wind, id_div_drag) {
@@ -748,7 +744,7 @@ function highlitec() {
 		// Выделяем скобки
 		.replace(/(\(|\))/gi,
 			'<span class="gly">$1</span>')
-		.replace(/(@[a-z]*)/g, 
+		.replace(/(@[a-z]*)/g,
 			'<span class="R"> $1</span>()')
 		// Возвращаем на место каменты, строки
 		.replace(/~~~([CSR])(\d+)~~~/g, function (m, t, i) {
@@ -760,6 +756,15 @@ function highlitec() {
 }
 
 highlitec();
+
+function findInTextarea(str){
+	var pos = sourceArea.value.indexOf(str);
+	while (pos >= 0) {
+		input.setSelectionRange(pos, pos + str.length);
+		pos = sourceArea.value.indexOf(str, pos + 1);
+	}
+	input.focus();
+}
 
 //компиляция ассемблерного кода из поля ввода
 function onlyAsm() {
@@ -783,7 +788,7 @@ function main() {
 	file = asm(asmSource);
 	compress(file);
 	document.getElementById('disasm').innerHTML = highliteasm(asmSource);
-	if(memoryType == 1)
+	if (memoryType == 1)
 		document.getElementById('ram').value = toHexC(file);
 	else
 		document.getElementById('ram').value = toHexA(file);
@@ -1084,7 +1089,7 @@ function run() {
 	}
 	timertime += 16;
 	var diff = (new Date().getTime() - timerstart) - timertime;
-	if(diff > 12)
+	if (diff > 12)
 		diff = 12;
 	clearTimeout(timerId);
 	timerId = setTimeout(function () {
@@ -1092,10 +1097,10 @@ function run() {
 		}, 16 - diff);
 }
 
-function stopCpu(){
-	isRun=false;
+function stopCpu() {
+	isRun = false;
 	clearTimeout(timerId);
-	document.getElementById('debug').value=cpu.debug();
+	document.getElementById('debug').value = cpu.debug();
 }
 //функция вывода на экран
 function Display() {
@@ -1266,7 +1271,7 @@ function Display() {
 
 	function drawJoy() {
 		var coordinate = [8, 143, 24, 130, 24, 156, 40, 143, 90, 150, 110, 135];
-		
+
 		ctx.fillStyle = '#8FAA63';
 		for (var i = 0; i < 8; i++) {
 			ctx.beginPath();
@@ -1300,20 +1305,19 @@ function Display() {
 					ctx.fillRect(x * pixelSize, (y + 16) * pixelSize, pixelSize, pixelSize);
 				}
 			}
-		for (var i = 0; i < 128 * 128; i++){
+		for (var i = 0; i < 128 * 128; i++) {
 			spriteArray2[i] = spriteArray[i];
 		}
 		isDebug = false;
 		isChangePalette = false;
-		if(saveGifFrame > 1){
+		if (saveGifFrame > 1) {
 			ctx.fillStyle = "#516399";
 			ctx.fillRect(80 * pixelSize, 8 * pixelSize, pixelSize * 45, pixelSize * 8);
 			ctx.fillStyle = "#ADFF2F";
 			ctx.fillText('save GIF ' + Math.floor((saveGifFrame + 15) / 20), 80 * pixelSize, 8 * pixelSize);
-		    gif.addFrame(ctx.getImageData(0, 32, 256, 256), 1);
+			gif.addFrame(ctx.getImageData(0, 32, 256, 256), 1);
 			saveGifFrame--;
-		}
-		else if(saveGifFrame == 1){
+		} else if (saveGifFrame == 1) {
 			ctx.fillStyle = "#516399";
 			ctx.fillRect(80 * pixelSize, 8 * pixelSize, pixelSize * 45, pixelSize * 8);
 			saveGifFrame = 0;
@@ -1371,24 +1375,24 @@ function Display() {
 function redraw() {
 	clearTimeout(screenTimeout);
 	screenTimeout = setTimeout(function () {
-		requestAnimationFrame(redraw);
-		if(isRun){
-			cpu.redrawParticle();
-			display.redraw();
-			cpu.setRedraw();
-		}
-		isRedraw = true;
-	}, timeForRedraw);
+			requestAnimationFrame(redraw);
+			if (isRun) {
+				cpu.redrawParticle();
+				display.redraw();
+				cpu.setRedraw();
+			}
+			isRedraw = true;
+		}, timeForRedraw);
 }
 
 function saveAsH(file, im, name) {
 	var s = '#define ROM_NAME " ';
-	if(name)
+	if (name)
 		s += name + '"';
 	else
 		s += 'rom"';
 	s += '\n\nconst uint8_t romImage[] PROGMEM = {\n';
-	if(im)
+	if (im)
 		s += toHexC(im);
 	else
 		s += '0x0, 0x0, 0x0';

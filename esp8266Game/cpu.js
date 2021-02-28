@@ -59,6 +59,8 @@ function Cpu() {
 				speedy: 0,
 				height: 8,
 				width: 8,
+				size: 256,
+				zindex: i,
 				angle: 0,
 				isonebit: 0,
 				lives: 0,
@@ -68,7 +70,8 @@ function Cpu() {
 				oncollision: 0,
 				onexitscreen: 0,
 				isscrolled: 1,
-				fliphorisontal: 0
+				fliphorisontal: 0,
+				color: 1
 			};
 		}
 		for (i = 0; i < maxParticles; i++) {
@@ -496,48 +499,62 @@ function Cpu() {
 	function redrawSprite() {
 		var clr,
 		n,
-		i;
+		i,
+		z;
+		var sortarr = [];
 		for (n = 0; n < 32; n++) {
-			if (_spr[n].lives > 0) {
+			sortarr[n] = [];
+			sortarr[n][0] = _spr[n].zindex;
+			sortarr[n][1] = n;
+		}
+		sortarr.sort(function(a, b) {
+		  return a[0] - b[0];
+		});
+		for (z = 0; z < 32; z++) {
+			n = sortarr[z][1];
+			if (_spr[n].lives > 0 && _spr[n].size > 0) {
 				var adr = _spr[n].address;
 				var x1 = Math.floor(_spr[n].x >> 2);
 				var y1 = Math.floor(_spr[n].y >> 2);
+				var x2, y2, hx2, p;
 				if (_spr[n].isonebit == 0) {
-					for (var y = 0; y < _spr[n].height; y++)
-						for (var x = 0; x < _spr[n].width; x++) {
-							clr = (readMem(adr) & 0xf0) >> 4;
-							if (clr > 0) {
-								if (_spr[n].fliphorisontal)
-									drawRotateSprPixel(clr, x1, y1, _spr[n].width - x, y, _spr[n].width, _spr[n].height, _spr[n].angle / 57);
-								else
-									drawRotateSprPixel(clr, x1, y1, x, y, _spr[n].width, _spr[n].height, _spr[n].angle / 57);
+					for (var yi = 0; yi < ((_spr[n].height * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS); yi++) {
+						y2 = Math.floor(((yi << MULTIPLY_FP_RESOLUTION_BITS) + 1) / _spr[n].size);
+						for (var xi = 0; xi < ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS); xi++) {
+							x2 = Math.floor(((xi << MULTIPLY_FP_RESOLUTION_BITS) + 1) / _spr[n].size);
+							hx2 = Math.floor(x2 / 2);
+							if (x2 & 1) {
+								p = readMem(adr + hx2 + Math.floor((y2 * _spr[n].width) / 2));
+								clr = (p & 0x0f);
+							} else {
+								p = readMem(adr + hx2 + Math.floor((y2 * _spr[n].width) / 2));
+								clr = (p & 0xf0) >> 4;
 							}
-							x++;
-							clr = (readMem(adr) & 0xf);
 							if (clr > 0)
 								if (_spr[n].fliphorisontal)
-									drawRotateSprPixel(clr, x1, y1, _spr[n].width - x, y, _spr[n].width, _spr[n].height, _spr[n].angle / 57);
+									drawRotateSprPixel(clr, x1, y1, ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS) - xi, yi, ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), ((_spr[n].height * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), _spr[n].angle / 57);
 								else
-									drawRotateSprPixel(clr, x1, y1, x, y, _spr[n].width, _spr[n].height, _spr[n].angle / 57);
-							adr++;
+									drawRotateSprPixel(clr, x1, y1, xi, yi, ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), ((_spr[n].height * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), _spr[n].angle / 57);
 						}
+					}
 				} else {
-					i = 0;
 					var ibit;
-					for (var y = 0; y < _spr[n].height; y++)
-						for (var x = 0; x < _spr[n].width; x++) {
-							if (i % 8 == 0) {
-								ibit = readMem(adr);
-								adr++;
-							}
-							if (ibit & 0x80)
+					var c;
+					i = 0;
+					for (var yi = 0; yi < ((_spr[n].height * _spr[n].size) >> 8); yi++) {
+						y2 = Math.floor(((yi << 8) + 1) / _spr[n].size);
+						for (var xi = 0; xi < ((_spr[n].width * _spr[n].size) >> 8); xi++) {
+							x2 = Math.floor(((xi << 8) + 1) / _spr[n].size);
+							p = readMem(adr + Math.floor(x2 / 8 + (y2 * _spr[n].width) / 8));
+							c = (1 << (7 - (Math.floor(x2 + y2 * _spr[n].width) & 7)));
+							if (p & c){
 								if (_spr[n].fliphorisontal)
-									drawRotateSprPixel(color, x1, y1, _spr[n].width - x, y, _spr[n].width, _spr[n].height, _spr[n].angle / 57);
+									drawRotateSprPixel(_spr[n].color, x1, y1, ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS) - xi, yi, ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), ((_spr[n].height * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), _spr[n].angle / 57);
 								else
-									drawRotateSprPixel(color, x1, y1, x, y, _spr[n].width, _spr[n].height, _spr[n].angle / 57);
-							ibit = ibit << 1;
-							i++;
+									drawRotateSprPixel(_spr[n].color, x1, y1, xi, yi, ((_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), ((_spr[n].height * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS), _spr[n].angle / 57);
+							}
 						}
+					}
 				}
 				_spr[n].speedy += _spr[n].gravity;
 				_spr[n].x += _spr[n].speedx;
@@ -669,12 +686,16 @@ function Cpu() {
 			if (_spr[n].lives > 0) {
 				var oldx = (_spr[n].x - _spr[n].speedx) >> 2;
 				var oldy = (_spr[n].y - _spr[n].speedy) >> 2;
+				var wn = (_spr[n].width * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS;
+				var hn = (_spr[n].height * _spr[n].size) >> MULTIPLY_FP_RESOLUTION_BITS;
 				for (i = 0; i < n; i++) {
-					if (_spr[i].lives > 0)
-						if (_spr[n].x < _spr[i].x + (_spr[i].width << 2) &&
-							_spr[n].x + (_spr[n].width << 2) > _spr[i].x &&
-							_spr[n].y < _spr[i].y + (_spr[i].height << 2) &&
-							_spr[n].y + (_spr[n].height << 2) > _spr[i].y) {
+					if (_spr[i].lives > 0){
+						var wi = (_spr[i].width * _spr[i].size) >> MULTIPLY_FP_RESOLUTION_BITS;
+						var hi = (_spr[i].height * _spr[i].size) >> MULTIPLY_FP_RESOLUTION_BITS;
+						if (_spr[n].x < _spr[i].x + (wi << 2) &&
+							_spr[n].x + (wn << 2) > _spr[i].x &&
+							_spr[n].y < _spr[i].y + (hi << 2) &&
+							_spr[n].y + (hn << 2) > _spr[i].y) {
 							_spr[n].collision = i;
 							_spr[i].collision = n;
 							if (_spr[n].oncollision > 0)
@@ -682,17 +703,18 @@ function Cpu() {
 							if (_spr[i].oncollision > 0)
 								setinterrupt(_spr[i].oncollision, i);
 							if (debug) {
-								display.drawTestRect(_spr[n].x >> 2, _spr[n].y >> 2, _spr[n].width, _spr[n].height, _spr[n].solid);
-								display.drawTestRect(_spr[i].x >> 2, _spr[i].y >> 2, _spr[i].width, _spr[i].height, _spr[i].solid);
+								display.drawTestRect(_spr[n].x >> 2, _spr[n].y >> 2, wn, hn, _spr[n].solid);
+								display.drawTestRect(_spr[i].x >> 2, _spr[i].y >> 2, wi, hi, _spr[i].solid);
 							}
 							if (_spr[n].solid != 0 && _spr[i].solid != 0) {
 								resolveCollision(n, i);
 							}
 						}
+					}
 				}
 				if (_spr[n].solid != 0) {
-					x0 = Math.floor((Math.floor(_spr[n].x >> 2) + _spr[n].width / 2 - tile.x) / tile.imgwidth);
-					y0 = Math.floor((Math.floor(_spr[n].y >> 2) + _spr[n].height / 2 - tile.y) / tile.imgheight);
+					x0 = Math.floor((Math.floor(_spr[n].x >> 2) + wn / 2 - tile.x) / tile.imgwidth);
+					y0 = Math.floor((Math.floor(_spr[n].y >> 2) + hn / 2 - tile.y) / tile.imgheight);
 					if (x0 >= -1 && x0 <= tile.width && y0 >= -1 && y0 <= tile.height) {
 						if (debug) {
 							display.drawTestRect(tile.x + x0 * tile.imgwidth, tile.y + y0 * tile.imgheight, tile.imgwidth, tile.imgheight, getTile(x0, y0));
@@ -703,26 +725,26 @@ function Cpu() {
 						}
 						x0 = Math.floor(_spr[n].x >> 2);
 						y0 = Math.floor(_spr[n].y >> 2);
-						if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0, tile.collisionMap)
-							 || getTileInXY(x0, y0 + _spr[n].height, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0 + _spr[n].height, tile.collisionMap)) {
+						if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + wn, y0, tile.collisionMap)
+							 || getTileInXY(x0, y0 + hn, tile.collisionMap) || getTileInXY(x0 + wn, y0 + hn, tile.collisionMap)) {
 							_spr[n].y = _spr[n].y - _spr[n].speedy;
 							_spr[n].speedy = Math.floor(_spr[n].speedy / 2) - _spr[n].gravity;
 							x0 = Math.floor(_spr[n].x >> 2);
 							y0 = Math.floor(_spr[n].y >> 2);
-							if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0, tile.collisionMap)
-								 || getTileInXY(x0, y0 + _spr[n].height, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0 + _spr[n].height, tile.collisionMap)) {
+							if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + wn, y0, tile.collisionMap)
+								 || getTileInXY(x0, y0 + hn, tile.collisionMap) || getTileInXY(x0 + wn, y0 + hn, tile.collisionMap)) {
 								_spr[n].y = _spr[n].y - _spr[n].speedy;
 								_spr[n].speedy = Math.floor(_spr[n].speedy / 2) - _spr[n].gravity;
 								y0 = _spr[n].y >> 2;
-								if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0, tile.collisionMap)
-									 || getTileInXY(x0, y0 + _spr[n].height, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0 + _spr[n].height, tile.collisionMap)) {
+								if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + wn, y0, tile.collisionMap)
+									 || getTileInXY(x0, y0 + hn, tile.collisionMap) || getTileInXY(x0 + wn, y0 + hn, tile.collisionMap)) {
 									_spr[n].x = _spr[n].x - _spr[n].speedx;
 									_spr[n].speedx = Math.floor((_spr[n].x - (_spr[n].x - _spr[n].speedx)) / 2);
 								}
 								x0 = _spr[n].x >> 2;
 								y0 = _spr[n].y >> 2;
-								if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0, tile.collisionMap)
-									 || getTileInXY(x0, y0 + _spr[n].height, tile.collisionMap) || getTileInXY(x0 + _spr[n].width, y0 + _spr[n].height, tile.collisionMap)) {
+								if (getTileInXY(x0, y0, tile.collisionMap) || getTileInXY(x0 + wn, y0, tile.collisionMap)
+									 || getTileInXY(x0, y0 + hn, tile.collisionMap) || getTileInXY(x0 + wn, y0 + hn, tile.collisionMap)) {
 									_spr[n].x = _spr[n].previousx;
 									_spr[n].y = _spr[n].previousy;
 								} else {
@@ -2425,6 +2447,12 @@ function Cpu() {
 				r2 = o2 & 0xf; //y
 				drawTile(reg[r1], reg[r2]);
 				break;
+			case 0xDB:
+				// SPRSIZE R,R	DB RR
+				r1 = (o2 & 0xf0) >> 4; //n
+				r2 = o2 & 0xf; //s
+				_spr[reg[r1] & 31].size = reg[r2] & 0x7fff;
+				break;
 			case 0xDC:
 				// SPRGET R,R		DC RR
 				r1 = (o2 & 0xf0) >> 4; //num
@@ -2528,6 +2556,10 @@ function Cpu() {
 				_spr[reg[r1] & 31].isonebit = reg[r3];
 			else if (reg[r2] == 15)
 				_spr[reg[r1] & 31].fliphorisontal = reg[r3];
+			else if (reg[r2] == 16)
+				_spr[reg[r1] & 31].zindex = reg[r3] & 0xff;
+			else if (reg[r2] == 17)
+				_spr[reg[r1] & 31].color = reg[r3];
 			break;
 		}
 	}
@@ -2580,12 +2612,14 @@ function Cpu() {
 			d += 'S_ADDRESS \t' + toHex4(_spr[i].address) + '\n';
 			d += 'S_X \t' + _spr[i].x / 4 + '\n';
 			d += 'S_Y \t' + _spr[i].y / 4 + '\n';
+			d += 'S_SIZE \t' + _spr[i].size + '\n';
 			d += 'S_SPEEDX \t' + _spr[i].speedx + '\n';
 			d += 'S_SPEEDY \t' + _spr[i].speedy + '\n';
 			d += 'S_WIDTH \t' + _spr[i].width + '\n';
 			d += 'S_HEIGHT \t' + _spr[i].height + '\n';
 			d += 'S_ANGLE \t' + _spr[i].angle + '\n';
 			d += 'S_LIVES \t' + _spr[i].lives + '\n';
+			d += 'S_ZINDEX \t' + _spr[i].zindex + '\n';
 		}
 		d = clearStringFast(d);
 		debugSprArea.value = d;

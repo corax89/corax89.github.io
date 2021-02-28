@@ -10,7 +10,7 @@ function tokenize(s) {
 		's_x', 0, 's_y', 1, 's_speedx', 2, 's_speedy', 3, 's_width', 4, 's_height', 5,
 		's_angle', 6, 's_lives', 7, 's_collision', 8, 's_solid', 9, 's_gravity', 10,
 		's_on_collision', 11, 's_on_exit_screen', 12, 's_is_scrolled', 13, 's_is_onebit', 14,
-		's_flip_horizontal', 15,
+		's_flip_horizontal', 15, 's_zindex', 16, 's_color', 17,
 		'key_up', 1, 'key_left', 4, 'key_down', 2, 'key_right', 8, 'key_a', 16, 'key_b', 32,
 		'key_select', 64, 'key_start', 128
 	];
@@ -2828,6 +2828,7 @@ function compile(t) {
 	registerFunction('getpixel', 'int', ['int', 'x', 'int', 'y'], 1, 'GETPIX R%2,R%1', true, 0);
 	registerFunction('@gpx', 'int', ['int', 'x', 'int', 'y'], 1, 'GETPIX R%2,R%1', true, 0);
 	registerFunction('getsprite', 'void', ['int', 'n', 'int', 'a'], 1, 'LDSPRT R%2,R%1', true, 0);
+	registerFunction('spritesize', 'void', ['int', 'n', 'fixed', 's'], 1, 'SPRSIZE R%2,R%1', true, 0);
 	registerFunction('putsprite', 'void', ['int', 'n', 'int', 'x', 'int', 'y'], 1, 'DRSPRT R%3,R%2,R%1', true, 0);
 	registerFunction('getspriteinxy', 'int', ['int', 'x', 'int', 'y'], 1, 'GSPRXY R%2,R%1', true, 0);
 	registerFunction('gettileinxy', 'int', ['int', 'x', 'int', 'y'], 1, 'GTILEXY R%2,R%1', true, 0);
