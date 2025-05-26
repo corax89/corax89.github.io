@@ -1543,14 +1543,14 @@ javascript.javascriptGenerator.forBlock['delete_object'] = function(block, gener
 javascript.javascriptGenerator.forBlock['object_onstep'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
   const body = generator.statementToCode(block, 'BODY');
-  return `${obj}.onStep=function(){${body}};\n`;
+  return `${obj}.onStep=function(){\n${body}};\n`;
 };
 
 // Генератор для обработки столкновений
 javascript.javascriptGenerator.forBlock['object_oncollision'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
   const body = generator.statementToCode(block, 'BODY');
-  return `${obj}.onCollision=function(object){${body}};\n`;
+  return `${obj}.onCollision=function(object){\n${body}};\n`;
 };
 
 // Генератор для проверки выхода объекта за экран
