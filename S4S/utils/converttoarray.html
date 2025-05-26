@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File to Uint8Array Converter with Compression</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        #fileInfo {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        #preview {
+            max-height: 300px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+        }
+        .stats {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>File to Uint8Array Converter with Compression</h1>
+        <p>Upload a file to convert it to JavaScript Uint8Array format with optional compression</p>
+        
+        <div class="input-group">
+            <label for="fileInput">Select file:</label>
+            <input type="file" id="fileInput">
+            <div id="fileInfo">No file selected</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="varName">Variable name:</label>
+            <input type="text" id="varName" value="fileData" placeholder="Enter variable name">
+        </div>
+        
+        <div class="options">
+            <div class="option-item">
+                <input type="checkbox" id="compressCheck" checked>
+                <label for="compressCheck">Enable compression</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="base64Check">
+                <label for="base64Check">Use Base64 encoding</label>
+            </div>
+        </div>
+        
+        <button id="convertBtn" disabled>Convert to JS</button>
+        
+        <div id="status"></div>
+        
+        <div id="stats" class="stats" style="display: none;">
+            <strong>Compression stats:</strong>
+            <div>Original size: <span id="originalSize">0</span> bytes</div>
+            <div>Compressed size: <span id="compressedSize">0</span> bytes</div>
+            <div>Ratio: <span id="compressionRatio">0</span>%</div>
+        </div>
+        
+        <h3>Preview:</h3>
+        <div id="preview">No file converted yet</div>
+    </div>
+
+    <script>
+        // Elements
+        const fileInput = document.getElementById('fileInput');
+        const varNameInput = document.getElementById('varName');
+        const convertBtn = document.getElementById('convertBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const statusDiv = document.getElementById('status');
+        const previewDiv = document.getElementById('preview');
+        const compressCheck = document.getElementById('compressCheck');
+        const base64Check = document.getElementById('base64Check');
+        const statsDiv = document.getElementById('stats');
+        const originalSizeSpan = document.getElementById('originalSize');
+        const compressedSizeSpan = document.getElementById('compressedSize');
+        const compressionRatioSpan = document.getElementById('compressionRatio');
+        
+        let fileBuffer = null;
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                fileInfo.textContent = 'No file selected';
+                fileBuffer = null;
+                convertBtn.disabled = true;
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                fileBuffer = event.target.result;
+                fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                convertBtn.disabled = false;
+            };
+            reader.onerror = function() {
+                showStatus('Error reading file', 'error');
+                fileInfo.textContent = 'Error reading file';
+            };
+            reader.readAsArrayBuffer(file);
+        });
+        
+        // Convert button click handler
+        convertBtn.addEventListener('click', function() {
+            try {
+                const varName = varNameInput.value.trim() || 'fileData';
+                const useCompression = compressCheck.checked;
+                const useBase64 = base64Check.checked;
+                
+                const { jsContent, originalSize, compressedSize } = convertToUint8ArrayJS(
+                    fileBuffer, 
+                    varName,
+                    useCompression,
+                    useBase64
+                );
+                
+                // Show stats
+                if (useCompression) {
+                    statsDiv.style.display = 'block';
+                    originalSizeSpan.textContent = originalSize;
+                    compressedSizeSpan.textContent = compressedSize;
+                    compressionRatioSpan.textContent = 
+                        Math.round((compressedSize / originalSize) * 10000) / 100;
+                } else {
+                    statsDiv.style.display = 'none';
+                }
+                
+                // Show preview
+                previewDiv.textContent = jsContent.substring(0, 1000) + 
+                    (jsContent.length > 1000 ? '\n... (truncated)' : '');
+                
+                // Create download
+                const blob = new Blob([jsContent], {type: 'application/javascript'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = varName + '.js';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('File converted successfully!', 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+                console.error(error);
+            }
+        });
+        
+        /**
+         * Convert ArrayBuffer to JavaScript Uint8Array code with optional compression
+         */
+        function convertToUint8ArrayJS(arrayBuffer, varName, useCompression, useBase64) {
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const originalSize = uint8Array.length;
+            let compressedSize = originalSize;
+            let jsCode = `// Generated from file conversion\n`;
+            
+            if (useCompression) {
+                // Convert to string for compression
+                let binaryString = '';
+                for (let i = 0; i < uint8Array.length; i++) {
+                    binaryString += String.fromCharCode(uint8Array[i]);
+                }
+                
+                // Compress
+                let compressed;
+                if (useBase64) {
+                    compressed = LZString.compressToBase64(binaryString);
+                    jsCode += `const ${varName} = LZString.decompressFromBase64("${compressed}");\n`;
+                } else {
+                    compressed = LZString.compress(binaryString);
+                    jsCode += `const ${varName} = LZString.decompress("${compressed}");\n`;
+                }
+                
+                compressedSize = compressed.length;
+                
+                // Add conversion back to Uint8Array
+                jsCode += `const ${varName}_bytes = new Uint8Array(${varName}.length);\n`;
+                jsCode += `for (let i = 0; i < ${varName}.length; i++) {\n`;
+                jsCode += `    ${varName}_bytes[i] = ${varName}.charCodeAt(i);\n`;
+                jsCode += `}\n`;
+                
+                // Add LZString library reference if needed
+                jsCode += `// Requires LZString library: https://github.com/pieroxy/lz-string\n`;
+                jsCode += `// Original size: ${originalSize} bytes, Compressed size: ${compressedSize} bytes\n`;
+            } else {
+                // No compression - direct Uint8Array
+                jsCode += `const ${varName} = new Uint8Array([\n`;
+                
+                // Format as 16 values per line
+                const chunkSize = 16;
+                for (let i = 0; i < uint8Array.length; i += chunkSize) {
+                    const chunk = Array.from(uint8Array.slice(i, i + chunkSize))
+                        .map(n => '0x' + n.toString(16).padStart(2, '0'));
+                    jsCode += '    ' + chunk.join(', ') + ',\n';
+                }
+                
+                jsCode += `]);\n`;
+                jsCode += `// Total bytes: ${originalSize}\n`;
+            }
+            
+            return {
+                jsContent: jsCode,
+                originalSize,
+                compressedSize
+            };
+        }
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Blockly Blocks Reference</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #34A853;;
+            margin-top: 40px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--blockly-green);
+            font-weight: 500;
+        }
+        .blockly-category {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .block {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background-color: white;
+            border-left: 5px solid;
+            vertical-align: top;
+            width: 300px;
+        }
+        .block-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .block-description {
+            font-size: 0.9em;
+            color: #555;
+        }
+		.param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .param-table th {
+            background-color: var(--blockly-gray);
+            text-align: left;
+            padding: 10px;
+            font-weight: 500;
+        }
+        
+        .param-table td {
+            padding: 10px;
+            border-bottom: 1px solid #EEE;
+            vertical-align: top;
+        }
+        
+        .param-table tr:nth-child(even) {
+            background-color: #FFF;
+        }
+		
+		.example {
+			padding: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+			background-color: white;
+			vertical-align: top;
+		}
+        .block-color-30 { border-color: #5b80a5; } /* Drawing */
+        .block-color-60 { border-color: #5ba55b; } /* Logic */
+        .block-color-120 { border-color: #a55b80; } /* Game loop */
+        .block-color-160 { border-color: #a55b5b; } /* Sound */
+        .block-color-230 { border-color: #5ba5a5; } /* Variables */
+        .block-color-340 { border-color: #a5805b; } /* Objects */
+    </style>
+</head>
+<body>
+    <h1>Blockly Blocks Reference</h1>
+	
+	<h2>Basic Object Parameters</h2>
+	<p>Every object in Blockly has a set of parameters that define its behavior and appearance. Below is a complete list of all available parameters with detailed descriptions:</p>
+	<div class="blockly-category">
+		<table class="param-table">
+			<thead>
+				<tr>
+					<th>Parameter</th>
+					<th>Code</th>
+					<th>Type</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>X</strong></td>
+					<td><span class="code">x</span></td>
+					<td>Number</td>
+					<td>Horizontal coordinate of the object (in pixels). Measured from the left edge of the screen.</td>
+				</tr>
+				<tr>
+					<td><strong>Y</strong></td>
+					<td><span class="code">y</span></td>
+					<td>Number</td>
+					<td>Vertical coordinate of the object (in pixels). Measured from the top edge of the screen.</td>
+				</tr>
+				<tr>
+					<td><strong>Width</strong></td>
+					<td><span class="code">width</span></td>
+					<td>Number</td>
+					<td>Object width in pixels. Determines horizontal collision size.</td>
+				</tr>
+				<tr>
+					<td><strong>Height</strong></td>
+					<td><span class="code">height</span></td>
+					<td>Number</td>
+					<td>Object height in pixels. Determines vertical collision size.</td>
+				</tr>
+				<tr>
+					<td><strong>Speed X</strong></td>
+					<td><span class="code">speedx</span></td>
+					<td>Number</td>
+					<td>Horizontal movement speed (pixels per frame). Positive values - right, negative - left.</td>
+				</tr>
+				<tr>
+					<td><strong>Speed Y</strong></td>
+					<td><span class="code">speedy</span></td>
+					<td>Number</td>
+					<td>Vertical movement speed (pixels per frame). Positive values - down, negative - up.</td>
+				</tr>
+				<tr>
+					<td><strong>Visible</strong></td>
+					<td><span class="code">visible</span></td>
+					<td>Boolean</td>
+					<td>Determines whether the object is visible on screen. When false, the object isn't rendered but still participates in physics.</td>
+				</tr>
+				<tr>
+					<td><strong>Solid</strong></td>
+					<td><span class="code">solid</span></td>
+					<td>Boolean</td>
+					<td>If true, the object will collide with other solid objects. If false - the object will be passable.</td>
+				</tr>
+				<tr>
+					<td><strong>Angle</strong></td>
+					<td><span class="code">angle</span></td>
+					<td>Number</td>
+					<td>Rotation angle in degrees (0-360). Rotation occurs around the object's center.</td>
+				</tr>
+				<tr>
+					<td><strong>Flip</strong></td>
+					<td><span class="code">flip</span></td>
+					<td>Boolean</td>
+					<td>If true, the object's sprite will be horizontally flipped (mirrored).</td>
+				</tr>
+				<tr>
+					<td><strong>Mass</strong></td>
+					<td><span class="code">mass</span></td>
+					<td>Number</td>
+					<td>Object mass for physics calculations. Default is 1.0. Higher mass makes the object harder to move.</td>
+				</tr>
+				<tr>
+					<td><strong>Restitution</strong></td>
+					<td><span class="code">restitution</span></td>
+					<td>Number (0-1)</td>
+					<td>Bounciness coefficient during collisions. 0 - no bounce, 1 - perfectly elastic bounce.</td>
+				</tr>
+				<tr>
+					<td><strong>Is Static</strong></td>
+					<td><span class="code">isStatic</span></td>
+					<td>Boolean</td>
+					<td>If true, the object won't move under physics (like a platform or wall).</td>
+				</tr>
+				<tr>
+					<td><strong>Z-index</strong></td>
+					<td><span class="code">zIndex</span></td>
+					<td>Number</td>
+					<td>Determines rendering order. Objects with higher zIndex are drawn above objects with lower values.</td>
+				</tr>
+				<tr>
+					<td><strong>Is On Ground?</strong></td>
+					<td><span class="code">isOnGround</span></td>
+					<td>Boolean</td>
+					<td>Automatically set to true if the object is standing on another solid object. Read-only.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+    
+    <div class="blockly-category" id="gameloop">
+        <h2>Game Loop</h2>
+        
+        <div class="block block-color-120">
+            <div class="block-header">Infinite Game Loop</div>
+            <div class="block-description">
+                Main game loop that runs every frame. You can enable/disable screen clearing.
+            </div>
+        </div>
+		
+		<div class="example">
+		</div>
+    </div>
+    
+    <div class="blockly-category" id="control">
+        <h2>Controls</h2>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Is Button Held?</div>
+            <div class="block-description">
+                Checks if the specified button (arrows or A/B/X/Y) is being held.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Is Button Pressed?</div>
+            <div class="block-description">
+                Checks if the specified button was just pressed.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Get Joystick Axis Value</div>
+            <div class="block-description">
+                Returns joystick axis value (-1.0 to 1.0).
+            </div>
+        </div>
+		
+		<div class="example">
+		</div>
+    </div>
+    
+    <div class="blockly-category" id="draw">
+        <h2>Drawing</h2>
+        
+        <div class="block block-color-30">
+            <div class="block-header">Draw Point</div>
+            <div class="block-description">
+                Draws a point at specified coordinates with given color.
+            </div>
+        </div>
+        
+        <div class="block block-color-30">
+            <div class="block-header">Draw Text</div>
+            <div class="block-description">
+                Displays text at specified coordinates with given size and color.
+            </div>
+        </div>
+        
+        <div class="block block-color-30">
+            <div class="block-header">Draw Sprite</div>
+            <div class="block-description">
+                Draws a sprite (image) at specified coordinates with given size.
+            </div>
+        </div>
+        
+        <div class="block block-color-30">
+            <div class="block-header">Clear Screen</div>
+            <div class="block-description">
+                Fills the entire screen with specified color.
+            </div>
+        </div>
+        
+        <div class="block block-color-30">
+            <div class="block-header">Load Sprite</div>
+            <div class="block-description">
+                Allows loading a sprite in png format. Returns the ID of loaded sprite. Each call will reload the sprite and occupy memory, 
+				so it's better to load sprites at game start and store them in variables.
+            </div>
+        </div>
+        
+        <div class="block block-color-30">
+            <div class="block-header">Color Picker</div>
+            <div class="block-description">
+                Allows selecting a color from palette.
+            </div>
+        </div>
+    </div>
+    
+    <div class="blockly-category">
+        <h2>Objects</h2>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Create New Object</div>
+            <div class="block-description">
+                Creates a new game object with specified parameters (position, size, sprite).
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Clone Object</div>
+            <div class="block-description">
+                Creates a copy of existing object.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Set Object Parameter</div>
+            <div class="block-description">
+                Changes value of object parameter (X, Y, width, height etc.).
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Get Object Parameter</div>
+            <div class="block-description">
+                Returns value of object parameter.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Add to Object Parameter</div>
+            <div class="block-description">
+                Increases object parameter value by specified number.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Do Every Frame</div>
+            <div class="block-description">
+                Sets code that will execute for the object every frame.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Do on Collision</div>
+            <div class="block-description">
+                Sets code that will execute when object collides with another.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Control Object</div>
+            <div class="block-description">
+                Allows controlling object with keys or joystick.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Move to Point</div>
+            <div class="block-description">
+                Makes object move to specified point with given speed.
+            </div>
+        </div>
+        
+        <div class="block block-color-340">
+            <div class="block-header">Iterate All Objects</div>
+            <div class="block-description">
+                Executes code for each existing object.
+            </div>
+        </div>
+    </div>
+    
+    <div class="blockly-category">
+        <h2>Logic</h2>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Check Rectangle Collision</div>
+            <div class="block-description">
+                Checks if two rectangles intersect.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">If Outside Screen</div>
+            <div class="block-description">
+                Checks if object went outside screen boundaries.
+            </div>
+        </div>
+    </div>
+    
+    <div class="blockly-category">
+        <h2>Sound</h2>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Melody Editor</div>
+            <div class="block-description">
+                Allows creating melodies in visual editor.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Play Melody</div>
+            <div class="block-description">
+                Plays melody with specified tempo.
+            </div>
+        </div>
+    </div>
+    
+    <div class="blockly-category">
+        <h2>System</h2>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Execute After</div>
+            <div class="block-description">
+                Executes code after specified time (in milliseconds).
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Get Time</div>
+            <div class="block-description">
+                Returns current time in milliseconds.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Set Gravity</div>
+            <div class="block-description">
+                Sets global gravity for all objects.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Is Touching?</div>
+            <div class="block-description">
+                Checks if user is touching the screen.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Get Touch</div>
+            <div class="block-description">
+                Returns touch screen coordinates.
+            </div>
+        </div>
+    </div>
+    
+    <div class="blockly-category">
+        <h2>Variables</h2>
+        
+        <div class="block block-color-230">
+            <div class="block-header">Create Local Variable</div>
+            <div class="block-description">
+                Creates new variable with specified name and value.
+            </div>
+        </div>
+        
+        <div class="block block-color-230">
+            <div class="block-header">Get Local Variable</div>
+            <div class="block-description">
+                Returns value of local variable.
+            </div>
+        </div>
+    </div>
+    
+    <div class="blockly-category">
+        <h2>Advanced</h2>
+        
+        <div class="block block-color-60">
+            <div class="block-header">JS Code</div>
+            <div class="block-description">
+                Allows inserting arbitrary JavaScript code.
+            </div>
+        </div>
+    </div>
+
+    <!-- Standard Blockly blocks -->
+    <div class="blockly-category">
+        <h2>Standard Blockly Blocks</h2>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Logical Operators</div>
+            <div class="block-description">
+                Blocks for working with boolean values: AND, OR, NOT, comparisons (==, !=, &lt;, &gt;, &lt;=, &gt;=).
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Conditionals</div>
+            <div class="block-description">
+                Blocks for branching logic: if, if-else.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Loops</div>
+            <div class="block-description">
+                Blocks for creating loops: while, for, repeat.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Math Operations</div>
+            <div class="block-description">
+                Blocks for mathematical calculations: +, -, *, /, %, exponent, root, trigonometric functions.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Text</div>
+            <div class="block-description">
+                Blocks for working with strings: concatenation, length, substring, contains check.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Lists</div>
+            <div class="block-description">
+                Blocks for working with arrays: create list, access by index, add/remove elements, list length.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Functions</div>
+            <div class="block-description">
+                Blocks for creating and calling custom functions with parameters and return values.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Variables</div>
+            <div class="block-description">
+                Blocks for creating variables, assigning values and getting variable values.
+            </div>
+        </div>
+        
+        <div class="block block-color-60">
+            <div class="block-header">Comments</div>
+            <div class="block-description">
+                Blocks for adding explanatory comments to code.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

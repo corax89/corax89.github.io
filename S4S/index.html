@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <title>Scratch4Switch</title>
+	<link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="loader-container">
+	<h2>Load</h2>
+	
+	<div class="progress-container">
+		<div class="progress-bar">
+			<div class="progress" id="progressBar"></div>
+		</div>
+		<div id="progressText" style="text-align: center; margin-top: 5px;">0%</div>
+	</div>
+	
+	<div class="status" id="statusText">Wait...</div>
+	<div class="library-info" id="libraryInfo"></div>
+</div>
+<div id="switchModal" class="switch-modal">
+	<div id="modalContent" class="switch-modal-content">
+		<div class="switch-modal-header">
+			<span id="modalTitle" class="switch-modal-title">Уведомление системы</span>
+			<span class="switch-modal-close">&times;</span>
+		</div>
+		<div class="switch-modal-body">
+			<p id="modalMessage">Сообщение</p>
+			<div class="switch-modal-buttons">
+				<button id="modalPrimaryBtn" class="switch-btn switch-btn-primary">OK</button>
+				<button id="modalSecondaryBtn" class="switch-btn switch-btn-secondary" style="display: none;">Отмена</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div>
+	<button onclick="changeLanguage('ru')">RU</button>
+	<button onclick="changeLanguage('en')">EN</button>
+	<div class="dropdown" id="project-dropdown">
+		<button class="dropdown-btn" id="project-actions">Project Actions</button>
+		<div class="dropdown-content">
+			<button id="save-project-btn" onclick="saveToFile()">Save Project</button>
+			<input type="file" id="loadFile" accept=".json" style="display: none;">
+			<button id="load-project-btn" onclick="document.getElementById('loadFile').click()">Load Project</button>
+		</div>
+	</div>
+	
+	<div class="dropdown" id="build-dropdown">
+		<button class="dropdown-btn" id="project-build">Build Options</button>
+		<div class="dropdown-content">
+			<button id="build-html-btn" onclick="buildHTML()">Build HTML Version</button>
+			<button id="build-switch-btn" onclick="buildSwitch()">Build Switch Version</button>
+		</div>
+	</div>
+	<input type="text" id="Name" placeholder="Game name">
+	<div class="dropdown" id="help-dropdown">
+		<button class="dropdown-btn" id="project-help">?</button>
+		<div class="dropdown-content">
+			<a id="help-author" class="dropdown-hlp" href="https://github.com/corax89/" target="_blank"> Author Corax89</a>
+			<a id="help-powered" class="dropdown-hlp" href="https://developers.google.com/blockly" target="_blank"> Powered by Blockly</a>
+			<a id="help-help" class="dropdown-hlp" href="helpen.html" target="_blank"> Help</a>
+		</div>
+	</div>
+</div>
+<div class="tabs">
+	<div class="tabs__nav">
+		<button class="tabs__btn active" data-tab="tab-1" onclick="Game.gameLoop=false;">Code</button>
+		<button class="tabs__btn" data-tab="tab-2" onclick="showCode();Game.gameLoop=false;">JS</button>
+		<button class="tabs__btn" data-tab="tab-3" onclick="runJS()">Screen</button>
+	</div>
+	
+	<div class="tabs__content">
+		<div class="tabs__item active" id="tab-1">
+			<div id="blocklyDiv"></div>
+		</div>
+		<div class="tabs__item" id="tab-2">
+			<div id="codeOutput">// Generated code will appear here</div>
+		</div>
+		<div class="tabs__item" id="tab-3">
+			<canvas width="1280" height="720" id="cnv"></canvas>
+		</div>
+	</div>
+</div>
+<img id="icon" src="" alt="Icon preview">
+<input type="file" id="icoFileInput" accept="image/*">
+<!-- Подключаем скрипты Blockly -->
+<script src="loader.js"></script>
+</body>
+</html>

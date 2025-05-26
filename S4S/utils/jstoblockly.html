@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS to Blockly Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/esprima@4.0.1/dist/esprima.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .code-area {
+            display: flex;
+            gap: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #convertBtn {
+            background-color: #4CAF50;
+        }
+        #convertBtn:hover {
+            background-color: #45a049;
+        }
+        #downloadBtn {
+            background-color: #2196F3;
+        }
+        #downloadBtn:hover {
+            background-color: #0b7dda;
+        }
+        #downloadBtn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .output {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+        h1 {
+            color: #333;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript to Blockly JSON Converter</h1>
+        
+        <div class="code-area">
+            <div style="flex: 1;">
+                <h3>JavaScript Code:</h3>
+                <textarea id="jsCode" spellcheck="false">let x = 5;
+if (x > 3) {
+    console.log("Hello");
+}</textarea>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="convertBtn">Convert to Blockly JSON</button>
+            <button id="downloadBtn" disabled>Download JSON</button>
+        </div>
+        
+        <div>
+            <h3>Blockly JSON Output:</h3>
+            <div id="output" class="output">Click "Convert" to see the result...</div>
+            <div id="error" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentJson = null;
+        
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const jsCode = document.getElementById('jsCode').value;
+            const output = document.getElementById('output');
+            const error = document.getElementById('error');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            error.textContent = '';
+            output.textContent = 'Processing...';
+            
+            try {
+                currentJson = convertJsToBlocklyJson(jsCode);
+                const jsonString = JSON.stringify(currentJson, null, 2);
+                output.textContent = jsonString;
+                downloadBtn.disabled = false;
+            } catch (e) {
+                error.textContent = 'Error: ' + e.message;
+                output.textContent = '';
+                downloadBtn.disabled = true;
+                console.error(e);
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            if (!currentJson) return;
+            
+            const jsonString = JSON.stringify(currentJson, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'blockly_export.json';
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+        });
+
+        function convertJsToBlocklyJson(jsCode) {
+            const ast = esprima.parseScript(jsCode, { range: true });
+            const blocks = {
+                blocks: {
+                    languageVersion: 0,
+                    blocks: []
+                }
+            };
+
+            function traverse(node) {
+                const block = convertNodeToBlockly(node);
+                if (block) {
+                    blocks.blocks.blocks.push(block);
+                }
+
+                for (const key in node) {
+                    if (node.hasOwnProperty(key)) {
+                        const child = node[key];
+                        if (typeof child === 'object' && child !== null) {
+                            if (Array.isArray(child)) {
+                                child.forEach(node => node && traverse(node));
+                            } else {
+                                traverse(child);
+                            }
+                        }
+                    }
+                }
+            }
+
+            traverse(ast);
+            return blocks;
+        }
+
+        function convertNodeToBlockly(node) {
+            if (!node) return null;
+
+            switch (node.type) {
+                case 'VariableDeclaration':
+                    return convertVariableDeclaration(node);
+                case 'ExpressionStatement':
+                    return convertExpressionStatement(node);
+                case 'IfStatement':
+                    return convertIfStatement(node);
+                case 'ForStatement':
+                    return convertForStatement(node);
+                case 'WhileStatement':
+                    return convertWhileStatement(node);
+                case 'FunctionDeclaration':
+                    return convertFunctionDeclaration(node);
+                case 'Literal':
+                    return convertLiteral(node);
+                case 'BinaryExpression':
+                    return convertBinaryExpression(node);
+                case 'Identifier':
+                    return convertIdentifier(node);
+                case 'CallExpression':
+                    return convertCallExpression(node);
+                default:
+                    return null;
+            }
+        }
+
+        function convertVariableDeclaration(node) {
+            if (node.declarations.length === 0) return null;
+            const decl = node.declarations[0];
+            
+            return {
+                type: 'variables_set',
+                fields: {
+                    VAR: decl.id.name || 'var'
+                },
+                inputs: {
+                    VALUE: {
+                        block: convertNodeToBlockly(decl.init) || {
+                            type: 'math_number',
+                            fields: { NUM: 0 }
+                        }
+                    }
+                }
+            };
+        }
+
+        function convertIfStatement(node) {
+            return {
+                type: 'controls_if',
+                inputs: {
+                    IF0: {
+                        block: convertNodeToBlockly(node.test)
+                    },
+                    DO0: {
+                        block: convertNodeToBlockly(node.consequent)
+                    }
+                }
+            };
+        }
+
+        function convertExpressionStatement(node) {
+            return convertNodeToBlockly(node.expression);
+        }
+
+        function convertLiteral(node) {
+            if (typeof node.value === 'number') {
+                return {
+                    type: 'math_number',
+                    fields: {
+                        NUM: node.value
+                    }
+                };
+            } else if (typeof node.value === 'string') {
+                return {
+                    type: 'text',
+                    fields: {
+                        TEXT: node.value
+                    }
+                };
+            }
+            return null;
+        }
+
+        function convertBinaryExpression(node) {
+            const operators = {
+                '+': 'math_arithmetic',
+                '-': 'math_arithmetic',
+                '*': 'math_arithmetic',
+                '/': 'math_arithmetic',
+                '>': 'logic_compare',
+                '<': 'logic_compare',
+                '>=': 'logic_compare',
+                '<=': 'logic_compare',
+                '==': 'logic_compare',
+                '!=': 'logic_compare'
+            };
+
+            const opMap = {
+                '+': 'ADD',
+                '-': 'MINUS',
+                '*': 'MULTIPLY',
+                '/': 'DIVIDE',
+                '>': 'GT',
+                '<': 'LT',
+                '>=': 'GTE',
+                '<=': 'LTE',
+                '==': 'EQ',
+                '!=': 'NEQ'
+            };
+
+            return {
+                type: operators[node.operator] || 'math_arithmetic',
+                fields: operators[node.operator] ? { OP: opMap[node.operator] } : undefined,
+                inputs: {
+                    A: { block: convertNodeToBlockly(node.left) },
+                    B: { block: convertNodeToBlockly(node.right) }
+                }
+            };
+        }
+
+        function convertIdentifier(node) {
+            return {
+                type: 'variables_get',
+                fields: {
+                    VAR: node.name
+                }
+            };
+        }
+
+        function convertCallExpression(node) {
+            if (node.callee.type === 'MemberExpression' && 
+                node.callee.object.name === 'console' && 
+                node.callee.property.name === 'log') {
+                return {
+                    type: 'text_print',
+                    inputs: {
+                        TEXT: {
+                            block: convertNodeToBlockly(node.arguments[0]) || {
+                                type: 'text',
+                                fields: { TEXT: '' }
+                            }
+                        }
+                    }
+                };
+            }
+            return null;
+        }
+
+        // Stubs for unimplemented features
+        function convertForStatement(node) { return null; }
+        function convertWhileStatement(node) { return null; }
+        function convertFunctionDeclaration(node) { return null; }
+    </script>
+</body>
+</html>
