@@ -103,7 +103,7 @@ class FieldMusicEditor extends Blockly.Field {
     }
     if (this.textElement_) {
       this.textElement_.textContent = Blockly.Msg['MUSIC_EDITOR_LABEL'];
-      this.textElement_.setAttribute('y', (this.defaultHeight_ / 2 + 6).toString());
+      this.textElement_.setAttribute('y', (this.defaultHeight_ / 2).toString());
       this.textElement_.setAttribute('x', '8');
       this.textElement_.style.fontSize = '14px';
       this.textElement_.style.fontWeight = 'bold';
