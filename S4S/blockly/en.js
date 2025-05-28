@@ -523,6 +523,21 @@ Blockly.Msg['MUSIC_CLEAR_BTN'] = 'Clear';
 Blockly.Msg['BUTTON_LABEL_UPLOAD'] = 'Upload PNG';
 Blockly.Msg['HELP_A'] = 'helpen.html';
 Blockly.Msg['ENTER_NAME'] = 'Enter a name for the game';
+Blockly.Msg['CLICK_TO_EDIT'] = 'Click to edit';
+Blockly.Msg['LOAD_IMAGE'] = 'Load image';
+Blockly.Msg['SAVE_IMAGE'] = 'Save image to file'
+Blockly.Msg['APPLY_AND_CLOSE'] = 'Apply and close';
+Blockly.Msg['IMAGE_BRUSH'] = 'Brush';
+Blockly.Msg['IMAGE_LINE'] = 'Line';
+Blockly.Msg['IMAGE_ERASER'] = 'Eraser';
+Blockly.Msg['IMAGE_FILL'] = 'Fill';
+Blockly.Msg['IMAGE_CLEAR'] = 'Clear';
+Blockly.Msg['IMAGE_RESIZE'] = 'Resize';
+Blockly.Msg['IMAGE_UNDO'] = 'Undo';
+Blockly.Msg['IMAGE_REDO'] = 'Redo';
+Blockly.Msg['IMAGE_ZOOM_OUT'] = 'Zoom out';
+Blockly.Msg['ZOOM_IN'] = 'Zoom in';
+Blockly.Msg['IMAGE_RESET_VIEW'] = 'Reset view';
 };
 
 function changeLanguage(selectedValue) {

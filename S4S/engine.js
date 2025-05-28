@@ -746,7 +746,8 @@ function game_loop() {
                 }
 
                 ctx.restore();
-                o.onStep();
+				if(o.onStep)
+					o.onStep();
             }
         }
     }

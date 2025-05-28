@@ -8,7 +8,6 @@ const scripts = [
     { name: 'Blockly Russian', path: 'blockly/ru.js' },
     { name: 'Blockly English', path: 'blockly/en.js' },
     { name: 'Multiline Field', path: 'blockly/field_multiline.js' },
-    { name: 'Bitmap Field', path: 'blockly/field_bitmap.js' },
     { name: 'Color Field', path: 'blockly/field_color.js' },
     { name: 'Music Field', path: 'blockly/field_music.js' },
     { name: 'MP3 Field', path: 'blockly/field_mp3.js' },

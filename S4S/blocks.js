@@ -294,36 +294,12 @@ Blockly.Blocks['draw_image'] = {
     this.appendValueInput("Y")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_Y']);
-    this.appendValueInput("Size")
+    this.appendValueInput("Width")
         .setCheck("Number")
-        .appendField(Blockly.Msg['SIZE_LABEL']);
-    this.setPreviousStatement(true, "Array");
-    this.setNextStatement(true, "Array");
-  }
-};
-
-// Блок рисования спрайта
-Blockly.Blocks['draw_sprite'] = {
-  init: function() {
-    this.setColour(30);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
-    this.appendDummyInput()
-        .appendField(Blockly.Msg['DRAW_SPRITE_LABEL']);
-    this.appendValueInput("Sprite")
-        .setCheck("Array")
-        .appendField(Blockly.Msg['SPRITE_LABEL']);
-    this.appendValueInput("X")
+        .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
+	this.appendValueInput("Height")
         .setCheck("Number")
-        .appendField(Blockly.Msg['OBJECT_PARAM_X']);
-    this.appendValueInput("Y")
-        .setCheck("Number")
-        .appendField(Blockly.Msg['OBJECT_PARAM_Y']);
-    this.appendValueInput("Size")
-        .setCheck("Number")
-        .appendField(Blockly.Msg['SIZE_LABEL']);
-    this.appendValueInput("Colour")
-        .setCheck("Colour")
-        .appendField(Blockly.Msg['COLOR_LABEL']);
+        .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -384,38 +360,24 @@ Blockly.Blocks['clear_screen'] = {
   }
 };
 
-// Блок редактора спрайтов
-Blockly.defineBlocksWithJsonArray([{
-  "type": "field_bitmap",
-  "message0": Blockly.Msg['SPRITE_EDITOR_LABEL'] + " %1",
-  "output": "Array",
-  "colour": 30,
-  "args0": [{
-    "type": "field_bitmap",
-    "name": "sprite",
-    "width": 32,
-    "height": 32,
-    "buttons": {"randomize": false, "clear": true},
-    "colours": {"filled": "#363d80", "empty": "#fff"},
-    "fieldHeight": 64
-  }]
-}]);
-
 // Блок загрузки изображения
-Blockly.defineBlocksWithJsonArray([{
-  "type": "field_png",
-  "message0": Blockly.Msg['IMAGE_UPLOAD_LABEL'] + " %1",
-  "output": "type_sprite",
-  "colour": 30,
-  "args0": [{
-    "type": "field_png",
-    "name": "sprite",
-    "width": 32,
-    "height": 32,
-    "colours": {"filled": "#363d80", "empty": "#fff"},
-    "fieldHeight": 64
-  }]
-}]);
+Blockly.Blocks['field_png'] = {
+  init: function() {
+	this.appendDummyInput()
+        .appendField(Blockly.Msg['SPRITE_EDITOR_LABEL']);
+    this.appendDummyInput()
+        .appendField(new FieldImageEditor(
+            null, // Initial value (can be a data URL or null)
+            null, // No validator function
+            { alt: "Edit Image", tooltip: "Click to edit image" } // Configuration
+        ), "IMAGE");
+    this.setOutput(true, null); // Or any other block configuration
+    this.setColour(30);
+	this.setInputsInline(true);
+	this.setTooltip("");
+	this.setHelpUrl("");
+  }
+};
 
 // Блок загрузки MP3
 Blockly.defineBlocksWithJsonArray([{
@@ -1348,18 +1310,9 @@ javascript.javascriptGenerator.forBlock['draw_image'] = function(block, generato
   const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
   const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
   const sprite = generator.valueToCode(block, 'Image', generator.ORDER_ATOMIC);
-  const size = generator.valueToCode(block, 'Size', generator.ORDER_ATOMIC);
-  return `Draw.image(${sprite}, ${x}, ${y}, ${size}, ${size});\n`;
-};
-
-// Генератор для рисования спрайта
-javascript.javascriptGenerator.forBlock['draw_sprite'] = function(block, generator) {
-  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
-  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
-  const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC);
-  const size = generator.valueToCode(block, 'Size', generator.ORDER_ATOMIC);
-  const color = generator.valueToCode(block, 'Colour', generator.ORDER_ATOMIC);
-  return `Draw.sprite(${sprite}, ${x}, ${y}, ${size}, ${color});\n`;
+  const width = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC);
+  const height = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC);
+  return `Draw.image(${sprite}, ${x}, ${y}, ${width}, ${height});\n`;
 };
 
 // Генератор для проверки столкновений
@@ -1381,15 +1334,9 @@ javascript.javascriptGenerator.forBlock['clear_screen'] = function(block, genera
   return `Draw.clear_screen(${color});\n`;
 };
 
-// Генератор для спрайтового редактора
-javascript.javascriptGenerator.forBlock['field_bitmap'] = function(block, generator) {
-  const sprite = block.getFieldValue('sprite');
-  return [JSON.stringify(sprite), generator.ORDER_ATOMIC];
-};
-
 // Генератор для загрузки изображения
 javascript.javascriptGenerator.forBlock['field_png'] = function(block, generator) {
-  const sprite = block.getFieldValue('sprite');
+  const sprite = block.getFieldValue('IMAGE');
   return [`Draw.loadImage("${sprite}")`, generator.ORDER_ATOMIC];
 };
 
