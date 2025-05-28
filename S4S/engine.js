@@ -486,15 +486,42 @@ Game.distance = function(x1, y1, x2, y2) {
 };
 
 // Функция воспроизведения музыки
+const globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// Очередь и активные мелодии
+const MAX_CONCURRENT_MELODIES = 8;
+let activeMelodies = 0;
+const melodyQueue = [];
+
 Game.play_music = function(melodyString, bpm = 120) {
+    // Если уже играет максимум, ставим в очередь
+    if (activeMelodies >= MAX_CONCURRENT_MELODIES) {
+        melodyQueue.push({ melodyString, bpm });
+        return;
+    }
+
+    // Запускаем новую мелодию
+    activeMelodies++;
+    _playMelody(melodyString, bpm);
+};
+
+// Внутренняя функция для реального воспроизведения
+function _playMelody(melodyString, bpm) {
+    // Проверка формата (как в исходном коде)
     if (typeof melodyString !== 'string' || !/^(\d+,)*\d+$/.test(melodyString)) {
         console.error("Invalid melody string format");
+        activeMelodies--;
+        _checkQueue(); // Проверяем очередь, если была ошибка
         return;
     }
 
     const steps = melodyString.split(',').map(Number);
     const totalSteps = steps.length;
-    if (totalSteps === 0) return;
+    if (totalSteps === 0) {
+        activeMelodies--;
+        _checkQueue();
+        return;
+    }
 
     const instruments = [
         {name: 'C4', freq: 261.63, type: 'square'},
@@ -512,10 +539,10 @@ Game.play_music = function(melodyString, bpm = 120) {
         {name: 'Tom', type: 'drum', drumType: 'tom'}
     ];
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const stepDuration = 60 / bpm / 2;
-    let currentTime = audioCtx.currentTime + 0.1;
+    let currentTime = globalAudioCtx.currentTime + 0.1;
 
+    // Воспроизведение нот и ударных (как в исходном коде)
     for (let step = 0; step < totalSteps; step++) {
         const stepValue = steps[step];
         
@@ -534,9 +561,17 @@ Game.play_music = function(melodyString, bpm = 120) {
         currentTime += stepDuration;
     }
 
+    // После завершения всей мелодии освобождаем слот
+    const totalDuration = stepDuration * totalSteps;
+    setTimeout(() => {
+        activeMelodies--;
+        _checkQueue(); // Проверяем очередь на наличие ожидающих мелодий
+    }, totalDuration * 1000 + 100);
+
+    // Функции playNote и playDrum (с очисткой!)
     function playNote(freq, startTime, waveType) {
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+        const oscillator = globalAudioCtx.createOscillator();
+        const gainNode = globalAudioCtx.createGain();
         
         oscillator.type = waveType || 'square';
         oscillator.frequency.value = freq;
@@ -545,40 +580,46 @@ Game.play_music = function(melodyString, bpm = 120) {
         gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + stepDuration * 0.9);
         
         oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        gainNode.connect(globalAudioCtx.destination);
         
         oscillator.start(startTime);
         oscillator.stop(startTime + stepDuration);
+
+        // Очистка после завершения
+        oscillator.onended = () => {
+            oscillator.disconnect();
+            gainNode.disconnect();
+        };
     }
 
     function playDrum(type, startTime) {
-        const bufferSource = audioCtx.createBufferSource();
-        const gainNode = audioCtx.createGain();
+        const bufferSource = globalAudioCtx.createBufferSource();
+        const gainNode = globalAudioCtx.createGain();
         const duration = 0.2;
         
-        const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * duration, audioCtx.sampleRate);
+        const buffer = globalAudioCtx.createBuffer(1, globalAudioCtx.sampleRate * duration, globalAudioCtx.sampleRate);
         const data = buffer.getChannelData(0);
         
         switch(type) {
             case 'kick':
                 for (let i = 0; i < data.length; i++) {
-                    const t = i / audioCtx.sampleRate;
+                    const t = i / globalAudioCtx.sampleRate;
                     data[i] = Math.sin(t * 50 * Math.PI * 2) * Math.exp(-t * 10);
                 }
                 break;
             case 'snare':
                 for (let i = 0; i < data.length; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.1));
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (globalAudioCtx.sampleRate * 0.1));
                 }
                 break;
             case 'hihat':
                 for (let i = 0; i < data.length; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.02));
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (globalAudioCtx.sampleRate * 0.02));
                 }
                 break;
             case 'clap':
                 for (let i = 0; i < data.length; i++) {
-                    const t = i / audioCtx.sampleRate;
+                    const t = i / globalAudioCtx.sampleRate;
                     if (t < 0.02 || (t > 0.03 && t < 0.05) || (t > 0.06 && t < 0.08)) {
                         data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 20);
                     }
@@ -586,7 +627,7 @@ Game.play_music = function(melodyString, bpm = 120) {
                 break;
             case 'tom':
                 for (let i = 0; i < data.length; i++) {
-                    const t = i / audioCtx.sampleRate;
+                    const t = i / globalAudioCtx.sampleRate;
                     data[i] = Math.sin(t * 100 * Math.PI * 2) * Math.exp(-t * 5);
                 }
                 break;
@@ -597,12 +638,26 @@ Game.play_music = function(melodyString, bpm = 120) {
         
         bufferSource.buffer = buffer;
         bufferSource.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        gainNode.connect(globalAudioCtx.destination);
         
         bufferSource.start(startTime);
         bufferSource.stop(startTime + duration);
+
+        // Очистка после завершения
+        bufferSource.onended = () => {
+            bufferSource.disconnect();
+            gainNode.disconnect();
+        };
     }
-};
+}
+
+// Проверка очереди и запуск следующей мелодии
+function _checkQueue() {
+    if (melodyQueue.length > 0 && activeMelodies < MAX_CONCURRENT_MELODIES) {
+        const nextMelody = melodyQueue.shift();
+        _playMelody(nextMelody.melodyString, nextMelody.bpm);
+    }
+}
 
 // Вспомогательные функции
 function getApproximateMemoryUsage(obj) {
