@@ -6,6 +6,7 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_HEIGHT'], 'height'],
   [Blockly.Msg['OBJECT_PARAM_SPEEDX'], 'speedx'],
   [Blockly.Msg['OBJECT_PARAM_SPEEDY'], 'speedy'],
+  [Blockly.Msg['OBJECT_PARAM_NAME'], 'name'],
   [Blockly.Msg['OBJECT_PARAM_VISIBLE'], 'visible'],
   [Blockly.Msg['OBJECT_PARAM_SOLID'], 'solid'],
   [Blockly.Msg['OBJECT_PARAM_ANGLE'], 'angle'],
@@ -24,6 +25,41 @@ var ObjectType = [
 ];
 
 // ========= Вспомогательные функции ========
+
+var proto_object_array = [];
+var store_image_array = [];
+
+function add_to_image_array(str) {
+    // Создаем хеш строки (используем простой хеш для примера)
+    const hash = generateHash(str);
+    
+    // Проверяем, есть ли уже такой хеш в массиве
+    const existingIndex = store_image_array.findIndex(item => item.hash === hash);
+    
+    if (existingIndex !== -1) {
+        // Если хеш уже существует, возвращаем его индекс
+        return existingIndex;
+    } else {
+        // Если хеша нет, добавляем новую запись и возвращаем её индекс
+        const newEntry = {
+            data: str,
+            hash: hash
+        };
+        store_image_array.push(newEntry);
+        return store_image_array.length - 1;
+    }
+}
+
+function generateHash(str) {
+    // Используем простой хеш
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Преобразуем в 32-битное целое число
+    }
+    return hash.toString();
+}
 
 Blockly.Variables = {
   localVars: [],
@@ -360,25 +396,6 @@ Blockly.Blocks['clear_screen'] = {
   }
 };
 
-// Блок загрузки изображения
-Blockly.Blocks['field_png'] = {
-  init: function() {
-	this.appendDummyInput()
-        .appendField(Blockly.Msg['SPRITE_EDITOR_LABEL']);
-    this.appendDummyInput()
-        .appendField(new FieldImageEditor(
-            null, // Initial value (can be a data URL or null)
-            null, // No validator function
-            { alt: "Edit Image", tooltip: "Click to edit image" } // Configuration
-        ), "IMAGE");
-    this.setOutput(true, null); // Or any other block configuration
-    this.setColour(30);
-	this.setInputsInline(true);
-	this.setTooltip("");
-	this.setHelpUrl("");
-  }
-};
-
 // Блок загрузки MP3
 Blockly.defineBlocksWithJsonArray([{
   "type": "mp3_block",
@@ -427,6 +444,18 @@ Blockly.Blocks['play_music'] = {
   }
 };
 
+//редактор уровней
+Blockly.Blocks['level_editor'] = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField(Blockly.Msg['LEVEL_EDITOR_LABEL'])
+      .appendField(new FieldLevelEditor('[]', null, {}), 'LEVEL_DATA');
+    this.setColour(60);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+  }
+};
+
 // Блок ввода JS кода
 Blockly.Blocks['field_multilineinput'] = {
   init: function() {
@@ -456,6 +485,226 @@ Blockly.Blocks['set_timer'] = {
   }
 };
 
+// ================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ================== //
+function rebuildProtoObjectArray() {
+    // 1. Очищаем массив
+    proto_object_array = [];
+
+    // 2. Находим все блоки типа 'new_proto_object'
+    const blocks = workspace.getAllBlocks();
+    const protoBlocks = blocks.filter(block => block.type === 'new_proto_object');
+
+    // 3. Заполняем массив заново с проверкой дубликатов
+    const usedNames = new Set(); // Для отслеживания уже использованных имен
+    
+    for (const block of protoBlocks) {
+      const objectName = block.getFieldValue('Object');
+      if (!objectName || objectName === 'null') continue; // Пропускаем невалидные
+
+      // Проверяем, не существует ли уже такое имя
+      if (usedNames.has(objectName)) {
+        showSwitchModal('error', 'Внимание:%1 дублируется'.replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
+      }
+      usedNames.add(objectName);
+
+      const spriteBlock = block.getInputTargetBlock('Sprite');
+      let spriteValue = '';
+
+      if (spriteBlock && spriteBlock.type === 'field_png') {
+        spriteValue = spriteBlock.getField('IMAGE').getValue();
+      }
+
+      proto_object_array.push({
+        name: objectName,
+        width: getNumberValue(block, 'Width'),
+        height: getNumberValue(block, 'Height'),
+        sprite: spriteValue,
+        onCreate: getConnectedBlocks(block, 'ONCREATE'),
+        blockId: block.id
+      });
+    }
+    console.log('Массив перестроен. Текущие объекты:', proto_object_array);
+}
+
+function getNumberValue(block, inputName) {
+  const inputBlock = block.getInputTargetBlock(inputName);
+  if (!inputBlock) return 0;
+  return Number(inputBlock.getFieldValue('NUM')) || 0;
+}
+
+function getConnectedBlocks(block, inputName) {
+  const result = [];
+  let currentBlock = block.getInputTargetBlock(inputName);
+  
+  while (currentBlock) {
+    result.push({
+      type: currentBlock.type,
+      fields: getBlockFields(currentBlock)
+    });
+    currentBlock = currentBlock.getNextBlock();
+  }
+  
+  return result;
+}
+
+function getBlockFields(block) {
+  const fields = {};
+  for (const fieldName in block.fields_) {
+    fields[fieldName] = block.getFieldValue(fieldName);
+  }
+  return fields;
+}
+
+function objectExists(name, excludeBlockId = null) {
+  return proto_object_array.some(obj => 
+    obj.name === name && (!excludeBlockId || obj.blockId !== excludeBlockId)
+  );
+}
+
+function generateUniqueName(baseName) {
+  let newName = baseName;
+  let counter = 1;
+  while (objectExists(newName)) {
+    newName = `${baseName}_${counter++}`;
+  }
+  return newName;
+}
+// ================== ОПРЕДЕЛЕНИЕ БЛОКА ================== //
+
+Blockly.Blocks['new_proto_object'] = {
+  init: function() {
+	this.variableId = null;
+    this.setColour(340);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['NEW_PROTO_OBJECT_LABEL']);
+    
+    // Генерируем уникальное имя переменной
+    const varName = this.generateUniqueVarName('prototype');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable(varName), 'Object');
+    
+    // Остальные поля блока
+    this.appendValueInput("Width")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
+    this.appendValueInput("Height")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
+    this.appendValueInput("Sprite")
+        .setCheck("type_sprite")
+        .appendField(Blockly.Msg['IMAGE_LABEL']);
+    this.appendStatementInput("ONCREATE")
+        .setCheck(null)
+        .appendField(Blockly.Msg['ON_CREATE_LABEL']);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+
+    this.originalName = varName;
+    
+    // Валидатор имени переменной
+    this.getField('Object').setValidator(newName => {
+      if (!newName) return this.originalName;
+      
+      const variableField = this.getField('Object');
+      const currentVar = variableField.getVariable();
+      
+      if (currentVar) {
+        this.variableId = currentVar.value; // Сохраняем ID переменной
+      }
+      
+      // Проверяем существование переменной с таким именем
+      const allVars = this.workspace.getAllVariables();
+      const nameExists = allVars.some(v => 
+        v.name === newName && 
+        (!currentVar || v.getId() !== currentVar.getId())
+      );
+      
+      if (nameExists) {
+        console.warn(`Переменная "${newName}" уже существует!`);
+        return this.originalName;
+      }
+      
+      this.originalName = newName;
+      return newName;
+    });
+  },
+
+  /**
+   * Генерирует уникальное имя переменной
+   */
+  generateUniqueVarName: function(baseName) {
+    const workspace = this.workspace || Blockly.getMainWorkspace();
+    let counter = 1;
+    let newName = baseName + counter;
+    
+    // Получаем все существующие переменные
+    const allVars = workspace.getAllVariables();
+    
+    while (allVars.some(v => v.name === newName)) {
+      counter++;
+      newName = baseName + counter;
+    }
+    
+    return newName;
+  },
+	
+  saveExtraState: function() {
+    const variable = this.getField('Object').getVariable();
+    return {
+      varId: variable ? variable.getId() : null,
+      originalName: this.originalName
+    };
+  },
+
+  loadExtraState: function(state) {
+    const workspace = this.workspace;
+    let variable;
+	this.variableId = state.varId;
+    
+    // Восстанавливаем переменную
+    if (state.varId) {
+      variable = workspace.getVariableById(state.varId);
+    }
+    
+    if (!variable) {
+      // Создаем новую переменную с уникальным именем
+      const varName = state.originalName || this.generateUniqueVarName('prototype');
+      variable = workspace.createVariable(varName);
+    }
+    
+    this.originalName = variable.name;
+    this.setFieldValue(variable.name, 'Object');
+  }
+};
+
+Blockly.Blocks['field_png'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['SPRITE_EDITOR_LABEL']);
+    this.appendDummyInput()
+        .appendField(new FieldImageEditor(
+            null,
+            null,
+            { alt: "Edit Image", tooltip: "Click to edit image" }
+        ), "IMAGE");
+    this.setOutput(true, null);
+    this.setColour(30);
+    this.setInputsInline(true);
+    this.setTooltip("");
+    this.setHelpUrl("");
+  }
+};
+
+// ================== ИНТЕГРАЦИОННЫЕ ФУНКЦИИ ================== //
+
+function getProtoObjects() {
+  return proto_object_array;
+}
+
+function resetProtoObjects() {
+  proto_object_array = [];
+  console.log('Массив объектов сброшен');
+}
 // Блок создания объекта
 Blockly.Blocks['new_object'] = {
   init: function() {
@@ -487,6 +736,28 @@ Blockly.Blocks['new_object'] = {
   }
 };
 
+Blockly.Blocks['new_object_from_proto'] = {
+  init: function() {
+    this.setColour(340);
+	this.appendDummyInput()
+        .appendField(Blockly.Msg['NEW_OBJECT_FROM_PROTO_LABEL']);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('prototype1'), 'Object')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['CLONE_OBJECT_LABEL2']);
+	this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('obj1'), 'Object2');
+	this.appendValueInput("X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['POSITION_X_LABEL']);
+    this.appendValueInput("Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['POSITION_Y_LABEL']);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+  }
+};
 // ==================== Блоки объектов ====================
 
 Blockly.Blocks['clone_object'] = {
@@ -1337,7 +1608,9 @@ javascript.javascriptGenerator.forBlock['clear_screen'] = function(block, genera
 // Генератор для загрузки изображения
 javascript.javascriptGenerator.forBlock['field_png'] = function(block, generator) {
   const sprite = block.getFieldValue('IMAGE');
-  return [`Draw.loadImage("${sprite}")`, generator.ORDER_ATOMIC];
+  const id = add_to_image_array(sprite);
+  //return [`Draw.loadImage("${sprite}")`, generator.ORDER_ATOMIC];
+  return [`${id}`, generator.ORDER_ATOMIC];
 };
 
 // Генератор для MP3
@@ -1357,6 +1630,31 @@ javascript.javascriptGenerator.forBlock['play_music'] = function(block, generato
   const music = generator.valueToCode(block, 'String', generator.ORDER_ATOMIC);
   const tempo = generator.valueToCode(block, 'Number', generator.ORDER_ATOMIC);
   return `Game.play_music(${music}, ${tempo});\n`;
+};
+// Генератор для редактора уровней
+javascript.javascriptGenerator.forBlock['level_editor'] = function(block, generator) {
+  // Получаем значение поля (JSON строку)
+  const levelData = JSON.parse(block.getFieldValue('LEVEL_DATA'));
+  
+  // Проверяем, что у нас есть массив objects
+  const originalArray = levelData.objects;
+  
+  const grouped = {};
+
+  originalArray.forEach(item => {
+    if (!grouped[item.protoIndex]) {
+      grouped[item.protoIndex] = [];
+    }
+    grouped[item.protoIndex].push(item.x, item.y);
+  });
+
+  // Преобразуем объект в массив
+  const resultArray = Object.keys(grouped).map(protoIndex => ({
+    id: generator.getVariableName(proto_object_array[parseInt(protoIndex)].name),
+    xy: grouped[protoIndex]
+  }));
+
+  return 'Game.addObjectsFromArray(' + JSON.stringify(resultArray).replace(/"id"\s*:\s*"([a-zA-Z_][a-zA-Z0-9_]*)"/g,'"id": $1') + ');';
 };
 
 // Генератор для выбора цвета
@@ -1378,6 +1676,21 @@ javascript.javascriptGenerator.forBlock['set_timer'] = function(block, generator
   return `Game.setTimeout(function(){${body}},${time});\n`;
 };
 
+// Генератор для создания прототипа объекта
+javascript.javascriptGenerator.forBlock['new_proto_object'] = function(block, generator) {
+  const obj = generator.getVariableName(block.getFieldValue('Object'));
+  const w = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC);
+  const h = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC);
+  const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC);
+  const oncreate = generator.statementToCode(block, 'ONCREATE');
+  
+  let code = `${obj}={name:"${obj}",x:0,y:0,width:${w},height:${h},sprite:${sprite}};\n`;
+  if(oncreate.length > 1) {
+    code += `${obj}.onCreate=function(){${oncreate}};\n${obj}.onCreate();\n`;
+  }
+  return code;
+};
+
 // Генератор для создания объекта
 javascript.javascriptGenerator.forBlock['new_object'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
@@ -1392,6 +1705,17 @@ javascript.javascriptGenerator.forBlock['new_object'] = function(block, generato
   if(oncreate.length > 1) {
     code += `${obj}.onCreate=function(){${oncreate}};\n${obj}.onCreate();\n`;
   }
+  return code;
+};
+
+// Генератор для создания объекта из прототипа
+javascript.javascriptGenerator.forBlock['new_object_from_proto'] = function(block, generator) {
+  const obj1 = generator.getVariableName(block.getFieldValue('Object'));
+  const obj2 = generator.getVariableName(block.getFieldValue('Object2'));
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
+  
+  let code = `${obj2}=Game.addObject(${obj1}.name,${x},${y},${obj1}.width,${obj1}.height,${obj1}.sprite);\n`;
   return code;
 };
 

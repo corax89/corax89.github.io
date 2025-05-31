@@ -4,7 +4,6 @@
 class FieldImageEditor extends Blockly.Field {
   constructor(value, validator, config) {
     super(value, validator, config);
-    
     this.SERIALIZABLE = true;
     this.CURSOR = 'pointer';
     this.value_ = value || '';
@@ -36,6 +35,20 @@ class FieldImageEditor extends Blockly.Field {
     this.addStyles_();
     this.updateSize_();
   }
+  
+  doValueUpdate_(newValue) {
+	  if (newValue === this.value_) {
+		return; // Ничего не изменилось
+	  }
+	  this.value_ = newValue; // Явное обновление значения
+	  super.doValueUpdate_(newValue);
+	  
+	  if (this.sourceBlock_ && this.sourceBlock_.workspace) {
+		Blockly.Events.fire(new Blockly.Events.BlockChange(
+		  this.sourceBlock_, 'IMAGE', null, this.value_
+		));
+	  }
+	}
 
   addStyles_() {
     const style = document.createElement('style');
@@ -1346,10 +1359,10 @@ class FieldImageEditor extends Blockly.Field {
     });
     
     modal.querySelector('#close-editor-btn').addEventListener('click', () => {
-      this.value_ = canvas.toDataURL();
-      this.forceRerender();
-      document.body.removeChild(modal);
-    });
+	  const newValue = canvas.toDataURL();
+	  this.setValue(newValue); // Вместо this.value_ = canvas.toDataURL();
+	  document.body.removeChild(modal);
+	});
     
     // Close modal when clicking outside
     modal.addEventListener('click', function(e) {

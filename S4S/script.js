@@ -27,10 +27,13 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="set_timer"></block>
             <block type="music_block"></block>
             <block type="play_music"></block>
+			<block type="level_editor"></block>
             <block type="field_multilineinput"></block>
         </category>
         <category name="${Blockly.Msg['OBJECTS']}" colour="340">
+			<block type="new_proto_object"></block>
             <block type="new_object"></block>
+			<block type="new_object_from_proto"></block>
             <block type="clone_object"></block>
             <block type="delete_object"></block>
             <block type="change_object_var"></block>
@@ -506,7 +509,7 @@ function highlightJS(code) {
  * Генерирует и отображает код из блоков
  */
 function showCode() {
-    const code = Blockly.JavaScript.workspaceToCode(workspace);
+    const code = getJScode();
     document.getElementById('codeOutput').innerHTML = highlightJS(code);
 }
 
@@ -515,7 +518,7 @@ function showCode() {
  */
 function runJS() {
     reset_game();
-    var code = Blockly.JavaScript.workspaceToCode(workspace);
+    var code = getJScode();
     Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
     try {
         eval(code);
@@ -652,7 +655,7 @@ function capture() {
 }
 // Добавляем пункт "Скриншот" в контекстное меню Blockly
 Blockly.ContextMenuRegistry.registry.register({
-  displayText: 'Сделать скриншот',
+  displayText: Blockly.Msg['CREATE_SCREENSHOT'],
   preconditionFn: () => 'enabled', // Всегда активно
   callback: async () => {
     try {

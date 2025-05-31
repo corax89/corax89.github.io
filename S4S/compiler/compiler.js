@@ -148,10 +148,20 @@ function findSequence(array, sequence, startPos = 0) {
     return -1;
 }
 
+function getJScode(){
+	rebuildProtoObjectArray();
+	store_image_array = [];
+	var script = Blockly.JavaScript.workspaceToCode(workspace);
+	var loadImage = '';
+	for(var i = 0; i < store_image_array.length; i++){
+		loadImage += `Draw.loadImage(${i},"${store_image_array[i].data}");\n`
+	}
+	return loadImage + script;
+}
 
 function buildSwitch(){
 		// Заменяем контент между метками
-	const state = Blockly.JavaScript.workspaceToCode(workspace);
+	const state = getJScode();
 	const replacementText = replacementTextInput.value.trim();
 	if(newIco)
 		var img = atob(newIco);
@@ -211,7 +221,7 @@ function buildHTML() {
         return `{\n${props.map(p => `        ${p}`).join(',\n')}\n    }`;
     }
 	
-	const customScript = Blockly.JavaScript.workspaceToCode(workspace);
+	const customScript = getJScode();
 	// Формируем содержимое HTML-документа
 	// Получаем исходный код существующих объектов
     const drawCode = compressJS(serializeObject(Draw));

@@ -243,6 +243,53 @@ Game.init = function() {
         };
     };
 
+	Game.addObjectsFromArray = function(objectsArray) {
+	  for (var arrIndex = 0; arrIndex < objectsArray.length; arrIndex++) {
+		var obj = objectsArray[arrIndex];
+		var xyArray = obj.xy;
+		var objectRef = obj.id;
+		
+		// Проверяем, существует ли объект с таким id
+		if (!objectRef) {
+		  console.error('Object with id "' + objectRef + '" not found in window scope');
+		  continue;  // вместо return, так как это цикл
+		}
+		
+		// Проверяем, что xyArray является массивом и имеет четное количество элементов
+		if (!Array.isArray(xyArray)) {
+		  console.error('xy property for object "' + objectRef + '" is not an array');
+		  continue;
+		}
+		
+		if (xyArray.length % 2 !== 0) {
+		  console.error('xy array for object "' + objectRef + '" has odd number of elements');
+		  continue;
+		}
+		
+		// Добавляем объекты
+		for (var i = 0; i < xyArray.length; i += 2) {
+		  var x = xyArray[i];
+		  var y = xyArray[i + 1];
+		  
+		  // Проверяем, что координаты являются числами
+		  if (typeof x !== 'number' || typeof y !== 'number') {
+			console.error('Invalid coordinates at position ' + i + ' for object "' + objectRef + '"');
+			continue;
+		  }
+		  
+		  // Вызываем метод addObject с нужными параметрами
+		  Game.addObject(
+			objectRef.name,
+			x,
+			y,
+			objectRef.width,
+			objectRef.height,
+			objectRef.sprite
+		  );
+		}
+	  }
+	};
+
     Game.resolveCollision = function(a, b, collisionInfo) {
         if (a.isStatic && b.isStatic) return;
         
@@ -307,18 +354,16 @@ Game.init = function() {
 };
 
 // Функции для работы с изображениями
-Draw.loadImage = function(str) {
-    for (let i = 0; i < 1024; i++) {
-        if (image_array[i] == 0) {
-            let img = new Image();
-            img.src = str;
-            image_array[i] = 1;
-            img.onload = function() {
-                image_array[i] = img;
-            };
-            return i;
-        }
-    }
+Draw.loadImage = function(n, str) {
+    if(n < 1024){
+		let img = new Image();
+		img.src = str;
+		image_array[n] = 1;
+		img.onload = function() {
+			image_array[n] = img;
+		};
+		return n;
+	}
     return 0;
 };
 
@@ -680,6 +725,8 @@ function reset_game() {
         Game.allObject.splice(i, 1);  
         i--;
     }
+	for (let i = 0; i < 1024; i++)
+        image_array[i] = 0;
     Game.screenx = 0;
     Game.screeny = 0;
     Game.gravitation = 0;

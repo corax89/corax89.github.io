@@ -132,6 +132,13 @@
 					<td>Vertical movement speed (pixels per frame). Positive values - down, negative - up.</td>
 				</tr>
 				<tr>
+					<td><strong>Name</strong></td>
+					<td><span class="code">name</span></td>
+					<td>String</td>
+					<td>Contains the name of the object, if the object is created from a prototype then it will have the prototype name</td>
+				</tr>
+				<tr>
+				<tr>
 					<td><strong>Visible</strong></td>
 					<td><span class="code">visible</span></td>
 					<td>Boolean</td>
@@ -265,8 +272,7 @@
         <div class="block block-color-30">
             <div class="block-header">Load Sprite</div>
             <div class="block-description">
-                Allows loading a sprite in png format. Returns the ID of loaded sprite. Each call will reload the sprite and occupy memory, 
-				so it's better to load sprites at game start and store them in variables.
+                Allows you to upload or draw a picture.
             </div>
         </div>
         
@@ -281,6 +287,20 @@
     <div class="blockly-category">
         <h2>Objects</h2>
         
+		<div class="block block-color-340">
+            <div class="block-header">Create a prototype of an object</div>
+            <div class="block-description">
+                The object prototype is used to create objects and in the level editor.
+            </div>
+        </div>
+		
+		<div class="block block-color-340">
+            <div class="block-header">Create a new object from a prototype</div>
+            <div class="block-description">
+                Creates an object with parameters from the prototype at point X Y 
+            </div>
+        </div>
+		
         <div class="block block-color-340">
             <div class="block-header">Create New Object</div>
             <div class="block-description">

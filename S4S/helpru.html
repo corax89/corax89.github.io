@@ -132,6 +132,12 @@
 					<td>Вертикальная скорость движения объекта (пикселей за кадр). Положительные значения - вниз, отрицательные - вверх.</td>
 				</tr>
 				<tr>
+					<td><strong>Имя</strong></td>
+					<td><span class="code">name</span></td>
+					<td>Строка</td>
+					<td>Содержит имя объекта, если объект создан из прототипа то у него будет имя прототипа</td>
+				</tr>
+				<tr>
 					<td><strong>Видимость</strong></td>
 					<td><span class="code">visible</span></td>
 					<td>Логический</td>
@@ -265,10 +271,9 @@
         </div>
         
         <div class="block block-color-30">
-            <div class="block-header">Загрузка спрайта</div>
+            <div class="block-header">Картинка</div>
             <div class="block-description">
-                Позволяет загрузить спрайт в формате png. Возвращает номер загруженного спрайта, каждый вызов будет заргужать спрайт заново и занимать место в памяти, 
-				поэтому лучше загружать спрайт в начале игры и сохранять в переменной.
+                Позволяет загрузить или нарисовать картинку
             </div>
         </div>
         
@@ -283,6 +288,20 @@
     <div class="blockly-category">
         <h2>Объекты</h2>
         
+		<div class="block block-color-340">
+            <div class="block-header">Создать прототип объекта</div>
+            <div class="block-description">
+                Прототип объекта используется для создания объектов и в редакторе уровней.
+            </div>
+        </div>
+		
+		<div class="block block-color-340">
+            <div class="block-header">Создать новый объект из прототипа</div>
+            <div class="block-description">
+                Создает объект с параметрами из прототипа в точке X Y 
+            </div>
+        </div>
+		
         <div class="block block-color-340">
             <div class="block-header">Создать новый объект</div>
             <div class="block-description">

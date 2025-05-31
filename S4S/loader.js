@@ -12,6 +12,7 @@ const scripts = [
     { name: 'Music Field', path: 'blockly/field_music.js' },
     { name: 'MP3 Field', path: 'blockly/field_mp3.js' },
     { name: 'PNG Field', path: 'blockly/field_png.js' },
+	{ name: 'Level editor Field', path: 'blockly/field_leveleditor.js' },
     { name: 'Minimap', path: 'blockly/minimap.js' },
     { name: 'Scroll', path: 'blockly/scroll.js' },
     { name: 'Copy/Paste', path: 'blockly/copypast.js' },
