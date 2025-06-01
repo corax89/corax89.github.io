@@ -1,10 +1,10 @@
-
 class FieldMusicEditor extends Blockly.Field {
   constructor(value, validator, config) {
-    // First call super() with default values
-    super(null, validator, config);
+    super(value, validator, config);
+    // Привязываем контекст для обработчиков
+    this.disposeEditor_ = this.disposeEditor_.bind(this);
+    this.positionWidget_ = this.positionWidget_.bind(this);
     
-    // Now we can safely use this
     const parsedValue = typeof value === 'string' ? value : this.getEmptyPattern();
     
     this.SERIALIZABLE = true;
@@ -17,10 +17,9 @@ class FieldMusicEditor extends Blockly.Field {
     this.timeSteps = 32;
     this.tempo = 120;
     this.audioContext = null;
-    this.currentStep = -1; // Текущий шаг воспроизведения
-    this.playbackInterval = null; // Интервал воспроизведения
+    this.currentStep = -1;
+    this.playbackInterval = null;
     
-    // Set the parsed value
     this.value_ = parsedValue;
     
     this.defaultWidth_ = 144;
@@ -28,11 +27,9 @@ class FieldMusicEditor extends Blockly.Field {
   }
 
   static fromJson(options) {
-    // options['value'] will be passed to the constructor
     return new this(options['value'], undefined, options);
   }
 
-  // Преобразует строку "0,1,3,0,..." в объект паттерна {note: [steps]}
   parsePatternString(patternStr) {
     const pattern = this.getEmptyObjectPattern();
     const steps = patternStr.split(',');
@@ -52,7 +49,6 @@ class FieldMusicEditor extends Blockly.Field {
     return pattern;
   }
 
-  // Преобразует объект паттерна в строку "0,1,3,0,..."
   serializePattern(patternObj) {
     const steps = [];
     
@@ -69,12 +65,10 @@ class FieldMusicEditor extends Blockly.Field {
     return steps.join(',');
   }
 
-  // Создает пустой паттерн в формате строки
   getEmptyPattern() {
     return Array(this.timeSteps).fill('0').join(',');
   }
 
-  // Создает пустой паттерн в объектном формате
   getEmptyObjectPattern() {
     const pattern = {};
     this.noteList.forEach(note => {
@@ -111,28 +105,73 @@ class FieldMusicEditor extends Blockly.Field {
   }
 
   showEditor_(e) {
+    // Запрещаем скролл страницы
+    document.body.style.overflow = 'hidden';
+    
+    const div = Blockly.WidgetDiv.getDiv();
+    
     const editor = this.createEditor_();
-    Blockly.DropDownDiv.getContentDiv().appendChild(editor);
-    Blockly.DropDownDiv.showPositionedByField(this, this.disposeEditor_.bind(this));
+    div.appendChild(editor);
+    
+    Blockly.WidgetDiv.show(
+      this, 
+      this.disposeEditor_,  
+      this.sourceBlock_.RTL
+    );
+    this.positionWidget_();
+  }
+
+  positionWidget_() {
+    const div = Blockly.WidgetDiv.getDiv();
+    div.style.position = 'fixed';
+    div.style.top = (window.innerHeight / 2 - 220) + 'px';
+	div.style.left = (window.innerWidth / 2 - 450) + 'px';
+    
+    // Стили для модального вида
+    div.style.backgroundColor = 'white';
+    div.style.borderRadius = '10px';
+    div.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+    
+    // Горизонтальное отражение (RTL)
+    div.style.direction = 'rtl';
+    
+    // Для внутреннего содержимого возвращаем нормальное направление
+    const content = div.querySelector('.music-editor-widget');
+    if (content) {
+      content.style.direction = 'ltr';
+    }
+  }
+
+  disposeEditor_() {
+    // Восстанавливаем скролл страницы
+    document.body.style.overflow = '';
+	
+    this.stopPlayback_();
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
+    }
   }
 
   createEditor_() {
     const div = document.createElement('div');
-    div.className = 'music-editor';
-    div.style.width = '900px';
-    div.style.height = '440px';
+    div.className = 'music-editor-widget';
+    div.style.width = '100%';
+    div.style.height = '100%';
     div.style.fontSize = '14px';
+	div.style.padding = '0';
+    div.style.overflow = 'hidden'; // Отключаем скроллы внутри редактора
+    div.style.direction = 'ltr'; // Обеспечиваем нормальное направление контента
     
     const scrollContainer = document.createElement('div');
-    scrollContainer.style.overflowX = 'auto';
     scrollContainer.style.width = '100%';
+    scrollContainer.style.height = 'calc(100% - 60px)';
     
     const table = document.createElement('table');
     table.className = 'music-grid';
     table.style.margin = '15px auto';
     table.style.fontSize = '14px';
     
-    // Парсим текущее значение в объектный формат для редактора
     const currentPattern = this.parsePatternString(this.value_);
     
     const headerRow = document.createElement('tr');
@@ -187,6 +226,7 @@ class FieldMusicEditor extends Blockly.Field {
     controls.style.display = 'flex';
     controls.style.justifyContent = 'center';
     controls.style.gap = '20px';
+	controls.style.padding = '20px';
     
     const playBtn = document.createElement('button');
     playBtn.textContent = Blockly.Msg['MUSIC_PLAY_BTN'];
@@ -220,7 +260,6 @@ class FieldMusicEditor extends Blockly.Field {
   toggleCell_(cell) {
     cell.classList.toggle('active');
     
-    // Сначала парсим текущее значение
     const currentPattern = this.parsePatternString(this.value_);
     const note = cell.dataset.note;
     const step = parseInt(cell.dataset.step);
@@ -231,7 +270,6 @@ class FieldMusicEditor extends Blockly.Field {
     
     currentPattern[note][step] = cell.classList.contains('active');
     
-    // Сериализуем обратно в строку и сохраняем
     this.value_ = this.serializePattern(currentPattern);
     this.setValue(this.value_);
   }
@@ -241,22 +279,17 @@ class FieldMusicEditor extends Blockly.Field {
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
     
-    // Остановить предыдущее воспроизведение, если оно есть
     this.stopPlayback_();
     
     const currentPattern = this.parsePatternString(this.value_);
     const stepDuration = 60 / this.tempo / 2;
     let currentStep = 0;
     
-    // Сбросить выделение всех шагов
     this.resetHighlight_();
     
-    // Запустить интервал для воспроизведения и подсветки
     this.playbackInterval = setInterval(() => {
-      // Подсветить текущий шаг
       this.highlightStep_(currentStep);
       
-      // Воспроизвести ноты для текущего шага
       for (let note of this.noteList) {
         if (currentPattern[note] && currentPattern[note][currentStep]) {
           if (['Kick', 'Snare', 'HiHat', 'Clap', 'Tom'].includes(note)) {
@@ -267,28 +300,23 @@ class FieldMusicEditor extends Blockly.Field {
         }
       }
       
-      // Перейти к следующему шагу
       currentStep = (currentStep + 1) % this.timeSteps;
     }, stepDuration * 1000);
   }
 
-  // Подсветить текущий шаг
   highlightStep_(step) {
-    // Сбросить предыдущее выделение
     if (this.currentStep >= 0) {
       for (let row of this.editorCells) {
         row[this.currentStep].classList.remove('current-step');
       }
     }
     
-    // Установить новое выделение
     this.currentStep = step;
     for (let row of this.editorCells) {
       row[step].classList.add('current-step');
     }
   }
 
-  // Сбросить все выделения шагов
   resetHighlight_() {
     if (this.currentStep >= 0) {
       for (let row of this.editorCells) {
@@ -405,10 +433,10 @@ class FieldMusicEditor extends Blockly.Field {
       this.audioContext.close();
       this.audioContext = null;
     }
+    Blockly.WidgetDiv.hide();
   }
 
   doClassValidation_(value) {
-    // Проверяем, что значение - строка с числами через запятую
     if (typeof value === 'string' && /^(\d+,)*\d+$/.test(value)) {
       const steps = value.split(',');
       if (steps.length === this.timeSteps) {
@@ -419,7 +447,6 @@ class FieldMusicEditor extends Blockly.Field {
   }
 
   getText() {
-    // Просто возвращаем сохраненное значение
     return this.value_;
   }
 }
@@ -427,16 +454,22 @@ class FieldMusicEditor extends Blockly.Field {
 Blockly.fieldRegistry.register('field_music', FieldMusicEditor);
 
 Blockly.Css.register(`
-.music-editor-dropdown {
-  max-height: none !important;
-  padding: 0 !important;
-}
-
-.music-editor {
+.music-editor-widget {
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   font-family: Arial, sans-serif;
+  padding: 15px;
+}
+
+.music-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
 }
 
 .music-grid {
@@ -512,7 +545,6 @@ Blockly.Css.register(`
   opacity: 0.9;
 }
 
-/* Стиль для текущего шага воспроизведения */
 .music-cell.current-step {
   position: relative;
   z-index: 2;
@@ -530,7 +562,6 @@ Blockly.Css.register(`
   animation: pulse 0.5s ease-out;
 }
 
-/* Для активных ячеек текущего шага */
 .music-cell.active.current-step:after {
   border-color: white;
   animation: pulse-active 0.5s ease-out;

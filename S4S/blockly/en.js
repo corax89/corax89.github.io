@@ -551,6 +551,7 @@ Blockly.Msg['LEVEL_CLEAR_ALL'] = 'Clear all';
 Blockly.Msg['LEVEL_SELECT_MOVE'] = 'Select/Move';
 Blockly.Msg['LEVEL_SET_GRID_SIZE'] = 'Set Grid Size';
 Blockly.Msg['ERROR_NO_PROTOTYPES'] = 'The editor uses object prototypes, at least one must be added';
+Blockly.Msg['WARNING_ES5'] = "The code used is ES6 which will not work on the console.";
 };
 
 function changeLanguage(selectedValue) {

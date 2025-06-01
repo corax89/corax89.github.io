@@ -513,6 +513,71 @@ function showCode() {
     document.getElementById('codeOutput').innerHTML = highlightJS(code);
 }
 
+function gameSandboxEval(code) {
+  // Предполагаем, что Game и Draw уже существуют в глобальной области видимости
+  // Создаем песочницу с разрешенными объектами
+  const sandbox = {
+    Game: window.Game,  // или просто Game, если выполняется в Node.js
+    Draw: window.Draw,  // или global.Draw для Node.js
+    console: {
+      log: console.log,
+      warn: console.warn,
+      error: console.error
+    },
+    Math: Object.create(null)  // Создаем чистый объект Math без прототипа
+  };
+
+  // Копируем безопасные методы Math
+  const allowedMathMethods = [
+    'abs', 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
+    'cbrt', 'ceil', 'clz32', 'cos', 'cosh', 'exp', 'expm1', 'floor',
+    'fround', 'hypot', 'imul', 'log', 'log10', 'log1p', 'log2', 'max',
+    'min', 'pow', 'random', 'round', 'sign', 'sin', 'sinh', 'sqrt',
+    'tan', 'tanh', 'trunc'
+  ];
+
+  allowedMathMethods.forEach(name => {
+    sandbox.Math[name] = Math[name].bind(Math);
+  });
+
+  // Создаем прокси для контроля доступа
+  const proxy = new Proxy(sandbox, {
+	  has(target, key) {
+		return true; // Имитируем наличие всех свойств
+	  },
+	  get(target, key, receiver) {
+		// Если ключ — Symbol, просто возвращаем его
+		if (typeof key === 'symbol') {
+		  return target[key];
+		}
+
+		// Запрещаем опасные ключи
+		const forbidden = ['eval', 'Function', 'constructor', 'window', 'document'];
+		if (forbidden.includes(key)) {
+		  throw new Error(`Access to "${key}" is forbidden`);
+		}
+
+		// Разрешаем только свойства песочницы
+		if (key in target) {
+		  return target[key];
+		}
+
+		throw new Error(`"${key}" is not available in the sandbox`);
+	  }
+	});
+  // Выполняем код в ограниченном контексте
+  try {
+    const func = new Function('sandbox', `with(sandbox){${code}}`);
+    func(proxy);
+    return { success: true };
+  } catch (e) {
+    return { 
+      success: false, 
+      error: e.message,
+      stack: e.stack 
+    };
+  }
+}
 /**
  * Выполняет сгенерированный код
  */
@@ -520,11 +585,16 @@ function runJS() {
     reset_game();
     var code = getJScode();
     Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+	const result = gameSandboxEval(code);
+	if (!result.success) {
+	  showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
+	}
+	/*
     try {
         eval(code);
     } catch (e) {
 		showSwitchModal('error', 'badCode%1'.replace('%1', e), false, 'ok');
-    }
+    }*/
 };
 
 /**

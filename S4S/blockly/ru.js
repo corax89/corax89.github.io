@@ -562,6 +562,7 @@ Blockly.Msg['LEVEL_RESIZE'] = 'Изменить размер';
 Blockly.Msg['LEVEL_SELECT_MOVE'] = 'Выбрать и переместить';
 Blockly.Msg['LEVEL_SET_GRID_SIZE'] = 'Изменить размер сетки';
 Blockly.Msg['ERROR_NO_PROTOTYPES'] = 'Редактор использует прототипы объектов, должен быть добавлен хотя бы один';
+Blockly.Msg['WARNING_ES5'] = "Используется код ES6 который не заработает на приставке";
 const ruTexts = {
 	'INTERFACE_TITLE': 'Blockly с JavaScript',
 	'PROJECT_ACTIONS': 'Проект',

@@ -1663,9 +1663,31 @@ javascript.javascriptGenerator.forBlock['field_colour'] = function(block, genera
   return [`"${color}"`, generator.ORDER_ATOMIC];
 };
 
+function isES5Compatible(code) {
+  const es6Keywords = [
+    'let', 'const',          // Блочная область видимости
+    '=>',                    // Стрелочные функции
+    'class ', 'extends ',    // Классы
+    '...',                   // Оператор расширения
+    '`', '${',               // Шаблонные строки
+    'for..of',               // Цикл for-of
+    'import ', 'export ',    // Модули ES6
+    'Promise', 'Map', 'Set'  // Новые встроенные объекты
+  ];
+
+  return !es6Keywords.some(keyword => code.includes(keyword));
+}
+
 // Генератор для ввода JS кода
 javascript.javascriptGenerator.forBlock['field_multilineinput'] = function(block, generator) {
   const code = block.getFieldValue('FIELDSCRIPT');
+  if(!isES5Compatible(code)) {
+	  block.setWarningText(Blockly.Msg['WARNING_ES5']);
+	  showSwitchModal('warning', Blockly.Msg['WARNING_ES5'], false, 'ok');
+	  Blockly.JavaScript.lastError = true;
+	  return null;
+	}
+  block.setWarningText(null);
   return code;
 };
 

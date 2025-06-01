@@ -151,6 +151,7 @@ function findSequence(array, sequence, startPos = 0) {
 function getJScode(){
 	rebuildProtoObjectArray();
 	store_image_array = [];
+	Blockly.JavaScript.lastError = false;
 	var script = Blockly.JavaScript.workspaceToCode(workspace);
 	var loadImage = '';
 	for(var i = 0; i < store_image_array.length; i++){
