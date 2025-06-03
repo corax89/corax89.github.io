@@ -506,11 +506,11 @@ class FieldLevelEditor extends Blockly.Field {
           <button id="delete-btn" class="tool-btn" title="${Blockly.Msg["LISTS_GET_INDEX_REMOVE"]}"><i class="fas fa-trash-alt"></i></button>
           <button id="clear-btn" class="tool-btn" title="${Blockly.Msg['LEVEL_CLEAR_ALL']}"><i class="fas fa-broom"></i></button>
         </div>
-        <div class="grid-toggle">
-          <span><i class="fas fa-th"></i></span>
+        <label class="grid-toggle checkbox-container">
           <input type="checkbox" id="grid-toggle" checked>
-          <span>${Blockly.Msg['LEVEL_GRID'] }</span>
-        </div>
+		  <span class="checkbox-custom"></span>
+		  <label for="grid-toggle"><span><i class="fas fa-th"></i> </span>${Blockly.Msg['LEVEL_GRID'] } </label>
+        </label>
         <div class="grid-size-controls">
           <span><i class="fas fa-border-all"></i></span>
           <input type="number" id="grid-size-input" class="size-input" min="1" max="128" value="${this.editorConfig.gridSize}" placeholder="Grid size">

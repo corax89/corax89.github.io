@@ -440,6 +440,7 @@ Blockly.Msg['OBJECT_PARAM_SOLID'] = 'solidity';
 Blockly.Msg['OBJECT_PARAM_ANGLE'] = 'angle';
 Blockly.Msg['OBJECT_PARAM_FLIP'] = 'flip';
 Blockly.Msg['OBJECT_PARAM_MASS'] = 'mass';
+Blockly.Msg['OBJECT_PARAM_SPRITE'] = 'sprite';
 Blockly.Msg['OBJECT_PARAM_RESTITUTION'] = 'restitution';
 Blockly.Msg['OBJECT_PARAM_ISSTATIC'] = 'static';
 Blockly.Msg['OBJECT_PARAM_ZINDEX'] = 'drawing depth';

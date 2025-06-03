@@ -7,6 +7,7 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_SPEEDX'], 'speedx'],
   [Blockly.Msg['OBJECT_PARAM_SPEEDY'], 'speedy'],
   [Blockly.Msg['OBJECT_PARAM_NAME'], 'name'],
+  [Blockly.Msg['OBJECT_PARAM_SPRITE'], 'sprite'],
   [Blockly.Msg['OBJECT_PARAM_VISIBLE'], 'visible'],
   [Blockly.Msg['OBJECT_PARAM_SOLID'], 'solid'],
   [Blockly.Msg['OBJECT_PARAM_ANGLE'], 'angle'],
@@ -523,7 +524,7 @@ function rebuildProtoObjectArray() {
         blockId: block.id
       });
     }
-    console.log('Массив перестроен. Текущие объекты:', proto_object_array);
+    //console.log('Массив перестроен. Текущие объекты:', proto_object_array);
 }
 
 function getNumberValue(block, inputName) {
@@ -584,12 +585,26 @@ Blockly.Blocks['new_proto_object'] = {
         .appendField(new Blockly.FieldVariable(varName), 'Object');
     
     // Остальные поля блока
-    this.appendValueInput("Width")
+    const widthInput = this.appendValueInput("Width")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
-    this.appendValueInput("Height")
+    const shadowBlockWidth = this.workspace.newBlock('math_number');
+    shadowBlockWidth.setFieldValue('32', 'NUM');
+    shadowBlockWidth.initSvg();
+    shadowBlockWidth.render();
+    widthInput.connection.connect(shadowBlockWidth.outputConnection);
+    shadowBlockWidth.setShadow(true);
+	
+    const heightInput = this.appendValueInput("Height")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
+	const shadowBlockHeight = this.workspace.newBlock('math_number');
+    shadowBlockHeight.setFieldValue('32', 'NUM');
+    shadowBlockHeight.initSvg();
+    shadowBlockHeight.render();
+    heightInput.connection.connect(shadowBlockHeight.outputConnection);
+    shadowBlockHeight.setShadow(true);	
+	
     this.appendValueInput("Sprite")
         .setCheck("type_sprite")
         .appendField(Blockly.Msg['IMAGE_LABEL']);
@@ -719,12 +734,27 @@ Blockly.Blocks['new_object'] = {
     this.appendValueInput("Y")
         .setCheck("Number")
         .appendField(Blockly.Msg['POSITION_Y_LABEL']);
-    this.appendValueInput("Width")
+	
+    const widthInput = this.appendValueInput("Width")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
-    this.appendValueInput("Height")
+    const shadowBlockWidth = this.workspace.newBlock('math_number');
+    shadowBlockWidth.setFieldValue('32', 'NUM');
+    shadowBlockWidth.initSvg();
+    shadowBlockWidth.render();
+    widthInput.connection.connect(shadowBlockWidth.outputConnection);
+    shadowBlockWidth.setShadow(true);
+	
+    const heightInput = this.appendValueInput("Height")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
+	const shadowBlockHeight = this.workspace.newBlock('math_number');
+    shadowBlockHeight.setFieldValue('32', 'NUM');
+    shadowBlockHeight.initSvg();
+    shadowBlockHeight.render();
+    heightInput.connection.connect(shadowBlockHeight.outputConnection);
+    shadowBlockHeight.setShadow(true);	
+	
     this.appendValueInput("Sprite")
         .setCheck("type_sprite")
         .appendField(Blockly.Msg['IMAGE_LABEL']);
@@ -1706,9 +1736,9 @@ javascript.javascriptGenerator.forBlock['new_proto_object'] = function(block, ge
   const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC);
   const oncreate = generator.statementToCode(block, 'ONCREATE');
   
-  let code = `${obj}={name:"${obj}",x:0,y:0,width:${w},height:${h},sprite:${sprite}};\n`;
+  let code = `${obj}={name:"${obj}",x:0,y:0,width:${w},height:${h},sprite:${sprite},local:{}};\n`;
   if(oncreate.length > 1) {
-    code += `${obj}.onCreate=function(){${oncreate}};\n${obj}.onCreate();\n`;
+    code += `${obj}.onCreate=function(){\n${oncreate}};\n`;
   }
   return code;
 };
@@ -1725,7 +1755,7 @@ javascript.javascriptGenerator.forBlock['new_object'] = function(block, generato
   
   let code = `${obj}=Game.addObject("${obj}",${x},${y},${w},${h},${sprite});\n`;
   if(oncreate.length > 1) {
-    code += `${obj}.onCreate=function(){${oncreate}};\n${obj}.onCreate();\n`;
+    code += `${obj}.onCreate=function(){\n${oncreate}};\n${obj}.onCreate();\n`;
   }
   return code;
 };
@@ -1737,7 +1767,7 @@ javascript.javascriptGenerator.forBlock['new_object_from_proto'] = function(bloc
   const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
   const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
   
-  let code = `${obj2}=Game.addObject(${obj1}.name,${x},${y},${obj1}.width,${obj1}.height,${obj1}.sprite);\n`;
+  let code = `${obj2}=Game.addObject(${obj1}.name,0,0,0,0,0);\nfor(var key in ${obj1}){if(${obj1}.hasOwnProperty(key)){${obj2}[key]=${obj1}[key];}};${obj2}.x=${x};${obj2}.y=${y};\nif(${obj2}.onCreate)${obj2}.onCreate();\n`;
   return code;
 };
 
@@ -1787,7 +1817,7 @@ javascript.javascriptGenerator.forBlock['get_object_var'] = function(block, gene
 javascript.javascriptGenerator.forBlock['addto_object_var'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
   const param = block.getFieldValue('NAME');
-  const value = generator.valueToCode(block, 'VALUE', javascript.Order.ADDITIVE) || '0';
+  const value = generator.valueToCode(block, 'VALUE', generator.ORDER_ATOMIC) || '0';
   
   let code;
   if (mode === 'VAR') {
@@ -1805,7 +1835,7 @@ javascript.javascriptGenerator.forBlock['addto_object_var'] = function(block, ge
 javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
   const param = block.getFieldValue('NAME');
-  const value = generator.valueToCode(block, 'VALUE', javascript.Order.ASSIGNMENT) || '0';
+  const value = generator.valueToCode(block, 'VALUE', javascript.Order.ATOMIC) || '0';
   
   let code;
   if (mode === 'VAR') {
@@ -1972,13 +2002,13 @@ javascript.javascriptGenerator.forBlock['get_touchxy'] = function(block, generat
 javascript.javascriptGenerator.forBlock['create_local_var'] = function(block, generator) {
   const varName = processText(block.getFieldValue('VAR_NAME'));
   const varValue = generator.valueToCode(block, 'VAR_VALUE', generator.ORDER_ATOMIC) || '0';
-  return `local.${varName} = ${varValue};\n`;
+  return `this.local.${varName} = ${varValue};\n`;
 };
 
 // Генератор для получения локальной переменной
 javascript.javascriptGenerator.forBlock['get_local_var'] = function(block, generator) {
   const varName = processText(block.getFieldValue('VAR_NAME'));
-  return [`local.${varName}`, generator.ORDER_ATOMIC];
+  return [`this.local.${varName}`, generator.ORDER_ATOMIC];
 };
 
 // Вспомогательная функция для обработки имен переменных

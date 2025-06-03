@@ -210,6 +210,8 @@ function compressJS(code) {
 }
 
 function buildHTML() {
+	reset_game();
+	
 	function serializeObject(obj) {
         const props = [];
         for (const [key, value] of Object.entries(obj)) {
@@ -229,14 +231,17 @@ function buildHTML() {
     const gameCode = compressJS(serializeObject(Game));
     const gameLoopCode = compressJS(game_loop.toString());
 
-    const htmlContent = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${replacementTextInput.value.trim()}</title>
-<style>body {margin: 0;padding: 0;display: flex;justify-content: center;align-items: center;height: 100vh;background-color: #f0f0f0;}
-canvas {background-color: black;box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);}</style></head><body><canvas width="1280" height="720" id="cnv"></canvas>
-<script>var image_array = [];var game_helper_timers = [];var gravitation = 0;var gamepads = {};var inputState = {};var local = {};
-const canvas = document.getElementById("cnv");const ctx = canvas.getContext("2d");const Draw = ${drawCode};
-const Game = ${gameCode};
+    const htmlContent = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${replacementTextInput.value}</title></head>
+<body style="margin:0;padding:0;overflow:hidden;background-color:#f0f0f0;display:flex;justify-content:center;align-items:center;height:100vh;">
+<canvas width="1280" height="720" id="cnv" style="background-color:black;box-shadow:0 0 10px rgba(0,0,0,0.5);width:100vw;height:56.25vw;max-height:100vh;max-width:177.78vh;object-fit:contain;"></canvas>
+<script>var image_array = [];var game_helper_timers = [];var gravitation = 0;var gamepads = {};var inputState = {};var local = {};var draw_bounding_box = false;
+const canvas = document.getElementById("cnv");const ctx = canvas.getContext("2d");const Draw = ${drawCode};const Game = ${gameCode};var debugShowExpandedObjectsBorder = false;
+const globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();const MAX_CONCURRENT_MELODIES = 8;let activeMelodies = 0;const melodyQueue = [];
+function checkTouchButtons(x,y,isPressed){if(!Game.enableTouchInput)return!1;for(const btnId in inputState.touchButtons){const btn=inputState.touchButtons[btnId];
+if(x>=btn.x&&x<=btn.x+btn.width&&y>=btn.y&&y<=btn.y+btn.height){btn.isPressed=isPressed;inputState.keys[btn.keyCode]=isPressed;if(isPressed){inputState.pressKeys[btn.keyCode]=!0};return!0}}return!1}
 ${gameLoopCode}
-Game.init();
+Game.initSensorInput();Game.init();Game.enableTouchInput='ontouchstart' in window||(window.matchMedia && window.matchMedia("(pointer: coarse)").matches)||(navigator.maxTouchPoints>0)||(navigator.msMaxTouchPoints>0);
 ${customScript}
 game_loop();</script></body></html>`;
 

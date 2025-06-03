@@ -308,6 +308,49 @@ Blockly.getMainWorkspace().addChangeListener(function(event) {
     }
 });
 
+function toggleBoth(checkbox) {  
+    // Обновить оба параметра игры
+    Game.enableDrawing = checkbox.checked;
+    Game.enableTouchInput = checkbox.checked;
+}
+
+function toggleBoundingBox(checkbox) {
+    draw_bounding_box= checkbox.checked;
+}
+
+function toggleDebug(checkbox) {
+    const objectsList = document.getElementById("objectsList");
+    const canvas = document.getElementById("cnv");
+    
+    if (checkbox.checked) {
+        // Плавное появление objectsList
+        objectsList.style.display = 'block';
+        objectsList.style.opacity = '0';
+        objectsList.style.width = '0';
+		Game.helper.debug = true;
+        
+        setTimeout(() => {
+            objectsList.style.opacity = '1';
+            objectsList.style.width = '25%';
+            canvas.style.marginRight = '0';
+        }, 10); // Небольшая задержка для запуска анимации
+    } else {
+        // Плавное скрытие objectsList
+        objectsList.style.opacity = '0';
+        objectsList.style.width = '0';
+		Game.helper.debug = false;
+        
+        setTimeout(() => {
+            objectsList.style.display = 'none';
+            canvas.style.marginLeft = 'auto'; // Центрируем canvas
+            canvas.style.marginRight = 'auto';
+        }, 300); // Ждем завершения анимации (0.3s)
+    }
+    
+    // Пересчет размеров после анимации
+    setTimeout(resizeCanvas, 310);
+}
+
 // Управление вкладками интерфейса
 const tabs = document.querySelectorAll('.tabs__btn');
 tabs.forEach(tab => {
@@ -325,6 +368,7 @@ tabs.forEach(tab => {
         // Добавляем активные классы к текущей вкладке
         tab.classList.add('active');
         document.getElementById(tabId).classList.add('active');
+		resizeCanvas();
     });
 });
 
@@ -539,6 +583,8 @@ function gameSandboxEval(code) {
   allowedMathMethods.forEach(name => {
     sandbox.Math[name] = Math[name].bind(Math);
   });
+  
+  sandbox.String = String.bind(String);
 
   // Создаем прокси для контроля доступа
   const proxy = new Proxy(sandbox, {
@@ -914,6 +960,54 @@ function removeAllEventListeners() {
 	isDragging = false;
 	document.body.style.cursor = '';
 }
+
+function resizeCanvas() {
+    const container = document.getElementById('screen-container');
+    const canvas = document.getElementById('cnv');
+    const objectsList = document.getElementById('objectsList');
+    
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const targetRatio = 16 / 9;
+    
+    // Проверяем, виден ли objectsList (учитываем анимацию)
+    const isObjectsListVisible = 
+        objectsList.style.display !== 'none' && 
+        window.getComputedStyle(objectsList).display !== 'none';
+    
+    // Ширина objectsList (0, если скрыт)
+    const listWidth = isObjectsListVisible ? 
+        parseFloat(window.getComputedStyle(objectsList).width) : 0;
+    
+    // Доступная ширина для canvas
+    const availableWidth = containerWidth - listWidth;
+    
+    // Рассчитываем размер canvas
+    let canvasWidth = availableWidth;
+    let canvasHeight = canvasWidth / targetRatio;
+    
+    // Если высота больше контейнера — уменьшаем
+    if (canvasHeight > containerHeight) {
+        canvasHeight = containerHeight;
+        canvasWidth = canvasHeight * targetRatio;
+    }
+    
+    // Устанавливаем размеры
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
+    
+    // Обновляем внутреннее разрешение (если нужно)
+    canvas.width = 1280;
+    canvas.height = 720;
+    
+    // Синхронизируем высоту objectsList
+    if (isObjectsListVisible) {
+        objectsList.style.height = `${canvasHeight}px`;
+    }
+}
+
+// Вызывать при загрузке и ресайзе
+window.addEventListener('resize', resizeCanvas);
 
 // Инициализация мини-карты workspace (должна быть в конце)
 const minimap = new PositionedMinimap(workspace);

@@ -451,10 +451,11 @@ Blockly.Msg['OBJECT_PARAM_SOLID'] = 'твердость';
 Blockly.Msg['OBJECT_PARAM_ANGLE'] = 'угол';
 Blockly.Msg['OBJECT_PARAM_FLIP'] = 'отражение';
 Blockly.Msg['OBJECT_PARAM_MASS'] = 'масса';
+Blockly.Msg['OBJECT_PARAM_SPRITE'] = 'спрайт';
 Blockly.Msg['OBJECT_PARAM_RESTITUTION'] = 'упругость';
 Blockly.Msg['OBJECT_PARAM_ISSTATIC'] = 'статичность';
-Blockly.Msg['OBJECT_PARAM_ZINDEX'] = 'глубина прорисовки';
-Blockly.Msg['OBJECT_PARAM_ISONGROUND'] = 'стоит на поверхности?';
+Blockly.Msg['OBJECT_PARAM_ZINDEX'] = 'очередь рисования';
+Blockly.Msg['OBJECT_PARAM_ISONGROUND'] = 'на поверхности?';
 
 Blockly.Msg['OBJECT_ITERATE'] = 'Перебор всех объектов';
 Blockly.Msg['OBJECT_TYPE_COLLIDED'] = 'столкнувшегося объекта';
@@ -578,6 +579,9 @@ const ruTexts = {
 	'CODE_TAB': 'Код',
 	'JS_TAB': 'JS',
 	'SCREEN_TAB': 'Экран',
+	'DRAW_GEYMPAD_BTN':'виртуальный геймпад',
+	'VIEW_BOX_BTN':'ограничивающие рамки',
+	'VIEW_OBJECTS_BTN':'список объектов',
 	'CODE_OUTPUT_PLACEHOLDER': '// Здесь будет сгенерированный код',
 	'ICON_PREVIEW_ALT': 'Превью иконки',
 	'GAME_CATEGORY': 'Игра',
@@ -603,6 +607,9 @@ document.getElementById('load-project-btn').textContent = ruTexts.LOAD_PROJECT_B
 document.getElementById('Name').placeholder = ruTexts.GAME_NAME_PLACEHOLDER;
 document.getElementById('build-html-btn').textContent = ruTexts.BUILD_HTML_BTN;
 document.getElementById('build-switch-btn').textContent = ruTexts.BUILD_GAME_BTN;
+document.getElementById('drawGeympadtxt').textContent = ruTexts.DRAW_GEYMPAD_BTN;
+document.getElementById('viewBoundingBoxtxt').textContent = ruTexts.VIEW_BOX_BTN;
+document.getElementById('viewObjectstxt').textContent = ruTexts.VIEW_OBJECTS_BTN;
 document.querySelector('[data-tab="tab-1"]').textContent = ruTexts.CODE_TAB;
 document.querySelector('[data-tab="tab-2"]').textContent = ruTexts.JS_TAB;
 document.querySelector('[data-tab="tab-3"]').textContent = ruTexts.SCREEN_TAB;

@@ -78,7 +78,27 @@
 			<div id="codeOutput">// Generated code will appear here</div>
 		</div>
 		<div class="tabs__item" id="tab-3">
-			<canvas width="1280" height="720" id="cnv"></canvas>
+			<div id="gameFlags">
+				<label class="checkbox-container">
+					<input type="checkbox" id="bothToggle" onchange="toggleBoth(this)">
+					<span class="checkbox-custom"></span>
+					<label for="bothToggle" id="drawGeympadtxt">draw geympad</label>
+				</label>
+				<label class="checkbox-container">
+					<input type="checkbox" id="objectsToggleBox" onchange="toggleBoundingBox(this)">
+					<span class="checkbox-custom"></span>
+					<label for="objectsToggleBox" id="viewBoundingBoxtxt">view bounding box</label>
+				</label>
+				<label class="checkbox-container">
+					<input type="checkbox" id="objectsToggle" onchange="toggleDebug(this)">
+					<span class="checkbox-custom"></span>
+					<label for="objectsToggle" id="viewObjectstxt">view objects</label>
+				</label>
+			</div>
+			<div id="screen-container">
+				<canvas width="1280" height="720" id="cnv"></canvas>
+				<div id="objectsList"></div>
+			</div>
 		</div>
 	</div>
 </div>
