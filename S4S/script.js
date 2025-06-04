@@ -42,6 +42,7 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="object_onstep"></block>
             <block type="object_oncollision"></block>
             <block type="object_exit_screen"></block>
+			<block type="object_tap_screen"></block>
             <block type="object_control"></block>
             <block type="object_velocity"></block>
             <block type="object_distance"></block>
@@ -557,6 +558,135 @@ function showCode() {
     document.getElementById('codeOutput').innerHTML = highlightJS(code);
 }
 
+function addWatchdogToCode(code) {
+    // Watchdog функция
+    const watchdogFunc = `
+        const __watchdog = () => {
+            const __startTime = Date.now();
+            return () => {
+                if (Date.now() - __startTime > 1000) {
+                    throw Game.helper.error("${Blockly.Msg['ERROR_INFINITE_LOOP']}");
+                }
+            };
+        };
+    `;
+
+    // Добавляем watchdog в каждый цикл
+    const modifiedCode = code
+        .replace(/for\s*\([^)]*\)\s*\{([^}]*)\}/g, (match, body) => {
+            return `for (let __i = 0; __i < 1; __i++) { 
+                const __check = __watchdog(); 
+                ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
+                __check(); 
+            }`.replace(/for \(let __i = 0; __i < 1; __i\+\+\)/, match);
+        })
+        .replace(/while\s*\([^)]*\)\s*\{([^}]*)\}/g, (match, body) => {
+            return `{ 
+                const __check = __watchdog(); 
+                while (true) { 
+                    ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
+                    __check(); 
+                    if (!(${match.match(/while\s*\(([^)]*)\)/)[1]})) break; 
+                } 
+            }`;
+        })
+        .replace(/do\s*\{([^}]*)\}\s*while\s*\([^)]*\)/g, (match, body, condition) => {
+            return `{ 
+                const __check = __watchdog(); 
+                do { 
+                    ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
+                    __check(); 
+                } while (${match.match(/while\s*\(([^)]*)\)/)[1]}); 
+            }`;
+        });
+
+    return `${watchdogFunc}\n${modifiedCode}`;
+}
+
+function translateError(error) {
+  if (typeof error !== 'string') {
+    error = error.message || error.toString();
+  }
+
+  const errorTranslations = {
+    // Синтаксические ошибки
+    "Unexpected token": "Неожиданный символ",
+    "Unexpected identifier": "Неожиданный идентификатор",
+    "Missing ) after argument list": "Пропущена закрывающая скобка ')' после списка аргументов",
+    "Missing } after function body": "Пропущена закрывающая скобка '}' после тела функции",
+    "Missing ] after element list": "Пропущена закрывающая скобка ']' после списка элементов",
+    "Missing ' after string literal": "Пропущена закрывающая кавычка строки",
+    "Unterminated string literal": "Незавершённая строковая константа",
+    "Invalid left-hand side in assignment": "Недопустимое выражение в левой части присваивания",
+    "Expected ')'": "Ожидалась закрывающая скобка ')'",
+    "Expected '}'": "Ожидалась закрывающая скобка '}'",
+    "Expected ']'": "Ожидалась закрывающая скобка ']'",
+    "Expected ';'": "Ожидалась точка с запятой ';'",
+
+    // Ошибки регулярных выражений
+    "Invalid regular expression": "Некорректное регулярное выражение",
+    "Unmatched ')'": "Непарная закрывающая скобка ')'",
+    "Unmatched '('": "Непарная открывающая скобка '('",
+    "Unmatched ']'": "Непарная закрывающая скобка ']'",
+    "Unmatched '['": "Непарная открывающая скобка '['",
+    "Unmatched '{'": "Непарная открывающая скобка '{'",
+    "Unmatched '}'": "Непарная закрывающая скобка '}'",
+
+    // Ошибки доступа к объектам и переменным
+    "'.*' is not available in the sandbox": "Объект '.*' недоступен в песочнице",
+    "Cannot read property '.*' of undefined": "Нельзя прочитать свойство '.*' у undefined",
+    "Cannot read property '.*' of null": "Нельзя прочитать свойство '.*' у null",
+    "undefined is not a function": "undefined не является функцией",
+    "'.*' is not a function": "'.*' не является функцией",
+    "'.*' is not defined": "'.*' не определён",
+    "Cannot set property '.*' of undefined": "Нельзя установить свойство '.*' у undefined",
+    "Cannot set property '.*' of null": "Нельзя установить свойство '.*' у null",
+
+    // Ошибки выполнения
+    "Maximum call stack size exceeded": "Превышен максимальный размер стека вызовов",
+    "Invalid array length": "Некорректная длина массива",
+    "Failed to fetch": "Ошибка загрузки данных (fetch)",
+    "NetworkError when attempting to fetch resource": "Сетевая ошибка при загрузке ресурса",
+    "404 Not Found": "404 Не найдено",
+    "500 Internal Server Error": "500 Внутренняя ошибка сервера",
+    "Script error.": "Ошибка в скрипте (CORS или другой источник)",
+
+    // Ошибки промисов и асинхронности
+    "Uncaught \\(in promise\\)": "Необработанная ошибка в промиссе",
+    "Unhandled promise rejection": "Необработанный отказ промисса",
+  };
+
+  // Сначала проверяем ошибки песочницы
+  if (error.includes("is not available in the sandbox")) {
+    const objName = error.match(/"([^"]+)"/)?.[1] || "объект";
+    return `Объект "${objName}" недоступен в песочнице`;
+  }
+
+  // Проверяем ошибки регулярных выражений
+  if (error.includes("Invalid regular expression")) {
+    const unmatchedCharMatch = error.match(/Unmatched '(.)'/);
+    if (unmatchedCharMatch) {
+      const char = unmatchedCharMatch[1];
+      return `Некорректное регулярное выражение: непарная скобка '${char}'`;
+    }
+    return "Некорректное регулярное выражение";
+  }
+
+  // Проверяем остальные ошибки
+  for (const [key, translation] of Object.entries(errorTranslations)) {
+    const regex = new RegExp(key.replace(/\\.\*/g, '(.*?)'));
+    if (regex.test(error)) {
+      const match = error.match(regex);
+      if (match && match[1]) {
+        return translation.replace('.*', `'${match[1]}'`);
+      }
+      return translation;
+    }
+  }
+
+  return `Неизвестная ошибка: ${error}`;
+}
+
 function gameSandboxEval(code) {
   // Предполагаем, что Game и Draw уже существуют в глобальной области видимости
   // Создаем песочницу с разрешенными объектами
@@ -568,6 +698,9 @@ function gameSandboxEval(code) {
       warn: console.warn,
       error: console.error
     },
+	Date: getSafeDate(),
+	Array: getSafeArray(),
+    Object: getSafeObject(),
     Math: Object.create(null)  // Создаем чистый объект Math без прототипа
   };
 
@@ -584,7 +717,54 @@ function gameSandboxEval(code) {
     sandbox.Math[name] = Math[name].bind(Math);
   });
   
-  sandbox.String = String.bind(String);
+  sandbox.Math.PI = Math.PI;
+  sandbox.Math.E  = Math.E;
+  sandbox.String  = String.bind(String);
+  
+  function getSafeDate() {
+	  // Функция-конструктор для new Date()
+	  function SafeDate(...args) {
+		const realDate = new window.Date(...args);
+		return {
+		  getTime: () => realDate.getTime(),
+		  toString: () => realDate.toString(),
+		  toISOString: () => realDate.toISOString(),
+		  getFullYear: () => realDate.getFullYear()
+		};
+	  }
+
+	  // Добавляем статические методы Date
+	  SafeDate.now = () => window.Date.now();
+	  SafeDate.parse = (str) => window.Date.parse(str);
+	  SafeDate.UTC = (...args) => window.Date.UTC(...args);
+
+	  return SafeDate;
+	}
+
+	// ✅ Array (разрешаем только базовые методы)
+	function getSafeArray() {
+	  return {
+		from: Array.from,
+		isArray: Array.isArray,
+		prototype: { // Ограниченный прототип
+		  push: Array.prototype.push,
+		  pop: Array.prototype.pop,
+		  map: Array.prototype.map,
+		  filter: Array.prototype.filter
+		}
+	  };
+	}
+
+	// ✅ Object (только безопасные методы)
+	function getSafeObject() {
+	  return {
+		keys: Object.keys,
+		values: Object.values,
+		entries: Object.entries,
+		assign: Object.assign,
+		freeze: Object.freeze
+	  };
+	}
 
   // Создаем прокси для контроля доступа
   const proxy = new Proxy(sandbox, {
@@ -629,11 +809,14 @@ function gameSandboxEval(code) {
  */
 function runJS() {
     reset_game();
-    var code = getJScode();
-    Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+    var code = addWatchdogToCode(getJScode());
+    Blockly.JavaScript.INFINITE_LOOP_TRAP = false;
 	const result = gameSandboxEval(code);
 	if (!result.success) {
-	  showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
+		if (savedLanguage === 'ru')
+			showSwitchModal('ошибка', 'Программа прервана:%1'.replace('%1', translateError(result.error)), false, 'ok');
+		else
+			showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
 	}
 	/*
     try {

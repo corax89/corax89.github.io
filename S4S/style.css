@@ -67,10 +67,6 @@ body{
 	opacity: 1;
 }
 
-.blocklyDropDownContent {
-  max-height: 500px !important;
-}
-
 .js-keyword { color: #0077aa; font-weight: bold; }
 .js-string { color: #669900; }
 .js-number { color: #990055; }
@@ -106,6 +102,20 @@ body{
     overflow-y: auto;
     flex-shrink: 0;
     transition: all 0.3s ease; /* Анимация для плавного скрытия/показа */
+}
+
+.debug-object-details {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 8px !important; /* Важно сохранить горизонтальные отступы */
+    transition: all 0.3s ease;
+}
+
+.debug-object-details.expanded {
+    max-height: 1000px; /* Достаточно большое значение для вмещения контента */
+    opacity: 1;
+    padding: 8px !important;
 }
 
 #cnv {

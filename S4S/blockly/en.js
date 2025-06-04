@@ -504,6 +504,7 @@ Blockly.Msg['EACH_FRAME_LABEL'] = 'Do each frame for';
 Blockly.Msg['ON_COLLISION_LABEL'] = 'Do on collision';
 Blockly.Msg['DELETE_OBJECT_LABEL'] = 'Delete';
 Blockly.Msg['OBJECT_OFFSCREEN_LABEL'] = 'If offscreen';
+Blockly.Msg['OBJECT_TAPSCREEN_LABEL'] = 'If you touch the screen over an object';
 Blockly.Msg['THIS_OFFSCREEN_LABEL'] = 'If offscreen';
 Blockly.Msg['CONTROL_OBJECT_LABEL'] = 'Control for';
 Blockly.Msg['CONTROL_TYPE_LABEL'] = 'control type';
@@ -552,6 +553,7 @@ Blockly.Msg['LEVEL_CLEAR_ALL'] = 'Clear all';
 Blockly.Msg['LEVEL_SELECT_MOVE'] = 'Select/Move';
 Blockly.Msg['LEVEL_SET_GRID_SIZE'] = 'Set Grid Size';
 Blockly.Msg['ERROR_NO_PROTOTYPES'] = 'The editor uses object prototypes, at least one must be added';
+Blockly.Msg['ERROR_INFINITE_LOOP'] = 'Infinite loop detected (1000ms timeout)';
 Blockly.Msg['WARNING_ES5'] = "The code used is ES6 which will not work on the console.";
 };
 

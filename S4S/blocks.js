@@ -1228,6 +1228,63 @@ Blockly.Blocks['object_exit_screen'] = {
   }
 };
 
+Blockly.Blocks['object_tap_screen'] = {
+  init: function() {
+	this.setInputsInline(true);
+    // Сохраняем ссылки на все элементы
+    this.varHeader = this.appendDummyInput('VAR_HEADER')
+        .appendField(Blockly.Msg['OBJECT_TAPSCREEN_LABEL']);
+    
+    this.thisHeader = this.appendDummyInput('THIS_HEADER')
+        .appendField(Blockly.Msg['OBJECT_TAPSCREEN_LABEL'])
+        .setVisible(false);
+    
+    // Переключатель режима
+    var modeField = new Blockly.FieldDropdown([
+      [Blockly.Msg['OBJECT_BY_VAR_LABEL'], 'VAR'],
+      [Blockly.Msg['THIS_OBJECT_LABEL'], 'THIS']
+    ], (newMode) => this.updateShape_(newMode));
+    this.appendDummyInput('MODE_INPUT')
+        .appendField(modeField, 'MODE');
+    
+    // Поле выбора переменной
+    this.varField = this.appendDummyInput('VAR_INPUT')
+        .appendField(new Blockly.FieldVariable('obj1'), 'Object')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
+    
+    this.setOutput(true, 'Boolean');
+    this.setColour(340);
+    
+    // Инициализация
+    this.updateShape_(this.getFieldValue('MODE') || 'VAR');
+  },
+  
+  updateShape_: function(newMode) {
+    // Получаем элементы по их ID
+    var varHeader = this.getInput('VAR_HEADER');
+    var thisHeader = this.getInput('THIS_HEADER');
+    var varField = this.getInput('VAR_INPUT');
+    
+    // Управляем видимостью
+    varHeader.setVisible(newMode === 'VAR');
+    thisHeader.setVisible(newMode === 'THIS');
+    varField.setVisible(newMode === 'VAR');
+    
+    // Перерисовка
+    Blockly.Events.disable();
+    this.render();
+    Blockly.Events.enable();
+  },
+  
+  saveExtraState: function() {
+    return { mode: this.getFieldValue('MODE') };
+  },
+  
+  loadExtraState: function(state) {
+    this.updateShape_(state.mode);
+    this.setFieldValue(state.mode, 'MODE');
+  }
+};
 // ==================== Блоки управления объектами ====================
 
 Blockly.Blocks['object_control'] = {
@@ -1724,16 +1781,16 @@ javascript.javascriptGenerator.forBlock['field_multilineinput'] = function(block
 // Генератор для таймера
 javascript.javascriptGenerator.forBlock['set_timer'] = function(block, generator) {
   const body = generator.statementToCode(block, 'BODY');
-  const time = generator.valueToCode(block, 'time', generator.ORDER_ATOMIC);
+  const time = generator.valueToCode(block, 'time', generator.ORDER_ATOMIC) || 0;
   return `Game.setTimeout(function(){${body}},${time});\n`;
 };
 
 // Генератор для создания прототипа объекта
 javascript.javascriptGenerator.forBlock['new_proto_object'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
-  const w = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC);
-  const h = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC);
-  const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC);
+  const w = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC) || 0;
+  const h = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC) || 0;
+  const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC) || 0;
   const oncreate = generator.statementToCode(block, 'ONCREATE');
   
   let code = `${obj}={name:"${obj}",x:0,y:0,width:${w},height:${h},sprite:${sprite},local:{}};\n`;
@@ -1746,11 +1803,11 @@ javascript.javascriptGenerator.forBlock['new_proto_object'] = function(block, ge
 // Генератор для создания объекта
 javascript.javascriptGenerator.forBlock['new_object'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
-  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
-  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
-  const w = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC);
-  const h = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC);
-  const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC);
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || 0;
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || 0;
+  const w = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC) || 0;
+  const h = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC) || 0;
+  const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC) || 0;
   const oncreate = generator.statementToCode(block, 'ONCREATE');
   
   let code = `${obj}=Game.addObject("${obj}",${x},${y},${w},${h},${sprite});\n`;
@@ -1764,8 +1821,8 @@ javascript.javascriptGenerator.forBlock['new_object'] = function(block, generato
 javascript.javascriptGenerator.forBlock['new_object_from_proto'] = function(block, generator) {
   const obj1 = generator.getVariableName(block.getFieldValue('Object'));
   const obj2 = generator.getVariableName(block.getFieldValue('Object2'));
-  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
-  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || 0;
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || 0;
   
   let code = `${obj2}=Game.addObject(${obj1}.name,0,0,0,0,0);\nfor(var key in ${obj1}){if(${obj1}.hasOwnProperty(key)){${obj2}[key]=${obj1}[key];}};${obj2}.x=${x};${obj2}.y=${y};\nif(${obj2}.onCreate)${obj2}.onCreate();\n`;
   return code;
@@ -1788,7 +1845,7 @@ javascript.javascriptGenerator.forBlock['draw_object'] = function(block, generat
 javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
   const param = block.getFieldValue('NAME');
-  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC);
+  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC) || 0;
   
   if (mode === 'VAR') {
     const obj = generator.getVariableName(block.getFieldValue('Object'));
@@ -1888,12 +1945,40 @@ javascript.javascriptGenerator.forBlock['object_exit_screen'] = function(block, 
   }
 };
 
+// Генератор для проверки касания объекта
+javascript.javascriptGenerator.forBlock['object_tap_screen'] = function(block, generator) {
+  const mode = block.getFieldValue('MODE');
+  if (!Blockly.JavaScript.definitions_['isPointInRotatedSquare']) {
+    Blockly.JavaScript.definitions_['isPointInRotatedSquare'] = 
+		`function isPointInRotatedSquare(obj) {
+  if(!Game.getTouch.istouch)
+    return false;
+  var angleRad = obj.angle * Math.PI / 180;
+  var centerX = obj.x + obj.width / 2;
+  var centerY = obj.y + obj.height / 2;
+  var dx = Game.getTouch.x - centerX;
+  var dy = Game.getTouch.y - centerY;
+  var cos = Math.cos(-angleRad);
+  var sin = Math.sin(-angleRad);
+  var rx = dx * cos - dy * sin;
+  var ry = dx * sin + dy * cos;
+  return Math.abs(rx) <= obj.width / 2 && Math.abs(ry) <= obj.height / 2;
+}`
+  }
+  if (mode === 'VAR') {
+    const obj = generator.getVariableName(block.getFieldValue('Object'));
+    return [`isPointInRotatedSquare(${obj})`, generator.ORDER_ATOMIC];
+  } else {
+    return ['isPointInRotatedSquare(this)', generator.ORDER_ATOMIC];
+  }
+};
+
 // Генератор для управления объектом
 javascript.javascriptGenerator.forBlock['object_control'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
   const type = block.getFieldValue('type');
-  const speedx = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC);
-  const speedy = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC);
+  const speedx = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
+  const speedy = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
   
   let code = `${obj}.speedx=0;${obj}.speedy=0;\n`;
   
@@ -1922,9 +2007,9 @@ if(Game.getAxes(3)>0.3){${obj}.speedy=${speedy}*Game.getAxes(3);}\n`;
 // Генератор для движения к точке
 javascript.javascriptGenerator.forBlock['object_velocity'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
-  const x = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC);
-  const y = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC);
-  const speed = generator.valueToCode(block, 'ValueSpeed', generator.ORDER_ATOMIC);
+  const x = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
+  const y = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
+  const speed = generator.valueToCode(block, 'ValueSpeed', generator.ORDER_ATOMIC) || 0;
   
   let obj;
   if (mode === 'VAR') {
@@ -1977,13 +2062,13 @@ javascript.javascriptGenerator.forBlock['get_memory'] = function(block, generato
 // Генератор для установки позиции экрана
 javascript.javascriptGenerator.forBlock['set_screen_xy'] = function(block, generator) {
   const xy = block.getFieldValue('XY');
-  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC);
+  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC) || 0;
   return xy === 'X' ? `Game.setScreenX(${value});\n` : `Game.setScreenY(${value});\n`;
 };
 
 // Генератор для установки гравитации
 javascript.javascriptGenerator.forBlock['set_gravitation'] = function(block, generator) {
-  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC);
+  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC) || 0;
   return `Game.setGravity(${value});\n`;
 };
 

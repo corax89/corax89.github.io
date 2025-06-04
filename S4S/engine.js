@@ -440,13 +440,81 @@ Draw.loadImage = function(n, str) {
     return 0;
 };
 
-// Функции отрисовки
 Draw.text = function(x, y, size, colour, str) {
-    ctx.fillStyle = colour;
-    ctx.textBaseline = "top";
-    ctx.font = size + "px serif";
-    ctx.fillText(str, x - Game.screenx, y - Game.screeny);
+    function hexToRgb(hex) {
+		return [
+			parseInt(hex.slice(1, 3), 16),
+			parseInt(hex.slice(3, 5), 16),
+			parseInt(hex.slice(5, 7), 16)
+		];
+	}
+    const baseFontSize = 24;
+    const scale = Math.max(1, Math.floor(size / baseFontSize));
+    const finalSize = baseFontSize * scale;
+
+    // Создаем временный холст (если ещё нет)
+    if (!this._tempCanvas) {
+        this._tempCanvas = document.createElement('canvas');
+        // Пробуем получить контекст (без willReadFrequently для максимальной совместимости)
+        this._tempCanvasCtx = this._tempCanvas.getContext('2d');
+    }
+
+    var tempCtx = this._tempCanvasCtx; // Важно: везде используем tempCtx (без опечаток!)
+
+    // Устанавливаем шрифт и измеряем ширину текста
+    tempCtx.font = `${baseFontSize}px 'Courier New', monospace`;
+	if (!tempCtx.measureText) {
+        this._tempCanvas = document.createElement('canvas');
+        this._tempCanvasCtx = this._tempCanvas.getContext('2d', { willReadFrequently: true });
+        tempCtx = this._tempCanvasCtx;
+		tempCtx.font = `${baseFontSize}px 'Courier New', monospace`;
+    }
+    const textWidth = Math.ceil(tempCtx.measureText(str).width);
+
+    // Настраиваем размеры временного холста
+    this._tempCanvas.width = textWidth;
+    this._tempCanvas.height = baseFontSize;
+    tempCtx.clearRect(0, 0, this._tempCanvas.width, this._tempCanvas.height);
+
+    // Рисуем текст
+    tempCtx.fillStyle = colour;
+    tempCtx.textBaseline = "top";
+    tempCtx.font = `${baseFontSize}px 'Courier New', monospace`;
+    tempCtx.fillText(str, 0, 0);
+
+    // Убираем полутона, если текст крупный (>24px)
+    if (finalSize > 24) {
+        const imageData = tempCtx.getImageData(0, 0, this._tempCanvas.width, this._tempCanvas.height);
+        const data = imageData.data;
+        const [r, g, b] = hexToRgb(colour);
+
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i + 3] > 0) { // Если пиксель не прозрачный
+                data[i] = r;     // R
+                data[i + 1] = g; // G
+                data[i + 2] = b; // B
+                data[i + 3] = 255; // Делаем полностью непрозрачным
+            }
+        }
+        tempCtx.putImageData(imageData, 0, 0);
+    }
+
+    // Рисуем на основном холсте
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(
+        this._tempCanvas,
+        0, 0, textWidth, baseFontSize,
+        x - Game.screenx, y - Game.screeny, textWidth * scale, finalSize
+    );
 };
+
+// Вспомогательная функция: конвертация hex в RGB
+function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b];
+}
 
 Draw.plot = function(x, y, colour) {
     ctx.fillStyle = colour;
@@ -1124,6 +1192,12 @@ Game.initSensorInput = function() {
 	}
 };
 
+Game.helper.error = function(err){
+	showSwitchModal('error', err, false, 'ok');
+	reset_game();
+	Game.gameLoop = function(){};
+}
+
 // Инициализация сенсорного ввода при запуске игры
 Game.initSensorInput();
 
@@ -1296,8 +1370,8 @@ function initObjectsDebugPanel() {
     container.style.color = '#e0e0e0';
     container.style.fontFamily = 'monospace';
     container.style.fontSize = '13px';
-	container.style.width = 0;
-	container.style.opacity = 0;
+    container.style.width = 0;
+    container.style.opacity = 0;
 
     const expandedStates = new Map();
     const objectElements = new Map();
@@ -1324,7 +1398,11 @@ function initObjectsDebugPanel() {
     };
 
     function getObjectId(obj, index) {
-        return obj.__debugId || (obj.__debugId = `obj_${index}_${Math.random().toString(36).substr(2, 6)}`);
+        // Используем более стабильный идентификатор
+        if (!obj.__debugId) {
+            obj.__debugId = `obj_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        }
+        return obj.__debugId;
     }
 
     function createObjectElement(obj, id) {
@@ -1361,7 +1439,6 @@ function initObjectsDebugPanel() {
 
         const details = document.createElement('div');
         details.className = 'debug-object-details';
-        details.style.display = isExpanded ? 'block' : 'none';
         details.style.padding = '8px';
         details.style.background = '#2a2a2a';
         details.style.borderTop = '1px solid #444';
@@ -1372,12 +1449,18 @@ function initObjectsDebugPanel() {
         element.appendChild(details);
 
         header.addEventListener('click', (e) => {
-            const newState = !isExpanded;
-            details.style.display = newState ? 'block' : 'none';
-            arrowSpan.textContent = newState ? '▼' : '▶';
-            expandedStates.set(id, newState);
-            e.stopPropagation();
-        });
+			const newState = !(expandedStates.get(id) || false);
+			expandedStates.set(id, newState);
+			
+			if (newState) {
+				details.classList.add('expanded');
+			} else {
+				details.classList.remove('expanded');
+			}
+			
+			arrowSpan.textContent = newState ? '▼' : '▶';
+			e.stopPropagation();
+		});
 
         return element;
     }
@@ -1389,11 +1472,11 @@ function initObjectsDebugPanel() {
                 let valueStr;
                 try {
                     valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
+                if (valueStr.length > 100) valueStr = valueStr.substring(0, 100) + '...';
                 } catch {
                     valueStr = '[Complex Data]';
                 }
 
-                // Используем перевод из PARAM_TRANSLATIONS или оставляем оригинальное название
                 const displayName = PARAM_TRANSLATIONS[key] || key;
 
                 return `
@@ -1416,12 +1499,27 @@ function initObjectsDebugPanel() {
 
     function updateObjectsList() {
         if (!Game.allObject) return;
-		if (!Game.helper.debug) return;
+        if (!Game.helper.debug) return;
 
         const currentObjects = Game.allObject;
         const currentCount = currentObjects.length;
 
+        // Очищаем expandedStates от удаленных объектов
+        const currentIds = new Set();
+        currentObjects.forEach((obj, index) => {
+            const id = getObjectId(obj, index);
+            currentIds.add(id);
+        });
+
+        // Удаляем состояния для объектов, которых больше нет
+        expandedStates.forEach((_, id) => {
+            if (!currentIds.has(id)) {
+                expandedStates.delete(id);
+            }
+        });
+
         if (currentCount === lastObjectCount) {
+            // Обновляем только существующие элементы
             currentObjects.forEach((obj, index) => {
                 const id = getObjectId(obj, index);
                 const element = objectElements.get(id);
@@ -1430,7 +1528,7 @@ function initObjectsDebugPanel() {
                     if (nameSpan) nameSpan.textContent = obj.name || `Object ${index}`;
                     
                     const details = element.querySelector('.debug-object-details');
-                    if (details && details.style.display !== 'none') {
+                    if (details && expandedStates.get(id)) {
                         updateObjectDetails(details, obj);
                     }
                 }
@@ -1438,13 +1536,7 @@ function initObjectsDebugPanel() {
             return;
         }
 
-        objectElements.forEach((element, id) => {
-            const details = element.querySelector('.debug-object-details');
-            if (details) {
-                expandedStates.set(id, details.style.display !== 'none');
-            }
-        });
-
+        // Полная перерисовка при изменении количества объектов
         container.innerHTML = '';
         objectElements.clear();
 
@@ -1470,8 +1562,8 @@ function initObjectsDebugPanel() {
         const id = obj.__debugId;
         return id ? expandedStates.get(id) : false;
     }
-	
-	Game.helper.debug = false;
+    
+    Game.helper.debug = false;
     updateObjectsList();
 
     return {

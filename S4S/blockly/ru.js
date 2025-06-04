@@ -515,6 +515,7 @@ Blockly.Msg['EACH_FRAME_LABEL'] = 'Делать каждый кадр для';
 Blockly.Msg['ON_COLLISION_LABEL'] = 'Делать при столкновении';
 Blockly.Msg['DELETE_OBJECT_LABEL'] = 'Удаление';
 Blockly.Msg['OBJECT_OFFSCREEN_LABEL'] = 'Если выход за экран';
+Blockly.Msg['OBJECT_TAPSCREEN_LABEL'] = 'Если касание экрана в месте';
 Blockly.Msg['THIS_OFFSCREEN_LABEL'] = 'Если выход за экран';
 Blockly.Msg['CONTROL_OBJECT_LABEL'] = 'Управление для';
 Blockly.Msg['CONTROL_TYPE_LABEL'] = 'тип управления';
@@ -563,6 +564,7 @@ Blockly.Msg['LEVEL_RESIZE'] = 'Изменить размер';
 Blockly.Msg['LEVEL_SELECT_MOVE'] = 'Выбрать и переместить';
 Blockly.Msg['LEVEL_SET_GRID_SIZE'] = 'Изменить размер сетки';
 Blockly.Msg['ERROR_NO_PROTOTYPES'] = 'Редактор использует прототипы объектов, должен быть добавлен хотя бы один';
+Blockly.Msg['ERROR_INFINITE_LOOP'] = 'Обнаружен бесконечный цикл (выполнение более 1000мс)';
 Blockly.Msg['WARNING_ES5'] = "Используется код ES6 который не заработает на приставке";
 const ruTexts = {
 	'INTERFACE_TITLE': 'Blockly с JavaScript',
