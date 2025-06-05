@@ -1377,6 +1377,17 @@ function initObjectsDebugPanel() {
     const objectElements = new Map();
     let lastObjectCount = 0;
 
+    // Создаем элемент для отображения счетчика
+    const counterElement = document.createElement('div');
+    counterElement.style.padding = '6px 8px';
+    counterElement.style.background = '#222';
+    counterElement.style.borderBottom = '1px solid #444';
+    counterElement.style.fontWeight = 'bold';
+    counterElement.style.position = 'sticky';
+    counterElement.style.top = '0';
+    counterElement.style.zIndex = '1';
+    container.appendChild(counterElement);
+
     // Маппинг стандартных параметров объекта на переводы
     const PARAM_TRANSLATIONS = {
         'x': Blockly.Msg['OBJECT_PARAM_X'],
@@ -1398,7 +1409,6 @@ function initObjectsDebugPanel() {
     };
 
     function getObjectId(obj, index) {
-        // Используем более стабильный идентификатор
         if (!obj.__debugId) {
             obj.__debugId = `obj_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
         }
@@ -1449,18 +1459,18 @@ function initObjectsDebugPanel() {
         element.appendChild(details);
 
         header.addEventListener('click', (e) => {
-			const newState = !(expandedStates.get(id) || false);
-			expandedStates.set(id, newState);
-			
-			if (newState) {
-				details.classList.add('expanded');
-			} else {
-				details.classList.remove('expanded');
-			}
-			
-			arrowSpan.textContent = newState ? '▼' : '▶';
-			e.stopPropagation();
-		});
+            const newState = !(expandedStates.get(id) || false);
+            expandedStates.set(id, newState);
+            
+            if (newState) {
+                details.classList.add('expanded');
+            } else {
+                details.classList.remove('expanded');
+            }
+            
+            arrowSpan.textContent = newState ? '▼' : '▶';
+            e.stopPropagation();
+        });
 
         return element;
     }
@@ -1472,7 +1482,7 @@ function initObjectsDebugPanel() {
                 let valueStr;
                 try {
                     valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
-                if (valueStr.length > 100) valueStr = valueStr.substring(0, 100) + '...';
+                    if (valueStr.length > 100) valueStr = valueStr.substring(0, 100) + '...';
                 } catch {
                     valueStr = '[Complex Data]';
                 }
@@ -1504,6 +1514,9 @@ function initObjectsDebugPanel() {
         const currentObjects = Game.allObject;
         const currentCount = currentObjects.length;
 
+        // Обновляем счетчик объектов
+        counterElement.textContent = `Objects: ${currentCount}`;
+
         // Очищаем expandedStates от удаленных объектов
         const currentIds = new Set();
         currentObjects.forEach((obj, index) => {
@@ -1518,11 +1531,16 @@ function initObjectsDebugPanel() {
             }
         });
 
+        // Сохраняем текущие состояния перед обновлением
+        const prevExpandedStates = new Map(expandedStates);
+        const prevObjectElements = new Map(objectElements);
+
         if (currentCount === lastObjectCount) {
             // Обновляем только существующие элементы
             currentObjects.forEach((obj, index) => {
                 const id = getObjectId(obj, index);
                 const element = objectElements.get(id);
+
                 if (element) {
                     const nameSpan = element.querySelector('.debug-object-header span:first-child');
                     if (nameSpan) nameSpan.textContent = obj.name || `Object ${index}`;
@@ -1537,22 +1555,32 @@ function initObjectsDebugPanel() {
         }
 
         // Полная перерисовка при изменении количества объектов
-        container.innerHTML = '';
+        // Сохраняем счетчик и очищаем остальное содержимое
+        const children = Array.from(container.children);
+        children.forEach(child => {
+            if (child !== counterElement) {
+                container.removeChild(child);
+            }
+        });
+        
         objectElements.clear();
-
-        const title = document.createElement('div');
-        title.textContent = `Objects (${currentCount})`;
-        title.style.marginBottom = '15px';
-        title.style.fontWeight = 'bold';
-        title.style.borderBottom = '1px solid #555';
-        title.style.paddingBottom = '5px';
-        container.appendChild(title);
 
         currentObjects.forEach((obj, index) => {
             const id = getObjectId(obj, index);
+            const wasExpanded = prevExpandedStates.get(id) || false;
+            expandedStates.set(id, wasExpanded);
+            
             const element = createObjectElement(obj, id);
             container.appendChild(element);
             objectElements.set(id, element);
+            
+            // Восстанавливаем состояние раскрытия
+            if (wasExpanded) {
+                const details = element.querySelector('.debug-object-details');
+                details.classList.add('expanded');
+                const arrow = element.querySelector('.debug-object-arrow');
+                if (arrow) arrow.textContent = '▼';
+            }
         });
 
         lastObjectCount = currentCount;

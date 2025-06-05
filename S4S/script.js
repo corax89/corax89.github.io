@@ -565,38 +565,31 @@ function addWatchdogToCode(code) {
             const __startTime = Date.now();
             return () => {
                 if (Date.now() - __startTime > 1000) {
-                    throw Game.helper.error("${Blockly.Msg['ERROR_INFINITE_LOOP']}");
+                    throw new Error("${Blockly.Msg['ERROR_INFINITE_LOOP']}");
                 }
             };
         };
     `;
 
-    // Добавляем watchdog в каждый цикл
     const modifiedCode = code
-        .replace(/for\s*\([^)]*\)\s*\{([^}]*)\}/g, (match, body) => {
-            return `for (let __i = 0; __i < 1; __i++) { 
-                const __check = __watchdog(); 
-                ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
-                __check(); 
-            }`.replace(/for \(let __i = 0; __i < 1; __i\+\+\)/, match);
-        })
-        .replace(/while\s*\([^)]*\)\s*\{([^}]*)\}/g, (match, body) => {
+        // Обрабатываем while циклы
+        .replace(/while\s*\(([^)]*)\)\s*\{([^}]*)\}/g, (match, condition, body) => {
             return `{ 
                 const __check = __watchdog(); 
-                while (true) { 
+                while (${condition}) { 
                     ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
                     __check(); 
-                    if (!(${match.match(/while\s*\(([^)]*)\)/)[1]})) break; 
                 } 
             }`;
         })
-        .replace(/do\s*\{([^}]*)\}\s*while\s*\([^)]*\)/g, (match, body, condition) => {
+        // Обрабатываем do...while циклы
+        .replace(/do\s*\{([^}]*)\}\s*while\s*\(([^)]*)\);/g, (match, body, condition) => {
             return `{ 
                 const __check = __watchdog(); 
                 do { 
                     ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
                     __check(); 
-                } while (${match.match(/while\s*\(([^)]*)\)/)[1]}); 
+                } while (${condition}); 
             }`;
         });
 
@@ -612,25 +605,25 @@ function translateError(error) {
     // Синтаксические ошибки
     "Unexpected token": "Неожиданный символ",
     "Unexpected identifier": "Неожиданный идентификатор",
-    "Missing ) after argument list": "Пропущена закрывающая скобка ')' после списка аргументов",
-    "Missing } after function body": "Пропущена закрывающая скобка '}' после тела функции",
-    "Missing ] after element list": "Пропущена закрывающая скобка ']' после списка элементов",
+    "Missing \\) after argument list": "Пропущена закрывающая скобка ')' после списка аргументов",
+    "Missing \\} after function body": "Пропущена закрывающая скобка '}' после тела функции",
+    "Missing \\] after element list": "Пропущена закрывающая скобка ']' после списка элементов",
     "Missing ' after string literal": "Пропущена закрывающая кавычка строки",
     "Unterminated string literal": "Незавершённая строковая константа",
     "Invalid left-hand side in assignment": "Недопустимое выражение в левой части присваивания",
-    "Expected ')'": "Ожидалась закрывающая скобка ')'",
-    "Expected '}'": "Ожидалась закрывающая скобка '}'",
-    "Expected ']'": "Ожидалась закрывающая скобка ']'",
+    "Expected '\\)'": "Ожидалась закрывающая скобка ')'",
+    "Expected '\\}'": "Ожидалась закрывающая скобка '}'",
+    "Expected '\\]'": "Ожидалась закрывающая скобка ']'",
     "Expected ';'": "Ожидалась точка с запятой ';'",
 
     // Ошибки регулярных выражений
     "Invalid regular expression": "Некорректное регулярное выражение",
-    "Unmatched ')'": "Непарная закрывающая скобка ')'",
-    "Unmatched '('": "Непарная открывающая скобка '('",
-    "Unmatched ']'": "Непарная закрывающая скобка ']'",
-    "Unmatched '['": "Непарная открывающая скобка '['",
-    "Unmatched '{'": "Непарная открывающая скобка '{'",
-    "Unmatched '}'": "Непарная закрывающая скобка '}'",
+    "Unmatched '\\)'": "Непарная закрывающая скобка ')'",
+    "Unmatched '\\('": "Непарная открывающая скобка '('",
+    "Unmatched '\\]'": "Непарная закрывающая скобка ']'",
+    "Unmatched '\\['": "Непарная открывающая скобка '['",
+    "Unmatched '\\{'": "Непарная открывающая скобка '{'",
+    "Unmatched '\\}'": "Непарная закрывающая скобка '}'",
 
     // Ошибки доступа к объектам и переменным
     "'.*' is not available in the sandbox": "Объект '.*' недоступен в песочнице",
@@ -674,7 +667,10 @@ function translateError(error) {
 
   // Проверяем остальные ошибки
   for (const [key, translation] of Object.entries(errorTranslations)) {
-    const regex = new RegExp(key.replace(/\\.\*/g, '(.*?)'));
+    // Escape special regex characters except for our .* patterns
+    const escapedKey = key.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1')
+                          .replace(/\\\.\\\*/g, '(.*?)');
+    const regex = new RegExp(escapedKey);
     if (regex.test(error)) {
       const match = error.match(regex);
       if (match && match[1]) {
@@ -687,114 +683,10 @@ function translateError(error) {
   return `Неизвестная ошибка: ${error}`;
 }
 
-function gameSandboxEval(code) {
-  // Предполагаем, что Game и Draw уже существуют в глобальной области видимости
-  // Создаем песочницу с разрешенными объектами
-  const sandbox = {
-    Game: window.Game,  // или просто Game, если выполняется в Node.js
-    Draw: window.Draw,  // или global.Draw для Node.js
-    console: {
-      log: console.log,
-      warn: console.warn,
-      error: console.error
-    },
-	Date: getSafeDate(),
-	Array: getSafeArray(),
-    Object: getSafeObject(),
-    Math: Object.create(null)  // Создаем чистый объект Math без прототипа
-  };
-
-  // Копируем безопасные методы Math
-  const allowedMathMethods = [
-    'abs', 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
-    'cbrt', 'ceil', 'clz32', 'cos', 'cosh', 'exp', 'expm1', 'floor',
-    'fround', 'hypot', 'imul', 'log', 'log10', 'log1p', 'log2', 'max',
-    'min', 'pow', 'random', 'round', 'sign', 'sin', 'sinh', 'sqrt',
-    'tan', 'tanh', 'trunc'
-  ];
-
-  allowedMathMethods.forEach(name => {
-    sandbox.Math[name] = Math[name].bind(Math);
-  });
-  
-  sandbox.Math.PI = Math.PI;
-  sandbox.Math.E  = Math.E;
-  sandbox.String  = String.bind(String);
-  
-  function getSafeDate() {
-	  // Функция-конструктор для new Date()
-	  function SafeDate(...args) {
-		const realDate = new window.Date(...args);
-		return {
-		  getTime: () => realDate.getTime(),
-		  toString: () => realDate.toString(),
-		  toISOString: () => realDate.toISOString(),
-		  getFullYear: () => realDate.getFullYear()
-		};
-	  }
-
-	  // Добавляем статические методы Date
-	  SafeDate.now = () => window.Date.now();
-	  SafeDate.parse = (str) => window.Date.parse(str);
-	  SafeDate.UTC = (...args) => window.Date.UTC(...args);
-
-	  return SafeDate;
-	}
-
-	// ✅ Array (разрешаем только базовые методы)
-	function getSafeArray() {
-	  return {
-		from: Array.from,
-		isArray: Array.isArray,
-		prototype: { // Ограниченный прототип
-		  push: Array.prototype.push,
-		  pop: Array.prototype.pop,
-		  map: Array.prototype.map,
-		  filter: Array.prototype.filter
-		}
-	  };
-	}
-
-	// ✅ Object (только безопасные методы)
-	function getSafeObject() {
-	  return {
-		keys: Object.keys,
-		values: Object.values,
-		entries: Object.entries,
-		assign: Object.assign,
-		freeze: Object.freeze
-	  };
-	}
-
-  // Создаем прокси для контроля доступа
-  const proxy = new Proxy(sandbox, {
-	  has(target, key) {
-		return true; // Имитируем наличие всех свойств
-	  },
-	  get(target, key, receiver) {
-		// Если ключ — Symbol, просто возвращаем его
-		if (typeof key === 'symbol') {
-		  return target[key];
-		}
-
-		// Запрещаем опасные ключи
-		const forbidden = ['eval', 'Function', 'constructor', 'window', 'document'];
-		if (forbidden.includes(key)) {
-		  throw new Error(`Access to "${key}" is forbidden`);
-		}
-
-		// Разрешаем только свойства песочницы
-		if (key in target) {
-		  return target[key];
-		}
-
-		throw new Error(`"${key}" is not available in the sandbox`);
-	  }
-	});
-  // Выполняем код в ограниченном контексте
+function gameEval(code) {
   try {
-    const func = new Function('sandbox', `with(sandbox){${code}}`);
-    func(proxy);
+    const safeEval = (code) => new Function(code)();
+	safeEval(code);
     return { success: true };
   } catch (e) {
     return { 
@@ -811,19 +703,13 @@ function runJS() {
     reset_game();
     var code = addWatchdogToCode(getJScode());
     Blockly.JavaScript.INFINITE_LOOP_TRAP = false;
-	const result = gameSandboxEval(code);
+	const result = gameEval(code);
 	if (!result.success) {
 		if (savedLanguage === 'ru')
 			showSwitchModal('ошибка', 'Программа прервана:%1'.replace('%1', translateError(result.error)), false, 'ok');
 		else
 			showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
 	}
-	/*
-    try {
-        eval(code);
-    } catch (e) {
-		showSwitchModal('error', 'badCode%1'.replace('%1', e), false, 'ok');
-    }*/
 };
 
 /**

@@ -126,7 +126,8 @@ class FieldMusicEditor extends Blockly.Field {
     div.style.position = 'fixed';
     div.style.top = (window.innerHeight / 2 - 220) + 'px';
 	div.style.left = (window.innerWidth / 2 - 450) + 'px';
-    
+    div.style.width = '920px';
+	div.style.height = '440px';
     // Стили для модального вида
     div.style.backgroundColor = 'white';
     div.style.borderRadius = '10px';
@@ -226,7 +227,6 @@ class FieldMusicEditor extends Blockly.Field {
     controls.style.display = 'flex';
     controls.style.justifyContent = 'center';
     controls.style.gap = '20px';
-	controls.style.padding = '20px';
     
     const playBtn = document.createElement('button');
     playBtn.textContent = Blockly.Msg['MUSIC_PLAY_BTN'];
