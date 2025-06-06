@@ -2046,7 +2046,7 @@ javascript.javascriptGenerator.forBlock['object_distance'] = function(block, gen
 // Генератор для перебора объектов
 javascript.javascriptGenerator.forBlock['object_iterate'] = function(block, generator) {
   const body = generator.statementToCode(block, 'BODY');
-  return `for(var i=0;i<Game.allObject.length;i++){\nvar object=Game.allObject[i];\nif(object.use){\n${body}\n}\n};\n`;
+  return `for(var i=0;i<Game.allObject.length;i++){\nvar object=Game.allObject[i];\nif(object){\n${body}\n}\n};\n`;
 };
 
 // Генератор для получения времени

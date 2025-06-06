@@ -573,6 +573,7 @@ const ruTexts = {
 	'HELP_AUTHOR': 'Автор Corax89',
 	'HELP_POWERED': 'Использует Blockly',
 	'HELP_HELP': 'Справка',
+	'EXAMPLES': 'Примеры',
 	'SAVE_PROJECT_BTN': 'Сохранить проект',
 	'LOAD_PROJECT_BTN': 'Загрузить проект',
 	'GAME_NAME_PLACEHOLDER': 'Название игры',
@@ -604,6 +605,7 @@ document.getElementById('help-author').textContent = ruTexts.HELP_AUTHOR;
 document.getElementById('help-powered').textContent = ruTexts.HELP_POWERED;
 document.getElementById('help-help').textContent = ruTexts.HELP_HELP;;
 document.getElementById('help-help').href = Blockly.Msg['HELP_A'];
+document.getElementById('examples-name').textContent = ruTexts.EXAMPLES;;
 document.getElementById('save-project-btn').textContent = ruTexts.SAVE_PROJECT_BTN;
 document.getElementById('load-project-btn').textContent = ruTexts.LOAD_PROJECT_BTN;
 document.getElementById('Name').placeholder = ruTexts.GAME_NAME_PLACEHOLDER;

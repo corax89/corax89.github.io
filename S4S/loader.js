@@ -1,5 +1,6 @@
 // Список скриптов для загрузки (ваш список)
 const scripts = [
+	{ name: 'Examples', path: 'examples.js' },
 	{ name: 'LZ-String', path: 'compiler/lz-string.min.js' },
 	{ name: 'File Data', path: 'compiler/fileData.js'},
     { name: 'Blockly Core', path: 'blockly/blockly_compressed.js' },
