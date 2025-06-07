@@ -39,6 +39,7 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="change_object_var"></block>
             <block type="addto_object_var"></block>
             <block type="get_object_var"></block>
+			<block type="set_object_bounding"></block>
             <block type="object_onstep"></block>
             <block type="object_oncollision"></block>
             <block type="object_exit_screen"></block>
@@ -230,6 +231,14 @@ const workspace = Blockly.inject('blocklyDiv', {
         <category name="${Blockly.Msg['VARIABLES']}" custom="VARIABLE"></category>
         <category name="${Blockly.Msg['LOCAL_VARIABLES']}">
             <block type="create_local_var">
+                <field name="VAR_NAME">x</field>
+                <value name="VAR_VALUE">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+			<block type="addto_local_var">
                 <field name="VAR_NAME">x</field>
                 <value name="VAR_VALUE">
                     <shadow type="math_number">

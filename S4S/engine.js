@@ -196,78 +196,79 @@ Game.init = function() {
 
     // Функции проверки и разрешения коллизий
     Game.checkCollision = function(a, b) {
-        const angle_a = a.angle * Math.PI / 180;
-        const angle_b = b.angle * Math.PI / 180;
-        
-        const center_a = new Vector2(a.x + a.width/2, a.y + a.height/2);
-        const center_b = new Vector2(b.x + b.width/2, b.y + b.height/2);
-        
-        const half_size_a = new Vector2(a.width/2, a.height/2);
-        const half_size_b = new Vector2(b.width/2, b.height/2);
-        
-        const a_points = [
-            new Vector2(-half_size_a.x, -half_size_a.y),
-            new Vector2( half_size_a.x, -half_size_a.y),
-            new Vector2( half_size_a.x,  half_size_a.y),
-            new Vector2(-half_size_a.x,  half_size_a.y)
-        ];
-        
-        const b_points = [
-            new Vector2(-half_size_b.x, -half_size_b.y),
-            new Vector2( half_size_b.x, -half_size_b.y),
-            new Vector2( half_size_b.x,  half_size_b.y),
-            new Vector2(-half_size_b.x,  half_size_b.y)
-        ];
-        
-        // Поворот и смещение точек
-        for (let i = 0; i < 4; i++) {
-            a_points[i] = Vector2.rotate(a_points[i], angle_a);
-            a_points[i].x += center_a.x;
-            a_points[i].y += center_a.y;
-            
-            b_points[i] = Vector2.rotate(b_points[i], angle_b);
-            b_points[i].x += center_b.x;
-            b_points[i].y += center_b.y;
-        }
-        
-        // Получение осей для SAT
-        const axes = [
-            ...getPolygonAxes(a_points),
-            ...getPolygonAxes(b_points)
-        ];
-        
-        let minOverlap = Infinity;
-        let smallestAxis = new Vector2(0, 0);
-        
-        // Проверка коллизий по осям
-        for (const axis of axes) {
-            const projA = projectPolygon(axis, a_points);
-            const projB = projectPolygon(axis, b_points);
-            
-            if (projA.max < projB.min || projB.max < projA.min) {
-                return { collides: false };
-            }
-            
-            const overlap = Math.min(projA.max, projB.max) - Math.max(projA.min, projB.min);
-            
-            if (overlap < minOverlap) {
-                minOverlap = overlap;
-                smallestAxis = axis;
-            }
-        }
-        
-        // Определение направления нормали
-        const centerDiff = new Vector2(center_b.x - center_a.x, center_b.y - center_a.y);
-        if (Vector2.dot(centerDiff, smallestAxis) < 0) {
-            smallestAxis = new Vector2(-smallestAxis.x, -smallestAxis.y);
-        }
-        
-        return {
-            collides: true,
-            normal: smallestAxis,
-            overlap: minOverlap
-        };
-    };
+		const angle_a = a.angle * Math.PI / 180;
+		const angle_b = b.angle * Math.PI / 180;
+		
+		// Используем boundingWidth и boundingHeight для расчета центра и размеров
+		const center_a = new Vector2(a.x + a.width/2, a.y + a.height/2); // Центр остается тем же
+		const center_b = new Vector2(b.x + b.width/2, b.y + b.height/2); // Центр остается тем же
+		
+		const half_size_a = new Vector2(a.boundingWidth/2, a.boundingHeight/2); // Используем bounding размеры
+		const half_size_b = new Vector2(b.boundingWidth/2, b.boundingHeight/2); // Используем bounding размеры
+		
+		const a_points = [
+			new Vector2(-half_size_a.x, -half_size_a.y),
+			new Vector2( half_size_a.x, -half_size_a.y),
+			new Vector2( half_size_a.x,  half_size_a.y),
+			new Vector2(-half_size_a.x,  half_size_a.y)
+		];
+		
+		const b_points = [
+			new Vector2(-half_size_b.x, -half_size_b.y),
+			new Vector2( half_size_b.x, -half_size_b.y),
+			new Vector2( half_size_b.x,  half_size_b.y),
+			new Vector2(-half_size_b.x,  half_size_b.y)
+		];
+		
+		// Поворот и смещение точек
+		for (let i = 0; i < 4; i++) {
+			a_points[i] = Vector2.rotate(a_points[i], angle_a);
+			a_points[i].x += center_a.x;
+			a_points[i].y += center_a.y;
+			
+			b_points[i] = Vector2.rotate(b_points[i], angle_b);
+			b_points[i].x += center_b.x;
+			b_points[i].y += center_b.y;
+		}
+		
+		// Получение осей для SAT
+		const axes = [
+			...getPolygonAxes(a_points),
+			...getPolygonAxes(b_points)
+		];
+		
+		let minOverlap = Infinity;
+		let smallestAxis = new Vector2(0, 0);
+		
+		// Проверка коллизий по осям
+		for (const axis of axes) {
+			const projA = projectPolygon(axis, a_points);
+			const projB = projectPolygon(axis, b_points);
+			
+			if (projA.max < projB.min || projB.max < projA.min) {
+				return { collides: false };
+			}
+			
+			const overlap = Math.min(projA.max, projB.max) - Math.max(projA.min, projB.min);
+			
+			if (overlap < minOverlap) {
+				minOverlap = overlap;
+				smallestAxis = axis;
+			}
+		}
+		
+		// Определение направления нормали
+		const centerDiff = new Vector2(center_b.x - center_a.x, center_b.y - center_a.y);
+		if (Vector2.dot(centerDiff, smallestAxis) < 0) {
+			smallestAxis = new Vector2(-smallestAxis.x, -smallestAxis.y);
+		}
+		
+		return {
+			collides: true,
+			normal: smallestAxis,
+			overlap: minOverlap
+		};
+	};
 
     Game.addObjectsFromArray = function(objectsArray) {
       for (var arrIndex = 0; arrIndex < objectsArray.length; arrIndex++) {
@@ -606,6 +607,8 @@ Game.addObject = function(name, x, y, width, height, sprite) {
         speedy: 0,
         onCollision: function(){},
         onStep: function(){},
+		boundingWidth: width,
+		boundingHeight: height,
         visible: 1,
         solid: 1,
         angle: 0,
@@ -1291,62 +1294,64 @@ function game_loop() {
         
         const sortedArray = sortObjectsByY();
         for (var i = 0; i < sortedArray.length; i++) {
-            var o = sortedArray[i];
-            if (o.visible) {
-                ctx.save();
-                ctx.translate(o.x + o.width / 2 - Game.screenx, o.y + o.height / 2 - Game.screeny);
-                ctx.rotate(o.angle * Math.PI / 180);
+			var o = sortedArray[i];
+			if (o.visible) {
+				ctx.save();
+				ctx.translate(o.x + o.width / 2 - Game.screenx, o.y + o.height / 2 - Game.screeny);
+				ctx.rotate(o.angle * Math.PI / 180);
 
-                const SDL_FLIP_NONE = 0x00000000;
-                const SDL_FLIP_HORIZONTAL = 0x00000001;
-                const SDL_FLIP_VERTICAL = 0x00000002;
-                const flipHorz = (o.flip & SDL_FLIP_HORIZONTAL) !== 0;
-                const flipVert = (o.flip & SDL_FLIP_VERTICAL) !== 0;
+				const SDL_FLIP_NONE = 0x00000000;
+				const SDL_FLIP_HORIZONTAL = 0x00000001;
+				const SDL_FLIP_VERTICAL = 0x00000002;
+				const flipHorz = (o.flip & SDL_FLIP_HORIZONTAL) !== 0;
+				const flipVert = (o.flip & SDL_FLIP_VERTICAL) !== 0;
 
-                if (flipHorz || flipVert) {
-                    const scaleX = flipHorz ? -1 : 1;
-                    const scaleY = flipVert ? -1 : 1;
-                    const offsetX = flipHorz ? o.width / 2 : -o.width / 2;
-                    const offsetY = flipVert ? o.height / 2 : -o.height / 2;
+				if (flipHorz || flipVert) {
+					const scaleX = flipHorz ? -1 : 1;
+					const scaleY = flipVert ? -1 : 1;
+					const offsetX = flipHorz ? o.width / 2 : -o.width / 2;
+					const offsetY = flipVert ? o.height / 2 : -o.height / 2;
 
-                    ctx.scale(scaleX, scaleY);
-                    Draw.image(o.sprite, offsetX, offsetY, o.width, o.height);
-                } else {
-                    Draw.image(o.sprite, -o.width / 2, -o.height / 2, o.width, o.height);
-                }
-				
-				if (draw_bounding_box){
-					ctx.save();
-                    ctx.strokeStyle = '#0ff';
-                    ctx.lineWidth = 2;                
-                    ctx.beginPath();
-                    ctx.rect(-o.width / 2, -o.height / 2, o.width, o.height);
-                    ctx.stroke();
-                    ctx.restore();
+					ctx.scale(scaleX, scaleY);
+					Draw.image(o.sprite, offsetX, offsetY, o.width, o.height);
+				} else {
+					Draw.image(o.sprite, -o.width / 2, -o.height / 2, o.width, o.height);
 				}
-                // Отрисовка зеленой рамки для раскрытых объектов
-                if (debugShowExpandedObjectsBorder && objectsDebugPanel && 
-                    objectsDebugPanel.isObjectExpanded(o)) {
-                    ctx.save();
-                    ctx.strokeStyle = '#0f0';
-                    ctx.lineWidth = 2;     
-                    ctx.beginPath();
-                    ctx.rect(-o.width / 2, -o.height / 2, o.width, o.height);
-                    ctx.stroke();             
-                    ctx.fillStyle = '#0f0';
-                    ctx.font = '12px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(o.name || 'Unnamed', 0, 0);
-                    ctx.restore();
-                }
+				
+				if (draw_bounding_box) {
+					ctx.save();
+					ctx.strokeStyle = '#0ff';
+					ctx.lineWidth = 2;                
+					ctx.beginPath();
+					// Используем boundingWidth и boundingHeight вместо width и height
+					ctx.rect(-o.boundingWidth / 2, -o.boundingHeight / 2, o.boundingWidth, o.boundingHeight);
+					ctx.stroke();
+					ctx.restore();
+				}
+				
+				// Отрисовка зеленой рамки для раскрытых объектов
+				if (debugShowExpandedObjectsBorder && objectsDebugPanel && 
+					objectsDebugPanel.isObjectExpanded(o)) {
+					ctx.save();
+					ctx.strokeStyle = '#0f0';
+					ctx.lineWidth = 2;     
+					ctx.beginPath();
+					ctx.rect(-o.width / 2, -o.height / 2, o.width, o.height);
+					ctx.stroke();             
+					ctx.fillStyle = '#0f0';
+					ctx.font = '12px Arial';
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'middle';
+					ctx.fillText(o.name || 'Unnamed', 0, 0);
+					ctx.restore();
+				}
 
-                ctx.restore();
-                
-                if(o.onStep)
-                    o.onStep();
-            }
-        }
+				ctx.restore();
+				
+				if(o.onStep)
+					o.onStep();
+			}
+		}
         
         if (Game.enableTouchInput) {
             Game.updateSensorKey();

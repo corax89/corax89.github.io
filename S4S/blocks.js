@@ -1044,6 +1044,84 @@ Blockly.Blocks['addto_object_var'] = {
   }
 };
 
+Blockly.Blocks['set_object_bounding'] = {
+  init: function() {
+    // Основное поле с выбором режима
+	this.setInputsInline(true);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['CHANGE_BOUNDING_LABEL'] || 'Изменить параметр:')
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['OBJECT_BY_VAR_LABEL'] || 'По переменной', 'VAR'],
+          [Blockly.Msg['OBJECT_TYPE_COLLIDED'] || 'Столкнувшийся объект', ' object'],
+          [Blockly.Msg['OBJECT_TYPE_THIS'] || 'Этот объект', 'this'],
+          [Blockly.Msg['OBJECT_TYPE_ITERATED'] || 'Итерируемый объект', 'object']
+        ], this.updateShape_.bind(this)), 'MODE');
+
+    // Поле для выбора переменной (изначально скрыто)
+    this.appendDummyInput('VAR_INPUT')
+        .appendField(new Blockly.FieldVariable(
+          Blockly.Msg['DEFAULT_VARIABLE_NAME'] || 'obj1',
+          null, null, 'Object'), 'VAR_NAME')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
+        .setVisible(false);
+
+    // Поле для значения
+    this.appendValueInput("WIDTH")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH'] || 'Width');
+	this.appendValueInput("HEIGHT")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT'] || 'Height');
+
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setColour(340);
+
+    // Инициализация видимости
+    this.updateShape_(this.getFieldValue('MODE'));
+  },
+
+  updateShape_: function(selectedMode) {
+    // Получаем поле ввода переменной
+    var varInput = this.getInput('VAR_INPUT');
+    
+    // Показываем только если выбран режим VAR
+    if (varInput) {
+      varInput.setVisible(selectedMode === 'VAR');
+      
+      // Если нужно, можно обновить список переменных
+      if (selectedMode === 'VAR') {
+        var varField = this.getField('VAR_NAME');
+        if (varField && varField.initModel) {
+          varField.initModel();
+        }
+      }
+    }
+
+    // Перерисовываем блок
+    Blockly.Events.disable();
+    this.render();
+    Blockly.Events.enable();
+  },
+
+  saveExtraState: function() {
+    return {
+      mode: this.getFieldValue('MODE'),
+      varName: this.getFieldValue('VAR_NAME')
+    };
+  },
+
+  loadExtraState: function(state) {
+    if (state) {
+      this.setFieldValue(state.mode || 'VAR', 'MODE');
+      if (state.varName) {
+        this.setFieldValue(state.varName, 'VAR_NAME');
+      }
+      this.updateShape_(state.mode || 'VAR');
+    }
+  }
+};
+
 Blockly.Blocks['object_onstep'] = {
   init: function() {
 	this.setInputsInline(true);
@@ -1584,6 +1662,33 @@ Blockly.Blocks['create_local_var'] = {
   }
 };
 
+Blockly.Blocks['addto_local_var'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['ADDTO_LOCAL_VAR_LABEL'])
+        .appendField(new Blockly.FieldDropdown(() => this.getVarOptions()), "VAR_NAME");
+    this.appendValueInput("VAR_VALUE")
+        .setCheck(null)
+        .appendField(Blockly.Msg['WITH_VALUE_LABEL']);
+	this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+  },
+  
+  // Возвращает актуальный список переменных
+  getVarOptions: function() {
+    const options = Blockly.Variables.localVars.map(name => [name, name]);
+    return options.length ? options : [[Blockly.Msg['NO_VARS_LABEL'], ""]];
+  },
+  
+  updateVarDropdown: function(v) {
+    const dropdown = this.getField('VAR_NAME');
+    if (dropdown) {
+      dropdown.selectedOptions = v;
+    }
+  }
+};
+
 Blockly.Blocks['get_local_var'] = {
   init: function() {
     this.appendDummyInput()
@@ -1824,7 +1929,7 @@ javascript.javascriptGenerator.forBlock['new_object_from_proto'] = function(bloc
   const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || 0;
   const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || 0;
   
-  let code = `${obj2}=Game.addObject(${obj1}.name,0,0,0,0,0);\nfor(var key in ${obj1}){if(${obj1}.hasOwnProperty(key)){${obj2}[key]=${obj1}[key];}};${obj2}.x=${x};${obj2}.y=${y};\nif(${obj2}.onCreate)${obj2}.onCreate();\n`;
+  let code = `${obj2}=Game.addObject(${obj1}.name,0,0,${obj1}.width,${obj1}.height,0);\nfor(var key in ${obj1}){if(${obj1}.hasOwnProperty(key)){${obj2}[key]=${obj1}[key];}};${obj2}.x=${x};${obj2}.y=${y};\nif(${obj2}.onCreate)${obj2}.onCreate();\n`;
   return code;
 };
 
@@ -1901,6 +2006,25 @@ javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, g
   } else {
     // Для режимов object/this/iterated
     code = `${mode}.${param} = ${value};\n`;
+  }
+  
+  return code;
+};
+
+// Генератор для изменения границ столкновения
+javascript.javascriptGenerator.forBlock['set_object_bounding'] = function(block, generator) {
+  const mode = block.getFieldValue('MODE');
+  const param = block.getFieldValue('NAME');
+  const width = generator.valueToCode(block, 'WIDTH', javascript.Order.ATOMIC) || '0';
+  const height = generator.valueToCode(block, 'HEIGHT', javascript.Order.ATOMIC) || '0';
+  
+  let code;
+  if (mode === 'VAR') {
+    const varName = generator.getVariableName(block.getFieldValue('VAR_NAME')) || 'obj1';
+    code = `${varName}.boundingWidth = ${width};\n${varName}.boundingHeight = ${height};\n`;
+  } else {
+    // Для режимов object/this/iterated
+    code = `${mode}.boundingWidth = ${width};\n${mode}.boundingHeight = ${height};\n`;
   }
   
   return code;
@@ -2088,6 +2212,13 @@ javascript.javascriptGenerator.forBlock['create_local_var'] = function(block, ge
   const varName = processText(block.getFieldValue('VAR_NAME'));
   const varValue = generator.valueToCode(block, 'VAR_VALUE', generator.ORDER_ATOMIC) || '0';
   return `this.local.${varName} = ${varValue};\n`;
+};
+
+// Генератор для получения локальной переменной
+javascript.javascriptGenerator.forBlock['addto_local_var'] = function(block, generator) {
+  const varName = processText(block.getFieldValue('VAR_NAME'));
+  const varValue = generator.valueToCode(block, 'VAR_VALUE', generator.ORDER_ATOMIC) || '0';
+  return `this.local.${varName} += ${varValue};\n`;
 };
 
 // Генератор для получения локальной переменной
