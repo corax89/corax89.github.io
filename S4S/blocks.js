@@ -51,6 +51,27 @@ function add_to_image_array(str) {
     }
 }
 
+ function add_to_sound_array(str) {
+    // Создаем хеш строки (используем простой хеш для примера)
+    const hash = generateHash(str);
+    
+    // Проверяем, есть ли уже такой хеш в массиве
+    const existingIndex = Game.sound_array.findIndex(item => item.hash === hash);
+    
+    if (existingIndex !== -1) {
+        // Если хеш уже существует, возвращаем его индекс
+        return existingIndex;
+    } else {
+        // Если хеша нет, добавляем новую запись и возвращаем её индекс
+        const newEntry = {
+            data: str,
+            hash: hash
+        };
+        Game.sound_array.push(newEntry);
+        return Game.sound_array.length - 1;
+    }
+}
+
 function generateHash(str) {
     // Используем простой хеш
     let hash = 0;
@@ -397,18 +418,6 @@ Blockly.Blocks['clear_screen'] = {
   }
 };
 
-// Блок загрузки MP3
-Blockly.defineBlocksWithJsonArray([{
-  "type": "mp3_block",
-  "message0": Blockly.Msg['MP3_UPLOAD_LABEL'] + " %1",
-  "args0": [{
-    "type": "field_mp3",
-    "name": "MP3_FIELD"
-  }],
-  "output": "String",
-  "colour": 160
-}]);
-
 // Блок редактора музыки
 Blockly.defineBlocksWithJsonArray([{
   "type": "music_block",
@@ -418,6 +427,21 @@ Blockly.defineBlocksWithJsonArray([{
     "name": "MUSIC_FIELD"
   }],
   "output": "String",
+  "colour": 60
+}]);
+
+// Блок редактора звука
+Blockly.defineBlocksWithJsonArray([{
+  "type": "audio_block",
+  "message0": Blockly.Msg['SOUND_EDITOR_LABEL'] + " %1",
+  "args0": [
+    {
+      "type": "field_wav_editor",
+      "name": "AUDIO",
+      "value": ""
+    }
+  ],
+  "output": "Number",
   "colour": 60
 }]);
 
@@ -440,6 +464,21 @@ Blockly.Blocks['play_music'] = {
     shadowBlockSize.render();
     durationInput.connection.connect(shadowBlockSize.outputConnection);
     shadowBlockSize.setShadow(true);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+  }
+};
+
+// Блок воспроизведения музыки
+Blockly.Blocks['play_sound'] = {
+  init: function() {
+    this.setColour(60);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PLAY_SOUND_LABEL']);
+    this.appendValueInput("Number")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['MUSIC_LABEL']);
+
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -1805,10 +1844,11 @@ javascript.javascriptGenerator.forBlock['field_png'] = function(block, generator
   return [`${id}`, generator.ORDER_ATOMIC];
 };
 
-// Генератор для MP3
-javascript.javascriptGenerator.forBlock['mp3_block'] = function(block, generator) {
-  const mp3 = block.getFieldValue('MP3_FIELD');
-  return `Game.loadAudio("${mp3}")\n`;
+// Генератор для WAV
+javascript.javascriptGenerator.forBlock['audio_block'] = function(block, generator) {
+  const wav = block.getFieldValue('AUDIO');
+  const id = add_to_sound_array(wav);
+  return [`${id}`, generator.ORDER_ATOMIC];
 };
 
 // Генератор для музыкального редактора
@@ -1822,6 +1862,11 @@ javascript.javascriptGenerator.forBlock['play_music'] = function(block, generato
   const music = generator.valueToCode(block, 'String', generator.ORDER_ATOMIC);
   const tempo = generator.valueToCode(block, 'Number', generator.ORDER_ATOMIC);
   return `Game.play_music(${music}, ${tempo});\n`;
+};
+// Генератор для воспроизведения звука
+javascript.javascriptGenerator.forBlock['play_sound'] = function(block, generator) {
+  const music = generator.valueToCode(block, 'Number', generator.ORDER_ATOMIC);
+  return `Game.play_sound(${music});\n`;
 };
 // Генератор для редактора уровней
 javascript.javascriptGenerator.forBlock['level_editor'] = function(block, generator) {

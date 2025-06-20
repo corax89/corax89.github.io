@@ -27,6 +27,8 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="set_timer"></block>
             <block type="music_block"></block>
             <block type="play_music"></block>
+			<block type="audio_block"></block>
+			<block type="play_sound"></block>
 			<block type="level_editor"></block>
             <block type="field_multilineinput"></block>
         </category>
@@ -563,7 +565,7 @@ function highlightJS(code) {
  * Генерирует и отображает код из блоков
  */
 function showCode() {
-    const code = getJScode();
+    const code = getJScode(true);
     document.getElementById('codeOutput').innerHTML = highlightJS(code);
 }
 

@@ -11,7 +11,7 @@ const scripts = [
     { name: 'Multiline Field', path: 'blockly/field_multiline.js' },
     { name: 'Color Field', path: 'blockly/field_color.js' },
     { name: 'Music Field', path: 'blockly/field_music.js' },
-    { name: 'MP3 Field', path: 'blockly/field_mp3.js' },
+    { name: 'WAV Field', path: 'blockly/field_wav.js' },
     { name: 'PNG Field', path: 'blockly/field_png.js' },
 	{ name: 'Level editor Field', path: 'blockly/field_leveleditor.js' },
     { name: 'Minimap', path: 'blockly/minimap.js' },

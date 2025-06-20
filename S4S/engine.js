@@ -18,6 +18,7 @@ var local = {};
 var Draw = {};
 var Game = {
     allObject: [],
+	sound_array: [],
     screenx: 0,
     screeny: 0,
     gravitation: 0,
@@ -693,6 +694,11 @@ Game.play_music = function(melodyString, bpm = 120) {
     activeMelodies++;
     Game._playMelody(melodyString, bpm);
 };
+
+Game.play_sound = function(id){
+	const audio = new Audio(Game.sound_array[id].data);
+	audio.play();
+}
 
 // Внутренняя функция для реального воспроизведения
 Game._playMelody = function(melodyString, bpm) {
