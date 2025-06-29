@@ -1,454 +1,585 @@
 class FieldMusicEditor extends Blockly.Field {
-  constructor(value, validator, config) {
-    super(value, validator, config);
-    // Привязываем контекст для обработчиков
-    this.disposeEditor_ = this.disposeEditor_.bind(this);
-    this.positionWidget_ = this.positionWidget_.bind(this);
-    
-    const parsedValue = typeof value === 'string' ? value : this.getEmptyPattern();
-    
-    this.SERIALIZABLE = true;
-    this.CURSOR = 'pointer';
-    
-    this.noteList = [
-      'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
-      'Kick', 'Snare', 'HiHat', 'Clap', 'Tom'
-    ];
-    this.timeSteps = 32;
-    this.tempo = 120;
-    this.audioContext = null;
-    this.currentStep = -1;
-    this.playbackInterval = null;
-    
-    this.value_ = parsedValue;
-    
-    this.defaultWidth_ = 144;
-    this.defaultHeight_ = 16;
-  }
+	constructor(value, validator, config) {
+		super(value, validator, config);
+		// Привязываем контекст для обработчиков
+		this.disposeEditor_ = this.disposeEditor_.bind(this);
+		this.positionWidget_ = this.positionWidget_.bind(this);
 
-  static fromJson(options) {
-    return new this(options['value'], undefined, options);
-  }
+		const parsedValue = typeof value === 'string' ? value : this.getEmptyPattern();
 
-  parsePatternString(patternStr) {
-    const pattern = this.getEmptyObjectPattern();
-    const steps = patternStr.split(',');
-    
-    steps.forEach((stepValue, stepIndex) => {
-      const bits = parseInt(stepValue);
-      if (isNaN(bits)) return;
-      
-      this.noteList.forEach((note, noteIndex) => {
-        if (bits & (1 << noteIndex)) {
-          if (!pattern[note]) pattern[note] = Array(this.timeSteps).fill(false);
-          pattern[note][stepIndex] = true;
-        }
-      });
-    });
-    
-    return pattern;
-  }
+		this.SERIALIZABLE = true;
+		this.CURSOR = 'pointer';
 
-  serializePattern(patternObj) {
-    const steps = [];
-    
-    for (let step = 0; step < this.timeSteps; step++) {
-      let bits = 0;
-      this.noteList.forEach((note, noteIndex) => {
-        if (patternObj[note] && patternObj[note][step]) {
-          bits |= (1 << noteIndex);
-        }
-      });
-      steps.push(bits.toString());
-    }
-    
-    return steps.join(',');
-  }
+		this.noteList = [
+			'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
+			'Kick', 'Snare', 'HiHat', 'Clap', 'Tom'
+		];
+		this.timeSteps = 32;
+		this.tempo = 120;
+		this.audioContext = null;
+		this.currentStep = -1;
+		this.playbackInterval = null;
 
-  getEmptyPattern() {
-    return Array(this.timeSteps).fill('0').join(',');
-  }
+		this.value_ = parsedValue;
 
-  getEmptyObjectPattern() {
-    const pattern = {};
-    this.noteList.forEach(note => {
-      pattern[note] = Array(this.timeSteps).fill(false);
-    });
-    return pattern;
-  }
+		this.defaultWidth_ = 144;
+		this.defaultHeight_ = 16;
+	}
 
-  initView() {
-    this.createBorderRect_();
-    this.createTextElement_();
-    this.updateEditable();
-    this.render_();
-  }
+	static fromJson(options) {
+		return new this(options['value'], undefined, options);
+	}
 
-  render_() {
-    super.render_();
-    if (this.borderRect_) {
-      this.borderRect_.setAttribute('width', this.defaultWidth_.toString());
-      this.borderRect_.setAttribute('height', this.defaultHeight_.toString());
-      this.borderRect_.setAttribute('rx', '8');
-      this.borderRect_.setAttribute('ry', '8');
-      this.borderRect_.setAttribute('stroke', '#aaa');
-      this.borderRect_.setAttribute('stroke-width', '1');
-      this.borderRect_.setAttribute('fill', '#f8f8f8');
-    }
-    if (this.textElement_) {
-      this.textElement_.textContent = Blockly.Msg['MUSIC_EDITOR_LABEL'];
-      this.textElement_.setAttribute('y', (this.defaultHeight_ / 2).toString());
-      this.textElement_.setAttribute('x', '8');
-      this.textElement_.style.fontSize = '14px';
-      this.textElement_.style.fontWeight = 'bold';
-    }
-  }
+	parsePatternString(patternStr) {
+		const pattern = this.getEmptyObjectPattern();
+		const steps = patternStr.split(',');
 
-  showEditor_(e) {
-    // Запрещаем скролл страницы
-    document.body.style.overflow = 'hidden';
-    
-    const div = Blockly.WidgetDiv.getDiv();
-    
-    const editor = this.createEditor_();
-    div.appendChild(editor);
-    
-    Blockly.WidgetDiv.show(
-      this, 
-      this.disposeEditor_,  
-      this.sourceBlock_.RTL
-    );
-    this.positionWidget_();
-  }
+		steps.forEach((stepValue, stepIndex) => {
+			const bits = parseInt(stepValue);
+			if (isNaN(bits))
+				return;
 
-  positionWidget_() {
-    const div = Blockly.WidgetDiv.getDiv();
-    div.style.position = 'fixed';
-    div.style.top = (window.innerHeight / 2 - 220) + 'px';
-	div.style.left = (window.innerWidth / 2 - 450) + 'px';
-    div.style.width = '920px';
-	div.style.height = '440px';
-    // Стили для модального вида
-    div.style.backgroundColor = 'white';
-    div.style.borderRadius = '10px';
-    div.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-    
-    // Горизонтальное отражение (RTL)
-    div.style.direction = 'rtl';
-    
-    // Для внутреннего содержимого возвращаем нормальное направление
-    const content = div.querySelector('.music-editor-widget');
-    if (content) {
-      content.style.direction = 'ltr';
-    }
-  }
+			this.noteList.forEach((note, noteIndex) => {
+				if (bits & (1 << noteIndex)) {
+					if (!pattern[note])
+						pattern[note] = Array(this.timeSteps).fill(false);
+					pattern[note][stepIndex] = true;
+				}
+			});
+		});
 
-  disposeEditor_() {
-    // Восстанавливаем скролл страницы
-    document.body.style.overflow = '';
-	
-    this.stopPlayback_();
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
-    }
-  }
+		return pattern;
+	}
 
-  createEditor_() {
-    const div = document.createElement('div');
-    div.className = 'music-editor-widget';
-    div.style.width = '100%';
-    div.style.height = '100%';
-    div.style.fontSize = '14px';
-	div.style.padding = '0';
-    div.style.overflow = 'hidden'; // Отключаем скроллы внутри редактора
-    div.style.direction = 'ltr'; // Обеспечиваем нормальное направление контента
-    
-    const scrollContainer = document.createElement('div');
-    scrollContainer.style.width = '100%';
-    scrollContainer.style.height = 'calc(100% - 60px)';
-    
-    const table = document.createElement('table');
-    table.className = 'music-grid';
-    table.style.margin = '15px auto';
-    table.style.fontSize = '14px';
-    
-    const currentPattern = this.parsePatternString(this.value_);
-    
-    const headerRow = document.createElement('tr');
-    headerRow.appendChild(document.createElement('th'));
-    
-    for (let i = 0; i < this.timeSteps; i++) {
-      const th = document.createElement('th');
-      th.textContent = i + 1;
-      th.style.padding = '4px 4px';
-      th.style.fontSize = '12px';
-      headerRow.appendChild(th);
-    }
-    table.appendChild(headerRow);
-    
-    this.editorCells = [];
-    for (let note of this.noteList) {
-      const row = document.createElement('tr');
-      const noteCell = document.createElement('td');
-      noteCell.className = 'note-label';
-      noteCell.textContent = note;
-      noteCell.style.padding = '4px 4px';
-      noteCell.style.fontWeight = 'bold';
-      noteCell.style.fontSize = '12px';
-      row.appendChild(noteCell);
-      
-      const rowCells = [];
-      for (let i = 0; i < this.timeSteps; i++) {
-        const cell = document.createElement('td');
-        cell.className = 'music-cell';
-        cell.dataset.note = note;
-        cell.dataset.step = i;
-        cell.style.width = '20px';
-        cell.style.height = '15px';
-        
-        if (currentPattern[note] && currentPattern[note][i]) {
-          cell.classList.add('active');
-        }
-        
-        cell.addEventListener('click', () => this.toggleCell_(cell));
-        row.appendChild(cell);
-        rowCells.push(cell);
-      }
-      table.appendChild(row);
-      this.editorCells.push(rowCells);
-    }
-    
-    scrollContainer.appendChild(table);
-    div.appendChild(scrollContainer);
-    
-    const controls = document.createElement('div');
-    controls.className = 'music-controls';
-    controls.style.display = 'flex';
-    controls.style.justifyContent = 'center';
-    controls.style.gap = '20px';
-    
-    const playBtn = document.createElement('button');
-    playBtn.textContent = Blockly.Msg['MUSIC_PLAY_BTN'];
-    playBtn.style.padding = '10px 20px';
-    playBtn.style.fontSize = '15px';
-    playBtn.style.minWidth = '100px';
-    playBtn.addEventListener('click', () => this.playSequence_());
-    controls.appendChild(playBtn);
-    
-    const stopBtn = document.createElement('button');
-    stopBtn.textContent = Blockly.Msg['MUSIC_STOP_BTN'];
-    stopBtn.style.padding = '10px 20px';
-    stopBtn.style.fontSize = '15px';
-    stopBtn.style.minWidth = '100px';
-    stopBtn.addEventListener('click', () => this.stopPlayback_());
-    controls.appendChild(stopBtn);
-    
-    const clearBtn = document.createElement('button');
-    clearBtn.textContent = Blockly.Msg['MUSIC_CLEAR_BTN'];
-    clearBtn.style.padding = '10px 20px';
-    clearBtn.style.fontSize = '15px';
-    clearBtn.style.minWidth = '100px';
-    clearBtn.addEventListener('click', () => this.clearPattern_());
-    controls.appendChild(clearBtn);
-    
-    div.appendChild(controls);
-    
-    return div;
-  }
+	serializePattern(patternObj) {
+		const steps = [];
 
-  toggleCell_(cell) {
-    cell.classList.toggle('active');
-    
-    const currentPattern = this.parsePatternString(this.value_);
-    const note = cell.dataset.note;
-    const step = parseInt(cell.dataset.step);
-    
-    if (!currentPattern[note]) {
-      currentPattern[note] = Array(this.timeSteps).fill(false);
-    }
-    
-    currentPattern[note][step] = cell.classList.contains('active');
-    
-    this.value_ = this.serializePattern(currentPattern);
-    this.setValue(this.value_);
-  }
+		for (let step = 0; step < this.timeSteps; step++) {
+			let bits = 0;
+			this.noteList.forEach((note, noteIndex) => {
+				if (patternObj[note] && patternObj[note][step]) {
+					bits |= (1 << noteIndex);
+				}
+			});
+			steps.push(bits.toString());
+		}
 
-  playSequence_() {
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    
-    this.stopPlayback_();
-    
-    const currentPattern = this.parsePatternString(this.value_);
-    const stepDuration = 60 / this.tempo / 2;
-    let currentStep = 0;
-    
-    this.resetHighlight_();
-    
-    this.playbackInterval = setInterval(() => {
-      this.highlightStep_(currentStep);
-      
-      for (let note of this.noteList) {
-        if (currentPattern[note] && currentPattern[note][currentStep]) {
-          if (['Kick', 'Snare', 'HiHat', 'Clap', 'Tom'].includes(note)) {
-            this.playDrum_(note, this.audioContext.currentTime);
-          } else {
-            this.playNote_(note, this.audioContext.currentTime);
-          }
-        }
-      }
-      
-      currentStep = (currentStep + 1) % this.timeSteps;
-    }, stepDuration * 1000);
-  }
+		return steps.join(',');
+	}
 
-  highlightStep_(step) {
-    if (this.currentStep >= 0) {
-      for (let row of this.editorCells) {
-        row[this.currentStep].classList.remove('current-step');
-      }
-    }
-    
-    this.currentStep = step;
-    for (let row of this.editorCells) {
-      row[step].classList.add('current-step');
-    }
-  }
+	getEmptyPattern() {
+		return Array(this.timeSteps).fill('0').join(',');
+	}
 
-  resetHighlight_() {
-    if (this.currentStep >= 0) {
-      for (let row of this.editorCells) {
-        row[this.currentStep].classList.remove('current-step');
-      }
-      this.currentStep = -1;
-    }
-  }
+	getEmptyObjectPattern() {
+		const pattern = {};
+		this.noteList.forEach(note => {
+			pattern[note] = Array(this.timeSteps).fill(false);
+		});
+		return pattern;
+	}
 
-  playNote_(note, time) {
-    const oscillator = this.audioContext.createOscillator();
-    const gainNode = this.audioContext.createGain();
-    
-    oscillator.type = 'sine';
-    oscillator.frequency.value = this.getNoteFrequency_(note);
-    
-    gainNode.gain.setValueAtTime(0, time);
-    gainNode.gain.linearRampToValueAtTime(0.3, time + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-    gainNode.gain.setValueAtTime(0, time + 0.31);
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(this.audioContext.destination);
-    
-    oscillator.start(time);
-    oscillator.stop(time + 0.3);
-  }
+	initView() {
+		this.createBorderRect_();
+		this.createTextElement_();
+		this.updateEditable();
+		this.render_();
+	}
 
-  playDrum_(drumType, time) {
-    const bufferSource = this.audioContext.createBufferSource();
-    const gainNode = this.audioContext.createGain();
-    
-    const duration = 0.2;
-    const buffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * duration, this.audioContext.sampleRate);
-    const data = buffer.getChannelData(0);
-    
-    if (drumType === 'Kick') {
-      for (let i = 0; i < data.length; i++) {
-        const t = i / this.audioContext.sampleRate;
-        data[i] = Math.sin(t * 50 * Math.PI * 2) * Math.exp(-t * 10);
-      }
-    } else if (drumType === 'Snare') {
-      for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.audioContext.sampleRate * 0.1));
-      }
-    } else if (drumType === 'HiHat') {
-      for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.audioContext.sampleRate * 0.02));
-      }
-    } else if (drumType === 'Clap') {
-      for (let i = 0; i < data.length; i++) {
-        const t = i / this.audioContext.sampleRate;
-        if (t < 0.02 || (t > 0.03 && t < 0.05) || (t > 0.06 && t < 0.08)) {
-          data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 20);
-        } else {
-          data[i] = 0;
-        }
-      }
-    } else if (drumType === 'Tom') {
-      for (let i = 0; i < data.length; i++) {
-        const t = i / this.audioContext.sampleRate;
-        data[i] = Math.sin(t * 100 * Math.PI * 2) * Math.exp(-t * 5);
-      }
-    }
-    
-    gainNode.gain.setValueAtTime(0.5, time);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, time + duration);
-    
-    bufferSource.buffer = buffer;
-    bufferSource.connect(gainNode);
-    gainNode.connect(this.audioContext.destination);
-    
-    bufferSource.start(time);
-    bufferSource.stop(time + duration);
-  }
+	render_() {
+		this.createBorderRect_();
+		this.createTextElement_();
 
-  getNoteFrequency_(note) {
-    const frequencies = {
-      'C4': 261.63, 'D4': 293.66, 'E4': 329.63,
-      'F4': 349.23, 'G4': 392.00, 'A4': 440.00,
-      'B4': 493.88, 'C5': 523.25
-    };
-    return frequencies[note] || 440;
-  }
+		if (!this.fieldGroup_) {
+			this.fieldGroup_ = Blockly.utils.dom.createSvgElement(
+					'g', {},
+					null);
+		} else {
+			this.fieldGroup_.innerHTML = '';
+		}
 
-  stopPlayback_() {
-    if (this.playbackInterval) {
-      clearInterval(this.playbackInterval);
-      this.playbackInterval = null;
-    }
-    
-    if (this.audioContext) {
-      this.audioContext.suspend();
-      this.audioContext.resume();
-    }
-    
-    this.resetHighlight_();
-  }
+		const minWidth = 64;
+		const minHeight = 30;
+		const width = Math.max(this.size_.width, minWidth);
+		const height = Math.max(this.size_.height, minHeight);
 
-  clearPattern_() {
-    this.value_ = this.getEmptyPattern();
-    this.setValue(this.value_);
-    
-    for (let row of this.editorCells) {
-      for (let cell of row) {
-        cell.classList.remove('active');
-      }
-    }
-  }
+		const container = Blockly.utils.dom.createSvgElement(
+				'svg', {
+				'width': width,
+				'height': height,
+				'viewBox': `0 0 ${width} ${height}`
+			},
+				this.fieldGroup_);
 
-  disposeEditor_() {
-    this.stopPlayback_();
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
-    }
-    Blockly.WidgetDiv.hide();
-  }
+		// Фон
+		const background = Blockly.utils.dom.createSvgElement(
+				'rect', {
+				'width': '100%',
+				'height': '100%',
+				'fill': '#f5f5f5',
+				'stroke': '#aaa',
+				'stroke-width': '1',
+				'rx': '4',
+				'ry': '4'
+			},
+				container);
 
-  doClassValidation_(value) {
-    if (typeof value === 'string' && /^(\d+,)*\d+$/.test(value)) {
-      const steps = value.split(',');
-      if (steps.length === this.timeSteps) {
-        return value;
-      }
-    }
-    return this.getEmptyPattern();
-  }
+		if (this.value_ && this.value_ !== this.getEmptyPattern()) {
+			// Код для отображения превью паттерна
+			const visibleSteps = 16;
+			const margin = 4;
+			const previewWidth = Math.max(width - 2 * margin, 10);
+			const previewHeight = Math.max(height - 2 * margin, 10);
+			const cellWidth = previewWidth / visibleSteps;
 
-  getText() {
-    return this.value_;
-  }
+			const preview = Blockly.utils.dom.createSvgElement(
+					'svg', {
+					'x': margin,
+					'y': margin,
+					'width': previewWidth,
+					'height': previewHeight,
+					'viewBox': `0 0 ${previewWidth} ${previewHeight}`
+				},
+					container);
+
+			const pattern = this.parsePatternString(this.value_);
+
+			const noteColors = {
+				'Kick': '#FF5722',
+				'Snare': '#2196F3',
+				'HiHat': '#FFC107',
+				'Clap': '#9C27B0'
+			};
+
+			const visibleNotes = this.noteList.slice(0, 12);
+			const rowHeight = previewHeight / visibleNotes.length;
+
+			visibleNotes.forEach((note, noteIndex) => {
+				if (pattern[note]) {
+					for (let step = 0; step < Math.min(visibleSteps, this.timeSteps); step++) {
+						if (pattern[note][step]) {
+							Blockly.utils.dom.createSvgElement(
+								'rect', {
+								'x': step * cellWidth,
+								'y': noteIndex * rowHeight,
+								'width': cellWidth,
+								'height': rowHeight,
+								'fill': noteColors[note] || '#4CAF50',
+								'stroke': '#fff',
+								'stroke-width': '0.3',
+								'stroke-opacity': '0.5'
+							},
+								preview);
+						}
+					}
+				}
+			});
+		} else {
+			// Состояние "пусто"
+			const text = Blockly.utils.dom.createSvgElement(
+					'text', {
+					'x': '50%',
+					'y': '50%',
+					'text-anchor': 'middle',
+					'dominant-baseline': 'middle',
+					'fill': '#888',
+					'font-size': Math.min(12, height / 2) + 'px'
+				},
+					container);
+			text.textContent = Blockly.Msg['MUSIC_CLICK_TO_EDIT'] || '♪ Edit';
+		}
+
+		this.updateSize_();
+	}
+
+	updateSize_() {
+		this.size_.width = 64;
+		this.size_.height = 64;
+	}
+
+	showEditor_(e) {
+		// Запрещаем скролл страницы
+		document.body.style.overflow = 'hidden';
+
+		const div = Blockly.WidgetDiv.getDiv();
+
+		const editor = this.createEditor_();
+		div.appendChild(editor);
+
+		Blockly.WidgetDiv.show(
+			this,
+			this.disposeEditor_,
+			this.sourceBlock_.RTL);
+		this.positionWidget_();
+	}
+
+	positionWidget_() {
+		const div = Blockly.WidgetDiv.getDiv();
+		div.style.position = 'fixed';
+		div.style.top = (window.innerHeight / 2 - 220) + 'px';
+		div.style.left = (window.innerWidth / 2 - 450) + 'px';
+		//div.style.width = '920px';
+		div.style.height = '440px';
+		// Стили для модального вида
+		div.style.backgroundColor = 'white';
+		div.style.borderRadius = '10px';
+		div.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+
+		// Горизонтальное отражение (RTL)
+		div.style.direction = 'rtl';
+
+		// Для внутреннего содержимого возвращаем нормальное направление
+		const content = div.querySelector('.music-editor-widget');
+		if (content) {
+			content.style.direction = 'ltr';
+		}
+	}
+
+	disposeEditor_() {
+		// Восстанавливаем скролл страницы
+		document.body.style.overflow = '';
+
+		this.stopPlayback_();
+		if (this.audioContext) {
+			this.audioContext.close();
+			this.audioContext = null;
+		}
+		this.render_();
+	}
+
+	createEditor_() {
+		const div = document.createElement('div');
+		div.className = 'music-editor-widget';
+		div.style.width = '100%';
+		div.style.height = '100%';
+		div.style.fontSize = '14px';
+		div.style.padding = '0';
+		div.style.overflow = 'hidden'; // Отключаем скроллы внутри редактора
+		div.style.direction = 'ltr'; // Обеспечиваем нормальное направление контента
+
+		const scrollContainer = document.createElement('div');
+		scrollContainer.style.width = '100%';
+		scrollContainer.style.height = 'calc(100% - 60px)';
+
+		const table = document.createElement('table');
+		table.className = 'music-grid';
+		table.style.margin = '15px auto';
+		table.style.fontSize = '14px';
+
+		const currentPattern = this.parsePatternString(this.value_);
+
+		const headerRow = document.createElement('tr');
+		headerRow.appendChild(document.createElement('th'));
+
+		for (let i = 0; i < this.timeSteps; i++) {
+			const th = document.createElement('th');
+			th.textContent = i + 1;
+			th.style.padding = '4px 4px';
+			th.style.fontSize = '12px';
+			headerRow.appendChild(th);
+		}
+		table.appendChild(headerRow);
+
+		this.editorCells = [];
+		for (let note of this.noteList) {
+			const row = document.createElement('tr');
+			const noteCell = document.createElement('td');
+			noteCell.className = 'note-label';
+			noteCell.textContent = note;
+			noteCell.style.padding = '4px 4px';
+			noteCell.style.fontWeight = 'bold';
+			noteCell.style.fontSize = '12px';
+			row.appendChild(noteCell);
+
+			const rowCells = [];
+			for (let i = 0; i < this.timeSteps; i++) {
+				const cell = document.createElement('td');
+				cell.className = 'music-cell';
+				cell.dataset.note = note;
+				cell.dataset.step = i;
+				cell.style.width = '20px';
+				cell.style.height = '15px';
+
+				if (currentPattern[note] && currentPattern[note][i]) {
+					cell.classList.add('active');
+				}
+
+				cell.addEventListener('click', () => this.toggleCell_(cell));
+				row.appendChild(cell);
+				rowCells.push(cell);
+			}
+			table.appendChild(row);
+			this.editorCells.push(rowCells);
+		}
+
+		scrollContainer.appendChild(table);
+		div.appendChild(scrollContainer);
+
+		const controls = document.createElement('div');
+		controls.className = 'music-controls';
+		controls.style.display = 'flex';
+		controls.style.justifyContent = 'center';
+		controls.style.gap = '20px';
+
+		const playBtn = document.createElement('button');
+		playBtn.textContent = Blockly.Msg['MUSIC_PLAY_BTN'];
+		playBtn.style.padding = '10px 20px';
+		playBtn.style.fontSize = '15px';
+		playBtn.style.minWidth = '100px';
+		playBtn.addEventListener('click', () => this.playSequence_());
+		controls.appendChild(playBtn);
+
+		const stopBtn = document.createElement('button');
+		stopBtn.textContent = Blockly.Msg['MUSIC_STOP_BTN'];
+		stopBtn.style.padding = '10px 20px';
+		stopBtn.style.fontSize = '15px';
+		stopBtn.style.minWidth = '100px';
+		stopBtn.addEventListener('click', () => this.stopPlayback_());
+		controls.appendChild(stopBtn);
+
+		const clearBtn = document.createElement('button');
+		clearBtn.textContent = Blockly.Msg['MUSIC_CLEAR_BTN'];
+		clearBtn.style.padding = '10px 20px';
+		clearBtn.style.fontSize = '15px';
+		clearBtn.style.minWidth = '100px';
+		clearBtn.addEventListener('click', () => this.clearPattern_());
+		controls.appendChild(clearBtn);
+		div.appendChild(controls);
+
+		const saveBtn = document.createElement('button');
+		saveBtn.textContent = Blockly.Msg['MUSIC_SAVE_BTN'] || '✔ Сохранить'; // Локализация
+		saveBtn.style.padding = '10px 20px';
+		saveBtn.style.fontSize = '15px';
+		saveBtn.style.minWidth = '100px';
+		saveBtn.style.backgroundColor = '#4CAF50';
+		saveBtn.addEventListener('click', () => {
+			this.saveAndClose_(); // Новый метод
+		});
+		controls.appendChild(saveBtn);
+
+		return div;
+	}
+
+	saveAndClose_() {
+		// 1. Обновляем значение (если нужно)
+		const currentPattern = this.parsePatternString(this.value_);
+		this.value_ = this.serializePattern(currentPattern);
+		this.setValue(this.value_);
+
+		// 2. Принудительно рендерим предпросмотр
+		this.render_();
+
+		// 3. Закрываем редактор
+		Blockly.WidgetDiv.hide();
+
+		// 4. Очищаем ресурсы (аудио, обработчики)
+		this.stopPlayback_();
+		if (this.audioContext) {
+			this.audioContext.close();
+			this.audioContext = null;
+		}
+
+		// 5. Восстанавливаем скролл страницы
+		document.body.style.overflow = '';
+	}
+
+	toggleCell_(cell) {
+		cell.classList.toggle('active');
+
+		const currentPattern = this.parsePatternString(this.value_);
+		const note = cell.dataset.note;
+		const step = parseInt(cell.dataset.step);
+
+		if (!currentPattern[note]) {
+			currentPattern[note] = Array(this.timeSteps).fill(false);
+		}
+
+		currentPattern[note][step] = cell.classList.contains('active');
+
+		this.value_ = this.serializePattern(currentPattern);
+		this.setValue(this.value_);
+	}
+
+	playSequence_() {
+		if (!this.audioContext) {
+			this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+		}
+
+		this.stopPlayback_();
+
+		const currentPattern = this.parsePatternString(this.value_);
+		const stepDuration = 60 / this.tempo / 2;
+		let currentStep = 0;
+
+		this.resetHighlight_();
+
+		this.playbackInterval = setInterval(() => {
+			this.highlightStep_(currentStep);
+
+			for (let note of this.noteList) {
+				if (currentPattern[note] && currentPattern[note][currentStep]) {
+					if (['Kick', 'Snare', 'HiHat', 'Clap', 'Tom'].includes(note)) {
+						this.playDrum_(note, this.audioContext.currentTime);
+					} else {
+						this.playNote_(note, this.audioContext.currentTime);
+					}
+				}
+			}
+
+			currentStep = (currentStep + 1) % this.timeSteps;
+		}, stepDuration * 1000);
+	}
+
+	highlightStep_(step) {
+		if (this.currentStep >= 0) {
+			for (let row of this.editorCells) {
+				row[this.currentStep].classList.remove('current-step');
+			}
+		}
+
+		this.currentStep = step;
+		for (let row of this.editorCells) {
+			row[step].classList.add('current-step');
+		}
+	}
+
+	resetHighlight_() {
+		if (this.currentStep >= 0) {
+			for (let row of this.editorCells) {
+				row[this.currentStep].classList.remove('current-step');
+			}
+			this.currentStep = -1;
+		}
+	}
+
+	playNote_(note, time) {
+		const oscillator = this.audioContext.createOscillator();
+		const gainNode = this.audioContext.createGain();
+
+		oscillator.type = 'sine';
+		oscillator.frequency.value = this.getNoteFrequency_(note);
+
+		gainNode.gain.setValueAtTime(0, time);
+		gainNode.gain.linearRampToValueAtTime(0.3, time + 0.01);
+		gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+		gainNode.gain.setValueAtTime(0, time + 0.31);
+
+		oscillator.connect(gainNode);
+		gainNode.connect(this.audioContext.destination);
+
+		oscillator.start(time);
+		oscillator.stop(time + 0.3);
+	}
+
+	playDrum_(drumType, time) {
+		const bufferSource = this.audioContext.createBufferSource();
+		const gainNode = this.audioContext.createGain();
+
+		const duration = 0.2;
+		const buffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * duration, this.audioContext.sampleRate);
+		const data = buffer.getChannelData(0);
+
+		if (drumType === 'Kick') {
+			for (let i = 0; i < data.length; i++) {
+				const t = i / this.audioContext.sampleRate;
+				data[i] = Math.sin(t * 50 * Math.PI * 2) * Math.exp(-t * 10);
+			}
+		} else if (drumType === 'Snare') {
+			for (let i = 0; i < data.length; i++) {
+				data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.audioContext.sampleRate * 0.1));
+			}
+		} else if (drumType === 'HiHat') {
+			for (let i = 0; i < data.length; i++) {
+				data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.audioContext.sampleRate * 0.02));
+			}
+		} else if (drumType === 'Clap') {
+			for (let i = 0; i < data.length; i++) {
+				const t = i / this.audioContext.sampleRate;
+				if (t < 0.02 || (t > 0.03 && t < 0.05) || (t > 0.06 && t < 0.08)) {
+					data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 20);
+				} else {
+					data[i] = 0;
+				}
+			}
+		} else if (drumType === 'Tom') {
+			for (let i = 0; i < data.length; i++) {
+				const t = i / this.audioContext.sampleRate;
+				data[i] = Math.sin(t * 100 * Math.PI * 2) * Math.exp(-t * 5);
+			}
+		}
+
+		gainNode.gain.setValueAtTime(0.5, time);
+		gainNode.gain.exponentialRampToValueAtTime(0.01, time + duration);
+
+		bufferSource.buffer = buffer;
+		bufferSource.connect(gainNode);
+		gainNode.connect(this.audioContext.destination);
+
+		bufferSource.start(time);
+		bufferSource.stop(time + duration);
+	}
+
+	getNoteFrequency_(note) {
+		const frequencies = {
+			'C4': 261.63,
+			'D4': 293.66,
+			'E4': 329.63,
+			'F4': 349.23,
+			'G4': 392.00,
+			'A4': 440.00,
+			'B4': 493.88,
+			'C5': 523.25
+		};
+		return frequencies[note] || 440;
+	}
+
+	stopPlayback_() {
+		if (this.playbackInterval) {
+			clearInterval(this.playbackInterval);
+			this.playbackInterval = null;
+		}
+
+		if (this.audioContext) {
+			this.audioContext.suspend();
+			this.audioContext.resume();
+		}
+
+		this.resetHighlight_();
+	}
+
+	clearPattern_() {
+		this.value_ = this.getEmptyPattern();
+		this.setValue(this.value_);
+
+		for (let row of this.editorCells) {
+			for (let cell of row) {
+				cell.classList.remove('active');
+			}
+		}
+	}
+
+	disposeEditor_() {
+		this.stopPlayback_();
+		if (this.audioContext) {
+			this.audioContext.close();
+			this.audioContext = null;
+		}
+		Blockly.WidgetDiv.hide();
+	}
+
+	doClassValidation_(value) {
+		if (typeof value === 'string' && /^(\d+,)*\d+$/.test(value)) {
+			const steps = value.split(',');
+			if (steps.length === this.timeSteps) {
+				return value;
+			}
+		}
+		return this.getEmptyPattern();
+	}
+
+	getText() {
+		return this.value_;
+	}
 }
 
 Blockly.fieldRegistry.register('field_music', FieldMusicEditor);

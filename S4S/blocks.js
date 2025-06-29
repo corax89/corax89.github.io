@@ -16,7 +16,8 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_RESTITUTION'], 'restitution'],
   [Blockly.Msg['OBJECT_PARAM_ISSTATIC'], 'isStatic'],
   [Blockly.Msg['OBJECT_PARAM_ZINDEX'], 'zIndex'],
-  [Blockly.Msg['OBJECT_PARAM_ISONGROUND'], 'isOnGround']
+  [Blockly.Msg['OBJECT_PARAM_ISONGROUND'], 'isOnGround'],
+  [Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'], 'collidingTiles']
 ];
 
 var ObjectType = [
@@ -141,6 +142,20 @@ Blockly.Blocks['game_loop'] = {
   }
 };
 
+// Блок для вывода текста через Game.alert
+Blockly.Blocks['text_print_custom'] = {
+  init: function() {
+    this.setColour(165); // Оранжевый цвет, как у стандартного текстового блока
+    this.appendValueInput('TEXT')
+        .setCheck('String')
+        .appendField(Blockly.Msg['TEXT_PRINT_TITLE'].replace('%1',''));
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip(Blockly.Msg["TEXT_PRINT_TOOLTIP"]);
+    this.setHelpUrl("");
+  }
+};
+
 // Блок проверки нажатия клавиши
 Blockly.Blocks['get_key_down'] = {
   init: function() {
@@ -160,6 +175,7 @@ Blockly.Blocks['get_key_down'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'Boolean');
 	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#control');
+	this.setFieldValue("ArrowUp", "KEY");
   }
 };
 
@@ -200,6 +216,76 @@ Blockly.Blocks['get_axes'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'Number');
 	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+  }
+};
+
+Blockly.Blocks['camera_follow'] = {
+  init: function() {
+    this.setInputsInline(true);
+    this.setColour(60);
+    
+    // Основной заголовок
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['CAMERA_FOLLOW_LABEL']);
+    
+    // Поле выбора объекта
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('obj1'), 'OBJECT')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
+    
+    // Плавность следования
+    const smoothInput = this.appendValueInput("SMOOTH")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['CAMERA_SMOOTH_LABEL']);
+    
+    // Теневой блок для значения по умолчанию (0.1)
+    const shadowSmooth = this.workspace.newBlock('math_number');
+    shadowSmooth.setFieldValue('0.1', 'NUM');
+    smoothInput.connection.connect(shadowSmooth.outputConnection);
+    shadowSmooth.setShadow(true);
+    
+    // Смещение камеры по X
+    const offsetXInput = this.appendValueInput("OFFSET_X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['CAMERA_OFFSET_X']);
+    
+    // Теневой блок для значения по умолчанию (0)
+    const shadowOffsetX = this.workspace.newBlock('math_number');
+    shadowOffsetX.setFieldValue('0', 'NUM');
+    offsetXInput.connection.connect(shadowOffsetX.outputConnection);
+    shadowOffsetX.setShadow(true);
+    
+    // Смещение камеры по Y
+    const offsetYInput = this.appendValueInput("OFFSET_Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['CAMERA_OFFSET_Y']);
+    
+    // Теневой блок для значения по умолчанию (0)
+    const shadowOffsetY = this.workspace.newBlock('math_number');
+    shadowOffsetY.setFieldValue('0', 'NUM');
+    offsetYInput.connection.connect(shadowOffsetY.outputConnection);
+    shadowOffsetY.setShadow(true);
+    
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setTooltip("Заставляет камеру плавно следовать за указанным объектом");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#camera');
+  }
+};
+
+Blockly.Blocks['get_window_position'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GET_WINDOW_POSITION_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['OBJECT_PARAM_X'], 'X'],
+          [Blockly.Msg['OBJECT_PARAM_Y'], 'Y']
+        ]), 'AXIS');
+    this.setOutput(true, 'Number');
+    this.setColour(60);
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg['GET_WINDOW_POSITION_TOOLTIP']);
+    this.setHelpUrl("");
   }
 };
 
@@ -313,8 +399,6 @@ Blockly.Blocks['draw_text'] = {
     
     const shadowBlockSize = this.workspace.newBlock('math_number');
     shadowBlockSize.setFieldValue('24', 'NUM');
-    shadowBlockSize.initSvg();
-    shadowBlockSize.render();
     sizeInput.connection.connect(shadowBlockSize.outputConnection);
     shadowBlockSize.setShadow(true);
     
@@ -326,8 +410,6 @@ Blockly.Blocks['draw_text'] = {
     // Создаем теневой блок на основе field_colour
     const shadowBlockColour = this.workspace.newBlock('field_colour');
     shadowBlockColour.setFieldValue('#FFFFFF', 'FIELDCOLOUR'); // Используем ваш ID поля
-    shadowBlockColour.initSvg();
-    shadowBlockColour.render();
     colourInput.connection.connect(shadowBlockColour.outputConnection);
     shadowBlockColour.setShadow(true);
     
@@ -409,8 +491,6 @@ Blockly.Blocks['clear_screen'] = {
 	// Создаем теневой блок на основе field_colour
     const shadowBlockColour = this.workspace.newBlock('field_colour');
     shadowBlockColour.setFieldValue('#000000', 'FIELDCOLOUR'); // Используем ваш ID поля
-    shadowBlockColour.initSvg();
-    shadowBlockColour.render();
     colourInput.connection.connect(shadowBlockColour.outputConnection);
     shadowBlockColour.setShadow(true);
     this.setPreviousStatement(true, "Array");
@@ -448,22 +528,29 @@ Blockly.defineBlocksWithJsonArray([{
 // Блок воспроизведения музыки
 Blockly.Blocks['play_music'] = {
   init: function() {
+    // Основная инициализация блока
     this.setColour(60);
+	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['PLAY_MUSIC_LABEL']);
+    
     this.appendValueInput("String")
         .setCheck("String")
         .appendField(Blockly.Msg['MUSIC_LABEL']);
+    
+    // Создаем input для длительности
     const durationInput = this.appendValueInput("Number")
         .setCheck("Number")
         .appendField(Blockly.Msg['DURATION_LABEL']);
-		
-	const shadowBlockSize = this.workspace.newBlock('math_number');
-    shadowBlockSize.setFieldValue('120', 'NUM');
-    shadowBlockSize.initSvg();
-    shadowBlockSize.render();
-    durationInput.connection.connect(shadowBlockSize.outputConnection);
-    shadowBlockSize.setShadow(true);
+
+    // Создаем теневой блок
+    const shadowBlock = this.workspace.newBlock('math_number');
+    shadowBlock.setShadow(true);
+    shadowBlock.setFieldValue('120', 'NUM');
+    
+    // Подключаем тень (универсальный способ)
+    durationInput.connection.connect(shadowBlock.outputConnection);
+
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -473,6 +560,7 @@ Blockly.Blocks['play_music'] = {
 Blockly.Blocks['play_sound'] = {
   init: function() {
     this.setColour(60);
+	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['PLAY_SOUND_LABEL']);
     this.appendValueInput("Number")
@@ -489,10 +577,140 @@ Blockly.Blocks['level_editor'] = {
   init: function() {
     this.appendDummyInput()
       .appendField(Blockly.Msg['LEVEL_EDITOR_LABEL'])
-      .appendField(new FieldLevelEditor('[]', null, {}), 'LEVEL_DATA');
+      .appendField(new FieldLevelEditor('{"objects": [],"tiles": [],"width": 800,"height": 600,"gridSize": 32}', null, {}), 'LEVEL_DATA');
+	this.appendValueInput("TILESET")
+        .setCheck("field_png")
+        .appendField("Tileset");
     this.setColour(60);
+	this.setInputsInline(true);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
+  }
+};
+
+// Генератор кода для блока проверки столкновения с тайлом
+Blockly.Blocks['is_colliding_with_tile'] = {
+  init: function() {
+    this.setColour(210);
+    this.setInputsInline(true);
+    this.setOutput(true, 'Boolean');
+    
+    // Выбор типа объекта
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['IS_COLLIDING_WITH_TILE_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['OBJECT_TYPE_THIS'], 'this'],
+          [Blockly.Msg['OBJECT_TYPE_COLLIDED'], ' object'],
+          [Blockly.Msg['OBJECT_TYPE_ITERATED'], 'object']
+        ]), 'OBJECT_TYPE');
+    
+    // Поле для ID тайла
+    this.appendValueInput("TILE_ID")
+        .setCheck("Number");
+    
+    this.setTooltip(Blockly.Msg['IS_COLLIDING_WITH_TILE_TOOLTIP']);
+    this.setHelpUrl("");
+  }
+};
+
+// Генератор кода для блока получения информации о тайле
+Blockly.Blocks['get_colliding_tile_info'] = {
+  init: function() {
+    this.setColour(340);
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    
+    // Выбор типа объекта
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GET_COLLIDING_TILE_INFO_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['OBJECT_TYPE_THIS'], 'this'],
+          [Blockly.Msg['OBJECT_TYPE_COLLIDED'], 'object'],
+          [Blockly.Msg['OBJECT_TYPE_ITERATED'], 'object']
+        ]), 'OBJECT_TYPE');
+    
+    // Выбор типа информации
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GET_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['TILE_COL_LABEL'], 'col'],
+          [Blockly.Msg['TILE_ROW_LABEL'], 'row'],
+          [Blockly.Msg['TILE_ID_LABEL'], 'tileId'],
+          [Blockly.Msg['TILE_X_LABEL'], 'tileX'],
+          [Blockly.Msg['TILE_Y_LABEL'], 'tileY']
+        ]), 'INFO_TYPE');
+    
+    // Индекс тайла (по умолчанию первый)
+    this.appendValueInput("INDEX")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['TILE_INDEX_LABEL']);
+    
+    this.setTooltip(Blockly.Msg['GET_COLLIDING_TILE_INFO_TOOLTIP']);
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['get_tile_at'] = {
+  init: function() {
+    this.setColour(60);
+    this.setInputsInline(true);
+    this.setOutput(true, 'Number');
+    
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GET_TILE_AT_LABEL']);
+    
+    // Координата X
+    this.appendValueInput("X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['COL']);
+    
+    // Координата Y
+    this.appendValueInput("Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['ROW']);
+    
+    // Только твердые тайлы
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['SOLID_ONLY_LABEL'])
+        .appendField(new Blockly.FieldCheckbox(false), 'SOLID_ONLY');
+    
+    this.setTooltip(Blockly.Msg['GET_TILE_AT_TOOLTIP']);
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['set_tile_at'] = {
+  init: function() {
+    this.setColour(60);
+    this.setInputsInline(true);
+    
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['SET_TILE_AT_LABEL']);
+    
+    // Координата X
+    this.appendValueInput("X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['COL']);
+    
+    // Координата Y
+    this.appendValueInput("Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['ROW']);
+    
+    // ID тайла
+    this.appendValueInput("TILE_ID")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['TILE_ID_LABEL']);
+    
+    // Твердость тайла
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['IS_SOLID_LABEL'])
+        .appendField(new Blockly.FieldCheckbox(false), 'IS_SOLID');
+    
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setTooltip(Blockly.Msg['SET_TILE_AT_TOOLTIP']);
+    this.setHelpUrl("");
   }
 };
 
@@ -629,8 +847,6 @@ Blockly.Blocks['new_proto_object'] = {
         .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
     const shadowBlockWidth = this.workspace.newBlock('math_number');
     shadowBlockWidth.setFieldValue('32', 'NUM');
-    shadowBlockWidth.initSvg();
-    shadowBlockWidth.render();
     widthInput.connection.connect(shadowBlockWidth.outputConnection);
     shadowBlockWidth.setShadow(true);
 	
@@ -639,8 +855,6 @@ Blockly.Blocks['new_proto_object'] = {
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
 	const shadowBlockHeight = this.workspace.newBlock('math_number');
     shadowBlockHeight.setFieldValue('32', 'NUM');
-    shadowBlockHeight.initSvg();
-    shadowBlockHeight.render();
     heightInput.connection.connect(shadowBlockHeight.outputConnection);
     shadowBlockHeight.setShadow(true);	
 	
@@ -779,8 +993,6 @@ Blockly.Blocks['new_object'] = {
         .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
     const shadowBlockWidth = this.workspace.newBlock('math_number');
     shadowBlockWidth.setFieldValue('32', 'NUM');
-    shadowBlockWidth.initSvg();
-    shadowBlockWidth.render();
     widthInput.connection.connect(shadowBlockWidth.outputConnection);
     shadowBlockWidth.setShadow(true);
 	
@@ -789,8 +1001,6 @@ Blockly.Blocks['new_object'] = {
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
 	const shadowBlockHeight = this.workspace.newBlock('math_number');
     shadowBlockHeight.setFieldValue('32', 'NUM');
-    shadowBlockHeight.initSvg();
-    shadowBlockHeight.render();
     heightInput.connection.connect(shadowBlockHeight.outputConnection);
     shadowBlockHeight.setShadow(true);	
 	
@@ -914,11 +1124,6 @@ Blockly.Blocks['change_object_var'] = {
         }
       }
     }
-
-    // Перерисовываем блок
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
   },
 
   saveExtraState: function() {
@@ -939,6 +1144,39 @@ Blockly.Blocks['change_object_var'] = {
   }
 };
 
+// Блок для проверки имени объекта
+Blockly.Blocks['if_object_name_equals'] = {
+  init: function() {
+    this.setColour(210);
+    this.setInputsInline(true);
+    this.setOutput(true, 'Boolean');
+    
+    // Основная структура блока
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['IF_OBJECT_NAME_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['IF_OBJECT_TYPE_COLLIDED'], ' object'],
+          [Blockly.Msg['IF_OBJECT_TYPE_ITERATED'], 'object'],
+          [Blockly.Msg['IF_OBJECT_TYPE_THIS'], 'this']
+        ]), 'OBJECT_TYPE');
+    
+    // Вход для имени объекта (вместо текстового поля)
+    const nameInput = this.appendValueInput("NAME")
+        .setCheck("String")
+        .appendField(Blockly.Msg['IF_OBJECT_NAME_EQUALS']);
+    
+    // Добавляем теневой блок строки по умолчанию
+    const shadowBlock = this.workspace.newBlock('text');
+    shadowBlock.setFieldValue('prototype1', 'TEXT');
+    shadowBlock.setShadow(true);
+    nameInput.connection.connect(shadowBlock.outputConnection);
+    
+    this.setTooltip("Проверяет, совпадает ли имя объекта с указанным");
+    this.setHelpUrl("");
+  }
+};
+
+
 // Блок для получения значения параметра объекта
 Blockly.Blocks['get_object_var'] = {
   init: function() {
@@ -955,17 +1193,17 @@ Blockly.Blocks['get_object_var'] = {
 
     // Поле для выбора переменной (изначально скрыто)
     this.appendDummyInput('VAR_INPUT')
+		.appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
         .appendField(new Blockly.FieldVariable(
           Blockly.Msg['DEFAULT_VARIABLE_NAME'] || 'obj1',
           null, null, 'Object'), 'VAR_NAME')
-        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
         .setVisible(false);
 
     // Поле для выбора параметра
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(ObjectParam), 'NAME');
 
-    this.setOutput(true, 'Number');
+    this.setOutput(true, ['Number', 'Boolean', 'String']);
     this.setColour(340);
 
     // Инициализация видимости
@@ -984,10 +1222,6 @@ Blockly.Blocks['get_object_var'] = {
         }
       }
     }
-
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
   },
 
   saveExtraState: function() {
@@ -1060,9 +1294,7 @@ Blockly.Blocks['addto_object_var'] = {
       }
     }
 
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
 
   saveExtraState: function() {
@@ -1137,10 +1369,7 @@ Blockly.Blocks['set_object_bounding'] = {
       }
     }
 
-    // Перерисовываем блок
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
 
   saveExtraState: function() {
@@ -1241,9 +1470,7 @@ Blockly.Blocks['delete_object'] = {
       }
     }
 
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
 
   saveExtraState: function() {
@@ -1312,7 +1539,7 @@ Blockly.Blocks['object_exit_screen'] = {
         .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
     
     this.setOutput(true, 'Boolean');
-    this.setColour(340);
+    this.setColour(210);
     
     // Инициализация
     this.updateShape_(this.getFieldValue('MODE') || 'VAR');
@@ -1330,9 +1557,7 @@ Blockly.Blocks['object_exit_screen'] = {
     varField.setVisible(newMode === 'VAR');
     
     // Перерисовка
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
   
   saveExtraState: function() {
@@ -1370,7 +1595,7 @@ Blockly.Blocks['object_tap_screen'] = {
         .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
     
     this.setOutput(true, 'Boolean');
-    this.setColour(340);
+    this.setColour(210);
     
     // Инициализация
     this.updateShape_(this.getFieldValue('MODE') || 'VAR');
@@ -1388,9 +1613,7 @@ Blockly.Blocks['object_tap_screen'] = {
     varField.setVisible(newMode === 'VAR');
     
     // Перерисовка
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
   
   saveExtraState: function() {
@@ -1406,7 +1629,7 @@ Blockly.Blocks['object_tap_screen'] = {
 
 Blockly.Blocks['object_control'] = {
   init: function() {
-	this.setInputsInline(true);
+    this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['CONTROL_OBJECT_LABEL']);
     this.appendDummyInput()
@@ -1416,8 +1639,14 @@ Blockly.Blocks['object_control'] = {
         .appendField(new Blockly.FieldDropdown([
           [Blockly.Msg['ARROWS_LABEL'], 'key'],
           [Blockly.Msg['STICK0_LABEL'], 'stick0'],
-          [Blockly.Msg['STICK1_LABEL'], 'stick1']
+          [Blockly.Msg['STICK1_LABEL'], 'stick1'],
+          [Blockly.Msg['BOTH_LABEL'], 'both'] // Комбинированное управление (клавиши + левый стик)
         ]), 'type');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['TDS_LABEL'], 'tds'],
+          [Blockly.Msg['PLATFORMER_LABEL'], 'platform']
+        ]), 'game');
     this.appendValueInput("ValueX")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_SPEEDX']);
@@ -1427,6 +1656,70 @@ Blockly.Blocks['object_control'] = {
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
     this.setColour(340);
+  }
+};
+
+// Блок для мгновенного перемещения объекта
+Blockly.Blocks['object_teleport'] = {
+  init: function() {
+    this.setInputsInline(true);
+    this.setColour(340);
+    
+    // Основной заголовок
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['OBJECT_TELEPORT_LABEL']);
+    
+    // Поле выбора объекта для перемещения
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('obj1'), 'OBJECT');
+    
+    // Переключатель режима (координаты/объект)
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['OBJECT_TELEPORT_TO'], 'COORDS'],
+          [Blockly.Msg['OBJECT_TELEPORT_TO_OBJECT'], 'OBJECT']
+        ], this.updateShape_.bind(this)), 'MODE');
+    
+    // Поля для координат (по умолчанию видимые)
+    this.appendValueInput("X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_X'])
+        .setVisible(true);
+    
+    this.appendValueInput("Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_Y'])
+        .setVisible(true);
+    
+    // Поле для целевого объекта (изначально скрытое)
+    this.appendDummyInput("TARGET_OBJECT_INPUT")
+        .appendField(new Blockly.FieldVariable('obj2'), 'TARGET_OBJECT')
+        .setVisible(false);
+    
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setTooltip("Мгновенно перемещает объект в указанную точку или к другому объекту");
+  },
+  
+  updateShape_: function(newMode) {
+    // Управляем видимостью полей в зависимости от выбранного режима
+    this.getInput('X').setVisible(newMode === 'COORDS');
+    this.getInput('Y').setVisible(newMode === 'COORDS');
+    this.getInput('TARGET_OBJECT_INPUT').setVisible(newMode === 'OBJECT');
+    
+    // Перестраиваем блок
+    this.render();
+  },
+  
+  saveExtraState: function() {
+    return {
+      mode: this.getFieldValue('MODE')
+    };
+  },
+  
+  loadExtraState: function(state) {
+    this.updateShape_(state.mode || 'COORDS');
+    this.setFieldValue(state.mode || 'COORDS', 'MODE');
   }
 };
 
@@ -1489,9 +1782,7 @@ Blockly.Blocks['object_velocity'] = {
     varField.setVisible(newMode === 'VAR');
     
     // Перерисовка
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
   
   saveExtraState: function() {
@@ -1501,6 +1792,52 @@ Blockly.Blocks['object_velocity'] = {
   loadExtraState: function(state) {
     this.updateShape_(state.mode);
     this.setFieldValue(state.mode, 'MODE');
+  }
+};
+
+// Блок для получения объекта
+Blockly.Blocks['get_object'] = {
+  init: function() {
+    this.setInputsInline(true);
+    this.setColour(340);
+    
+    // Основной заголовок
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GET_OBJECT_LABEL']);
+    
+    // Выбор типа объекта
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['GET_OBJECT_TYPE_ITERATED'], 'object'],
+          [Blockly.Msg['GET_OBJECT_TYPE_COLLIDED'], ' object'],
+          [Blockly.Msg['GET_OBJECT_TYPE_RANDOM'], 'RANDOM'],
+          [Blockly.Msg['GET_OBJECT_TYPE_THIS'], 'this']
+        ], this.updateShape_.bind(this)), 'TYPE');
+    
+    // Поле для имени объекта (только для режима RANDOM)
+    this.appendDummyInput("NAME_INPUT")
+        .appendField(Blockly.Msg['GET_OBJECT_NAME_LABEL'])
+        .appendField(new Blockly.FieldTextInput('prototype1'), 'NAME')
+        .setVisible(false);
+    
+    this.setOutput(true, 'Object');
+    this.setTooltip("Возвращает объект в зависимости от выбранного типа");
+  },
+  
+  updateShape_: function(selectedType) {
+    // Показываем поле имени только для случайного объекта
+    this.getInput('NAME_INPUT').setVisible(selectedType === 'RANDOM');
+  },
+  
+  saveExtraState: function() {
+    return {
+      type: this.getFieldValue('TYPE')
+    };
+  },
+  
+  loadExtraState: function(state) {
+    this.updateShape_(state.type || 'object');
+    this.setFieldValue(state.type || 'object', 'TYPE');
   }
 };
 
@@ -1561,9 +1898,7 @@ Blockly.Blocks['object_distance'] = {
     }
     
     // Перерисовка
-    Blockly.Events.disable();
-    this.render();
-    Blockly.Events.enable();
+    
   },
   
   saveExtraState: function() {
@@ -1616,6 +1951,7 @@ Blockly.Blocks['get_memory'] = {
 Blockly.Blocks['set_screen_xy'] = {
   init: function() {
     this.setColour(60);
+	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_SCREEN_POS_LABEL']);
     this.appendDummyInput()
@@ -1634,6 +1970,7 @@ Blockly.Blocks['set_screen_xy'] = {
 Blockly.Blocks['set_gravitation'] = {
   init: function() {
     this.setColour(60);
+	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_GRAVITY_LABEL']);
     this.appendValueInput("Value")
@@ -1664,6 +2001,7 @@ Blockly.Blocks['get_touchxy'] = {
         ]), 'XY');
     this.setOutput(true, 'Number');
     this.setColour(60);
+	this.setInputsInline(true);
   }
 };
 
@@ -1759,6 +2097,11 @@ javascript.javascriptGenerator.forBlock['game_loop'] = function(block, generator
   const checkclear = block.getFieldValue('CLEAR');
   const clearscreen = checkclear == 'TRUE' ? '\nDraw.clear_screen("#000000");' : "";
   return `Game.gameLoop = function() {${clearscreen}\n${body}\n}\n`;
+};
+
+javascript.javascriptGenerator.forBlock['text_print_custom'] = function(block, generator) {
+  const text = generator.valueToCode(block, 'TEXT', javascript.Order.NONE) || "''";
+  return `Game.alert(${text});\n`;
 };
 
 // Генератор для проверки нажатия клавиши
@@ -1869,29 +2212,190 @@ javascript.javascriptGenerator.forBlock['play_sound'] = function(block, generato
   return `Game.play_sound(${music});\n`;
 };
 // Генератор для редактора уровней
+/*Формат кодирования тайлов:
+    Воторые два числа - размеры сетки (колонки, строки)
+    Обычные тайлы: 0-16382
+    Твердые тайлы: 16383-32765 (16383 + исходный ID)
+    RLE-кодирование:
+        Числа ≥32768 указывают на повторение следующего тайла
+        Фактическое количество повторений = число - 32768*/
 javascript.javascriptGenerator.forBlock['level_editor'] = function(block, generator) {
   // Получаем значение поля (JSON строку)
+  const sprite = generator.valueToCode(block, 'TILESET', generator.ORDER_ATOMIC);
   const levelData = JSON.parse(block.getFieldValue('LEVEL_DATA'));
   
-  // Проверяем, что у нас есть массив objects
-  const originalArray = levelData.objects;
-  
-  const grouped = {};
+  // Обработка объектов
+  const originalObjects = levelData.objects || [];
+  const groupedObjects = {};
+  let hasObjects = false;
 
-  originalArray.forEach(item => {
-    if (!grouped[item.protoIndex]) {
-      grouped[item.protoIndex] = [];
+  originalObjects.forEach(item => {
+    // Ищем прототип по имени (новый формат)
+    const protoIndex = proto_object_array.findIndex(p => 
+      workspace.getVariableById(p.name).name === item.protoName);
+    
+    if (protoIndex === -1) {
+      console.warn(`Прототип не найден: ${item.protoName}`);
+      return;
     }
-    grouped[item.protoIndex].push(item.x, item.y);
+
+    if (!groupedObjects[protoIndex]) {
+      groupedObjects[protoIndex] = [];
+    }
+    groupedObjects[protoIndex].push(item.x, item.y);
+    hasObjects = true;
   });
 
-  // Преобразуем объект в массив
-  const resultArray = Object.keys(grouped).map(protoIndex => ({
-    id: generator.getVariableName(proto_object_array[parseInt(protoIndex)].name),
-    xy: grouped[protoIndex]
-  }));
+  // Формируем код для объектов (только если они есть)
+  let objectsCode = '';
+  if (hasObjects) {
+    const objectsArray = Object.keys(groupedObjects).map(protoIndex => ({
+      id: generator.getVariableName(proto_object_array[parseInt(protoIndex)].name),
+      xy: groupedObjects[protoIndex]
+    }));
+    objectsCode = 'Game.addObjectsFromArray(' + 
+      JSON.stringify(objectsArray).replace(/"id"\s*:\s*"([a-zA-Z_][a-zA-Z0-9_]*)"/g, '"id": $1') + 
+      ');\n';
+  }
 
-  return 'Game.addObjectsFromArray(' + JSON.stringify(resultArray).replace(/"id"\s*:\s*"([a-zA-Z_][a-zA-Z0-9_]*)"/g,'"id": $1') + ');';
+  // Обработка тайлов с RLE-кодированием (остаётся без изменений)
+  const tileSize = levelData.gridSize || 32;
+  const cols = Math.ceil(levelData.width / tileSize);
+  const rows = Math.ceil(levelData.height / tileSize);
+  
+  let tilesCode = '';
+  let hasTiles = false;
+
+  if (levelData.tiles && Array.isArray(levelData.tiles)) {
+    const tilesArray = [tileSize, cols, rows]; // Первые два элемента - размеры
+    let currentTile = null;
+    let count = 0;
+    const MAX_TILE_ID = 16383;
+    const SOLID_OFFSET = 16383;
+    const RLE_THRESHOLD = 32768;
+    const MIN_RUN_LENGTH = 4;
+
+    const flushRun = () => {
+      if (count > 0) {
+        if (count >= MIN_RUN_LENGTH) {
+          tilesArray.push(RLE_THRESHOLD + count);
+          tilesArray.push(currentTile);
+        } else {
+          for (let i = 0; i < count; i++) {
+            tilesArray.push(currentTile);
+          }
+        }
+        if (currentTile !== 0) hasTiles = true;
+        count = 0;
+      }
+    };
+
+    for (let i = 0; i < levelData.tiles.length; i++) {
+      let tileValue = levelData.tiles[i];
+      let encodedTile;
+
+      if (tileValue === 0) {
+        encodedTile = 0;
+      } else {
+        const isSolid = tileValue >= 1000;
+        const tileId = isSolid ? tileValue - 1000 : tileValue;
+        encodedTile = isSolid ? SOLID_OFFSET + tileId : tileId;
+        if (tileId > MAX_TILE_ID) {
+          console.warn(`Tile ID ${tileId} exceeds maximum allowed value (${MAX_TILE_ID})`);
+          encodedTile = 0;
+        }
+      }
+
+      if (encodedTile === currentTile) {
+        count++;
+      } else {
+        flushRun();
+        currentTile = encodedTile;
+        count = 1;
+      }
+    }
+    flushRun();
+
+    // Добавляем код для тайлов только если есть ненулевые тайлы
+    if (hasTiles) {
+      tilesCode = 'Game.setTileImage(' + sprite + ');\n';
+      tilesCode += 'Game.setTileFromArray(' + JSON.stringify(tilesArray) + ');\n';
+    }
+  }
+
+  // Комбинируем результат
+  const result = [];
+  if (objectsCode) result.push(objectsCode);
+  if (tilesCode) result.push(tilesCode);
+  
+  return result.join('\n') || '// Уровень не содержит объектов и тайлов\n';
+};
+
+// Генератор кода для блока проверки столкновения с тайлом
+javascript.javascriptGenerator.forBlock['is_colliding_with_tile'] = function(block, generator) {
+  const objectType = block.getFieldValue('OBJECT_TYPE');
+  const tileId = generator.valueToCode(block, 'TILE_ID', generator.ORDER_ATOMIC) || '0';
+  
+  // Добавляем функцию проверки столкновения, если она еще не определена
+  if (!Blockly.JavaScript.definitions_['isCollidingWithTile']) {
+    Blockly.JavaScript.definitions_['isCollidingWithTile'] = 
+      `function isCollidingWithTile(obj, tileId) {
+        var tiles = obj.collidingTiles;
+        if (!tiles || !tiles.length) return false;
+        for (var i = 0; i < tiles.length; i++) {
+          if (tiles[i].tileId === tileId) return true;
+        }
+        return false;
+      }`;
+  }
+  
+  return [`isCollidingWithTile(${objectType}, ${tileId})`, javascript.Order.ATOMIC];
+};
+
+// Генератор кода для блока получения информации о тайле
+javascript.javascriptGenerator.forBlock['get_colliding_tile_info'] = function(block, generator) {
+  const objectType = block.getFieldValue('OBJECT_TYPE');
+  const infoType = block.getFieldValue('INFO_TYPE');
+  const index = generator.valueToCode(block, 'INDEX', generator.ORDER_ATOMIC) || '0';
+  
+  // Добавляем функцию получения информации о тайле, если она еще не определена
+  if (!Blockly.JavaScript.definitions_['getCollidingTileInfo']) {
+    Blockly.JavaScript.definitions_['getCollidingTileInfo'] = 
+      `function getCollidingTileInfo(obj, infoType, index) {
+        var tiles = obj.collidingTiles;
+        if (!tiles || !tiles.length) return 0;
+        var idx = Math.min(index, tiles.length - 1);
+        return tiles[idx][infoType] || 0;
+      }`;
+  }
+  
+  return [`getCollidingTileInfo(${objectType}, '${infoType}', ${index})`, javascript.Order.ATOMIC];
+};
+
+javascript.javascriptGenerator.forBlock['get_tile_at'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+  const solidOnly = block.getFieldValue('SOLID_ONLY') === 'TRUE';
+  
+  // Добавляем функцию получения тайла, если она еще не определена
+  if (!Blockly.JavaScript.definitions_['getTileAt']) {
+    Blockly.JavaScript.definitions_['getTileAt'] = 
+      `function getTileAt(x, y, solidOnly) {
+        var tileId = Game.getTileInXY(x, y);
+        return solidOnly ? (Game.helper.tiles.solidTiles.has(tileId) ? tileId : 0) : tileId;
+      }`;
+  }
+  
+  return [`getTileAt(${x}, ${y}, ${solidOnly})`, generator.ORDER_ATOMIC];
+};
+
+javascript.javascriptGenerator.forBlock['set_tile_at'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+  const tileId = generator.valueToCode(block, 'TILE_ID', generator.ORDER_ATOMIC) || '0';
+  const isSolid = block.getFieldValue('IS_SOLID') === 'TRUE';
+  
+  return `Game.changeTileInXY(${x}, ${y}, ${tileId}, ${isSolid});\n`;
 };
 
 // Генератор для выбора цвета
@@ -1937,13 +2441,14 @@ javascript.javascriptGenerator.forBlock['set_timer'] = function(block, generator
 
 // Генератор для создания прототипа объекта
 javascript.javascriptGenerator.forBlock['new_proto_object'] = function(block, generator) {
+  const name = block.workspace.getVariableById(block.getFieldValue('Object')).name;
   const obj = generator.getVariableName(block.getFieldValue('Object'));
   const w = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC) || 0;
   const h = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC) || 0;
   const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC) || 0;
   const oncreate = generator.statementToCode(block, 'ONCREATE');
   
-  let code = `${obj}={name:"${obj}",x:0,y:0,width:${w},height:${h},sprite:${sprite},local:{}};\n`;
+  let code = `${obj}={name:"${name}",x:0,y:0,width:${w},height:${h},sprite:${sprite},local:{}};\n`;
   if(oncreate.length > 1) {
     code += `${obj}.onCreate=function(){\n${oncreate}};\n`;
   }
@@ -1952,6 +2457,7 @@ javascript.javascriptGenerator.forBlock['new_proto_object'] = function(block, ge
 
 // Генератор для создания объекта
 javascript.javascriptGenerator.forBlock['new_object'] = function(block, generator) {
+  const name = block.workspace.getVariableById(block.getFieldValue('Object')).name;
   const obj = generator.getVariableName(block.getFieldValue('Object'));
   const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || 0;
   const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || 0;
@@ -1960,7 +2466,7 @@ javascript.javascriptGenerator.forBlock['new_object'] = function(block, generato
   const sprite = generator.valueToCode(block, 'Sprite', generator.ORDER_ATOMIC) || 0;
   const oncreate = generator.statementToCode(block, 'ONCREATE');
   
-  let code = `${obj}=Game.addObject("${obj}",${x},${y},${w},${h},${sprite});\n`;
+  let code = `${obj}=Game.addObject("${name}",${x},${y},${w},${h},${sprite});\n`;
   if(oncreate.length > 1) {
     code += `${obj}.onCreate=function(){\n${oncreate}};\n${obj}.onCreate();\n`;
   }
@@ -2142,35 +2648,145 @@ javascript.javascriptGenerator.forBlock['object_tap_screen'] = function(block, g
   }
 };
 
+javascript.javascriptGenerator.forBlock['camera_follow'] = function(block, generator) {
+  const obj = generator.getVariableName(block.getFieldValue('OBJECT'));
+  const smooth = generator.valueToCode(block, 'SMOOTH', generator.ORDER_ATOMIC) || '0.1';
+  const offsetX = generator.valueToCode(block, 'OFFSET_X', generator.ORDER_ATOMIC) || '0';
+  const offsetY = generator.valueToCode(block, 'OFFSET_Y', generator.ORDER_ATOMIC) || '0';
+  
+  // Добавляем функцию слежения камеры, если она еще не определена
+  if (!Blockly.JavaScript.definitions_['cameraFollow']) {
+    Blockly.JavaScript.definitions_['cameraFollow'] = 
+      `function cameraFollow(target, smooth, offsetX, offsetY) {
+        if (!target) return;
+        var targetX = target.x + target.width/2 + offsetX;
+        var targetY = target.y + target.height/2 + offsetY;
+        var screenX = Game.getScreenX();
+        var screenY = Game.getScreenY();
+        Game.setScreenX(screenX + (targetX - screenX - 640) * smooth);
+        Game.setScreenY(screenY + (targetY - screenY - 360) * smooth);
+      }`;
+  }
+  
+  return `cameraFollow(${obj}, ${smooth}, ${offsetX}, ${offsetY});\n`;
+};
+
+javascript.javascriptGenerator.forBlock['get_window_position'] = function(block, generator) {
+  const axis = block.getFieldValue('AXIS');
+  return axis === 'X' 
+    ? ["Game.getScreenX()", generator.ORDER_ATOMIC]
+    : ["Game.getScreenY()", generator.ORDER_ATOMIC];
+};
+
 // Генератор для управления объектом
 javascript.javascriptGenerator.forBlock['object_control'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
   const type = block.getFieldValue('type');
   const speedx = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
   const speedy = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
+  const game_type = block.getFieldValue('game');
   
-  let code = `${obj}.speedx=0;${obj}.speedy=0;\n`;
+  // Добавляем определение переменной для отслеживания состояния стика
+  if (!Blockly.JavaScript.definitions_[`${obj}_stickJumpReady`]) {
+    Blockly.JavaScript.definitions_[`${obj}_stickJumpReady`] = 
+      `var ${obj}_stickJumpReady = true;`;
+  }
+
+  let code = (game_type == 'platform') ? `if(${obj}.isOnGround)${obj}.speedx=0;` : `${obj}.speedx=0;${obj}.speedy=0;\n`;
   
   if(type === 'key') {
-    code += `if(Game.getKey("ArrowLeft")){${obj}.speedx=-${speedx};}
-if(Game.getKey("ArrowRight")){${obj}.speedx=${speedx};}
-if(Game.getKey("ArrowUp")){${obj}.speedy=-${speedy};}
-if(Game.getKey("ArrowDown")){${obj}.speedy=${speedy};}\n`;
+    code += `if(Game.getKey("ArrowLeft")){${obj}.speedx=-${speedx};};
+if(Game.getKey("ArrowRight")){${obj}.speedx=${speedx};};\n`
+    code += (game_type == 'platform')
+      ?`if(Game.getKeyPress("ArrowUp") && ${obj}.isOnGround){${obj}.speedy=-${speedy};};\n`
+      :`if(Game.getKey("ArrowUp")){${obj}.speedy=-${speedy};}\n`;
+    code += (game_type == 'platform')
+      ?`if(Game.getKey("ArrowDown")){${obj}.speedx=0;};\n;`
+      :`if(Game.getKey("ArrowDown")){${obj}.speedy=${speedy};};\n`
   } 
   else if(type === 'stick0') {
-    code += `if(Game.getAxes(0)<-0.3){${obj}.speedx=${speedx}*Game.getAxes(0);}
-if(Game.getAxes(0)>0.3){${obj}.speedx=${speedx}*Game.getAxes(0);}
-if(Game.getAxes(1)<-0.3){${obj}.speedy=${speedy}*Game.getAxes(1);}
-if(Game.getAxes(1)>0.3){${obj}.speedy=${speedy}*Game.getAxes(1);}\n`;
+    code += `if(Game.getAxes(0)<-0.3){${obj}.speedx=${speedx}*Game.getAxes(0);};
+if(Game.getAxes(0)>0.3){${obj}.speedx=${speedx}*Game.getAxes(0);};\n`
+    code += (game_type == 'platform')
+      ?`if(Game.getAxes(1)<-0.3 && ${obj}.isOnGround && ${obj}_stickJumpReady) {
+        ${obj}.speedy=${speedy}*Game.getAxes(1);
+        ${obj}_stickJumpReady = false;
+      }
+      if(Game.getAxes(1) >= -0.3) {
+        ${obj}_stickJumpReady = true;
+      };\n`
+      :`if(Game.getAxes(1)<-0.3){${obj}.speedy=${speedy}*Game.getAxes(1);};\n`
+    code += (game_type == 'platform')
+      ?`if(Game.getAxes(1)>0.3){${obj}.speedx=0;};\n`
+      :`if(Game.getAxes(1)>0.3){${obj}.speedy=${speedy}*Game.getAxes(1);};\n`;
   }
-  else {
-    code += `if(Game.getAxes(2)<-0.3){${obj}.speedx=${speedx}*Game.getAxes(2);}
-if(Game.getAxes(2)>0.3){${obj}.speedx=${speedx}*Game.getAxes(2);}
-if(Game.getAxes(3)<-0.3){${obj}.speedy=${speedy}*Game.getAxes(3);}
-if(Game.getAxes(3)>0.3){${obj}.speedy=${speedy}*Game.getAxes(3);}\n`;
+  else if(type === 'stick1') {
+    code += `if(Game.getAxes(2)<-0.3){${obj}.speedx=${speedx}*Game.getAxes(2);};
+if(Game.getAxes(2)>0.3){${obj}.speedx=${speedx}*Game.getAxes(2);};\n`
+    code += (game_type == 'platform')
+      ?`if(Game.getAxes(3)<-0.3 && ${obj}.isOnGround && ${obj}_stickJumpReady) {
+        ${obj}.speedy=${speedy}*Game.getAxes(3);
+        ${obj}_stickJumpReady = false;
+      }
+      if(Game.getAxes(3) >= -0.3) {
+        ${obj}_stickJumpReady = true;
+      };\n`
+      :`if(Game.getAxes(3)<-0.3){${obj}.speedy=${speedy}*Game.getAxes(3);};\n`;
+    code += (game_type == 'platform')
+      ?`if(Game.getAxes(3)>0.3){${obj}.speedx=0;};\n`
+      :`if(Game.getAxes(3)>0.3){${obj}.speedy=${speedy}*Game.getAxes(3);};\n`;
+  }
+  else if(type === 'both') {
+    // Комбинированное управление - клавиши + левый стик (stick0)
+    code += `// Горизонтальное управление (клавиши ИЛИ стик)
+if(Game.getKey("ArrowLeft")) {
+  ${obj}.speedx=-${speedx};
+} else if(Game.getKey("ArrowRight")) {
+  ${obj}.speedx=${speedx};
+} else if(Math.abs(Game.getAxes(0)) > 0.3) {
+  ${obj}.speedx=${speedx}*Game.getAxes(0);
+}\n`;
+
+    // Вертикальное управление
+    if(game_type == 'platform') {
+      code += `// Прыжок (клавиша ИЛИ стик)
+if(Game.getKeyPress("ArrowUp") || (Game.getAxes(1)<-0.3 && ${obj}.isOnGround && ${obj}_stickJumpReady)) {
+  ${obj}.speedy=-${speedy};
+  if(Game.getAxes(1)<-0.3) ${obj}_stickJumpReady = false;
+}
+if(Game.getAxes(1) >= -0.3) {
+  ${obj}_stickJumpReady = true;
+}\n`;
+    } else {
+      code += `// Вертикальное управление (клавиши ИЛИ стик)
+if(Game.getKey("ArrowUp")) {
+  ${obj}.speedy=-${speedy};
+} else if(Game.getKey("ArrowDown")) {
+  ${obj}.speedy=${speedy};
+} else if(Math.abs(Game.getAxes(1)) > 0.3) {
+  ${obj}.speedy=${speedy}*Game.getAxes(1);
+}\n`;
+    }
   }
   
   return code;
+};
+
+// Генератор кода для блока перемещения
+javascript.javascriptGenerator.forBlock['object_teleport'] = function(block, generator) {
+  const obj = generator.getVariableName(block.getFieldValue('OBJECT'));
+  const mode = block.getFieldValue('MODE');
+  
+  if (mode === 'COORDS') {
+    // Режим перемещения по координатам
+    const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+    const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+    return `${obj}.x = ${x};\n${obj}.y = ${y};\n`;
+  } else {
+    // Режим перемещения к другому объекту
+    const targetObj = generator.getVariableName(block.getFieldValue('TARGET_OBJECT'));
+    return `${obj}.x = ${targetObj}.x;\n${obj}.y = ${targetObj}.y;\n`;
+  }
 };
 
 // Генератор для движения к точке
@@ -2188,6 +2804,55 @@ javascript.javascriptGenerator.forBlock['object_velocity'] = function(block, gen
   }
   
   return `Game.setVelocityTowards(${obj}, ${x}, ${y}, ${speed});\n`;
+};
+
+// Генератор кода для блока получения объекта
+javascript.javascriptGenerator.forBlock['get_object'] = function(block, generator) {
+  const type = block.getFieldValue('TYPE');
+  
+  switch(type) {
+    case 'object':
+      return ['object', generator.ORDER_ATOMIC]; // Итерируемый объект
+    case ' object':
+      return ['object', generator.ORDER_ATOMIC]; // Столкнувшийся объект (тот же идентификатор)
+    case 'this':
+      return ['this', generator.ORDER_ATOMIC]; // Текущий объект
+    case 'RANDOM':
+      const name = block.getFieldValue('NAME');
+      // Добавляем вспомогательную функцию если ее еще нет
+      if (!Blockly.JavaScript.definitions_['getRandomObjectByName']) {
+        Blockly.JavaScript.definitions_['getRandomObjectByName'] = 
+          `function getRandomObjectByName(name) {
+  var objects = [];
+  
+  // Фильтрация объектов с проверкой на существование и соответствие имени
+  for (var i = 0; i < Game.allObject.length; i++) {
+    var obj = Game.allObject[i];
+    if (obj && obj.name === name) {
+      objects.push(obj);
+    }
+  }
+  
+  // Возвращаем случайный объект или null, если не найдено
+  if (objects.length > 0) {
+    var randomIndex = Math.floor(Math.random() * objects.length);
+    return objects[randomIndex];
+  }
+  return null;
+};`;
+      }
+      return [`getRandomObjectByName("${name}")`, generator.ORDER_ATOMIC];
+    default:
+      return ['null', generator.ORDER_ATOMIC];
+  }
+};
+
+// Генератор кода для блока проверки имени объекта
+javascript.javascriptGenerator.forBlock['if_object_name_equals'] = function(block, generator) {
+  const objectType = block.getFieldValue('OBJECT_TYPE');
+  const name = generator.valueToCode(block, 'NAME', generator.ORDER_ATOMIC) || '""';
+  
+  return [`${objectType}.name === ${name}`, javascript.Order.ATOMIC];
 };
 
 // Генератор для получения расстояния

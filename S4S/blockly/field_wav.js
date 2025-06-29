@@ -7,7 +7,7 @@ class FieldWAVEditor extends Blockly.Field {
     this.SERIALIZABLE = true;
     this.CURSOR = 'pointer';
     this.value_ = value || '';
-    this.size_ = new Blockly.utils.Size(32, 32);
+    this.size_ = new Blockly.utils.Size(64, 24); // Увеличиваем размер для превью
     
     // Add styles to the document head
     this.addStyles_();
@@ -110,6 +110,20 @@ class FieldWAVEditor extends Blockly.Field {
         cursor: not-allowed;
       }
 
+      .wav-btn-record {
+        background-color: #f44336;
+      }
+
+      .wav-btn-record.active {
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0% { background-color: #f44336; }
+        50% { background-color: #ff7961; }
+        100% { background-color: #f44336; }
+      }
+
       .time-display {
         text-align: center;
         font-size: 14px;
@@ -206,6 +220,7 @@ class FieldWAVEditor extends Blockly.Field {
       this.fieldGroup_
     );
     
+    // Background with white color
     const background = Blockly.utils.dom.createSvgElement(
       'rect',
       {
@@ -219,20 +234,91 @@ class FieldWAVEditor extends Blockly.Field {
     );
     
     if (this.value_) {
-      const icon = Blockly.utils.dom.createSvgElement(
-        'text',
+      // Создаем превью звука
+      const previewSize = this.size_.width - 10;
+      const previewHeight = this.size_.height - 10;
+      
+      const preview = Blockly.utils.dom.createSvgElement(
+        'svg',
         {
-          'x': '50%',
-          'y': '50%',
-          'text-anchor': 'middle',
-          'dominant-baseline': 'middle',
-          'fill': '#4285f4',
-          'font-size': '12'
+          'x': '5',
+          'y': '5',
+          'width': previewSize,
+          'height': previewHeight,
+          'viewBox': `0 0 ${previewSize} ${previewHeight}`,
+          'preserveAspectRatio': 'none'
         },
         container
       );
-      icon.textContent = '🔊 WAV';
+      
+      // Загружаем и декодируем аудио для превью
+      this.loadAudioForPreview(this.value_).then(audioBuffer => {
+        if (!audioBuffer) return;
+        
+        const channelData = audioBuffer.getChannelData(0);
+        const step = Math.ceil(channelData.length / previewSize);
+        const amp = previewHeight / 2;
+        
+        // Рисуем упрощенную волновую форму
+        for (let i = 0; i < previewSize; i++) {
+          let min = 1.0;
+          let max = -1.0;
+          
+          for (let j = 0; j < step; j++) {
+            const idx = (i * step) + j;
+            if (idx >= channelData.length) break;
+            
+            const datum = channelData[idx];
+            if (datum < min) min = datum;
+            if (datum > max) max = datum;
+          }
+          
+          Blockly.utils.dom.createSvgElement(
+            'rect',
+            {
+              'x': i,
+              'y': (1 + min) * amp,
+              'width': 1,
+              'height': Math.max(1, (max - min) * amp),
+              'fill': '#4285f4'
+            },
+            preview
+          );
+        }
+      }).catch(() => {
+        // Если не удалось загрузить, показываем иконку
+        this.showFallbackIcon(container);
+      });
+      
+      // Текст с количеством секунд
+      const text = Blockly.utils.dom.createSvgElement(
+        'text',
+        {
+          'x': '50%',
+          'y': '70%',
+          'text-anchor': 'middle',
+          'dominant-baseline': 'middle',
+          'font-size': '8',
+          'fill': '#555',
+          'stroke': 'white',
+          'stroke-width': '2',
+          'stroke-linejoin': 'round',
+          'paint-order': 'stroke'
+        },
+        container
+      );
+      
+      this.loadAudioForPreview(this.value_).then(audioBuffer => {
+        if (audioBuffer) {
+          text.textContent = `${audioBuffer.duration.toFixed(1)}s`;
+        } else {
+          text.textContent = '🔊';
+        }
+      }).catch(() => {
+        text.textContent = '🔊';
+      });
     } else {
+      // Пустое состояние
       const text = Blockly.utils.dom.createSvgElement(
         'text',
         {
@@ -241,7 +327,7 @@ class FieldWAVEditor extends Blockly.Field {
           'text-anchor': 'middle',
           'dominant-baseline': 'middle',
           'fill': '#888',
-          'font-size': '12'
+          'font-size': '10'
         },
         container
       );
@@ -250,10 +336,38 @@ class FieldWAVEditor extends Blockly.Field {
     
     this.updateSize_();
   }
+  
+  async loadAudioForPreview(dataURL) {
+    try {
+      const response = await fetch(dataURL);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      return await audioContext.decodeAudioData(arrayBuffer);
+    } catch (err) {
+      console.error('Error loading audio for preview:', err);
+      return null;
+    }
+  }
+  
+  showFallbackIcon(container) {
+    const icon = Blockly.utils.dom.createSvgElement(
+      'text',
+      {
+        'x': '50%',
+        'y': '50%',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'fill': '#4285f4',
+        'font-size': '12'
+      },
+      container
+    );
+    icon.textContent = '🔊 WAV';
+  }
 
   updateSize_() {
     this.size_.width = 64;
-    this.size_.height = 24;
+    this.size_.height = 32;
   }
 
   showEditor_() {
@@ -272,10 +386,11 @@ class FieldWAVEditor extends Blockly.Field {
     editorContainer.innerHTML = `
       <div class="wav-controls">
         <input type="file" style="display:none" id="wav-file-input" accept=".wav,.wave,.mp3" />
-        <button id="wav-load-btn" class="wav-btn">${Blockly.Msg['WAV_LOAD_FILE']}</button>
-        <button id="wav-play-btn" class="wav-btn" disabled>${Blockly.Msg['WAV_PLAY']}</button>
-        <button id="wav-stop-btn" class="wav-btn" disabled>${Blockly.Msg['WAV_STOP']}</button>
-        <button id="wav-download-btn" class="wav-btn" disabled>${Blockly.Msg['WAV_DOWNLOAD']}</button>
+        <button id="wav-load-btn" class="wav-btn"><i class="icon-folder"></i>${Blockly.Msg['WAV_LOAD_FILE']}</button>
+        <button id="wav-record-btn" class="wav-btn wav-btn-record"><i class="icon-mic"></i>${Blockly.Msg['WAV_RECORD']}</button>
+        <button id="wav-play-btn" class="wav-btn" disabled><i class="icon-forward-1"></i>${Blockly.Msg['WAV_PLAY']}</button>
+        <button id="wav-stop-btn" class="wav-btn" disabled><i class="icon-pause-1"></i>${Blockly.Msg['WAV_STOP']}</button>
+        <button id="wav-download-btn" class="wav-btn" disabled><i class="icon-download"></i>${Blockly.Msg['WAV_DOWNLOAD']}</button>
       </div>
       
       <div class="waveform-container">
@@ -357,6 +472,7 @@ class FieldWAVEditor extends Blockly.Field {
     const stopBtn = modal.querySelector('#wav-stop-btn');
     const downloadBtn = modal.querySelector('#wav-download-btn');
     const loadBtn = modal.querySelector('#wav-load-btn');
+    const recordBtn = modal.querySelector('#wav-record-btn');
     const fileInput = modal.querySelector('#wav-file-input');
     const closeBtn = modal.querySelector('#wav-close-btn');
     
@@ -373,6 +489,13 @@ class FieldWAVEditor extends Blockly.Field {
     let isTrimmed = false;
     let isSelecting = false;
     let selectionStart = 0;
+    
+    // Recording variables
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let recordingStartTime = 0;
+    let recordingTimer = null;
     
     // Initialize audio context
     function initAudioContext() {
@@ -989,6 +1112,141 @@ class FieldWAVEditor extends Blockly.Field {
       }
     });
     
+    // Record audio from microphone
+    recordBtn.addEventListener('click', async function() {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        await startRecording();
+      }
+    });
+    
+    async function startRecording() {
+		try {
+			initAudioContext();
+			
+			// Stop any playback
+			stopAudio();
+			
+			// Check permission state first
+			let permissionState = 'prompt';
+			if (navigator.permissions && navigator.permissions.query) {
+				try {
+					const permission = await navigator.permissions.query({ name: 'microphone' });
+					permissionState = permission.state;
+					
+					// Show appropriate message based on permission state
+					if (permissionState === 'granted') {
+						showStatusMessage(Blockly.Msg['WAV_RECORDING_STARTING'] || 'Starting recording...');
+					} else if (permissionState === 'denied') {
+						showStatusMessage(Blockly.Msg['WAV_MIC_DENIED'] || 'Microphone access was previously denied. Please reset permissions in your browser settings.');
+						return;
+					}
+				} catch (e) {
+					console.warn('Permissions API not fully supported', e);
+				}
+			}
+
+			// Request microphone access
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			
+			// Create MediaRecorder
+			mediaRecorder = new MediaRecorder(stream);
+			recordedChunks = [];
+			
+			// Set up event handlers
+			mediaRecorder.ondataavailable = function(e) {
+				if (e.data.size > 0) {
+					recordedChunks.push(e.data);
+				}
+			};
+			
+			mediaRecorder.onstop = async function() {
+				// Combine recorded chunks into a Blob
+				const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+				
+				// Convert Blob to ArrayBuffer
+				const arrayBuffer = await blob.arrayBuffer();
+				
+				// Load the recorded audio
+				await loadFromArrayBuffer(arrayBuffer);
+				
+				// Clean up
+				stream.getTracks().forEach(track => track.stop());
+			};
+			
+			// Start recording
+			mediaRecorder.start(100); // Collect data every 100ms
+			
+			// Update UI
+			isRecording = true;
+			recordBtn.classList.add('active');
+			recordBtn.textContent = Blockly.Msg['WAV_STOP_RECORDING'] || 'Stop Recording';
+			showStatusMessage(Blockly.Msg['WAV_RECORDING_IN_PROGRESS'] || 'Recording in progress...');
+			
+			// Start timer
+			recordingStartTime = Date.now();
+			updateRecordingTime();
+			
+		} catch (err) {
+			console.error('Error starting recording:', err);
+			
+			// Handle specific error cases
+			if (err.name === 'NotAllowedError') {
+				showStatusMessage(Blockly.Msg['WAV_MIC_BLOCKED'] || 'Microphone access was blocked. Please allow microphone access to record.');
+			} else if (err.name === 'NotFoundError') {
+				showStatusMessage(Blockly.Msg['WAV_NO_MIC'] || 'No microphone found. Please connect a microphone and try again.');
+			} else {
+				showStatusMessage(Blockly.Msg['WAV_RECORD_ERROR'] || 'Error accessing microphone: ' + err.message);
+			}
+			
+			// Reset recording state
+			isRecording = false;
+			recordBtn.classList.remove('active');
+			recordBtn.textContent = Blockly.Msg['WAV_RECORD'];
+		}
+	}
+
+	// Helper function to show status messages
+	function showStatusMessage(message) {
+		const statusElement = document.getElementById('wav-status-message') || createStatusMessageElement();
+		statusElement.textContent = message;
+		setTimeout(() => statusElement.textContent = '', 5000);
+	}
+
+	function createStatusMessageElement() {
+		const container = document.querySelector('.wav-editor-container');
+		const statusElement = document.createElement('div');
+		statusElement.id = 'wav-status-message';
+		statusElement.style.margin = '10px 0';
+		statusElement.style.color = '#666';
+		container.insertBefore(statusElement, container.firstChild);
+		return statusElement;
+	}
+    
+    function stopRecording() {
+      if (!mediaRecorder || !isRecording) return;
+      
+      // Stop recording
+      mediaRecorder.stop();
+      
+      // Update UI
+      isRecording = false;
+      recordBtn.classList.remove('active');
+      recordBtn.textContent = Blockly.Msg['WAV_RECORD'];
+      
+      // Clear timer
+      clearInterval(recordingTimer);
+      currentTimeEl.textContent = '0:00';
+    }
+    
+    function updateRecordingTime() {
+      recordingTimer = setInterval(() => {
+        const elapsed = (Date.now() - recordingStartTime) / 1000;
+        currentTimeEl.textContent = formatTime(elapsed);
+      }, 100);
+    }
+    
     // Close editor
     closeBtn.addEventListener('click', function() {
       if (audioBuffer) {
@@ -1023,13 +1281,6 @@ class FieldWAVEditor extends Blockly.Field {
           reader.readAsDataURL(blob);
         });
       } else {
-        document.body.removeChild(modal);
-      }
-    });
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
         document.body.removeChild(modal);
       }
     });

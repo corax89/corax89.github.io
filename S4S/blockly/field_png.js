@@ -166,7 +166,7 @@ class FieldImageEditor extends Blockly.Field {
       }
 
       .tool-btn {
-        padding: 8px 12px;
+        padding: 8px 8px;
         border: 2px solid hsl(210, 11%, 85%);
         background: white;
         border-radius: 4px;
@@ -280,7 +280,7 @@ class FieldImageEditor extends Blockly.Field {
       }
 
       .action-btn {
-        padding: 10px 20px;
+        padding: 10px 6px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
@@ -358,7 +358,7 @@ class FieldImageEditor extends Blockly.Field {
         }
         
         .tool-btn {
-		  padding: 12px 16px;
+		  padding: 12px 15px;
 		  font-size: 16px;
 		}
 		
@@ -549,43 +549,37 @@ class FieldImageEditor extends Blockly.Field {
     const editorContainer = document.createElement('div');
     editorContainer.className = 'editor-container';
     
-    // Add Font Awesome for icons
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
-    
     editorContainer.innerHTML = `
       <div class="tools">
         <div class="tool-buttons">
-          <button id="brush-btn" class="tool-btn active" title="${Blockly.Msg['IMAGE_BRUSH']}"><i class="fas fa-paint-brush"></i></button>
-          <button id="line-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_LINE']}"><i class="fas fa-slash"></i></button>
-          <button id="eraser-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_ERASER']}"><i class="fas fa-eraser"></i></button>
-          <button id="fill-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_FILL']}"><i class="fas fa-fill-drip"></i></button>
-          <button id="clear-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_CLEAR']}"><i class="fas fa-trash-alt"></i></button>
+          <button id="brush-btn" class="tool-btn active" title="${Blockly.Msg['IMAGE_BRUSH']}"><i class="icon-pencil"></i></button>
+          <button id="line-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_LINE']}"><i style="width:1.3em;font-family:fantasy;">/</i></button>
+          <button id="eraser-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_ERASER']}"><i class="icon-trash"></i></button>
+          <button id="fill-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_FILL']}"><i class="icon-tint"></i></button>
+          <button id="clear-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_CLEAR']}"><i class="icon-cancel-circled"></i></button>
         </div>
         <div class="brush-size">
-          <span><i class="fas fa-ruler-horizontal"></i></span>
+          <span><i class="icon-resize-full-alt"></i></span>
           <input type="range" id="brush-size" min="1" max="16" value="1">
           <span id="brush-size-value">1</span>
         </div>
         <div class="size-controls">
-          <span><i class="fas fa-expand"></i></span>
+          <span><i class="icon-resize-full"></i></span>
           <input type="number" id="width-input" class="size-input" min="1" max="1280" placeholder="Width">
           <span>x</span>
           <input type="number" id="height-input" class="size-input" min="1" max="1280" placeholder="Height">
-          <button id="resize-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_RESIZE']}"><i class="fas fa-check"></i></button>
+          <button id="resize-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_RESIZE']}"><i class="icon-check"></i></button>
         </div>
         <div class="history-buttons">
-          <button id="undo-btn" class="tool-btn" disabled title="${Blockly.Msg['IMAGE_UNDO']}"><i class="fas fa-undo"></i></button>
-          <button id="redo-btn" class="tool-btn" disabled title="${Blockly.Msg['IMAGE_REDO']}"><i class="fas fa-redo"></i></button>
+          <button id="undo-btn" class="tool-btn" disabled title="${Blockly.Msg['IMAGE_UNDO']}"><i class="icon-reply"></i></button>
+          <button id="redo-btn" class="tool-btn" disabled title="${Blockly.Msg['IMAGE_REDO']}"><i class="icon-forward"></i></button>
         </div>
         <div class="editor-controls">
           <div class="zoom-controls">
-            <button id="zoom-out-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_ZOOM_OUT']}"><i class="fas fa-search-minus"></i></button>
+            <button id="zoom-out-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_ZOOM_OUT']}"><i class="icon-zoom-out"></i></button>
             <span class="zoom-value">100%</span>
-            <button id="zoom-in-btn" class="tool-btn" title="${Blockly.Msg['ZOOM_IN']}"><i class="fas fa-search-plus"></i></button>
-            <button id="reset-view-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_RESET_VIEW']}"><i class="fas fa-expand-arrows-alt"></i></button>
+            <button id="zoom-in-btn" class="tool-btn" title="${Blockly.Msg['ZOOM_IN']}"><i class="icon-zoom-in"></i></button>
+            <button id="reset-view-btn" class="tool-btn" title="${Blockly.Msg['IMAGE_RESET_VIEW']}"><i class="icon-resize-small"></i></button>
           </div>
         </div>
       </div>
@@ -600,10 +594,10 @@ class FieldImageEditor extends Blockly.Field {
       
       <div class="action-buttons">
         <div class="button-group">
-          <button id="load-image-btn" class="action-btn btn-primary"><i class="fas fa-folder-open"></i>${Blockly.Msg['LOAD_IMAGE']}</button>
-          <button id="save-image-btn" class="action-btn btn-success"><i class="fas fa-save"></i>${Blockly.Msg['SAVE_IMAGE']}</button>
+          <button id="load-image-btn" class="action-btn btn-primary"><i class="icon-folder"></i>${Blockly.Msg['LOAD_IMAGE']}</button>
+          <button id="save-image-btn" class="action-btn btn-success"><i class="icon-download"></i>${Blockly.Msg['SAVE_IMAGE']}</button>
         </div>
-        <button id="close-editor-btn" class="action-btn btn-warning"><i class="fas fa-check-circle"></i>${Blockly.Msg['APPLY_AND_CLOSE']}</button>
+        <button id="close-editor-btn" class="action-btn btn-warning"><i class="icon-check"></i>${Blockly.Msg['APPLY_AND_CLOSE']}</button>
       </div>
       
       <input type="file" id="file-input" style="display: none;" accept="image/*">
@@ -1363,13 +1357,6 @@ class FieldImageEditor extends Blockly.Field {
 	  this.setValue(newValue); // Вместо this.value_ = canvas.toDataURL();
 	  document.body.removeChild(modal);
 	});
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        document.body.removeChild(modal);
-      }
-    });
     
     // Handle mouse wheel for zooming
     canvasContainer.addEventListener('wheel', function(e) {
