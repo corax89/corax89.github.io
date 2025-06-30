@@ -1,5 +1,13 @@
 "use strict";
 
+let projectSettings = {
+    name: "Untitled",
+    author: "",
+    icon: "data:image/jpeg;base64," + ico,
+    enableVirtualGamepad: true,
+    code: null // Здесь будет храниться сериализованная рабочая область
+};
+
 const customTheme = Blockly.Theme.defineTheme('transparentTheme', {
 	'base': Blockly.Themes.Classic,
 	'componentStyles': {
@@ -21,12 +29,9 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="get_memory"></block>
             <block type="get_touch"></block>
             <block type="get_touchxy"></block>
-            <block type="collision_detect"></block>
-            <block type="set_screen_xy"></block>
-			<block type="get_window_position"></block>
-			<block type="camera_follow"></block>
-            <block type="set_gravitation"></block>
-            <block type="set_timer"></block>
+			<block type="set_timer"></block>
+			<block type="set_interval"></block>
+			<block type="clear_interval"></block>
             <block type="music_block"></block>
             <block type="play_music"></block>
 			<block type="audio_block"></block>
@@ -48,14 +53,21 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="get_object_var"></block>
 			<block type="get_colliding_tile_info"></block>
 			<block type="set_object_bounding"></block>
-            <block type="object_control"></block>
-            <block type="object_velocity"></block>
-			<block type="object_teleport"></block>
-            <block type="object_distance"></block>
 			<block type="object_onstep"></block>
 			<block type="object_oncollision"></block>
 			<block type="object_iterate"></block>
         </category>
+		<category name="${Blockly.Msg['MOVE']}" colour="190">
+			<block type="set_gravitation"></block>
+			<block type="object_control"></block>
+            <block type="object_velocity"></block>
+			<block type="object_teleport"></block>
+            <block type="object_distance"></block>
+			<block type="collision_detect"></block>
+			<block type="set_screen_xy"></block>
+			<block type="get_window_position"></block>
+			<block type="camera_follow"></block>
+		</category>
         <category name="${Blockly.Msg['LOGIC']}" colour="210">
             <block type="controls_if"></block>
             <block type="logic_compare"></block>
@@ -426,53 +438,53 @@ if (window.matchMedia("(hover: none)").matches) {
  * Сохраняет текущий workspace в файл
  */
 function saveToFile() {
-	const state = JSON.stringify(Blockly.serialization.workspaces.save(workspace));
-
-	// Создаём Blob и скачиваем файл
-	const blob = new Blob([state], {
-		type: 'text/json'
-	});
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = document.getElementById('Name').value + '.json';
-	a.click();
-	URL.revokeObjectURL(url);
+    // Сохраняем текущее состояние рабочей области в projectSettings
+    projectSettings.code = Blockly.serialization.workspaces.save(workspace);
+    
+    const state = JSON.stringify(projectSettings);
+    
+    // Создаём Blob и скачиваем файл
+    const blob = new Blob([state], {
+        type: 'text/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = projectSettings.name + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function loadJson(file) {
-	// 2. Парсим JSON данные
-	try {
-		const data = JSON.parse(file);
-
-		// 3. Очищаем текущую рабочую область
-		workspace.clear();
-
-		Blockly.serialization.workspaces.load(data, workspace);
-
-		// 6. Обновляем представление переменных
-		if (workspace.refreshToolboxSelectionForVariable) {
-		workspace.getAllVariables().forEach(function (variable) {
-			workspace.refreshToolboxSelectionForVariable(variable.name);
-		});
-		}
-
-		// 7. Принудительно обновляем рабочую область
-		setTimeout(() => {
-		workspace.render();
-		//workspace.zoomToFit();
-
-		// Дополнительная проверка для shadow-блоков
-		workspace.getAllBlocks().forEach(block => {
-			if (block.isShadow()) {
-				block.setShadow(true);
-			}
-		});
-		}, 100);
-	} catch (e) {
-	  console.error("Ошибка в позиции:", e.position);
-	  console.log("Контекст ошибки:", file.substring(e.position - 20, e.position + 20));
-	}
+    try {
+        const data = JSON.parse(file);
+        
+        // Проверяем, есть ли projectSettings в загружаемом файле
+        if (data.code) {
+            // Это файл с projectSettings
+            Object.assign(projectSettings, data);
+            if (projectSettings.name) {
+                document.getElementById('projectNameInput').value = projectSettings.name;
+            }
+            if (projectSettings.author) {
+                document.getElementById('projectAuthorInput').value = projectSettings.author;
+            }
+            if (projectSettings.enableVirtualGamepad !== undefined) {
+                document.getElementById('enableVirtualGamepad').checked = projectSettings.enableVirtualGamepad;
+            }
+            if (projectSettings.icon !== undefined) {
+                document.getElementById('icon').src = projectSettings.icon;
+            }
+            // Загружаем рабочую область
+            loadWorkspaceData(data.code);
+        } else {
+            // Это старый файл только с кодом
+            loadWorkspaceData(data);
+        }
+    } catch (e) {
+        console.error("Ошибка в позиции:", e.position);
+        console.log("Контекст ошибки:", file.substring(e.position - 20, e.position + 20));
+    }
 }
 
 // Обработчик загрузки workspace из файла
@@ -491,7 +503,7 @@ document.getElementById('loadFile').addEventListener('change', function (e) {
 				 ? fileName
 				 : fileName.substring(0, lastDotIndex);
 
-			document.getElementById('Name').value = fileNameWithoutExtension;
+			projectSettings.name = fileNameWithoutExtension;
 
 			loadJson(e.target.result);
 
@@ -507,11 +519,12 @@ document.getElementById('loadFile').addEventListener('change', function (e) {
  * Сохраняет workspace в localStorage
  */
 function saveWorkspace() {
-	if (typeof Blockly !== 'undefined' && workspace) {
-		const workspaceData = Blockly.serialization.workspaces.save(workspace);
-		const workspaceJson = JSON.stringify(workspaceData);
-		localStorage.setItem('blocklyWorkspace', workspaceJson);
-	}
+    if (typeof Blockly !== 'undefined' && workspace) {
+        // Сохраняем текущее состояние рабочей области в projectSettings
+        projectSettings.code = Blockly.serialization.workspaces.save(workspace);
+        const workspaceJson = JSON.stringify(projectSettings);
+        localStorage.setItem('blocklyWorkspace', workspaceJson);
+    }
 }
 
 /**
@@ -526,6 +539,33 @@ function loadWorkspace() {
 			console.error('Error loading workspace:', e);
 		}
 	}
+}
+
+function loadWorkspaceData(workspaceData) {
+    // Очищаем текущую рабочую область
+    workspace.clear();
+    
+    // Загружаем данные рабочей области
+    Blockly.serialization.workspaces.load(workspaceData, workspace);
+    
+    // Обновляем представление переменных
+    if (workspace.refreshToolboxSelectionForVariable) {
+        workspace.getAllVariables().forEach(function(variable) {
+            workspace.refreshToolboxSelectionForVariable(variable.name);
+        });
+    }
+    
+    // Принудительно обновляем рабочую область
+    setTimeout(() => {
+        workspace.render();
+        
+        // Дополнительная проверка для shadow-блоков
+        workspace.getAllBlocks().forEach(block => {
+            if (block.isShadow()) {
+                block.setShadow(true);
+            }
+        });
+    }, 100);
 }
 
 // Загружаем workspace при старте
@@ -811,7 +851,7 @@ async function resizeImageToBase64(file, maxWidth = 256, maxHeight = 256) {
 // Элементы управления иконкой приложения
 var icoFileInput = document.getElementById('icoFileInput');
 var previewImage = document.getElementById('icon');
-var newIco = 0;
+var previewImageS = document.getElementById('iconPreview');
 
 // Открываем окно выбора файла при клике на изображение
 previewImage.addEventListener('click', () => {
@@ -827,7 +867,8 @@ icoFileInput.addEventListener('change', async(e) => {
 	try {
 		const base64 = await resizeImageToBase64(file);
 		previewImage.src = base64;
-		newIco = base64.substring(base64.search(',') + 1);
+		previewImageS.src = base64;
+		projectSettings.icon = base64;
 	} catch (error) {
 		console.error('Ошибка обработки изображения:', error);
 	}
@@ -1121,6 +1162,42 @@ function resizeCanvas() {
 		objectsList.style.height = `${canvasHeight}px`;
 	}
 }
+
+// Функция для отображения модального окна настроек
+function showSettingsModal() {
+	// Заполняем поля текущими значениями
+	document.getElementById('projectNameInput').value = projectSettings.name;
+	document.getElementById('projectAuthorInput').value = projectSettings.author;
+	document.getElementById('enableVirtualGamepad').checked = projectSettings.enableVirtualGamepad;
+	
+	// Устанавливаем превью иконки
+	const iconPreview = document.getElementById('iconPreview');
+	iconPreview.src = projectSettings.icon;
+	
+	// Показываем модальное окно
+	document.getElementById('settingsModal').style.display = 'flex';
+}
+
+// Функция для закрытия модального окна настроек
+function closeSettingsModal() {
+	document.getElementById('settingsModal').style.display = 'none';
+}
+
+// Функция для сохранения настроек
+function saveSettings() {
+	projectSettings.name = document.getElementById('projectNameInput').value || "Untitled";
+	projectSettings.author = document.getElementById('projectAuthorInput').value || "Corax89";
+	projectSettings.enableVirtualGamepad = document.getElementById('enableVirtualGamepad').checked;
+	closeSettingsModal();
+}
+
+// Функция для загрузки настроек при старте
+function loadSettings() {
+
+}
+
+// Вызываем загрузку настроек при загрузке страницы
+window.addEventListener('DOMContentLoaded', loadSettings);
 
 // Вызывать при загрузке и ресайзе
 window.addEventListener('resize', resizeCanvas);

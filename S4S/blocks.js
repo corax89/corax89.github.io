@@ -222,7 +222,7 @@ Blockly.Blocks['get_axes'] = {
 Blockly.Blocks['camera_follow'] = {
   init: function() {
     this.setInputsInline(true);
-    this.setColour(60);
+    this.setColour(190);
     
     // Основной заголовок
     this.appendDummyInput()
@@ -282,7 +282,7 @@ Blockly.Blocks['get_window_position'] = {
           [Blockly.Msg['OBJECT_PARAM_Y'], 'Y']
         ]), 'AXIS');
     this.setOutput(true, 'Number');
-    this.setColour(60);
+    this.setColour(190);
     this.setInputsInline(true);
     this.setTooltip(Blockly.Msg['GET_WINDOW_POSITION_TOOLTIP']);
     this.setHelpUrl("");
@@ -448,7 +448,7 @@ Blockly.Blocks['draw_image'] = {
 // Блок проверки столкновений
 Blockly.Blocks['collision_detect'] = {
   init: function() {
-    this.setColour(60);
+    this.setColour(190);
     this.appendDummyInput()
         .appendField(Blockly.Msg['COLLISION_DETECT_LABEL']);
     this.appendValueInput("X1")
@@ -726,7 +726,38 @@ Blockly.Blocks['field_multilineinput'] = {
   }
 };
 
-// Блок таймера
+// ==================== Блоки таймеров ====================
+
+Blockly.Blocks['set_interval'] = {
+  init: function() {
+    this.setColour(60);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['SET_INTERVAL_LABEL']);
+    this.appendStatementInput("CALLBACK")
+        .setCheck(null)
+        .appendField(Blockly.Msg['CALLBACK_LABEL']);
+    this.appendValueInput("INTERVAL")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['INTERVAL_MS_LABEL']);
+    this.setOutput(true, "Number");
+    this.setTooltip(Blockly.Msg['SET_INTERVAL_TOOLTIP']);
+  }
+};
+
+Blockly.Blocks['clear_interval'] = {
+  init: function() {
+    this.setColour(60);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['CLEAR_INTERVAL_LABEL']);
+    this.appendValueInput("TIMER_ID")
+        .setCheck("Number");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip(Blockly.Msg['CLEAR_INTERVAL_TOOLTIP']);
+  }
+};
+
 Blockly.Blocks['set_timer'] = {
   init: function() {
     this.appendDummyInput()
@@ -1640,7 +1671,7 @@ Blockly.Blocks['object_control'] = {
           [Blockly.Msg['ARROWS_LABEL'], 'key'],
           [Blockly.Msg['STICK0_LABEL'], 'stick0'],
           [Blockly.Msg['STICK1_LABEL'], 'stick1'],
-          [Blockly.Msg['BOTH_LABEL'], 'both'] // Комбинированное управление (клавиши + левый стик)
+          [Blockly.Msg['BOTH_LABEL'], 'both']
         ]), 'type');
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown([
@@ -1655,7 +1686,7 @@ Blockly.Blocks['object_control'] = {
         .appendField(Blockly.Msg['OBJECT_PARAM_SPEEDY']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setColour(340);
+    this.setColour(190);
   }
 };
 
@@ -1663,7 +1694,7 @@ Blockly.Blocks['object_control'] = {
 Blockly.Blocks['object_teleport'] = {
   init: function() {
     this.setInputsInline(true);
-    this.setColour(340);
+    this.setColour(190);
     
     // Основной заголовок
     this.appendDummyInput()
@@ -1765,7 +1796,7 @@ Blockly.Blocks['object_velocity'] = {
     
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setColour(340);
+    this.setColour(190);
     
     // Инициализация
     this.updateShape_(this.getFieldValue('MODE') || 'VAR');
@@ -1780,8 +1811,6 @@ Blockly.Blocks['object_velocity'] = {
     varHeader.setVisible(newMode === 'VAR');
     thisHeader.setVisible(newMode === 'THIS');
     varField.setVisible(newMode === 'VAR');
-    
-    // Перерисовка
     
   },
   
@@ -1882,7 +1911,7 @@ Blockly.Blocks['object_distance'] = {
         .appendField(new Blockly.FieldVariable('obj2'), 'Object2');
     
     this.setOutput(true, 'Number');
-    this.setColour(340);
+    this.setColour(190);
     
     // Инициализация
     this.updateShape_(this.getFieldValue('MODE_1') || 'VAR', '1');
@@ -1950,7 +1979,7 @@ Blockly.Blocks['get_memory'] = {
 
 Blockly.Blocks['set_screen_xy'] = {
   init: function() {
-    this.setColour(60);
+    this.setColour(190);
 	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_SCREEN_POS_LABEL']);
@@ -1969,7 +1998,7 @@ Blockly.Blocks['set_screen_xy'] = {
 
 Blockly.Blocks['set_gravitation'] = {
   init: function() {
-    this.setColour(60);
+    this.setColour(190);
 	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_GRAVITY_LABEL']);
@@ -2432,7 +2461,25 @@ javascript.javascriptGenerator.forBlock['field_multilineinput'] = function(block
   return code;
 };
 
-// Генератор для таймера
+// ==================== Генераторы кода для таймеров ====================
+
+javascript.javascriptGenerator.forBlock['set_interval'] = function(block, generator) {
+  const callback = generator.statementToCode(block, 'CALLBACK', generator.ORDER_NONE);
+  const interval = generator.valueToCode(block, 'INTERVAL', generator.ORDER_ATOMIC) || 1000;
+  
+  // Если callback - это многострочный код (например, из блока функций), оборачиваем его
+  const callbackCode = callback.includes('\n') ? 
+    `function() {\n${callback}\n}` : 
+    callback;
+  
+  return [`Game.setInterval(${callbackCode}, ${interval})`, generator.ORDER_ATOMIC];
+};
+
+javascript.javascriptGenerator.forBlock['clear_interval'] = function(block, generator) {
+  const timerId = generator.valueToCode(block, 'TIMER_ID', generator.ORDER_ATOMIC);
+  return `Game.clearInterval(${timerId});\n`;
+};
+
 javascript.javascriptGenerator.forBlock['set_timer'] = function(block, generator) {
   const body = generator.statementToCode(block, 'BODY');
   const time = generator.valueToCode(block, 'time', generator.ORDER_ATOMIC) || 0;
@@ -2685,87 +2732,110 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   const speedx = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
   const speedy = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
   const game_type = block.getFieldValue('game');
-  
-  // Добавляем определение переменной для отслеживания состояния стика
+  const acceleration = 0.2;
+
+  // Добавляем необходимые определения переменных
   if (!Blockly.JavaScript.definitions_[`${obj}_stickJumpReady`]) {
     Blockly.JavaScript.definitions_[`${obj}_stickJumpReady`] = 
-      `var ${obj}_stickJumpReady = true;`;
+      'var ' + obj + '_stickJumpReady = true;';
+  }
+  if (!Blockly.JavaScript.definitions_[`${obj}_keyJumpReady`]) {
+    Blockly.JavaScript.definitions_[`${obj}_keyJumpReady`] = 
+      'var ' + obj + '_keyJumpReady = true;';
+  }
+  if (!Blockly.JavaScript.definitions_[`${obj}_targetSpeedX`]) {
+    Blockly.JavaScript.definitions_[`${obj}_targetSpeedX`] = 
+      'var ' + obj + '_targetSpeedX = 0;';
   }
 
-  let code = (game_type == 'platform') ? `if(${obj}.isOnGround)${obj}.speedx=0;` : `${obj}.speedx=0;${obj}.speedy=0;\n`;
-  
+  let code = (game_type == 'platform') 
+    ? 'if(' + obj + '.isOnGround) ' + obj + '.speedx *= 0.9;\n' 
+    : obj + '.speedx *= 0.95; ' + obj + '.speedy *= 0.95;\n';
+
+  // Функция для плавного горизонтального движения (ES5 style)
+  const applySmoothMovementX = function(value) {
+    return obj + '.speedx = ' + obj + '.speedx * (1 - ' + acceleration + ') + ' + value + ' * ' + acceleration + ';\n';
+  };
+
   if(type === 'key') {
-    code += `if(Game.getKey("ArrowLeft")){${obj}.speedx=-${speedx};};
-if(Game.getKey("ArrowRight")){${obj}.speedx=${speedx};};\n`
-    code += (game_type == 'platform')
-      ?`if(Game.getKeyPress("ArrowUp") && ${obj}.isOnGround){${obj}.speedy=-${speedy};};\n`
-      :`if(Game.getKey("ArrowUp")){${obj}.speedy=-${speedy};}\n`;
-    code += (game_type == 'platform')
-      ?`if(Game.getKey("ArrowDown")){${obj}.speedx=0;};\n;`
-      :`if(Game.getKey("ArrowDown")){${obj}.speedy=${speedy};};\n`
+    // Горизонтальное движение (плавное)
+    code += 'if(Game.getKey("ArrowLeft")){' + applySmoothMovementX('-' + speedx) + '};\n';
+    code += 'if(Game.getKey("ArrowRight")){' + applySmoothMovementX(speedx) + '};\n';
+    
+    // Вертикальное движение с защитой от повторных прыжков
+    if (game_type == 'platform') {
+      code += 'if(Game.getKey("ArrowUp") && ' + obj + '.isOnGround && ' + obj + '_keyJumpReady){\n' +
+        obj + '.speedy=-' + speedy + ';\n' +
+        obj + '_keyJumpReady = false;\n' +
+      '}\n' +
+      'if(!Game.getKey("ArrowUp")){\n' +
+        obj + '_keyJumpReady = true;\n' +
+      '}\n';
+      code += 'if(Game.getKey("ArrowDown")){' + obj + '.speedx *= 0.7;};\n';
+    } else {
+      code += 'if(Game.getKey("ArrowUp")){' + obj + '.speedy=-' + speedy + ';}\n';
+      code += 'if(Game.getKey("ArrowDown")){' + obj + '.speedy=' + speedy + ';}\n';
+    }
   } 
   else if(type === 'stick0') {
-    code += `if(Game.getAxes(0)<-0.3){${obj}.speedx=${speedx}*Game.getAxes(0);};
-if(Game.getAxes(0)>0.3){${obj}.speedx=${speedx}*Game.getAxes(0);};\n`
-    code += (game_type == 'platform')
-      ?`if(Game.getAxes(1)<-0.3 && ${obj}.isOnGround && ${obj}_stickJumpReady) {
-        ${obj}.speedy=${speedy}*Game.getAxes(1);
-        ${obj}_stickJumpReady = false;
-      }
-      if(Game.getAxes(1) >= -0.3) {
-        ${obj}_stickJumpReady = true;
-      };\n`
-      :`if(Game.getAxes(1)<-0.3){${obj}.speedy=${speedy}*Game.getAxes(1);};\n`
-    code += (game_type == 'platform')
-      ?`if(Game.getAxes(1)>0.3){${obj}.speedx=0;};\n`
-      :`if(Game.getAxes(1)>0.3){${obj}.speedy=${speedy}*Game.getAxes(1);};\n`;
+    // Горизонтальное движение (плавное)
+    code += 'if(Math.abs(Game.getAxes(0)) > 0.3){' + applySmoothMovementX(speedx + '*Game.getAxes(0)') + '};\n';
+    
+    // Вертикальное движение (мгновенное)
+    if (game_type == 'platform') {
+      code += 'if(Game.getAxes(1)<-0.3 && ' + obj + '.isOnGround && ' + obj + '_stickJumpReady){\n' +
+        obj + '.speedy=-' + speedy + ';\n' +
+        obj + '_stickJumpReady = false;\n' +
+      '}\n' +
+      'if(Game.getAxes(1) >= -0.3){\n' +
+        obj + '_stickJumpReady = true;\n' +
+      '}\n';
+    } else {
+      code += 'if(Game.getAxes(1)<-0.3){' + obj + '.speedy=-' + speedy + ';}\n';
+      code += 'if(Game.getAxes(1)>0.3){' + obj + '.speedy=' + speedy + ';}\n';
+    }
   }
   else if(type === 'stick1') {
-    code += `if(Game.getAxes(2)<-0.3){${obj}.speedx=${speedx}*Game.getAxes(2);};
-if(Game.getAxes(2)>0.3){${obj}.speedx=${speedx}*Game.getAxes(2);};\n`
-    code += (game_type == 'platform')
-      ?`if(Game.getAxes(3)<-0.3 && ${obj}.isOnGround && ${obj}_stickJumpReady) {
-        ${obj}.speedy=${speedy}*Game.getAxes(3);
-        ${obj}_stickJumpReady = false;
-      }
-      if(Game.getAxes(3) >= -0.3) {
-        ${obj}_stickJumpReady = true;
-      };\n`
-      :`if(Game.getAxes(3)<-0.3){${obj}.speedy=${speedy}*Game.getAxes(3);};\n`;
-    code += (game_type == 'platform')
-      ?`if(Game.getAxes(3)>0.3){${obj}.speedx=0;};\n`
-      :`if(Game.getAxes(3)>0.3){${obj}.speedy=${speedy}*Game.getAxes(3);};\n`;
+    // Горизонтальное движение (плавное)
+    code += 'if(Math.abs(Game.getAxes(2)) > 0.3){' + applySmoothMovementX(speedx + '*Game.getAxes(2)') + '};\n';
+    
+    // Вертикальное движение (мгновенное)
+    if (game_type == 'platform') {
+      code += 'if(Game.getAxes(3)<-0.3 && ' + obj + '.isOnGround && ' + obj + '_stickJumpReady){\n' +
+        obj + '.speedy=-' + speedy + ';\n' +
+        obj + '_stickJumpReady = false;\n' +
+      '}\n' +
+      'if(Game.getAxes(3) >= -0.3){\n' +
+        obj + '_stickJumpReady = true;\n' +
+      '}\n';
+    } else {
+      code += 'if(Game.getAxes(3)<-0.3){' + obj + '.speedy=-' + speedy + ';}\n';
+      code += 'if(Game.getAxes(3)>0.3){' + obj + '.speedy=' + speedy + ';}\n';
+    }
   }
   else if(type === 'both') {
-    // Комбинированное управление - клавиши + левый стик (stick0)
-    code += `// Горизонтальное управление (клавиши ИЛИ стик)
-if(Game.getKey("ArrowLeft")) {
-  ${obj}.speedx=-${speedx};
-} else if(Game.getKey("ArrowRight")) {
-  ${obj}.speedx=${speedx};
-} else if(Math.abs(Game.getAxes(0)) > 0.3) {
-  ${obj}.speedx=${speedx}*Game.getAxes(0);
-}\n`;
+    // Комбинированное управление (ES5 style)
+    code += 
+      obj + '_targetSpeedX = 0;\n' +
+      'if(Game.getKey("ArrowLeft")) ' + obj + '_targetSpeedX = -' + speedx + ';\n' +
+      'else if(Game.getKey("ArrowRight")) ' + obj + '_targetSpeedX = ' + speedx + ';\n' +
+      'else if(Math.abs(Game.getAxes(0)) > 0.3) ' + obj + '_targetSpeedX = ' + speedx + '*Game.getAxes(0);\n\n' +
+      obj + '.speedx = ' + obj + '.speedx * (1 - ' + acceleration + ') + ' + obj + '_targetSpeedX * ' + acceleration + ';\n';
 
-    // Вертикальное управление
-    if(game_type == 'platform') {
-      code += `// Прыжок (клавиша ИЛИ стик)
-if(Game.getKeyPress("ArrowUp") || (Game.getAxes(1)<-0.3 && ${obj}.isOnGround && ${obj}_stickJumpReady)) {
-  ${obj}.speedy=-${speedy};
-  if(Game.getAxes(1)<-0.3) ${obj}_stickJumpReady = false;
-}
-if(Game.getAxes(1) >= -0.3) {
-  ${obj}_stickJumpReady = true;
-}\n`;
+    // Вертикальное движение с защитой от повторных прыжков
+    if (game_type == 'platform') {
+      code += 'if((Game.getKey("ArrowUp") || (Game.getAxes(1)<-0.3)) && ' + obj + '.isOnGround && ' + obj + '_keyJumpReady){\n' +
+        obj + '.speedy=-' + speedy + ';\n' +
+        obj + '_keyJumpReady = false;\n' +
+      '}\n' +
+      'if(!(Game.getKey("ArrowUp") || Game.getAxes(1)<-0.3)){\n' +
+        obj + '_keyJumpReady = true;\n' +
+      '}\n';
     } else {
-      code += `// Вертикальное управление (клавиши ИЛИ стик)
-if(Game.getKey("ArrowUp")) {
-  ${obj}.speedy=-${speedy};
-} else if(Game.getKey("ArrowDown")) {
-  ${obj}.speedy=${speedy};
-} else if(Math.abs(Game.getAxes(1)) > 0.3) {
-  ${obj}.speedy=${speedy}*Game.getAxes(1);
-}\n`;
+      code += 'if(Game.getKey("ArrowUp")){' + obj + '.speedy=-' + speedy + ';}\n';
+      code += 'if(Game.getKey("ArrowDown")){' + obj + '.speedy=' + speedy + ';}\n';
+      code += 'if(Game.getAxes(1)<-0.3){' + obj + '.speedy=-' + speedy + ';}\n';
+      code += 'if(Game.getAxes(1)>0.3){' + obj + '.speedy=' + speedy + ';}\n';
     }
   }
   

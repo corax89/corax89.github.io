@@ -430,6 +430,7 @@ Blockly.Msg['CROSS_TAB_COPY'] = 'Копировать';
 Blockly.Msg['CROSS_TAB_PASTE'] = 'Вставить';
 Blockly.Msg['GAME'] = 'Игра';
 Blockly.Msg['OBJECTS'] = 'Объекты';
+Blockly.Msg['MOVE'] = 'Движение';
 Blockly.Msg['LOGIC'] = 'Логика';
 Blockly.Msg['LOOPS'] = 'Циклы';
 Blockly.Msg['MATH'] = 'Математика';
@@ -660,8 +661,14 @@ Blockly.Msg['SOLID_ONLY_LABEL'] = 'только твердый';
 Blockly.Msg['IS_SOLID_LABEL'] = 'твердый';
 Blockly.Msg['COL'] = 'колонка';
 Blockly.Msg['ROW'] = 'строка';
-Blockly.Msg['GET_WINDOW_POSITION_LABEL'] = 'Получить позицию окна';
+Blockly.Msg['GET_WINDOW_POSITION_LABEL'] = 'Получить позицию экрана';
 Blockly.Msg['GET_WINDOW_POSITION_TOOLTIP'] = 'Возвращает текущую позицию виртуального экрана (окна просмотра)';
+Blockly.Msg['SET_INTERVAL_LABEL'] = "установить интервал";
+Blockly.Msg['CALLBACK_LABEL'] = "функция";
+Blockly.Msg['INTERVAL_MS_LABEL'] = "интервал (мс)";
+Blockly.Msg['SET_INTERVAL_TOOLTIP'] = "Запускает функцию повторно через указанные интервалы времени";
+Blockly.Msg['CLEAR_INTERVAL_LABEL'] = "очистить интервал";
+Blockly.Msg['CLEAR_INTERVAL_TOOLTIP'] = "Останавливает интервал по его ID";
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 
@@ -675,7 +682,12 @@ const ruTexts = {
 	'EXAMPLES': 'Примеры',
 	'SAVE_PROJECT_BTN': 'Сохранить проект',
 	'LOAD_PROJECT_BTN': 'Загрузить проект',
+	'SETTINGS_BTN': 'Настройки',
+	'SETTINGS_TITTLE': 'Настройки проекта',
 	'GAME_NAME_PLACEHOLDER': 'Название игры',
+	'GAME_AUTHOR_PLACEHOLDER': 'Автор',
+	'SET_ICON': 'Иконка игры',
+	'GAMEPAD_LABEL': 'Виртуальный геймпад (для HTML)',
 	'BUILD_GAME_BTN': 'Собрать игру для Switch',
 	'BUILD_HTML_BTN': 'Собрать игру для Web',
 	'CODE_TAB': 'Код',
@@ -707,7 +719,12 @@ document.getElementById('help-help').href = Blockly.Msg['HELP_A'];
 document.getElementById('examples-name').textContent = ruTexts.EXAMPLES;;
 document.getElementById('save-project-btn').textContent = ruTexts.SAVE_PROJECT_BTN;
 document.getElementById('load-project-btn').textContent = ruTexts.LOAD_PROJECT_BTN;
-document.getElementById('Name').placeholder = ruTexts.GAME_NAME_PLACEHOLDER;
+document.getElementById('settingsBtn').textContent = ruTexts.SETTINGS_BTN;
+document.getElementById('projectSettings').textContent = ruTexts.SETTINGS_TITTLE;
+document.getElementById('projectName').textContent = ruTexts.GAME_NAME_PLACEHOLDER;
+document.getElementById('projectAuthor').textContent = ruTexts.GAME_AUTHOR_PLACEHOLDER;
+document.getElementById('settingsIconLabel').textContent = ruTexts.SET_ICON;
+document.getElementById('labelEnableVirtualGamepad').textContent = ruTexts.GAMEPAD_LABEL;
 document.getElementById('build-html-btn').textContent = ruTexts.BUILD_HTML_BTN;
 document.getElementById('build-switch-btn').textContent = ruTexts.BUILD_GAME_BTN;
 document.getElementById('drawGeympadtxt').textContent = ruTexts.DRAW_GEYMPAD_BTN;

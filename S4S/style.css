@@ -563,3 +563,76 @@ input:hover {
 .modal-hide {
 	animation: fadeOut 0.3s forwards;
 }
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+.switch-input {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: #fff;
+}
+
+.icon-container {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 5px;
+}
+
+.icon-preview {
+	width: 64px;
+	height: 64px;
+	border-radius: 4px;
+	background-color: #f5f5f5;
+	object-fit: contain;
+	border: 1px solid #ddd;
+}
+
+.switch-checkbox {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.switch-checkbox input {
+	display: none;
+}
+
+.switch-checkbox-custom {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	margin-right: 8px;
+	position: relative;
+}
+
+.switch-checkbox input:checked + .switch-checkbox-custom {
+	background-color: #4285f4;
+	border-color: #4285f4;
+}
+
+.switch-checkbox input:checked + .switch-checkbox-custom::after {
+	content: "";
+	position: absolute;
+	left: 5px;
+	top: 1px;
+	width: 5px;
+	height: 10px;
+	border: solid white;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+.switch-modal-footer {
+	padding: 15px;
+	border-top: 1px solid #eee;
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}

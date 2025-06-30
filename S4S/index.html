@@ -53,7 +53,9 @@
 			<button id="build-switch-btn" onclick="buildSwitch()">Build Switch Version</button>
 		</div>
 	</div>
-	<input type="text" id="Name" placeholder="Game name">
+	<button onclick="showSettingsModal()" id="settingsBtn">
+		Settings
+	</button>
 	<div class="dropdown" id="examples-dropdown">
 		<button class="dropdown-btn" id="examples-name">Examples</button>
 		<div class="dropdown-content">
@@ -111,6 +113,44 @@
 </div>
 <img id="icon" src="" alt="Icon preview">
 <input type="file" id="icoFileInput" accept="image/*">
+<div id="settingsModal" class="switch-modal">
+	<div class="switch-modal-content">
+		<div class="switch-modal-header">
+			<span class="switch-modal-title" id="projectSettings">Project Settings</span>
+			<span class="switch-modal-close" onclick="closeSettingsModal()">&times;</span>
+		</div>
+		<div class="switch-modal-body">
+			<div class="form-group">
+				<label id="projectName">Project Name:</label>
+				<input type="text" id="projectNameInput" class="switch-input">
+			</div>
+			<div class="form-group">
+				<label id="projectAuthor">Author:</label>
+				<input type="text" id="projectAuthorInput" class="switch-input">
+			</div>
+			<div class="form-group">
+				<label id="settingsIconLabel">Icon:</label>
+				<div class="icon-container">
+					<img id="iconPreview" src="" alt="Icon preview" class="icon-preview">
+					<button onclick="document.getElementById('icoFileInput').click()" class="switch-btn">
+						Choose Icon
+					</button>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="checkbox-container">
+					<input type="checkbox" id="enableVirtualGamepad">
+					<span class="checkbox-custom"></span>
+					<label for="enableVirtualGamepad" id="labelEnableVirtualGamepad">Enable Virtual Gamepad (HTML)</label>
+				</label>
+			</div>
+		</div>
+		<div class="switch-modal-footer">
+			<button onclick="saveSettings()" class="switch-btn switch-btn-primary">Save</button>
+			<button onclick="closeSettingsModal()" class="switch-btn">Cancel</button>
+		</div>
+	</div>
+</div>
 <!-- Подключаем скрипты Blockly -->
 <script src="loader.js"></script>
 </body>

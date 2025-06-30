@@ -36,6 +36,16 @@ Game.init = function () {
 		image_array[i] = -1; // Используем -1 для отсутствия изображения
 	};
 
+	Game.duc_helper_global_game_timers = {
+        nextId: 1,
+        timers: {},
+        pending: [],
+		length: 0,
+		lengthAvg: 0,
+		timerHistory: [],
+		lastSampleTime: 0
+    };
+
 	Game.helper.tiles = {
 		grid: [],
 		cols: 0,
@@ -1476,12 +1486,54 @@ Game.getScreenY = function () {
 	return Game.screeny;
 };
 
-Game.setTimeout = function (callback, delayMs) {
-	var targetTime = Date.now() + delayMs;
-	game_helper_timers.push({
-		callback,
-		targetTime
-	});
+Game.setTimeout = function(callback, delay) {
+    if (delay < 0) delay = 0;
+    var timerId = Game.duc_helper_global_game_timers.nextId++;
+    var triggerTime = Date.now() + delay;
+
+    Game.duc_helper_global_game_timers.timers[timerId] = {
+        callback: callback,
+        time: triggerTime,
+        isInterval: false
+    };
+
+    return timerId;
+};
+
+// Улучшенный setInterval
+Game.setInterval = function(callback, interval) {
+    if (interval < 0) interval = 0;
+    var timerId = Game.duc_helper_global_game_timers.nextId++;
+    var nextTime = Date.now() + interval;
+
+    var wrappedCallback = function() {
+        callback();
+        if (interval > 0) {  // Не планируем следующий вызов для interval=0
+            Game.duc_helper_global_game_timers.timers[timerId].time = Date.now() + interval;
+        }
+    };
+
+    Game.duc_helper_global_game_timers.timers[timerId] = {
+        callback: wrappedCallback,
+        time: nextTime,
+        isInterval: true,
+        interval: interval
+    };
+
+    return timerId;
+};
+
+// Функции очистки
+Game.clearTimeout = Game.clearInterval = function(timerId) {
+    if (Game.duc_helper_global_game_timers[timerId]) {
+        delete Game.duc_helper_global_game_timers.timers[timerId];
+    }
+};
+
+Game.clearInterval = function(timerId) {
+    if (Game.duc_helper_global_game_timers[timerId]) {
+        delete Game.duc_helper_global_game_timers.timers[timerId];
+    }
 };
 
 // Функции работы с игровыми объектами
@@ -1845,11 +1897,15 @@ function reset_game() {
 		touchButtons: {}
 	};
 
-	// Сброс виртуального геймпада
-	//Game.virtualGamepad.joystick.active = false;
-	//Game.virtualGamepad.joystick.touchId = null;
-	//Game.virtualGamepad.joystick.handle.x = 0;
-	//Game.virtualGamepad.joystick.handle.y = 0;
+	Game.duc_helper_global_game_timers = {
+        nextId: 1,
+        timers: {},
+        pending: [],
+		length: 0,
+		lengthAvg: 0,
+		timerHistory: [],
+		lastSampleTime: 0
+    };
 
 	// Сброс состояния касаний
 	Game.virtualGamepad.touches = {};
@@ -2468,16 +2524,72 @@ function game_loop() {
 		Object.keys(inputState.keys).forEach(key => {
 			inputState.pressKeys[key] = 0;
 		});
-
+		//твймеры
 		var now = Date.now();
-		for (var i = 0; i < game_helper_timers.length; i++) {
-			if (now >= game_helper_timers[i].targetTime) {
-				game_helper_timers[i].callback();
-				game_helper_timers.splice(i, 1);
-				i--;
-			};
-		};
+		var timers = Game.duc_helper_global_game_timers.timers;
+		var pending = Game.duc_helper_global_game_timers.pending;
 
+		// 1. Собираем таймеры для выполнения
+		for (var id in timers) {
+			if (timers.hasOwnProperty(id) && now >= timers[id].time) {
+				pending.push({
+					id: parseInt(id),
+					callback: timers[id].callback,
+					isInterval: timers[id].isInterval
+				});
+				
+				// Удаляем одноразовые таймеры
+				if (!timers[id].isInterval) {
+					delete timers[id];
+				}
+			}
+		}
+
+		Game.duc_helper_global_game_timers.length = pending.length;
+
+		// Обновляем историю для вычисления среднего значения
+		if (now - Game.duc_helper_global_game_timers.lastSampleTime >= 100) { // Обновляем каждые 100мс
+			Game.duc_helper_global_game_timers.timerHistory.push({
+				time: now,
+				count: Object.keys(timers).length + pending.length
+			});
+			Game.duc_helper_global_game_timers.lastSampleTime = now;
+			
+			// Удаляем старые записи (старше 1 секунды)
+			while (Game.duc_helper_global_game_timers.timerHistory.length > 0 && 
+				   now - Game.duc_helper_global_game_timers.timerHistory[0].time > 1000) {
+				Game.duc_helper_global_game_timers.timerHistory.shift();
+			}
+			
+			// Вычисляем среднее значение
+			if (Game.duc_helper_global_game_timers.timerHistory.length > 0) {
+				var total = Game.duc_helper_global_game_timers.timerHistory.reduce(function(sum, entry) {
+					return sum + entry.count;
+				}, 0);
+				Game.duc_helper_global_game_timers.lengthAvg = Math.round(total / Game.duc_helper_global_game_timers.timerHistory.length);
+			}
+		}
+
+		// 2. Выполняем собранные колбэки
+		for (var i = 0; i < pending.length; i++) {
+			try {
+				pending[i].callback();
+			} catch (e) {
+				console.error("Timer error:", e);
+			}
+			
+			// Удаляем интервалы с interval=0 (чтобы не росли бесконечно)
+			if (pending[i].isInterval) {
+				var id = pending[i].id;
+				if (timers[id] && timers[id].interval === 0) {
+					delete timers[id];
+				}
+			}
+		}
+
+		// 3. Очищаем очередь выполненных
+		pending.length = 0;
+		//конец таймеров
 		for (var i = 0; i < Game.allObject.length; i++) {
 			var o = Game.allObject[i];
 			if (o.isStatic == 0) {
@@ -2735,7 +2847,7 @@ function initObjectsDebugPanel() {
 		const currentCount = currentObjects.length;
 
 		// Обновляем счетчик объектов
-		counterElement.textContent = `Objects: ${currentCount};`;
+		counterElement.textContent = `Objects: ${currentCount}; Timers: ${Game.duc_helper_global_game_timers.length} (avg: ${Game.duc_helper_global_game_timers.lengthAvg})`;
 
 		// Очищаем expandedStates от удаленных объектов
 		const currentIds = new Set();

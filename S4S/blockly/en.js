@@ -418,6 +418,7 @@ Blockly.Msg["TEXT_CREATE_JOIN_ITEM_TITLE_ITEM"] = Blockly.Msg["VARIABLES_DEFAULT
 
 Blockly.Msg['GAME'] = 'Game';
 Blockly.Msg['OBJECTS'] = 'Objects';
+Blockly.Msg['MOVE'] = 'Move';
 Blockly.Msg['LOGIC'] = 'Logic';
 Blockly.Msg['LOOPS'] = 'Loops';
 Blockly.Msg['MATH'] = 'Math';
@@ -646,6 +647,12 @@ Blockly.Msg['COL'] = 'col';
 Blockly.Msg['ROW'] = 'row';
 Blockly.Msg['GET_WINDOW_POSITION_LABEL'] = 'Get window position';
 Blockly.Msg['GET_WINDOW_POSITION_TOOLTIP'] = 'Returns the current position of the viewport (window)';
+Blockly.Msg['SET_INTERVAL_LABEL'] = "Set interval";
+Blockly.Msg['CALLBACK_LABEL'] = "function";
+Blockly.Msg['INTERVAL_MS_LABEL'] = "interval (ms)";
+Blockly.Msg['SET_INTERVAL_TOOLTIP'] = "";
+Blockly.Msg['CLEAR_INTERVAL_LABEL'] = "Clear interval";
+Blockly.Msg['CLEAR_INTERVAL_TOOLTIP'] = "";
 Blockly.Msg['NO'] = 'NO';
 Blockly.Msg['YES'] = 'YES';
 };
