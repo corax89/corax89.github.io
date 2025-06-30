@@ -542,24 +542,66 @@ function loadWorkspace() {
 }
 
 function loadWorkspaceData(workspaceData) {
-    // Очищаем текущую рабочую область
+    // 1. Очищаем текущую рабочую область
     workspace.clear();
     
-    // Загружаем данные рабочей области
+    // 2. Сбрасываем массив локальных переменных
+    Blockly.Variables.localVars = [];
+    
+    // 3. Парсим XML/JSON и предварительно собираем ВСЕ переменные
+    if (typeof workspaceData === 'string') {
+        // Для XML
+        const xmlDoc = Blockly.Xml.textToDom(workspaceData);
+        const allBlocks = xmlDoc.getElementsByTagName('block');
+        
+        Array.from(allBlocks).forEach(blockNode => {
+            const blockType = blockNode.getAttribute('type');
+            const mutation = blockNode.querySelector('mutation');
+            
+            // Для блоков create_local_var и get_local_var
+            if (mutation && (blockType === 'create_local_var' || blockType === 'get_local_var')) {
+                const varName = mutation.getAttribute('var_name');
+                if (varName && !Blockly.Variables.localVars.includes(varName)) {
+                    Blockly.Variables.localVars.push(varName);
+                }
+            }
+            
+            // Для стандартных переменных Blockly (если используются)
+            const varNodes = blockNode.getElementsByTagName('field[name="VAR"]');
+            Array.from(varNodes).forEach(fieldNode => {
+                const varName = fieldNode.textContent;
+                if (varName && !workspace.getVariable(varName)) {
+                    workspace.createVariable(varName);
+                }
+            });
+        });
+    } else {
+        // Для JSON (если workspaceData - объект)
+        // Аналогичный обход блоков для поиска переменных
+    }
+    
+    // 4. Загружаем данные в рабочую область
     Blockly.serialization.workspaces.load(workspaceData, workspace);
     
-    // Обновляем представление переменных
+    // 5. Принудительно обновляем dropdown-ы локальных переменных
+    workspace.getAllBlocks().forEach(block => {
+        if (block.type === 'get_local_var' && block.updateVarDropdown) {
+            block.updateVarDropdown();
+        }
+    });
+    
+    // 6. Обновляем стандартные переменные Blockly
     if (workspace.refreshToolboxSelectionForVariable) {
-        workspace.getAllVariables().forEach(function(variable) {
+        workspace.getAllVariables().forEach(variable => {
             workspace.refreshToolboxSelectionForVariable(variable.name);
         });
     }
     
-    // Принудительно обновляем рабочую область
+    // 7. Финальное обновление UI
     setTimeout(() => {
         workspace.render();
         
-        // Дополнительная проверка для shadow-блоков
+        // Фикс для shadow-блоков (если нужно)
         workspace.getAllBlocks().forEach(block => {
             if (block.isShadow()) {
                 block.setShadow(true);

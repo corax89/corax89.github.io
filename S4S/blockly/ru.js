@@ -469,6 +469,7 @@ Blockly.Msg['OBJECT_BY_VAR_LABEL'] = 'конкретного';
 Blockly.Msg['THIS_OBJECT_LABEL'] = 'этого объекта';
 Blockly.Msg['PLATFORMER_LABEL'] = 'платформер';
 Blockly.Msg['TDS_LABEL'] = 'вид сверху';
+Blockly.Msg['JUMP_BUTTON'] = 'кнопка для прыжка';
 
 Blockly.Msg['GAME_LOOP_LABEL'] = 'Бесконечный игровой цикл';
 Blockly.Msg['CLEAR_SCREEN_OPTION'] = 'очищать экран:';

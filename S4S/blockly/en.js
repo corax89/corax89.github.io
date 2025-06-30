@@ -458,6 +458,7 @@ Blockly.Msg['OBJECT_BY_VAR_LABEL'] = 'specific';
 Blockly.Msg['THIS_OBJECT_LABEL'] = 'this object';
 Blockly.Msg['PLATFORMER_LABEL'] = 'platformer';
 Blockly.Msg['TDS_LABEL'] = 'TDS';
+Blockly.Msg['JUMP_BUTTON'] = 'jump button';
 
 Blockly.Msg['GAME_LOOP_LABEL'] = 'Infinite game loop';
 Blockly.Msg['CLEAR_SCREEN_OPTION'] = 'clear screen:';

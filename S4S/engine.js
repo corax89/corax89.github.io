@@ -1971,7 +1971,7 @@ Game.virtualGamepad = {
 	buttons: [{
 			id: 'KeyB',
 			x: 1150,
-			y: 500,
+			y: 600,
 			r: 30,
 			color: '#e61919',
 			text: 'B',
@@ -1998,7 +1998,7 @@ Game.virtualGamepad = {
 		{
 			id: 'KeyX',
 			x: 1150,
-			y: 600,
+			y: 500,
 			r: 30,
 			color: '#3a3aff',
 			text: 'X',

@@ -1673,11 +1673,28 @@ Blockly.Blocks['object_control'] = {
           [Blockly.Msg['STICK1_LABEL'], 'stick1'],
           [Blockly.Msg['BOTH_LABEL'], 'both']
         ]), 'type');
-    this.appendDummyInput()
+
+    // Создаем поле для типа игры
+    const gameField = new Blockly.FieldDropdown([
+      [Blockly.Msg['TDS_LABEL'], 'tds'],
+      [Blockly.Msg['PLATFORMER_LABEL'], 'platform']
+    ]);
+    
+    // Добавляем поле типа игры
+    const gameInput = this.appendDummyInput()
+        .appendField(gameField, 'game');
+    
+    // Создаем отдельный input для кнопки прыжка с надписью
+    this.jumpButtonInput = this.appendDummyInput()
+        .appendField(Blockly.Msg['JUMP_BUTTON'])  // Надпись перед выбором кнопки
         .appendField(new Blockly.FieldDropdown([
-          [Blockly.Msg['TDS_LABEL'], 'tds'],
-          [Blockly.Msg['PLATFORMER_LABEL'], 'platform']
-        ]), 'game');
+          ["🡅", "ArrowUp"],
+          ["🅐", "KeyA"],
+          ["🅑", "KeyB"],
+          ["🅧", "KeyX"],
+          ["🅨", "KeyY"]
+        ]), 'jump_button');
+    
     this.appendValueInput("ValueX")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_SPEEDX']);
@@ -1687,8 +1704,66 @@ Blockly.Blocks['object_control'] = {
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
     this.setColour(190);
+    
+    // Настраиваем обработчик изменений для gameField
+    gameField.setValidator((newValue) => {
+      this.updateJumpButtonVisibility(newValue);
+      return newValue;
+    });
+    
+    // Инициализируем видимость
+    this.updateJumpButtonVisibility(this.getFieldValue('game'));
+  },
+  
+  updateJumpButtonVisibility: function(gameType) {
+    const isPlatformer = gameType === 'platform';
+    this.jumpButtonInput.setVisible(isPlatformer);
+    
+    // Принудительно обновляем отображение блока
+    if (this.workspace) {
+      this.initSvg();
+    }
+  },
+  
+  mutationToDom: function() {
+    const container = Blockly.utils.xml.createElement('mutation');
+    container.setAttribute('jump_button', this.getFieldValue('jump_button') || 'ArrowUp');
+    container.setAttribute('game_type', this.getFieldValue('game'));
+    return container;
+  },
+  
+  domToMutation: function(xmlElement) {
+    const jumpButton = xmlElement.getAttribute('jump_button');
+    const gameType = xmlElement.getAttribute('game_type');
+    
+    if (jumpButton) {
+      this.setFieldValue(jumpButton, 'jump_button');
+    }
+    if (gameType) {
+      this.setFieldValue(gameType, 'game');
+    }
+    
+    this.updateJumpButtonVisibility(this.getFieldValue('game'));
+  },
+  
+  saveExtraState: function() {
+    return {
+      jump_button: this.getFieldValue('jump_button') || 'ArrowUp',
+      game_type: this.getFieldValue('game')
+    };
+  },
+  
+  loadExtraState: function(state) {
+    if (state.jump_button) {
+      this.setFieldValue(state.jump_button, 'jump_button');
+    }
+    if (state.game_type) {
+      this.setFieldValue(state.game_type, 'game');
+    }
+    this.updateJumpButtonVisibility(this.getFieldValue('game'));
   }
 };
+
 
 // Блок для мгновенного перемещения объекта
 Blockly.Blocks['object_teleport'] = {
@@ -2047,24 +2122,42 @@ Blockly.Blocks['create_local_var'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(230);
-	// Добавляем обработчик изменения поля
-    this.getField('VAR_NAME').setValidator(this.validateVarName_.bind(this));
+    
+    // Валидатор и обработчик изменений
+    this.getField('VAR_NAME').setValidator(this.validateVarName.bind(this));
   },
-  
-  // Валидатор имени переменной
-  validateVarName_: function(newName) {
-    // Удаляем старую переменную (если имя меняется)
-    const oldName = this.getFieldValue('VAR_NAME');
-    if (oldName && oldName !== newName) {
-      Blockly.Variables.removeVar(oldName);
+
+  validateVarName: function(newName) {
+	  const oldName = this.getFieldValue('VAR_NAME');
+	  // Добавляем новую переменную, если её нет
+	  if (newName && !Blockly.Variables.localVars.includes(newName)) {
+		Blockly.Variables.localVars.push(newName);
+	  }
+	  return newName;
+	},
+
+  // Сохраняем имя переменной в mutation
+  mutationToDom: function() {
+    const container = Blockly.utils.xml.createElement('mutation');
+    container.setAttribute('var_name', this.getFieldValue('VAR_NAME'));
+    return container;
+  },
+
+  // Восстанавливаем переменную из mutation
+  domToMutation: function(xmlElement) {
+    const varName = xmlElement.getAttribute('var_name');
+    if (varName) {
+      this.getField('VAR_NAME').setValue(varName);
+      if (!Blockly.Variables.localVars.includes(varName)) {
+        Blockly.Variables.addVar(varName);
+      }
     }
-    
-    // Добавляем новую переменную
-    if (newName) {
-      Blockly.Variables.addVar(newName);
-    }
-    
-    return newName; // Принимаем новое имя
+  },
+
+  // При удалении блока - удаляем переменную
+  onDestroy: function() {
+    const varName = this.getFieldValue('VAR_NAME');
+    if (varName) Blockly.Variables.removeVar(varName);
   }
 };
 
@@ -2075,22 +2168,50 @@ Blockly.Blocks['addto_local_var'] = {
         .appendField(new Blockly.FieldDropdown(() => this.getVarOptions()), "VAR_NAME");
     this.appendValueInput("VAR_VALUE")
         .setCheck(null)
-        .appendField(Blockly.Msg['WITH_VALUE_LABEL']);
-	this.setPreviousStatement(true, null);
+        .appendField('value');
+    this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(230);
   },
-  
-  // Возвращает актуальный список переменных
+
   getVarOptions: function() {
     const options = Blockly.Variables.localVars.map(name => [name, name]);
-    return options.length ? options : [[Blockly.Msg['NO_VARS_LABEL'], ""]];
+    return options.length ? options : [["No variables", ""]];
   },
-  
-  updateVarDropdown: function(v) {
+
+  // Сохраняем выбранную переменную
+  mutationToDom: function() {
+    const container = Blockly.utils.xml.createElement('mutation');
+    container.setAttribute('var_name', this.getFieldValue('VAR_NAME'));
+    return container;
+  },
+
+  // Восстанавливаем переменную
+  domToMutation: function(xmlElement) {
+    const varName = xmlElement.getAttribute('var_name');
+    if (varName) {
+      // Отложенное обновление (на случай если переменные ещё не загружены)
+      setTimeout(() => {
+        const dropdown = this.getField('VAR_NAME');
+        if (dropdown) {
+          dropdown.menuGenerator_ = () => this.getVarOptions();
+          if (Blockly.Variables.localVars.includes(varName)) {
+            dropdown.setValue(varName);
+          }
+        }
+      }, 0);
+    }
+  },
+
+  // Обновляем dropdown при изменении списка переменных
+  updateVarDropdown: function() {
     const dropdown = this.getField('VAR_NAME');
     if (dropdown) {
-      dropdown.selectedOptions = v;
+      const currentValue = dropdown.getValue();
+      dropdown.menuGenerator_ = () => this.getVarOptions();
+      if (currentValue && Blockly.Variables.localVars.includes(currentValue)) {
+        dropdown.setValue(currentValue);
+      }
     }
   }
 };
@@ -2102,18 +2223,45 @@ Blockly.Blocks['get_local_var'] = {
         .appendField(new Blockly.FieldDropdown(() => this.getVarOptions()), "VAR_NAME");
     this.setOutput(true, null);
     this.setColour(230);
+    // При инициализации обновляем dropdown
+    this.updateVarDropdown();
   },
-  
-  // Возвращает актуальный список переменных
+
   getVarOptions: function() {
     const options = Blockly.Variables.localVars.map(name => [name, name]);
-    return options.length ? options : [[Blockly.Msg['NO_VARS_LABEL'], ""]];
+    return options.length ? options : [["No vars", ""]];
   },
-  
-  updateVarDropdown: function(v) {
+
+  // Сохраняем выбранную переменную в mutation
+  mutationToDom: function() {
+    const container = Blockly.utils.xml.createElement('mutation');
+    const varName = this.getFieldValue('VAR_NAME');
+    if (varName) container.setAttribute('var_name', varName);
+    return container;
+  },
+
+  // Восстанавливаем переменную из mutation
+  domToMutation: function(xmlElement) {
+    const varName = xmlElement.getAttribute('var_name');
+    if (varName) {
+      // Добавляем переменную в массив, даже если её ещё нет
+      if (!Blockly.Variables.localVars.includes(varName)) {
+        Blockly.Variables.localVars.push(varName);
+      }
+      this.getField('VAR_NAME').setValue(varName);
+    }
+  },
+
+  // Обновляем dropdown при изменении списка переменных
+  updateVarDropdown: function() {
     const dropdown = this.getField('VAR_NAME');
     if (dropdown) {
-      dropdown.selectedOptions = v;
+      const currentValue = dropdown.getValue();
+      dropdown.menuGenerator_ = () => this.getVarOptions();
+      // Восстанавливаем текущее значение, если оно допустимо
+      if (currentValue && Blockly.Variables.localVars.includes(currentValue)) {
+        dropdown.setValue(currentValue);
+      }
     }
   }
 };
@@ -2728,118 +2876,120 @@ javascript.javascriptGenerator.forBlock['get_window_position'] = function(block,
 // Генератор для управления объектом
 javascript.javascriptGenerator.forBlock['object_control'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
-  const type = block.getFieldValue('type');
-  const speedx = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
-  const speedy = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
-  const game_type = block.getFieldValue('game');
+  const controlType = block.getFieldValue('type');
+  const speedX = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
+  const speedY = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
+  const gameType = block.getFieldValue('game');
+  const jumpButton = block.getFieldValue('jump_button') || 'ArrowUp'; // Default to ArrowUp if not set
   const acceleration = 0.2;
 
-  // Добавляем необходимые определения переменных
-  if (!Blockly.JavaScript.definitions_[`${obj}_stickJumpReady`]) {
-    Blockly.JavaScript.definitions_[`${obj}_stickJumpReady`] = 
-      'var ' + obj + '_stickJumpReady = true;';
-  }
-  if (!Blockly.JavaScript.definitions_[`${obj}_keyJumpReady`]) {
-    Blockly.JavaScript.definitions_[`${obj}_keyJumpReady`] = 
-      'var ' + obj + '_keyJumpReady = true;';
-  }
-  if (!Blockly.JavaScript.definitions_[`${obj}_targetSpeedX`]) {
-    Blockly.JavaScript.definitions_[`${obj}_targetSpeedX`] = 
-      'var ' + obj + '_targetSpeedX = 0;';
-  }
-
-  let code = (game_type == 'platform') 
-    ? 'if(' + obj + '.isOnGround) ' + obj + '.speedx *= 0.9;\n' 
-    : obj + '.speedx *= 0.95; ' + obj + '.speedy *= 0.95;\n';
-
-  // Функция для плавного горизонтального движения (ES5 style)
-  const applySmoothMovementX = function(value) {
-    return obj + '.speedx = ' + obj + '.speedx * (1 - ' + acceleration + ') + ' + value + ' * ' + acceleration + ';\n';
-  };
-
-  if(type === 'key') {
-    // Горизонтальное движение (плавное)
-    code += 'if(Game.getKey("ArrowLeft")){' + applySmoothMovementX('-' + speedx) + '};\n';
-    code += 'if(Game.getKey("ArrowRight")){' + applySmoothMovementX(speedx) + '};\n';
+  const controlFuncName = `${obj}_control`;
+  
+  if (!Blockly.JavaScript.definitions_[controlFuncName]) {
+    let funcCode = '';
+    const stateVars = [];
     
-    // Вертикальное движение с защитой от повторных прыжков
-    if (game_type == 'platform') {
-      code += 'if(Game.getKey("ArrowUp") && ' + obj + '.isOnGround && ' + obj + '_keyJumpReady){\n' +
-        obj + '.speedy=-' + speedy + ';\n' +
-        obj + '_keyJumpReady = false;\n' +
-      '}\n' +
-      'if(!Game.getKey("ArrowUp")){\n' +
-        obj + '_keyJumpReady = true;\n' +
-      '}\n';
-      code += 'if(Game.getKey("ArrowDown")){' + obj + '.speedx *= 0.7;};\n';
-    } else {
-      code += 'if(Game.getKey("ArrowUp")){' + obj + '.speedy=-' + speedy + ';}\n';
-      code += 'if(Game.getKey("ArrowDown")){' + obj + '.speedy=' + speedy + ';}\n';
+    if (gameType === 'platform') {
+      stateVars.push(`${obj}_jumpReady = true`);
     }
-  } 
-  else if(type === 'stick0') {
-    // Горизонтальное движение (плавное)
-    code += 'if(Math.abs(Game.getAxes(0)) > 0.3){' + applySmoothMovementX(speedx + '*Game.getAxes(0)') + '};\n';
     
-    // Вертикальное движение (мгновенное)
-    if (game_type == 'platform') {
-      code += 'if(Game.getAxes(1)<-0.3 && ' + obj + '.isOnGround && ' + obj + '_stickJumpReady){\n' +
-        obj + '.speedy=-' + speedy + ';\n' +
-        obj + '_stickJumpReady = false;\n' +
-      '}\n' +
-      'if(Game.getAxes(1) >= -0.3){\n' +
-        obj + '_stickJumpReady = true;\n' +
-      '}\n';
-    } else {
-      code += 'if(Game.getAxes(1)<-0.3){' + obj + '.speedy=-' + speedy + ';}\n';
-      code += 'if(Game.getAxes(1)>0.3){' + obj + '.speedy=' + speedy + ';}\n';
+    if (stateVars.length) {
+      funcCode += `var ${stateVars.join(', ')};\n`;
     }
-  }
-  else if(type === 'stick1') {
-    // Горизонтальное движение (плавное)
-    code += 'if(Math.abs(Game.getAxes(2)) > 0.3){' + applySmoothMovementX(speedx + '*Game.getAxes(2)') + '};\n';
     
-    // Вертикальное движение (мгновенное)
-    if (game_type == 'platform') {
-      code += 'if(Game.getAxes(3)<-0.3 && ' + obj + '.isOnGround && ' + obj + '_stickJumpReady){\n' +
-        obj + '.speedy=-' + speedy + ';\n' +
-        obj + '_stickJumpReady = false;\n' +
-      '}\n' +
-      'if(Game.getAxes(3) >= -0.3){\n' +
-        obj + '_stickJumpReady = true;\n' +
-      '}\n';
-    } else {
-      code += 'if(Game.getAxes(3)<-0.3){' + obj + '.speedy=-' + speedy + ';}\n';
-      code += 'if(Game.getAxes(3)>0.3){' + obj + '.speedy=' + speedy + ';}\n';
+    funcCode += `function ${controlFuncName}(obj) {\n`;
+    
+    // Base physics
+    if (gameType !== 'platform') {
+      funcCode += '  obj.speedx *= 0.95;\n';
+      funcCode += '  obj.speedy *= 0.95;\n';
     }
-  }
-  else if(type === 'both') {
-    // Комбинированное управление (ES5 style)
-    code += 
-      obj + '_targetSpeedX = 0;\n' +
-      'if(Game.getKey("ArrowLeft")) ' + obj + '_targetSpeedX = -' + speedx + ';\n' +
-      'else if(Game.getKey("ArrowRight")) ' + obj + '_targetSpeedX = ' + speedx + ';\n' +
-      'else if(Math.abs(Game.getAxes(0)) > 0.3) ' + obj + '_targetSpeedX = ' + speedx + '*Game.getAxes(0);\n\n' +
-      obj + '.speedx = ' + obj + '.speedx * (1 - ' + acceleration + ') + ' + obj + '_targetSpeedX * ' + acceleration + ';\n';
-
-    // Вертикальное движение с защитой от повторных прыжков
-    if (game_type == 'platform') {
-      code += 'if((Game.getKey("ArrowUp") || (Game.getAxes(1)<-0.3)) && ' + obj + '.isOnGround && ' + obj + '_keyJumpReady){\n' +
-        obj + '.speedy=-' + speedy + ';\n' +
-        obj + '_keyJumpReady = false;\n' +
-      '}\n' +
-      'if(!(Game.getKey("ArrowUp") || Game.getAxes(1)<-0.3)){\n' +
-        obj + '_keyJumpReady = true;\n' +
-      '}\n';
-    } else {
-      code += 'if(Game.getKey("ArrowUp")){' + obj + '.speedy=-' + speedy + ';}\n';
-      code += 'if(Game.getKey("ArrowDown")){' + obj + '.speedy=' + speedy + ';}\n';
-      code += 'if(Game.getAxes(1)<-0.3){' + obj + '.speedy=-' + speedy + ';}\n';
-      code += 'if(Game.getAxes(1)>0.3){' + obj + '.speedy=' + speedy + ';}\n';
+    
+    switch(controlType) {
+      case 'key': {
+        // Only getKey is cached as it's called multiple times
+        funcCode += '  // Keyboard controls\n';
+        funcCode += '  var getKey = Game.getKey;\n';
+        funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + ` +
+                   `(getKey("ArrowRight") ? ${speedX} : getKey("ArrowLeft") ? -${speedX} : 0) * ${acceleration};\n`;
+        
+        if (gameType === 'platform') {
+          funcCode += `  if(getKey("${jumpButton}") && obj.isOnGround && ${obj}_jumpReady) {\n`;
+          funcCode += `    obj.speedy = -${speedY};\n`;
+          funcCode += `    ${obj}_jumpReady = false;\n`;
+          funcCode += `  }\n`;
+          funcCode += `  if(!getKey("${jumpButton}")) ${obj}_jumpReady = true;\n`;
+          funcCode += `  if(getKey("ArrowDown")) obj.speedx *= 0.7;\n`;
+        } else {
+          funcCode += `  if(getKey("ArrowUp")) obj.speedy = -${speedY};\n`;
+          funcCode += `  if(getKey("ArrowDown")) obj.speedy = ${speedY};\n`;
+        }
+        break;
+      }
+      
+      case 'stick0': 
+      case 'stick1': {
+        const stickIndex = controlType === 'stick0' ? 0 : 2;
+        const axisIndex = controlType === 'stick0' ? 1 : 3;
+        
+        funcCode += `  // Gamepad controls\n`;
+        // Only getAxes is cached as it's called twice
+        funcCode += `  var getAxes = Game.getAxes;\n`;
+        funcCode += `  var stickX = getAxes(${stickIndex});\n`;
+        funcCode += `  if(Math.abs(stickX) > 0.3) {\n`;
+        funcCode += `    obj.speedx = obj.speedx * (1 - ${acceleration}) + ${speedX} * stickX * ${acceleration};\n`;
+        funcCode += `  }\n`;
+        
+        if (gameType === 'platform') {
+          funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+          funcCode += `  if(stickY < -0.3 && obj.isOnGround && ${obj}_jumpReady) {\n`;
+          funcCode += `    obj.speedy = -${speedY};\n`;
+          funcCode += `    ${obj}_jumpReady = false;\n`;
+          funcCode += `  }\n`;
+          funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
+        } else {
+          funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+          funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
+          funcCode += `  if(stickY > 0.3) obj.speedy = ${speedY};\n`;
+        }
+        break;
+      }
+      
+      case 'both': {
+        funcCode += '  // Combined controls\n';
+        // Cache both functions as they're called multiple times
+        funcCode += '  var getKey = Game.getKey, getAxes = Game.getAxes;\n';
+        funcCode += `  var targetSpeedX = getKey("ArrowLeft") ? -${speedX} : ` +
+                   `getKey("ArrowRight") ? ${speedX} : 0;\n`;
+        funcCode += `  var stickX = getAxes(0);\n`;
+        funcCode += `  if(targetSpeedX === 0 && Math.abs(stickX) > 0.3) {\n`;
+        funcCode += `    targetSpeedX = ${speedX} * stickX;\n`;
+        funcCode += `  }\n`;
+        funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + targetSpeedX * ${acceleration};\n`;
+        
+        if (gameType === 'platform') {
+          funcCode += `  var stickY = getAxes(1);\n`;
+          funcCode += `  if((getKey("${jumpButton}") || stickY < -0.3) && obj.isOnGround && ${obj}_jumpReady) {\n`;
+          funcCode += `    obj.speedy = -${speedY};\n`;
+          funcCode += `    ${obj}_jumpReady = false;\n`;
+          funcCode += `  }\n`;
+          funcCode += `  if(!(getKey("${jumpButton}") || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
+        } else {
+          funcCode += `  if(getKey("ArrowUp")) obj.speedy = -${speedY};\n`;
+          funcCode += `  if(getKey("ArrowDown")) obj.speedy = ${speedY};\n`;
+          funcCode += `  var stickY = getAxes(1);\n`;
+          funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
+          funcCode += `  if(stickY > 0.3) obj.speedy = ${speedY};\n`;
+        }
+        break;
+      }
     }
+    
+    funcCode += '}\n';
+    Blockly.JavaScript.definitions_[controlFuncName] = funcCode;
   }
   
-  return code;
+  return `${controlFuncName}(${obj});\n`;
 };
 
 // Генератор кода для блока перемещения
