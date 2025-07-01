@@ -1212,7 +1212,7 @@ format('woff2');font-weight: normal;font-style: normal;font-display: block;}
 </style>
 </head><body style="margin:0;padding:0;overflow:hidden;background-color:#f0f0f0;display:flex;justify-content:center;align-items:center;height:100vh;">
 <canvas width="1280" height="720" id="cnv" style="background-color:black;box-shadow:0 0 10px rgba(0,0,0,0.5);width:100vw;height:56.25vw;max-height:100vh;max-width:177.78vh;object-fit:contain;"></canvas>
-<script>var image_array = [];var game_helper_timers = [];var gravitation = 0;var gamepads = {};var inputState = {};var local = {};var draw_bounding_box = false;
+<script>var global = window;var image_array = [];var game_helper_timers = [];var gravitation = 0;var gamepads = {};var inputState = {};var local = {};var draw_bounding_box = false;
 const canvas = document.getElementById("cnv");const ctx = canvas.getContext("2d");const Draw = ${drawCode};const Game = ${gameCode};var debugShowExpandedObjectsBorder = false;
 const globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();const MAX_CONCURRENT_MELODIES = 8;let activeMelodies = 0;const melodyQueue = [];
 function checkTouchButtons(x,y,isPressed){if(!Game.enableTouchInput)return!1;for(const btnId in inputState.touchButtons){const btn=inputState.touchButtons[btnId];
@@ -1227,8 +1227,8 @@ game_loop();</script></body></html>`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-	if(replacementTextInput.value.trim().length > 0)
-		a.download = replacementTextInput.value.trim() + '.html';
+	if(projectSettings.name.trim().length > 0)
+		a.download = projectSettings.name.trim() + '.html';
 	else
 		a.download = 'game.html';
     document.body.appendChild(a);
