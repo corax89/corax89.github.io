@@ -23,7 +23,7 @@ body{
 }
 @font-face {
     font-family: 'PressStart2P';
-    src: url('font/PressStart2P-Regular.woff') format('woff'),
+    src: url('font/PressStart2P-Regular.woff2') format('woff2'),
 		 url('font/PressStart2P-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;

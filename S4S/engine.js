@@ -78,6 +78,103 @@ Game.init = function () {
 		inputState.keys[e.code] = false;
 	});
 
+	Game.Particles = {
+		list: [],
+		maxParticles: 1000, // Максимальное количество частиц
+		
+		// Создание частиц
+		create: function(x, y, count, options = {}) {
+			// Параметры по умолчанию
+			const {
+				color = "#ffffff",
+				size = 2,
+				speed = 1,
+				direction = 0, // в градусах (0 - вправо, 90 - вверх)
+				spread = 30, // разброс направления
+				life = 60, // время жизни в кадрах
+				gravity = 0.05,
+				fade = true,
+				randomColor = false
+			} = options;
+			
+			// Создаем указанное количество частиц
+			for (let i = 0; i < count && this.list.length < this.maxParticles; i++) {
+				// Вычисляем направление с учетом разброса
+				const angle = (direction + (Math.random() * spread - spread/2)) * Math.PI / 180;
+				
+				// Вычисляем скорость
+				const particleSpeed = speed * (0.8 + Math.random() * 0.4);
+				
+				// Определяем цвет
+				let particleColor = color;
+				if (randomColor) {
+					// Генерация случайного цвета
+					particleColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+				}
+				
+				// Добавляем частицу
+				this.list.push({
+					x: x,
+					y: y,
+					vx: Math.cos(angle) * particleSpeed,
+					vy: Math.sin(angle) * particleSpeed,
+					size: size * (0.5 + Math.random()),
+					color: particleColor,
+					life: life * (0.5 + Math.random()),
+					maxLife: life,
+					gravity: gravity,
+					fade: fade
+				});
+			}
+		},
+		
+		// Обновление частиц
+		update: function() {
+			for (let i = this.list.length - 1; i >= 0; i--) {
+				const p = this.list[i];
+				
+				// Движение
+				p.x += p.vx;
+				p.y += p.vy;
+				p.vy += p.gravity;
+				
+				// Уменьшение времени жизни
+				p.life--;
+				
+				// Удаление "мертвых" частиц
+				if (p.life <= 0) {
+					this.list.splice(i, 1);
+				}
+			}
+		},
+		
+		// Отрисовка частиц
+		draw: function() {
+			for (const p of this.list) {
+				// Прозрачность, если включено затухание
+				let alpha = 1;
+				if (p.fade) {
+					alpha = p.life / p.maxLife;
+				}
+				
+				ctx.fillStyle = p.color;
+				ctx.globalAlpha = alpha;
+				ctx.fillRect(
+					p.x - p.size/2 - Game.screenx,
+					p.y - p.size/2 - Game.screeny,
+					p.size,
+					p.size
+				);
+			}
+			ctx.globalAlpha = 1;
+		},
+		
+		// Очистка всех частиц
+		clear: function() {
+			this.list = [];
+		}
+	};
+
 	Game.helper.drawTiles = function () {
 		if (!Game.helper.tiles.grid || Game.helper.tiles.sprite === -1)
 			return;
@@ -115,6 +212,112 @@ Game.init = function () {
 				};
 			};
 		};
+	};
+
+	Game.save = function (n, s) {
+		localStorage.setItem(n, s);
+	};
+	
+	Game.load = function (n) {
+		return localStorage.getItem(n);
+	};
+	
+	Game.objectSerialize = function(v, depth) {
+	  if (depth === undefined) depth = 0;
+	  if (depth > 10) return null;
+	  if (v === null) return null;
+	  if (typeof v === "function") return undefined;
+	  if (typeof v !== "object") return v;
+	  if (Array.isArray(v)) {
+		var arr = [];
+		for (var i = 0; i < v.length; i++) {
+		  arr[i] = Game.objectSerialize(v[i], depth + 1);
+		};
+		return arr;
+	  };
+
+	  var res = {};
+	  for (var key in v) {
+		if (key !== "id" && key !== "constructor") {
+		  try {
+			var val = v[key];
+			if (typeof val !== "function") {
+			  val = Game.objectSerialize(val, depth + 1);
+			  if (val !== undefined) res[key] = val;
+			};
+		  } catch(e) {};
+		};
+	  };
+
+	  return res;
+	};
+
+	Game.objectDeserialize = function(value, target, seenObjects, seenValues) {
+	  if (value === undefined) return undefined;
+	  if (value === null || typeof value !== "object") return value;
+	  seenObjects = seenObjects || [];
+	  seenValues = seenValues || [];
+	  for (var i = 0; i < seenValues.length; i++) {
+		if (seenValues[i] === value) return seenObjects[i];
+	  };
+	  if (value.__type === "Date" && typeof value.value === "string") {
+		return new Date(value.value);
+	  };
+	  var result = target;
+	  var needsNewObject = (
+		result === undefined ||
+		result === null ||
+		(Array.isArray(value) && !Array.isArray(result)) ||
+		(!Array.isArray(value) && Array.isArray(result))
+	  );
+
+	  if (needsNewObject) {
+		if (Array.isArray(value)) {
+		  result = [];
+		} else {
+		  result = {};
+		}
+	  };
+
+	  seenObjects.push(result);
+	  seenValues.push(value);
+	  if (Array.isArray(value)) {
+		for (var i = 0; i < value.length; i++) {
+		  result[i] = Game.objectDeserialize(
+			value[i],
+			result[i],
+			seenObjects,
+			seenValues
+		  );
+		}
+		return result;
+	  };
+
+	  var keys = Object.keys(value);
+	  for (var j = 0; j < keys.length; j++) {
+		var key = keys[j];
+		if (key === "__type") continue;
+		try {
+		  var newVal = Game.objectDeserialize(
+			value[key],
+			result[key],
+			seenObjects,
+			seenValues
+		  );
+		  result[key] = newVal;
+		} catch (e) {
+		  console.log("Error " + key + ":", e);
+		}
+	  };
+
+	  return result;
+	};
+	
+	Game.copyState = function(source, target) {
+	  // Сериализуем исходный объект
+	  const serialized = dukSerialize(source);
+	  // Десериализуем в целевой объект
+	  return deserializeValue(serialized, target);
 	};
 
 	Game.alert = function (message, title, showCancel = false, primaryBtnText) {
@@ -1538,33 +1741,78 @@ Game.clearInterval = function(timerId) {
 
 // Функции работы с игровыми объектами
 Game.addObject = function (name, x, y, width, height, sprite) {
-	var obj = {
-		name: name,
-		x: x,
-		y: y,
-		width: width,
-		height: height,
-		sprite: sprite,
-		speedx: 0,
-		speedy: 0,
-		onCollision: function () {},
-		onStep: function () {},
-		boundingWidth: width,
-		boundingHeight: height,
-		visible: 1,
-		solid: 1,
-		angle: 0,
-		flip: 0,
-		mass: 1,
-		restitution: 0.5,
-		isStatic: 0,
-		isOnGround: 0,
-		zIndex: 0,
-		collidingTiles: [],
-		local: {}
-	};
-	Game.allObject.push(obj);
-	return obj;
+    var obj = {
+        name: name,
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        // Свойства анимации
+        _sprite: null, // внутреннее хранилище для спрайта
+        currentFrame: 0,
+        frameTime: 0,
+        animationSpeed: 10, // кадров в секунду
+        animationLoop: true,
+        isAnimationPlaying: false,
+        // Остальные свойства...
+        speedx: 0,
+        speedy: 0,
+        onCollision: function () {},
+        onStep: function () {},
+        boundingWidth: width,
+        boundingHeight: height,
+        visible: 1,
+        solid: 1,
+        angle: 0,
+        flip: 0,
+        mass: 1,
+        restitution: 0.5,
+        isStatic: 0,
+        isOnGround: 0,
+        zIndex: 0,
+        collidingTiles: [],
+        local: {}
+    };
+
+    // Добавляем методы анимации
+    obj.playAnimation = function() {
+        if (Array.isArray(this._sprite)) {
+            this.isAnimationPlaying = true;
+            this.currentFrame = 0;
+            this.frameTime = 0;
+        }
+    };
+
+    obj.stopAnimation = function() {
+        this.isAnimationPlaying = false;
+    };
+
+    obj.setAnimationFrame = function(frameIndex) {
+        if (Array.isArray(this._sprite)) {
+            this.currentFrame = Math.max(0, Math.min(frameIndex, this._sprite.length - 1));
+        }
+    };
+
+    // Сеттер для свойства sprite
+    Object.defineProperty(obj, 'sprite', {
+        get: function() { return this._sprite; },
+        set: function(value) {
+            this._sprite = value;
+            if (Array.isArray(value)) {
+                this.playAnimation(); // Автоматический запуск анимации
+            } else {
+                this.stopAnimation(); // Остановка анимации для статичного спрайта
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+    // Устанавливаем начальный спрайт (вызовет сеттер)
+    obj.sprite = sprite;
+    
+    Game.allObject.push(obj);
+    return obj;
 };
 
 Game.removeObject = function (obj) {
@@ -1633,14 +1881,14 @@ Game.play_music = function (melodyString, bpm = 120) {
 
     if (globalAudioCtx.state === 'suspended') {
         globalAudioCtx.resume().then(() => {
-            _continuePlayMusic(melodyString, bpm);
+            Game._continuePlayMusic(melodyString, bpm);
         });
     } else {
-        _continuePlayMusic(melodyString, bpm);
+        Game._continuePlayMusic(melodyString, bpm);
     }
 };
 
-function _continuePlayMusic(melodyString, bpm) {
+Game._continuePlayMusic = function(melodyString, bpm) {
     if (activeMelodies >= MAX_CONCURRENT_MELODIES) {
         melodyQueue.push({ melodyString, bpm });
         return;
@@ -2520,6 +2768,8 @@ function game_loop() {
 		Game.updateGamepadKey();
 		Game.gameLoop();
 		Game.helper.drawTiles();
+		Game.Particles.update();
+		Game.Particles.draw();
 
 		Object.keys(inputState.keys).forEach(key => {
 			inputState.pressKeys[key] = 0;
@@ -2621,6 +2871,24 @@ function game_loop() {
 		const sortedArray = sortObjectsByY();
 		for (var i = 0; i < sortedArray.length; i++) {
 			var o = sortedArray[i];
+			if (o.visible && o.isAnimationPlaying && Array.isArray(o.sprite)) {
+				o.frameTime += 1/60; // предполагаем 60 FPS
+				
+				const frameDuration = 1 / o.animationSpeed;
+				while (o.frameTime >= frameDuration) {
+					o.frameTime -= frameDuration;
+					o.currentFrame++;
+					
+					if (o.currentFrame >= o.sprite.length) {
+						if (o.animationLoop) {
+							o.currentFrame = 0;
+						} else {
+							o.currentFrame = o.sprite.length - 1;
+							o.isAnimationPlaying = false;
+						}
+					}
+				}
+			}
 			if (o.visible) {
 				ctx.save();
 				ctx.translate(o.x + o.width / 2 - Game.screenx, o.y + o.height / 2 - Game.screeny);
@@ -2637,7 +2905,8 @@ function game_loop() {
 					const scaleY = flipVert ? -1 : 1;
 					ctx.scale(scaleX, scaleY);
 				};
-				Draw.image(o.sprite, -o.width / 2, -o.height / 2, o.width, o.height);
+				const spriteToDraw = Array.isArray(o.sprite) ? o.sprite[o.currentFrame] : o.sprite;
+				Draw.image(spriteToDraw, -o.width / 2, -o.height / 2, o.width, o.height);
 
 				if (draw_bounding_box) {
 					ctx.save();

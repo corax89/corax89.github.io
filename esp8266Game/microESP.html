@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<title>esp8266gameEngine</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+	#screen{
+		width: 100%;
+		height: 30em;
+		image-rendering: optimizeSpeed;
+		image-rendering: -moz-crisp-edges;
+		image-rendering: -webkit-optimize-contrast;
+		image-rendering: -o-crisp-edges;
+		image-rendering: pixelated;
+		-ms-interpolation-mode: nearest-neighbor;
+	}
+	@media screen and (orientation: portrait) { 
+	  #screen { height: 40em; }
+	}
+	@media all and (display-mode: fullscreen) {
+	  #screen { height: 100%; }
+	}
+	</style>
+</head>
+<body>
+	<div id="cont" style="max-width:30em;height:40em;margin: 0 auto;background-color:#fff;">
+		<canvas id="screen" width="512" height="512" onclick="start()" ondblclick="fullScr()"></canvas>
+		<div id="viewKeyboard">print on keyboard</div>
+		<div>key A - z, key B - x or space. Created width <a href="https://corax89.github.io/esp8266Game/index.html">ESP lge</a><br>click on screen for start </div>
+		<input type="checkbox" onclick="sound.rtttl.globalSound = this.checked" id="soundCheckbox" checked>sound</label>
+	</div>
+	<script type="text/javascript" src="cpu.js"></script>
+	<script type="text/javascript" src="sound.js"></script>
+	<script type="text/javascript" src="font.js"></script>
+	<script>
+	var code = [0x11,0x01,0xB1,0x00,0x92,0x00,0x1C,0x00,0x11,0x00,0x12,0x00,0xD1,0x31,0xD1,0x42,0xD2,0x11,0xD1,0x21,0x11,0x20,0xD1,0x01,0x90,0x00,0x00,0x00,0x01,0x0F,0x00,0x00,0x06,0xF0,0x26,0x00,0x50,0x00];
+	var serialBuffer=[],serialBuffer1=[];
+	var display = new Display();
+	var sound = new Sound();
+	var cpuLostCycle = 0;
+	var isRedraw = true;
+	var timerId;
+	var timeForRedraw = 48;
+	var isRun = false;
+	var bpalette = [
+		"#000000", "#EDE3C7", "#BE3746", "#7FB8B5",
+		"#4A3E4F", "#6EA76C", "#273F68", "#DEBB59",
+		"#B48D6C", "#42595A", "#C0624D", "#333333",
+		"#777777", "#8FAB62", "#3ABFD1", "#bbbbbb"
+	];
+	var globalJKey = 0;
+	var globalKey = 0;
+	var palette = [];
+	var sprtpalette = [];
+	
+	function keyPressHandler(e) {
+		globalKey = e.keyCode;
+		if(globalKey == 13)
+			globalKey = 0xA;
+		e.preventDefault();
+	}
+	
+	function keyDownHandler(e) {
+		switch (e.keyCode) {
+		case 38:
+		case 87:
+			globalJKey |= 1;
+			break;
+		case 40:
+		case 83:
+			globalJKey |= 2;
+			break;
+		case 37:
+		case 65:
+			globalJKey |= 4;
+			break;
+		case 39:
+		case 68:
+			globalJKey |= 8;
+			break;
+		case 88:
+		case 32: //B - space,x
+			globalJKey |= 32;
+			break;
+		case 90: //A - Z
+			globalJKey |= 16;
+			break;
+		case 67: //select - c
+		case 16:
+			globalJKey |= 64;
+			break;
+		case 86: //start - enter
+		case 13:
+			globalJKey |= 128;
+			break;
+		}
+		e.preventDefault();
+	}
+
+	function keyUpHandler(e) {
+		switch (e.keyCode) {
+		case 38:
+		case 87:
+			globalJKey &= ~1;
+			break;
+		case 40:
+		case 83:
+			globalJKey &= ~2;
+			break;
+		case 37:
+		case 65:
+			globalJKey &= ~4;
+			break;
+		case 39:
+		case 68:
+			globalJKey &= ~8;
+			break;
+		case 88:
+		case 32: //B - space,x
+			globalJKey &= ~32;
+			break;
+		case 90: //A - Z
+			globalJKey &= ~16;
+			break;
+		case 67: //select - c
+		case 16: //select - shift
+			globalJKey &= ~64;
+			break;
+		case 86: //start - enter
+		case 13: //start - enter
+			globalJKey &= ~128;
+		}
+		e.preventDefault();
+	}
+	
+	function Display() {
+		var displayArray = [];
+		var spriteArray = [];
+		var spriteArray2 = [];
+		var canvasArray = [];
+		var canvasArray2 = [];
+		var ctx;
+		var width;
+		var height;
+		var pixelSizeW = 4;
+		var pixelSizeH = 4;
+		var canvas = document.getElementById("screen");
+		var isDrawKeyboard = false;
+		var isChangePalette = false;
+		var clipx0 = 0;
+		var clipx1 = 128;
+		var clipy0 = 0;
+		var clipy1 = 128;
+		
+		function init() {
+			width = canvas.getBoundingClientRect().width;
+			height = canvas.getBoundingClientRect().height;
+			ctx = canvas.getContext('2d');
+			ctx.imageSmoothingEnabled = false;
+			reset();
+		}
+
+		function reset() {
+			ctx.textAlign = "start";
+			ctx.textBaseline = "hanging";
+			ctx.font = pixelSizeH * 8 + "px monospace";
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, width * 2, height * 2);
+			for (var i = 0; i < 20480; i++) {
+				displayArray[i] = 0;
+				canvasArray[i] = 0;
+				canvasArray2[i] = 0;
+			}
+			cpuLostCycle += 2000;
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 128 * pixelSizeW, pixelSizeH * 128, pixelSizeW * 16);
+			ctx.fillStyle = "white";
+			for (var i = 0; i < 16; i++) {
+				palette[i] = bpalette[i];
+				sprtpalette[i] = bpalette[i];
+			}
+		}
+
+		function clearScreen(color) {
+			if (color === undefined || color === null)
+				color = 0;
+			for (var i = 0; i < 20480; i++) {
+				displayArray[i] = color;
+				canvasArray[i] = color;
+			}
+		}
+
+		function clearSprite() {
+			for (var i = 0; i < 20480; i++) {
+				spriteArray[i] = 0;
+			}
+		}
+
+		function drawLed(color) {
+			var r = ((((color >> 11) & 0x1F) * 527) + 23) >> 6;
+			var g = ((((color >> 5) & 0x3F) * 259) + 33) >> 6;
+			var b = (((color & 0x1F) * 527) + 23) >> 6;
+			ctx.fillStyle = fullColorHex(r, g, b);
+			ctx.fillRect(0, 0, pixelSize * 128, pixelSize * 16);
+			ctx.fillRect(0, (128 + 16) * pixelSizeH, pixelSizeW * 128, pixelSizeH * 16);
+		}
+
+		function char(chr, x, y, color, bgcolor) {
+			var c = chr.charCodeAt(0);
+			for (var i = 0; i < 5; i++) { // Char bitmap = 5 columns
+				var line = font[c * 5 + i];
+				for (var j = 0; j < 8; j++, line >>= 1) {
+					if (line & 1)
+						drawPixel(color, x + i, y + j);
+					else
+						drawPixel(bgcolor, x + i, y + j);
+				}
+			}
+		}
+
+		function setClip(x0, y0, x1, y1){
+		if (x0 > 0x7fff)
+			x0 -= 0x10000;
+		if (y0 > 0x7fff)
+			y0 -= 0x10000;
+		  clipx0 = (x0 >= 0 && x0 < 127) ? x0 : 0;
+		  clipy0 = (y0 >= 0 && y0 < 127) ? y0 : 0;
+		  clipx1 = (x0 + x1 > 0 && x0 + x1 <= 128) ? x0 + x1 : 128;
+		  clipy1 = (y0 + y1 > 0 && y0 + y1 <= 128) ? y0 + y1 : 128;
+		}
+		
+		function updatePixel(x, y) {
+			canvasArray[x * 128 + y] = displayArray[x * 128 + y];
+		}
+
+		function drawPixel(color, x, y) {
+			cpuLostCycle += 0.1;
+			if (x >= clipx0 && x < clipx1 && y >= clipy0 && y < clipy1)
+				canvasArray[x * 128 + y] = color;
+		}
+
+		function drawSpritePixel(color, x, y) {
+			if (x >= 0 && x < 128 && y >= 0 && y < 128)
+				spriteArray[x * 128 + y] = color;
+		}
+
+		function plot(color, x, y) {
+			if (x >= clipx0 && x < clipx1 && y >= clipy0 && y < clipy1) {
+				drawPixel(color, x, y);
+				displayArray[x * 128 + y] = color & 0x0f;
+			}
+		}
+
+		function largeplot(color, x, y, s) {
+			var x1,
+			y1;
+			for (x1 = 0; x1 < s; x1++)
+				for (y1 = 0; y1 < s; y1++) {
+					drawPixel(color, x + x1, y + y1);
+					displayArray[(x + x1) * 128 + y + y1] = color & 0x0f;
+				}
+		}
+
+		function getPixel(x, y) {
+			if (x >= 0 && x <= 127 && y >= 0 && y <= 127)
+				return displayArray[x * 128 + y];
+			return 0;
+		}
+
+		function viewKeyboard(pos) {
+			isDrawKeyboard = true;
+		}
+		
+		function drawIco(ico){
+			var i = 0;
+			for(var y = 0; y < 16; y++){
+				for(var x = 0; x < 24; x++){
+					largeplot((ico[i] & 0xf0) >> 4, 16 + x * 4 , 32 + y * 4, 4);
+					x++;
+					largeplot((ico[i] & 0xf), 16 + x * 4, 32 + y * 4, 4);
+					i++;
+					if(i >= ico.length){
+						return;
+					}
+				}
+			}
+		}
+		
+		function drawJoy(){
+			var coordinate = [8, 143, 24, 130, 24, 156, 40, 143, 90, 150, 110, 135];
+			ctx.beginPath();
+			ctx.strokeStyle = '#fff';
+			for(var i = 0; i < 8; i++){
+				ctx.rect(coordinate[i * 2] * pixelSizeW, coordinate[i * 2 + 1] * pixelSizeH, pixelSizeW * 12, pixelSizeH * 12);
+			}
+			ctx.stroke();
+		}
+
+		function redraw() {
+			var color,
+			x,
+			y,
+			all;
+			if (isDrawKeyboard) {
+				document.getElementById("viewKeyboard").style.display = "block";
+				isDrawKeyboard = 0;
+			}
+			else{
+				document.getElementById("viewKeyboard").style.display = "none";
+			}
+			if(canvas.clientWidth + 10 < canvas.clientHeight){
+				pixelSizeH = 3;
+				drawJoy();
+			}
+			else{
+				pixelSizeH = 4;
+			}
+			all = false;
+			if(width != canvas.getBoundingClientRect().width || height != canvas.getBoundingClientRect().height){
+				width = canvas.getBoundingClientRect().width;
+				height = canvas.getBoundingClientRect().height;
+				drawJoy();
+				all = true;
+			}
+			for (x = 0; x < 128; x++)
+				for (y = 0; y < 128; y++) {
+					if (spriteArray[x * 128 + y] > 0) {
+						color = spriteArray[x * 128 + y];
+						canvasArray2[x * 128 + y] = color;
+						ctx.fillStyle = sprtpalette[color & 0x0f];
+						ctx.fillRect(x * pixelSizeW, y * pixelSizeH, pixelSizeW, pixelSizeH);
+					} else if (canvasArray[x * 128 + y] != canvasArray2[x * 128 + y] || isChangePalette || all || spriteArray2[x * 128 + y] > 0) {
+						canvasArray2[x * 128 + y] = canvasArray[x * 128 + y];
+						color = canvasArray[x * 128 + y];
+						ctx.fillStyle = palette[color & 0x0f];
+						ctx.fillRect(x * pixelSizeW, y * pixelSizeH, pixelSizeW, pixelSizeH);
+					}
+				}
+			for (x = 0; x < 128 * 128; x++)
+				spriteArray2[x] = spriteArray[x];
+			isChangePalette = false;
+		}
+
+		function rgbToHex(rgb) {
+			var hex = Number(rgb).toString(16);
+			if (hex.length < 2) {
+				hex = "0" + hex;
+			}
+			return hex;
+		}
+
+		function fullColorHex(r, g, b) {
+			var red = rgbToHex(r);
+			var green = rgbToHex(g);
+			var blue = rgbToHex(b);
+			return '#' + red + green + blue;
+		}
+
+		function changePalette(n, color) {
+			var r = ((((color >> 11) & 0x1F) * 527) + 23) >> 6;
+			var g = ((((color >> 5) & 0x3F) * 259) + 33) >> 6;
+			var b = (((color & 0x1F) * 527) + 23) >> 6;
+			isChangePalette = true;
+			if (n < 16)
+				palette[n] = fullColorHex(r, g, b);
+			else if (n < 32)
+				sprtpalette[n - 16] = fullColorHex(r, g, b);
+		}
+
+		return {
+			init: init,
+			reset: reset,
+			clearScreen: clearScreen,
+			drawLed: drawLed,
+			char: char,
+			updatePixel: updatePixel,
+			drawPixel: drawPixel,
+			drawSpritePixel: drawSpritePixel,
+			plot: plot,
+			largeplot: largeplot,
+			getPixel: getPixel,
+			setClip: setClip,
+			viewKeyboard: viewKeyboard,
+			redraw: redraw,
+			changePalette: changePalette,
+			clearSprite: clearSprite,
+			drawIco: drawIco
+		};
+	}
+
+	function redraw() {
+		setTimeout(function () {
+			requestAnimationFrame(redraw);
+			cpu.redrawParticle();
+			display.redraw();
+			cpu.setRedraw();
+			isRedraw = true;
+		}, timeForRedraw);
+	}
+	
+	function run() {
+		//уменьшаем значение таймеров
+		for (var i = 0; i < 8; i++) {
+			timers[i] -= 16;
+			if (timers[i] <= 0)
+				timers[i] = 0;
+		}
+		soundTimer -= 16;
+		if (soundTimer <= 30)
+			soundTimer = sound.playRtttl();
+		if (soundTimer > 2000)
+			soundTimer = 2000;
+		//обрабатываем команды процессора
+		for (var i = 0; i < 8000; i++) {
+			cpu.step();
+			i += cpuLostCycle;
+			cpuLostCycle = 0;
+		}
+		//обработка спрайтов
+		if (isRedraw) {
+			display.clearSprite();
+			cpu.redrawSprite();
+			cpu.testSpriteCollision(0);
+			isRedraw = false;
+			//выводим отладочную информацию
+		}
+		timertime += 16;
+		var diff = (new Date().getTime() - timerstart) - timertime;
+		clearTimeout(timerId);
+		timerId = setTimeout(function () {
+				run()
+			}, 16 - diff);
+	}
+	
+	function fullScr(){
+		var el = document.getElementById('cont');
+		if(el.webkitRequestFullScreen) {
+		   el.webkitRequestFullScreen();
+		}
+		else {
+		 el.mozRequestFullScreen();
+		}      
+		display.redraw();
+	}
+	
+	window.addEventListener('load', function(){
+		var c = document.getElementById('screen');
+		var detecttouch = !!('ontouchstart' in window) || !!('ontouchstart' in document.documentElement) || !!window.ontouchstart || !!window.Touch || !!window.onmsgesturechange || (window.DocumentTouch && window.document instanceof window.DocumentTouch);
+		var ismousedown = false;
+		var coordinate = [24, 130, 24, 156, 8, 143, 40, 143, 90, 150, 110, 135];
+		
+		function ontouch(e){
+			var rect = e.target.getBoundingClientRect();
+			var touchobj = e.targetTouches; // reference first touch point (ie: first finger)
+			start();
+			globalJKey = 0;
+			for (var i = 0; i < touchobj.length; i++) {
+				var touchx  = parseInt((touchobj[i].clientX - rect.left) * 128 / c.clientWidth);
+				var touchy  = parseInt((touchobj[i].clientY - rect.left) * 160 / c.clientHeight);
+				//console.log(touchx, touchy);
+				for(var j = 0; j < 8; j++){
+					if(touchx > coordinate[j * 2 ] && touchx < coordinate[j * 2] + 10 && touchy > coordinate[j * 2 + 1] - 10 && touchy < coordinate[j * 2 + 1]){
+						globalJKey |= 1 << j;
+					}
+					if(touchy < 100){
+						fullScr();
+					}
+				}
+			  }
+			e.preventDefault();
+		}
+		
+		c.addEventListener('touchstart', ontouch, false);
+		c.addEventListener('touchend', ontouch, false);
+
+	}, false);
+	
+	function start(){
+		if(!isRun){
+			isRun = true;
+			sound.initAudio();
+			timerstart = new Date().getTime();
+			timertime = 0;
+			soundTimer = 0;
+			run();
+		}
+	}
+	
+	document.addEventListener("keydown", keyDownHandler, false);
+	document.addEventListener("keyup", keyUpHandler, false);
+	document.addEventListener("keypress", keyPressHandler, false);
+	display.init();
+	display.reset();
+	cpu.init();
+	cpu.load(code);
+	redraw();
+	</script>
+</body>
+</html>

@@ -17,7 +17,9 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_ISSTATIC'], 'isStatic'],
   [Blockly.Msg['OBJECT_PARAM_ZINDEX'], 'zIndex'],
   [Blockly.Msg['OBJECT_PARAM_ISONGROUND'], 'isOnGround'],
-  [Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'], 'collidingTiles']
+  [Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'], 'collidingTiles'],
+  [Blockly.Msg['OBJECT_PARAM_ANIMATION_SPEED'], 'animationSpeed'],
+  [Blockly.Msg['OBJECT_PARAM_ANIMATION_LOOP'], 'animationLoop'],
 ];
 
 var ObjectType = [
@@ -124,6 +126,100 @@ function updateAllVarDropdowns() {
 
 // ==================== Блоки ====================
 
+Blockly.Blocks['particles_create'] = {
+  init: function() {
+	this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_LABEL']);
+    this.appendValueInput('X')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_X']);
+    this.appendValueInput('Y')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_Y']);
+    this.appendValueInput('COUNT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_COUNT']);
+    
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_CREATE_OPTIONS']);
+    
+    this.appendValueInput('COLOR')
+        .setCheck('String')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_COLOR']);
+    this.appendValueInput('SIZE')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_SIZE']);
+    this.appendValueInput('SPEED')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_SPEED']);
+    this.appendValueInput('DIRECTION')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_DIRECTION']);
+    this.appendValueInput('SPREAD')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_SPREAD']);
+    this.appendValueInput('LIFE')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_CREATE_LIFE']);
+    
+    this.setInputsInline(false);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(30);
+    this.setTooltip(Blockly.Msg['PARTICLES_CREATE_TOOLTIP']);
+    this.setHelpUrl('');
+  }
+};
+
+// Блок с предустановленными эффектами частиц
+Blockly.Blocks['particles_preset'] = {
+  init: function() {
+	this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_PRESET_LABEL']);
+    this.appendValueInput('X')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_PRESET_X']);
+    this.appendValueInput('Y')
+        .setCheck('Number')
+        .appendField(Blockly.Msg['PARTICLES_PRESET_Y']);
+    
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_PRESET_TYPE'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['PARTICLES_PRESET_EXPLOSION'], 'explosion'],
+          [Blockly.Msg['PARTICLES_PRESET_FIRE'], 'fire'],
+          [Blockly.Msg['PARTICLES_PRESET_SMOKE'], 'smoke'],
+          [Blockly.Msg['PARTICLES_PRESET_RAIN'], 'rain'],
+          [Blockly.Msg['PARTICLES_PRESET_STARS'], 'stars'],
+          [Blockly.Msg['PARTICLES_PRESET_MAGIC'], 'magic']
+        ]), 'TYPE');
+    
+    this.appendValueInput('COLOR')
+        .setCheck('Colour')
+        .appendField(Blockly.Msg['PARTICLES_PRESET_COLOR']);
+    
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(30);
+    this.setTooltip(Blockly.Msg['PARTICLES_PRESET_TOOLTIP']);
+    this.setHelpUrl('');
+  }
+};
+
+// Блок очистки частиц
+Blockly.Blocks['particles_clear'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_CLEAR_TITLE']);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(30);
+    this.setTooltip(Blockly.Msg['PARTICLES_CLEAR_TOOLTIP']);
+    this.setHelpUrl('');
+  }
+};
+
 // Блок игрового цикла
 Blockly.Blocks['game_loop'] = {
   init: function() {
@@ -156,6 +252,160 @@ Blockly.Blocks['text_print_custom'] = {
   }
 };
 
+// 1. Сначала определим вспомогательные блоки для мутатора
+Blockly.Blocks['variables_container'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Переменные для сохранения");
+    this.appendStatementInput('STACK')
+        .setCheck(null);
+    this.setColour(60);
+    this.setTooltip("Контейнер для переменных");
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['variables_get_item'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("переменная");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(60);
+    this.setTooltip("Элемент переменной");
+    this.contextMenu = false;
+  }
+};
+
+// 2. Основной блок для сохранения переменных
+Blockly.Blocks['save_vars_with_values'] = {
+  init: function() {
+    this.itemCount_ = 1;
+    this.setHelpUrl('');
+    this.setColour(60);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip("Сохраняет переменные и их значения в localStorage");
+    
+    // Иконка мутатора
+    this.setMutator(new Blockly.icons.MutatorIcon(['variables_get_item'], this));
+    
+    this.updateShape_();
+  },
+
+  mutationToDom: function() {
+    var container = Blockly.utils.xml.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+
+  domToMutation: function(xmlElement) {
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10) || 1;
+    this.updateShape_();
+  },
+
+  saveExtraState: function() {
+    return {
+      'itemCount': this.itemCount_
+    };
+  },
+
+  loadExtraState: function(state) {
+    this.itemCount_ = state['itemCount'] || 1;
+    this.updateShape_();
+  },
+
+  decompose: function(workspace) {
+    var containerBlock = workspace.newBlock('variables_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    
+    for (var i = 0; i < this.itemCount_; i++) {
+      var itemBlock = workspace.newBlock('variables_get_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    
+    return containerBlock;
+  },
+
+  compose: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var connections = [];
+    var i = 0;
+    
+    while (itemBlock) {
+      if (!itemBlock.isInsertionMarker()) {
+        connections.push({
+          connection: itemBlock.valueConnection_,
+          varName: itemBlock.getFieldValue('VAR')
+        });
+      }
+      itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+      i++;
+    }
+    
+    this.itemCount_ = connections.length;
+    this.updateShape_();
+    
+    for (var j = 0; j < connections.length; j++) {
+      if (connections[j] && connections[j].connection) {
+        connections[j].connection.reconnect(this, 'VAR' + j);
+      }
+    }
+  },
+
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var i = 0;
+    
+    while (itemBlock) {
+      if (!itemBlock.isInsertionMarker()) {
+        var input = this.getInput('VAR' + i);
+        if (input && input.connection) {
+          itemBlock.valueConnection_ = input.connection.targetConnection;
+        }
+        i++;
+      }
+      itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+    }
+  },
+
+  updateShape_: function() {
+    for (var i = 0; this.getInput('VAR' + i); i++) {
+      this.removeInput('VAR' + i);
+    }
+    
+    for (var j = 0; j < this.itemCount_; j++) {
+      var input = this.appendValueInput('VAR' + j)
+        .setCheck('Variable')
+        .setAlign(Blockly.ALIGN_RIGHT);
+      
+      if (j === 0) {
+        input.appendField("Сохранить переменные:");
+      }
+    }
+    
+    if (this.itemCount_ === 0) {
+      this.appendDummyInput('EMPTY')
+        .appendField("Нет переменных для сохранения");
+    }
+  }
+};
+
+// 3. Блок для загрузки переменных
+Blockly.Blocks['load_vars_with_values'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Загрузить переменные и их значения");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(60);
+    this.setTooltip("Загружает переменные и их значения из localStorage");
+  }
+};
+
 // Блок проверки нажатия клавиши
 Blockly.Blocks['get_key_down'] = {
   init: function() {
@@ -165,8 +415,8 @@ Blockly.Blocks['get_key_down'] = {
         .appendField(new Blockly.FieldDropdown([
           ["🡅", "ArrowUp"],
           ["🡇", "ArrowDown"],
-          ["🡆", "ArrowLeft"],
-          ["🡄", "ArrowRight"],
+          ["🡄", "ArrowLeft"],
+          ["🡆", "ArrowRight"],
           ["🅐", "KeyA"],
           ["🅑", "KeyB"],
           ["🅧", "KeyX"],
@@ -188,8 +438,8 @@ Blockly.Blocks['get_key_pressed'] = {
         .appendField(new Blockly.FieldDropdown([
           ["🡅", "ArrowUp"],
           ["🡇", "ArrowDown"],
-          ["🡆", "ArrowLeft"],
-          ["🡄", "ArrowRight"],
+          ["🡄", "ArrowLeft"],
+          ["🡆", "ArrowRight"],
 		  ["🅐", "KeyA"],
           ["🅑", "KeyB"],
           ["🅧", "KeyX"],
@@ -994,6 +1244,47 @@ Blockly.Blocks['field_png'] = {
   }
 };
 
+Blockly.Blocks['object_animation'] = {
+  init: function() {
+    this.setColour(30);
+    this.setInputsInline(false);
+    
+    // Основной заголовок
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['OBJECT_ANIMATION_LABEL'] || 'Анимация объекта');
+    
+    // Поле выбора объекта
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('obj1'), 'OBJECT')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:');
+    
+    // Список кадров анимации
+    this.appendValueInput("FRAMES")
+        .setCheck("Array")
+        .appendField(Blockly.Msg['ANIMATION_FRAMES_LABEL'] || 'Кадры:');
+    
+    // Скорость анимации
+    const speedInput = this.appendValueInput("SPEED")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['ANIMATION_SPEED_LABEL'] || 'Скорость (кадров/сек):');
+    
+    // Теневой блок для значения по умолчанию (10)
+    const shadowSpeed = this.workspace.newBlock('math_number');
+    shadowSpeed.setFieldValue('10', 'NUM');
+    speedInput.connection.connect(shadowSpeed.outputConnection);
+    shadowSpeed.setShadow(true);
+    
+    // Опция зацикливания
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['ANIMATION_LOOP_LABEL'] || 'Зациклить:')
+        .appendField(new Blockly.FieldCheckbox("TRUE"), 'LOOP');
+    
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setTooltip(Blockly.Msg['ANIMATION_TOOLTIP'] || 'Управление анимацией объекта');
+    this.setHelpUrl("");
+  }
+};
 // ================== ИНТЕГРАЦИОННЫЕ ФУНКЦИИ ================== //
 
 function getProtoObjects() {
@@ -1085,6 +1376,22 @@ Blockly.Blocks['clone_object'] = {
         .appendField(new Blockly.FieldVariable('obj2'), 'Object2');
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
+  }
+};
+
+Blockly.Blocks['game_copy_state'] = {
+  init: function() {
+    this.setColour(340);
+    this.setInputsInline(true);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GAME_COPY_STATE_LABEL']);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('source'), 'SOURCE')
+        .appendField(Blockly.Msg['GAME_COPY_STATE_TO']);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('target'), 'TARGET');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
   }
 };
 
@@ -1656,6 +1963,35 @@ Blockly.Blocks['object_tap_screen'] = {
     this.setFieldValue(state.mode, 'MODE');
   }
 };
+
+Blockly.Blocks['lists_append'] = {
+  init: function() {
+    this.appendValueInput('LIST')
+        .setCheck('Array')
+        .appendField(Blockly.Msg['LISTS_APPEND_TITLE']);
+    this.appendValueInput('ITEM')
+        .appendField(Blockly.Msg['LISTS_APPEND_ITEM']);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg['LISTS_APPEND_TOOLTIP']);
+    this.setHelpUrl('');
+	this.setColour(255);
+  }
+};
+
+Blockly.Blocks['lists_pop_last'] = {
+  init: function() {
+    this.appendValueInput('LIST')
+        .setCheck('Array')
+        .appendField(Blockly.Msg['LISTS_POP_LAST_TITLE']);
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip(Blockly.Msg['LISTS_POP_LAST_TOOLTIP']);
+    this.setHelpUrl('');
+	this.setColour(255);
+  }
+};
 // ==================== Блоки управления объектами ====================
 
 Blockly.Blocks['object_control'] = {
@@ -1695,6 +2031,11 @@ Blockly.Blocks['object_control'] = {
           ["🅨", "KeyY"]
         ]), 'jump_button');
     
+    // Добавляем чекбокс для двойного прыжка
+    this.doubleJumpInput = this.appendDummyInput()
+		.appendField(Blockly.Msg['DOUBLE_JUMP_LABEL'])
+        .appendField(new Blockly.FieldCheckbox("FALSE"), 'double_jump');
+    
     this.appendValueInput("ValueX")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_SPEEDX']);
@@ -1707,17 +2048,18 @@ Blockly.Blocks['object_control'] = {
     
     // Настраиваем обработчик изменений для gameField
     gameField.setValidator((newValue) => {
-      this.updateJumpButtonVisibility(newValue);
+      this.updatePlatformerControlsVisibility(newValue);
       return newValue;
     });
     
     // Инициализируем видимость
-    this.updateJumpButtonVisibility(this.getFieldValue('game'));
+    this.updatePlatformerControlsVisibility(this.getFieldValue('game'));
   },
   
-  updateJumpButtonVisibility: function(gameType) {
+  updatePlatformerControlsVisibility: function(gameType) {
     const isPlatformer = gameType === 'platform';
     this.jumpButtonInput.setVisible(isPlatformer);
+    this.doubleJumpInput.setVisible(isPlatformer);
     
     // Принудительно обновляем отображение блока
     if (this.workspace) {
@@ -1729,12 +2071,14 @@ Blockly.Blocks['object_control'] = {
     const container = Blockly.utils.xml.createElement('mutation');
     container.setAttribute('jump_button', this.getFieldValue('jump_button') || 'ArrowUp');
     container.setAttribute('game_type', this.getFieldValue('game'));
+    container.setAttribute('double_jump', this.getFieldValue('double_jump'));
     return container;
   },
   
   domToMutation: function(xmlElement) {
     const jumpButton = xmlElement.getAttribute('jump_button');
     const gameType = xmlElement.getAttribute('game_type');
+    const doubleJump = xmlElement.getAttribute('double_jump');
     
     if (jumpButton) {
       this.setFieldValue(jumpButton, 'jump_button');
@@ -1742,14 +2086,18 @@ Blockly.Blocks['object_control'] = {
     if (gameType) {
       this.setFieldValue(gameType, 'game');
     }
+    if (doubleJump) {
+      this.setFieldValue(doubleJump, 'double_jump');
+    }
     
-    this.updateJumpButtonVisibility(this.getFieldValue('game'));
+    this.updatePlatformerControlsVisibility(this.getFieldValue('game'));
   },
   
   saveExtraState: function() {
     return {
       jump_button: this.getFieldValue('jump_button') || 'ArrowUp',
-      game_type: this.getFieldValue('game')
+      game_type: this.getFieldValue('game'),
+      double_jump: this.getFieldValue('double_jump')
     };
   },
   
@@ -1760,10 +2108,12 @@ Blockly.Blocks['object_control'] = {
     if (state.game_type) {
       this.setFieldValue(state.game_type, 'game');
     }
-    this.updateJumpButtonVisibility(this.getFieldValue('game'));
+    if (state.double_jump) {
+      this.setFieldValue(state.double_jump, 'double_jump');
+    }
+    this.updatePlatformerControlsVisibility(this.getFieldValue('game'));
   }
 };
-
 
 // Блок для мгновенного перемещения объекта
 Blockly.Blocks['object_teleport'] = {
@@ -2281,6 +2631,72 @@ javascript.javascriptGenerator.forBlock['text_print_custom'] = function(block, g
   return `Game.alert(${text});\n`;
 };
 
+javascript.javascriptGenerator.forBlock['save_vars_with_values'] = function(block, generator) {
+
+  // Генерация кода для сохранения переменных
+  var varsCode = [];
+  for (var i = 0; i < block.itemCount_; i++) {
+    var varName = generator.valueToCode(block, 'VAR' + i, javascript.Order.ATOMIC);
+    if (varName) {
+      varName = varName.replace(/^['"](.*)['"]$/, '$1');
+      varsCode.push(
+        'try{ if(typeof ' + varName + ' !== "undefined") {\n' +
+        '  d[' + JSON.stringify(varName) + '] = Game.objectSerialize(' + varName + ');\n' +
+        '} }catch(e){}\n'
+      );
+    }
+  }
+
+  // Определение имени проекта
+  var projectName = (typeof projectSettings !== 'undefined' && projectSettings.name) 
+                  ? projectSettings.name : 'myProject';
+
+  // Финальный код
+  return 'try{\n' +
+         '  var d = {};\n' +
+         varsCode.join('') +
+         '  var jsonStr = JSON.stringify(d);\n' +
+         '  Game.save(' + JSON.stringify(projectName) + ', jsonStr);\n' +
+         '}catch(e){\n' +
+         '  console.log("Save error:", e);\n' +
+         '}';
+};
+
+javascript.javascriptGenerator.forBlock['load_vars_with_values'] = function(block, generator) {
+
+  // Генерация кода загрузки
+  return '  var savedData = Game.load("' + (projectSettings ? projectSettings.name : 'myProject') + '");\n' +
+      '  if (savedData) {\n' +
+      '    var parsedData = JSON.parse(savedData);\n' +
+      '    for (var varName in parsedData) {\n' +
+      '      if (parsedData.hasOwnProperty(varName)) {\n' +
+      '        try {\n' +
+      '          var existing = (typeof eval(varName) !== "undefined") \n' +
+      '                       ? eval(varName) \n' +
+      '                       : undefined;\n' +
+      '          var newValue = Game.objectDeserialize(parsedData[varName], existing);\n' +
+      '          if (existing === undefined) {\n' +
+      '            eval(varName + " = newValue");\n' +
+      '          }\n' +
+      '        } catch (e) {\n' +
+      '          console.log("Load error " + varName + ": " + e);\n' +
+      '        }\n' +
+      '      }\n' +
+      '    }\n' +
+      '  }\n';
+};
+
+javascript.javascriptGenerator.forBlock['lists_append'] = function(block, generator) {
+  const list = generator.valueToCode(block, 'LIST', generator.ORDER_MEMBER) || '[]';
+  const item = generator.valueToCode(block, 'ITEM', generator.ORDER_COMMA) || 'null';
+  return `${list}.push(${item});\n`;
+};
+
+javascript.javascriptGenerator.forBlock['lists_pop_last'] = function(block, generator) {
+  const list = generator.valueToCode(block, 'LIST', generator.ORDER_MEMBER) || '[]';
+  return [`${list}.pop()`, generator.ORDER_FUNCTION_CALL];
+};
+
 // Генератор для проверки нажатия клавиши
 javascript.javascriptGenerator.forBlock['get_key_down'] = function(block, generator) {
   const button = block.getFieldValue('KEY');
@@ -2575,6 +2991,133 @@ javascript.javascriptGenerator.forBlock['set_tile_at'] = function(block, generat
   return `Game.changeTileInXY(${x}, ${y}, ${tileId}, ${isSolid});\n`;
 };
 
+// Генератор кода для создания частиц
+javascript.javascriptGenerator.forBlock['particles_create'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', javascript.Order.ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', javascript.Order.ATOMIC) || '0';
+  const count = generator.valueToCode(block, 'COUNT', javascript.Order.ATOMIC) || '10';
+  
+  const color = generator.valueToCode(block, 'COLOR', javascript.Order.ATOMIC) || '"#ffffff"';
+  const size = generator.valueToCode(block, 'SIZE', javascript.Order.ATOMIC) || '2';
+  const speed = generator.valueToCode(block, 'SPEED', javascript.Order.ATOMIC) || '1';
+  const direction = generator.valueToCode(block, 'DIRECTION', javascript.Order.ATOMIC) || '0';
+  const spread = generator.valueToCode(block, 'SPREAD', javascript.Order.ATOMIC) || '30';
+  const life = generator.valueToCode(block, 'LIFE', javascript.Order.ATOMIC) || '60';
+  
+  return `Game.Particles.create(${x}, ${y}, ${count}, {
+    color: ${color},
+    size: ${size},
+    speed: ${speed},
+    direction: ${direction},
+    spread: ${spread},
+    life: ${life}
+  });\n`;
+};
+
+// Генератор кода для предустановленных эффектов
+javascript.javascriptGenerator.forBlock['particles_preset'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', javascript.Order.ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', javascript.Order.ATOMIC) || '0';
+  const type = block.getFieldValue('TYPE');
+  const color = generator.valueToCode(block, 'COLOR', javascript.Order.ATOMIC) || getDefaultColor(type);
+  
+  let code = '';
+  switch(type) {
+    case 'explosion':
+      code = `Game.Particles.create(${x}, ${y}, 50, {
+        color: ${color},
+        size: 3,
+        speed: 3,
+        spread: 360,
+        life: 60
+      });\n`;
+      break;
+      
+    case 'fire':
+      code = `Game.Particles.create(${x}, ${y}, 30, {
+        color: ${color},
+        size: 4,
+        speed: 1.5,
+        direction: 90,
+        spread: 20,
+        life: 80,
+        gravity: -0.05,
+        fade: true
+      });\n`;
+      break;
+      
+    case 'smoke':
+      code = `Game.Particles.create(${x}, ${y}, 20, {
+        color: ${color},
+        size: 5,
+        speed: 1,
+        direction: 90,
+        spread: 30,
+        life: 120,
+        gravity: -0.02,
+        fade: true
+      });\n`;
+      break;
+      
+    case 'rain':
+      code = `Game.Particles.create(${x}, ${y}, 15, {
+        color: ${color},
+        size: 2,
+        speed: 5,
+        direction: 90,
+        spread: 10,
+        life: 100,
+        gravity: 0.1
+      });\n`;
+      break;
+      
+    case 'stars':
+      code = `Game.Particles.create(${x}, ${y}, 25, {
+        color: ${color},
+        size: 2,
+        speed: 2,
+        direction: 0,
+        spread: 360,
+        life: 40,
+        randomColor: true
+      });\n`;
+      break;
+      
+    case 'magic':
+      code = `Game.Particles.create(${x}, ${y}, 40, {
+        color: ${color},
+        size: 3,
+        speed: 1.5,
+        direction: 90,
+        spread: 180,
+        life: 90,
+        gravity: -0.03,
+        fade: true
+      });\n`;
+      break;
+  }
+  
+  return code;
+  
+  function getDefaultColor(type) {
+    const colors = {
+      explosion: '"#ff6600"',
+      fire: '"#ff3300"',
+      smoke: '"#555555"',
+      rain: '"#6699ff"',
+      stars: '"#ffffff"',
+      magic: '"#cc00ff"'
+    };
+    return colors[type] || '"#ffffff"';
+  }
+};
+
+
+// Генератор кода для очистки частиц
+javascript.javascriptGenerator.forBlock['particles_clear'] = function(block, generator) {
+  return 'Game.Particles.clear();\n';
+};
+
 // Генератор для выбора цвета
 javascript.javascriptGenerator.forBlock['field_colour'] = function(block, generator) {
   const color = block.getFieldValue('FIELDCOLOUR');
@@ -2684,6 +3227,12 @@ javascript.javascriptGenerator.forBlock['clone_object'] = function(block, genera
   const obj1 = generator.getVariableName(block.getFieldValue('Object'));
   const obj2 = generator.getVariableName(block.getFieldValue('Object2'));
   return `${obj2}=Game.mirrorObject(${obj1});\n`;
+};
+
+javascript.javascriptGenerator.forBlock['game_copy_state'] = function(block, generator) {
+  const source = generator.getVariableName(block.getFieldValue('SOURCE'));
+  const target = generator.getVariableName(block.getFieldValue('TARGET'));
+  return `Game.copyState(${source}, ${target});\n`;
 };
 
 // Генератор для рисования объекта
@@ -2880,7 +3429,8 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   const speedX = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
   const speedY = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
   const gameType = block.getFieldValue('game');
-  const jumpButton = block.getFieldValue('jump_button') || 'ArrowUp'; // Default to ArrowUp if not set
+  const jumpButton = block.getFieldValue('jump_button') || 'ArrowUp';
+  const doubleJumpEnabled = block.getFieldValue('double_jump') === 'TRUE';
   const acceleration = 0.2;
 
   const controlFuncName = `${obj}_control`;
@@ -2891,6 +3441,10 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
     
     if (gameType === 'platform') {
       stateVars.push(`${obj}_jumpReady = true`);
+      if (doubleJumpEnabled) {
+        stateVars.push(`${obj}_jumpCount = 0`);
+        stateVars.push(`${obj}_hasDoubleJump = false`);
+      }
     }
     
     if (stateVars.length) {
@@ -2907,18 +3461,40 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
     
     switch(controlType) {
       case 'key': {
-        // Only getKey is cached as it's called multiple times
         funcCode += '  // Keyboard controls\n';
         funcCode += '  var getKey = Game.getKey;\n';
         funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + ` +
                    `(getKey("ArrowRight") ? ${speedX} : getKey("ArrowLeft") ? -${speedX} : 0) * ${acceleration};\n`;
         
         if (gameType === 'platform') {
-          funcCode += `  if(getKey("${jumpButton}") && obj.isOnGround && ${obj}_jumpReady) {\n`;
-          funcCode += `    obj.speedy = -${speedY};\n`;
-          funcCode += `    ${obj}_jumpReady = false;\n`;
-          funcCode += `  }\n`;
-          funcCode += `  if(!getKey("${jumpButton}")) ${obj}_jumpReady = true;\n`;
+          if (doubleJumpEnabled) {
+            // Сбрасываем счетчик прыжков при приземлении
+            funcCode += `  if(obj.isOnGround) {\n`;
+            funcCode += `    ${obj}_jumpCount = 0;\n`;
+            funcCode += `    ${obj}_hasDoubleJump = true;\n`;
+            funcCode += `  }\n`;
+            
+            // Обработка нажатия кнопки прыжка
+            funcCode += `  if(getKey("${jumpButton}") && ${obj}_jumpReady) {\n`;
+            funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
+            funcCode += `      obj.speedy = -${speedY};\n`;
+            funcCode += `      ${obj}_jumpCount++;\n`;
+            funcCode += `      ${obj}_jumpReady = false;\n`;
+            funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
+            funcCode += `    }\n`;
+            funcCode += `  }\n`;
+            // Сбрасываем jumpReady при отпускании кнопки
+            funcCode += `  if(!getKey("${jumpButton}")) {\n`;
+            funcCode += `    ${obj}_jumpReady = true;\n`;
+            funcCode += `  }\n`;
+          } else {
+            // Обычный прыжок без двойного
+            funcCode += `  if(getKey("${jumpButton}") && obj.isOnGround && ${obj}_jumpReady) {\n`;
+            funcCode += `    obj.speedy = -${speedY};\n`;
+            funcCode += `    ${obj}_jumpReady = false;\n`;
+            funcCode += `  }\n`;
+            funcCode += `  if(!getKey("${jumpButton}")) ${obj}_jumpReady = true;\n`;
+          }
           funcCode += `  if(getKey("ArrowDown")) obj.speedx *= 0.7;\n`;
         } else {
           funcCode += `  if(getKey("ArrowUp")) obj.speedy = -${speedY};\n`;
@@ -2927,13 +3503,13 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
         break;
       }
       
+      // Аналогичные изменения для других типов управления (stick0, stick1, both)
       case 'stick0': 
       case 'stick1': {
         const stickIndex = controlType === 'stick0' ? 0 : 2;
         const axisIndex = controlType === 'stick0' ? 1 : 3;
         
         funcCode += `  // Gamepad controls\n`;
-        // Only getAxes is cached as it's called twice
         funcCode += `  var getAxes = Game.getAxes;\n`;
         funcCode += `  var stickX = getAxes(${stickIndex});\n`;
         funcCode += `  if(Math.abs(stickX) > 0.3) {\n`;
@@ -2941,12 +3517,30 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
         funcCode += `  }\n`;
         
         if (gameType === 'platform') {
-          funcCode += `  var stickY = getAxes(${axisIndex});\n`;
-          funcCode += `  if(stickY < -0.3 && obj.isOnGround && ${obj}_jumpReady) {\n`;
-          funcCode += `    obj.speedy = -${speedY};\n`;
-          funcCode += `    ${obj}_jumpReady = false;\n`;
-          funcCode += `  }\n`;
-          funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
+          if (doubleJumpEnabled) {
+            funcCode += `  if(obj.isOnGround) {\n`;
+            funcCode += `    ${obj}_jumpCount = 0;\n`;
+            funcCode += `    ${obj}_hasDoubleJump = true;\n`;
+            funcCode += `  }\n`;
+            
+            funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+            funcCode += `  if(stickY < -0.3 && ${obj}_jumpReady) {\n`;
+            funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
+            funcCode += `      obj.speedy = -${speedY};\n`;
+            funcCode += `      ${obj}_jumpCount++;\n`;
+            funcCode += `      ${obj}_jumpReady = false;\n`;
+            funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
+            funcCode += `    }\n`;
+            funcCode += `  }\n`;
+            funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
+          } else {
+            funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+            funcCode += `  if(stickY < -0.3 && obj.isOnGround && ${obj}_jumpReady) {\n`;
+            funcCode += `    obj.speedy = -${speedY};\n`;
+            funcCode += `    ${obj}_jumpReady = false;\n`;
+            funcCode += `  }\n`;
+            funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
+          }
         } else {
           funcCode += `  var stickY = getAxes(${axisIndex});\n`;
           funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
@@ -2957,7 +3551,6 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
       
       case 'both': {
         funcCode += '  // Combined controls\n';
-        // Cache both functions as they're called multiple times
         funcCode += '  var getKey = Game.getKey, getAxes = Game.getAxes;\n';
         funcCode += `  var targetSpeedX = getKey("ArrowLeft") ? -${speedX} : ` +
                    `getKey("ArrowRight") ? ${speedX} : 0;\n`;
@@ -2968,12 +3561,30 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
         funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + targetSpeedX * ${acceleration};\n`;
         
         if (gameType === 'platform') {
-          funcCode += `  var stickY = getAxes(1);\n`;
-          funcCode += `  if((getKey("${jumpButton}") || stickY < -0.3) && obj.isOnGround && ${obj}_jumpReady) {\n`;
-          funcCode += `    obj.speedy = -${speedY};\n`;
-          funcCode += `    ${obj}_jumpReady = false;\n`;
-          funcCode += `  }\n`;
-          funcCode += `  if(!(getKey("${jumpButton}") || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
+          if (doubleJumpEnabled) {
+            funcCode += `  if(obj.isOnGround) {\n`;
+            funcCode += `    ${obj}_jumpCount = 0;\n`;
+            funcCode += `    ${obj}_hasDoubleJump = true;\n`;
+            funcCode += `  }\n`;
+            
+            funcCode += `  var stickY = getAxes(1);\n`;
+            funcCode += `  if((getKey("${jumpButton}") || stickY < -0.3) && ${obj}_jumpReady) {\n`;
+            funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
+            funcCode += `      obj.speedy = -${speedY};\n`;
+            funcCode += `      ${obj}_jumpCount++;\n`;
+            funcCode += `      ${obj}_jumpReady = false;\n`;
+            funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
+            funcCode += `    }\n`;
+            funcCode += `  }\n`;
+            funcCode += `  if(!(getKey("${jumpButton}") || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
+          } else {
+            funcCode += `  var stickY = getAxes(1);\n`;
+            funcCode += `  if((getKey("${jumpButton}") || stickY < -0.3) && obj.isOnGround && ${obj}_jumpReady) {\n`;
+            funcCode += `    obj.speedy = -${speedY};\n`;
+            funcCode += `    ${obj}_jumpReady = false;\n`;
+            funcCode += `  }\n`;
+            funcCode += `  if(!(getKey("${jumpButton}") || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
+          }
         } else {
           funcCode += `  if(getKey("ArrowUp")) obj.speedy = -${speedY};\n`;
           funcCode += `  if(getKey("ArrowDown")) obj.speedy = ${speedY};\n`;
@@ -3067,12 +3678,23 @@ javascript.javascriptGenerator.forBlock['get_object'] = function(block, generato
   }
 };
 
+javascript.javascriptGenerator.forBlock['object_animation'] = function(block, generator) {
+  const obj = generator.getVariableName(block.getFieldValue('OBJECT'));
+  const frames = generator.valueToCode(block, 'FRAMES', generator.ORDER_ATOMIC) || '[]';
+  const speed = generator.valueToCode(block, 'SPEED', generator.ORDER_ATOMIC) || '10';
+  const loop = block.getFieldValue('LOOP') === 'TRUE';
+  
+  return `${obj}.sprite = ${frames};\n` +
+         `${obj}.animationSpeed = ${speed};\n` +
+         `${obj}.animationLoop = ${loop};\n`;
+};
+
 // Генератор кода для блока проверки имени объекта
 javascript.javascriptGenerator.forBlock['if_object_name_equals'] = function(block, generator) {
   const objectType = block.getFieldValue('OBJECT_TYPE');
   const name = generator.valueToCode(block, 'NAME', generator.ORDER_ATOMIC) || '""';
   
-  return [`${objectType}.name === ${name}`, javascript.Order.ATOMIC];
+  return [`(${objectType}.name === ${name})`, javascript.Order.ATOMIC];
 };
 
 // Генератор для получения расстояния

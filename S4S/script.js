@@ -39,6 +39,8 @@ const workspace = Blockly.inject('blocklyDiv', {
 			<block type="level_editor"></block>
 			<block type="get_tile_at"></block>
 			<block type="set_tile_at"></block>
+			<block type="save_vars_with_values"></block>
+			<block type="load_vars_with_values"></block>
             <block type="field_multilineinput"></block>
         </category>
         <category name="${Blockly.Msg['OBJECTS']}" colour="340">
@@ -46,6 +48,7 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="new_object"></block>
 			<block type="new_object_from_proto"></block>
             <block type="clone_object"></block>
+			<block type="game_copy_state"></block>
             <block type="delete_object"></block>
             <block type="change_object_var"></block>
             <block type="addto_object_var"></block>
@@ -240,6 +243,20 @@ const workspace = Blockly.inject('blocklyDiv', {
                     </block>
                 </value>
             </block>
+			<block type="lists_append">
+				<value name="LIST">
+                    <block type="variables_get">
+                        <field name="VAR" class="listVar">...</field>
+                    </block>
+                </value>
+			</block>
+			<block type="lists_pop_last">
+				<value name="LIST">
+                    <block type="variables_get">
+                        <field name="VAR" class="listVar">...</field>
+                    </block>
+                </value>
+			</block>
         </category>
         <category name="${Blockly.Msg['DRAWING']}" colour="30">
             <block type="field_colour"></block>
@@ -249,6 +266,10 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="draw_image"></block>
             <block type="clear_screen"></block>
             <block type="field_png"></block>
+			<block type="object_animation"></block>
+			<block type="particles_create"></block>
+			<block type="particles_preset"></block>
+			<block type="particles_clear"></block>
         </category>
         <sep></sep>
         <category name="${Blockly.Msg['VARIABLES']}" custom="VARIABLE"></category>
