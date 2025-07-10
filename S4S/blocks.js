@@ -31,6 +31,7 @@ var ObjectType = [
 // ========= Вспомогательные функции ========
 
 var proto_object_array = [];
+var object_array = [];
 var store_image_array = [];
 
 function add_to_image_array(str) {
@@ -144,7 +145,7 @@ Blockly.Blocks['particles_create'] = {
         .appendField(Blockly.Msg['PARTICLES_CREATE_OPTIONS']);
     
     this.appendValueInput('COLOR')
-        .setCheck('String')
+        .setCheck('Colour')
         .appendField(Blockly.Msg['PARTICLES_CREATE_COLOR']);
     this.appendValueInput('SIZE')
         .setCheck('Number')
@@ -451,6 +452,25 @@ Blockly.Blocks['get_key_pressed'] = {
   }
 };
 
+Blockly.Blocks['game_vibrate'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['VIBRATE_TITLE'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['VIBRATE_TYPE_SIMPLE'], "SIMPLE"],
+          [Blockly.Msg['VIBRATE_TYPE_PATTERN'], "PATTERN"]
+        ]), "TYPE");
+    this.appendValueInput("DURATION")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['VIBRATE_DURATION']);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(60);
+    this.setTooltip(Blockly.Msg['VIBRATE_TITLE']);
+  }
+};
+
 // Блок получения значения оси
 Blockly.Blocks['get_axes'] = {
   init: function() {
@@ -584,6 +604,71 @@ Blockly.Blocks['draw_line'] = {
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
 	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+  }
+};
+
+Blockly.Blocks['draw_triangle'] = {
+  init: function() {
+    this.setColour(30);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['DRAW_TRIANGLE_LABEL']);
+    this.appendValueInput("X1")
+        .setCheck("Number")
+        .appendField("X1");
+    this.appendValueInput("Y1")
+        .setCheck("Number")
+        .appendField("Y1");
+    this.appendValueInput("X2")
+        .setCheck("Number")
+        .appendField("X2");
+    this.appendValueInput("Y2")
+        .setCheck("Number")
+        .appendField("Y2");
+    this.appendValueInput("X3")
+        .setCheck("Number")
+        .appendField("X3");
+    this.appendValueInput("Y3")
+        .setCheck("Number")
+        .appendField("Y3");
+    this.appendValueInput("Colour")
+        .setCheck("Colour")
+        .appendField(Blockly.Msg['COLOR_LABEL']);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldCheckbox("FALSE"), "FILLED")
+        .appendField(Blockly.Msg['FILL_LABEL']);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+  }
+};
+
+// Блок для прямоугольника (с опцией заливки)
+Blockly.Blocks['draw_rect'] = {
+  init: function() {
+    this.setColour(30);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['DRAW_RECT_LABEL']);
+    this.appendValueInput("X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_X']);
+    this.appendValueInput("Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_Y']);
+    this.appendValueInput("Width")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
+    this.appendValueInput("Height")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
+    this.appendValueInput("Colour")
+        .setCheck("Colour")
+        .appendField(Blockly.Msg['COLOR_LABEL']);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldCheckbox("FALSE"), "FILLED")
+        .appendField(Blockly.Msg['FILL_LABEL']);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
   }
 };
 
@@ -830,7 +915,19 @@ Blockly.Blocks['level_editor'] = {
       .appendField(new FieldLevelEditor('{"objects": [],"tiles": [],"width": 800,"height": 600,"gridSize": 32}', null, {}), 'LEVEL_DATA');
 	this.appendValueInput("TILESET")
         .setCheck("field_png")
-        .appendField("Tileset");
+        .appendField(Blockly.Msg['LEVEL_EDITOR_TILESET']);
+    this.setColour(60);
+	this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+  }
+};
+
+Blockly.Blocks['set_tile'] = {
+  init: function() {
+	this.appendValueInput("TILESET")
+        .setCheck("field_png")
+        .appendField(Blockly.Msg['LEVEL_EDITOR_TILESET']);
     this.setColour(60);
 	this.setInputsInline(true);
     this.setPreviousStatement(true, "Array");
@@ -860,6 +957,69 @@ Blockly.Blocks['is_colliding_with_tile'] = {
     
     this.setTooltip(Blockly.Msg['IS_COLLIDING_WITH_TILE_TOOLTIP']);
     this.setHelpUrl("");
+  }
+};
+
+// Блоки для паузы
+Blockly.Blocks['game_pause'] = {
+  init: function() {
+    this.setColour(60);
+    this.appendDummyInput()
+		.appendField(Blockly.Msg['PAUSE_RESUME_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['PAUSE_PAUSE'], 'PAUSE'],
+          [Blockly.Msg['PAUSE_RESUME'], 'RESUME']
+        ]), 'ACTION');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip(Blockly.Msg['PAUSE_TOOLTIP']);
+  }
+};
+
+Blockly.Blocks['is_paused'] = {
+  init: function() {
+    this.setColour(210);
+    this.setInputsInline(true);
+    this.setOutput(true, 'Boolean');
+    
+    // Выбор типа объекта
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['IS_PAUSED_LABEL']);
+    this.setHelpUrl("");
+  }
+};
+
+// Блоки для работы с фоном
+Blockly.Blocks['set_background'] = {
+  init: function() {
+    this.setColour(60);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['SET_BACKGROUND_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['BACKGROUND_MODE_STRETCH'], '0'],
+          [Blockly.Msg['BACKGROUND_MODE_TILE'], '1']
+        ]), 'MODE');
+    this.appendValueInput("SPRITE")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['SPRITE_LABEL']);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip(Blockly.Msg['SET_BACKGROUND_TOOLTIP']);
+  }
+};
+
+Blockly.Blocks['set_background_xy'] = {
+  init: function() {
+    this.setColour(60);
+    this.appendValueInput("X")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['SET_BACKGROUND_XY_LABEL_X']);
+    this.appendValueInput("Y")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['SET_BACKGROUND_XY_LABEL_Y']);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip(Blockly.Msg['SET_BACKGROUND_XY_TOOLTIP']);
   }
 };
 
@@ -1655,75 +1815,82 @@ Blockly.Blocks['addto_object_var'] = {
 
 Blockly.Blocks['set_object_bounding'] = {
   init: function() {
-    // Основное поле с выбором режима
-	this.setInputsInline(true);
+    this.setInputsInline(true);
     this.appendDummyInput()
-        .appendField(Blockly.Msg['CHANGE_BOUNDING_LABEL'] || 'Изменить параметр:')
+        .appendField(Blockly.Msg['CHANGE_BOUNDING_LABEL'])
         .appendField(new Blockly.FieldDropdown([
-          [Blockly.Msg['OBJECT_BY_VAR_LABEL'] || 'По переменной', 'VAR'],
-          [Blockly.Msg['OBJECT_TYPE_COLLIDED'] || 'Столкнувшийся объект', ' object'],
-          [Blockly.Msg['OBJECT_TYPE_THIS'] || 'Этот объект', 'this'],
-          [Blockly.Msg['OBJECT_TYPE_ITERATED'] || 'Итерируемый объект', 'object']
+          [Blockly.Msg['OBJECT_BY_VAR_LABEL'], 'VAR'],
+          [Blockly.Msg['OBJECT_TYPE_COLLIDED'], 'object'],
+          [Blockly.Msg['OBJECT_TYPE_THIS'], 'this'],
+          [Blockly.Msg['OBJECT_TYPE_ITERATED'], 'object']
         ], this.updateShape_.bind(this)), 'MODE');
 
-    // Поле для выбора переменной (изначально скрыто)
     this.appendDummyInput('VAR_INPUT')
         .appendField(new Blockly.FieldVariable(
-          Blockly.Msg['DEFAULT_VARIABLE_NAME'] || 'obj1',
+          Blockly.Msg['DEFAULT_VARIABLE_NAME'],
           null, null, 'Object'), 'VAR_NAME')
-        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'])
         .setVisible(false);
 
-    // Поле для значения
-    this.appendValueInput("WIDTH")
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['COLLISION_SHAPE_LABEL'])
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['COLLISION_AUTO'], '0'],
+          [Blockly.Msg['COLLISION_RECTANGLE'], '1'],
+          [Blockly.Msg['COLLISION_CIRCLE_AUTO'], '2'],
+          [Blockly.Msg['COLLISION_CIRCLE_CUSTOM'], 'CUSTOM']
+        ], this.updateCollisionShape_.bind(this)), 'COLLISION_SHAPE');
+
+    this.widthInput = this.appendValueInput("WIDTH")
         .setCheck("Number")
-        .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH'] || 'Width');
-	this.appendValueInput("HEIGHT")
+        .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
+
+    this.heightInput = this.appendValueInput("HEIGHT")
         .setCheck("Number")
-        .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT'] || 'Height');
+        .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
+
+    this.radiusInput = this.appendValueInput("CUSTOM_RADIUS")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['CUSTOM_RADIUS_LABEL'])
+        .setVisible(false);
 
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setColour(340);
-
-    // Инициализация видимости
+    this.setColour(190);
     this.updateShape_(this.getFieldValue('MODE'));
+    this.updateCollisionShape_(this.getFieldValue('COLLISION_SHAPE'));
   },
 
   updateShape_: function(selectedMode) {
-    // Получаем поле ввода переменной
-    var varInput = this.getInput('VAR_INPUT');
-    
-    // Показываем только если выбран режим VAR
-    if (varInput) {
-      varInput.setVisible(selectedMode === 'VAR');
-      
-      // Если нужно, можно обновить список переменных
-      if (selectedMode === 'VAR') {
-        var varField = this.getField('VAR_NAME');
-        if (varField && varField.initModel) {
-          varField.initModel();
-        }
-      }
+    this.getInput('VAR_INPUT').setVisible(selectedMode === 'VAR');
+    if (selectedMode === 'VAR') {
+      this.getField('VAR_NAME').initModel();
     }
+  },
 
+  updateCollisionShape_: function(selectedShape) {
+    const showDimensions = selectedShape === '0' || selectedShape === '1';
     
+    this.getInput('WIDTH').setVisible(showDimensions);
+    this.getInput('HEIGHT').setVisible(showDimensions);
+    this.getInput('CUSTOM_RADIUS').setVisible(selectedShape === 'CUSTOM');
   },
 
   saveExtraState: function() {
     return {
       mode: this.getFieldValue('MODE'),
-      varName: this.getFieldValue('VAR_NAME')
+      varName: this.getFieldValue('VAR_NAME'),
+      collisionShape: this.getFieldValue('COLLISION_SHAPE')
     };
   },
 
   loadExtraState: function(state) {
     if (state) {
       this.setFieldValue(state.mode || 'VAR', 'MODE');
-      if (state.varName) {
-        this.setFieldValue(state.varName, 'VAR_NAME');
-      }
+      if (state.varName) this.setFieldValue(state.varName, 'VAR_NAME');
+      this.setFieldValue(state.collisionShape || '0', 'COLLISION_SHAPE');
       this.updateShape_(state.mode || 'VAR');
+      this.updateCollisionShape_(state.collisionShape || '0');
     }
   }
 };
@@ -2162,9 +2329,6 @@ Blockly.Blocks['object_teleport'] = {
     this.getInput('X').setVisible(newMode === 'COORDS');
     this.getInput('Y').setVisible(newMode === 'COORDS');
     this.getInput('TARGET_OBJECT_INPUT').setVisible(newMode === 'OBJECT');
-    
-    // Перестраиваем блок
-    this.render();
   },
   
   saveExtraState: function() {
@@ -2709,6 +2873,24 @@ javascript.javascriptGenerator.forBlock['get_key_pressed'] = function(block, gen
   return [`Game.getKeyPress("${button}")`, generator.ORDER_ATOMIC];
 };
 
+javascript.javascriptGenerator.forBlock['game_vibrate'] = function(block, generator) {
+  // Получаем значение длительности вибрации
+  const duration = generator.valueToCode(block, 'DURATION', javascript.Order.ATOMIC) || '0';
+  
+  // Поддержка двух вариантов:
+  // 1. Простая вибрация (число)
+  // 2. Паттерн вибрации (массив)
+  const isPattern = block.getFieldValue('TYPE') === 'PATTERN';
+  
+  if (isPattern) {
+    // Для паттерна генерируем массив
+    return `Game.vibrate([${duration}]);\n`;
+  } else {
+    // Для простой вибрации передаем число
+    return `Game.vibrate(${duration});\n`;
+  }
+};
+
 // Генератор для получения значения оси
 javascript.javascriptGenerator.forBlock['get_axes'] = function(block, generator) {
   const axis = block.getFieldValue('KEY');
@@ -2731,6 +2913,34 @@ javascript.javascriptGenerator.forBlock['draw_line'] = function(block, generator
   const y1 = generator.valueToCode(block, 'Y1', generator.ORDER_ATOMIC);
   const color = generator.valueToCode(block, 'Colour', generator.ORDER_ATOMIC);
   return `Draw.line(${x}, ${y}, ${x1}, ${y1}, ${color});\n`;
+};
+
+// Генератор для треугольника
+javascript.javascriptGenerator.forBlock['draw_triangle'] = function(block, generator) {
+  const x1 = generator.valueToCode(block, 'X1', generator.ORDER_ATOMIC);
+  const y1 = generator.valueToCode(block, 'Y1', generator.ORDER_ATOMIC);
+  const x2 = generator.valueToCode(block, 'X2', generator.ORDER_ATOMIC);
+  const y2 = generator.valueToCode(block, 'Y2', generator.ORDER_ATOMIC);
+  const x3 = generator.valueToCode(block, 'X3', generator.ORDER_ATOMIC);
+  const y3 = generator.valueToCode(block, 'Y3', generator.ORDER_ATOMIC);
+  const color = generator.valueToCode(block, 'Colour', generator.ORDER_ATOMIC);
+  const filled = block.getFieldValue('FILLED') === 'TRUE';
+  
+  const func = filled ? 'Draw.filledTriangle' : 'Draw.triangle';
+  return `${func}(${x1}, ${y1}, ${x2}, ${y2}, ${x3}, ${y3}, ${color});\n`;
+};
+
+// Генератор для прямоугольника
+javascript.javascriptGenerator.forBlock['draw_rect'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC);
+  const width = generator.valueToCode(block, 'Width', generator.ORDER_ATOMIC);
+  const height = generator.valueToCode(block, 'Height', generator.ORDER_ATOMIC);
+  const color = generator.valueToCode(block, 'Colour', generator.ORDER_ATOMIC);
+  const filled = block.getFieldValue('FILLED') === 'TRUE';
+  
+  const func = filled ? 'Draw.filledRect' : 'Draw.rect';
+  return `${func}(${x}, ${y}, ${width}, ${height}, ${color});\n`;
 };
 
 // Генератор для рисования текста
@@ -2924,6 +3134,11 @@ javascript.javascriptGenerator.forBlock['level_editor'] = function(block, genera
   return result.join('\n') || '// Уровень не содержит объектов и тайлов\n';
 };
 
+javascript.javascriptGenerator.forBlock['set_tile'] = function(block, generator) {
+  const sprite = generator.valueToCode(block, 'TILESET', generator.ORDER_ATOMIC);
+  return 'Game.setTileImage(' + sprite + ');\n';
+};
+
 // Генератор кода для блока проверки столкновения с тайлом
 javascript.javascriptGenerator.forBlock['is_colliding_with_tile'] = function(block, generator) {
   const objectType = block.getFieldValue('OBJECT_TYPE');
@@ -2943,6 +3158,32 @@ javascript.javascriptGenerator.forBlock['is_colliding_with_tile'] = function(blo
   }
   
   return [`isCollidingWithTile(${objectType}, ${tileId})`, javascript.Order.ATOMIC];
+};
+
+// Генераторы кода для блоков фона
+javascript.javascriptGenerator.forBlock['set_background'] = function(block, generator) {
+  const sprite = generator.valueToCode(block, 'SPRITE', generator.ORDER_ATOMIC) || '0';
+  const mode = block.getFieldValue('MODE');
+  return `Game.setBackground(${sprite}, ${mode});\n`;
+};
+
+javascript.javascriptGenerator.forBlock['set_background_xy'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+  return `Game.setBackgroundXY(${x}, ${y});\n`;
+};
+
+javascript.javascriptGenerator.forBlock['is_paused'] = function(block, generator) {
+  return [`Game.isPaused()`, javascript.Order.ATOMIC];
+};
+
+javascript.javascriptGenerator.forBlock['game_pause'] = function(block, generator) {
+  const action = block.getFieldValue('ACTION');
+  if (action === 'PAUSE') {
+    return 'Game.pause();\n';
+  } else {
+    return 'Game.resume();\n';
+  }
 };
 
 // Генератор кода для блока получения информации о тайле
@@ -3135,8 +3376,8 @@ function isES5Compatible(code) {
     'import ', 'export ',    // Модули ES6
     'Promise', 'Map', 'Set'  // Новые встроенные объекты
   ];
-
-  return !es6Keywords.some(keyword => code.includes(keyword));
+  return true;
+  //return !es6Keywords.some(keyword => code.includes(keyword));
 }
 
 // Генератор для ввода JS кода
@@ -3309,19 +3550,29 @@ javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, g
 // Генератор для изменения границ столкновения
 javascript.javascriptGenerator.forBlock['set_object_bounding'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
-  const param = block.getFieldValue('NAME');
-  const width = generator.valueToCode(block, 'WIDTH', javascript.Order.ATOMIC) || '0';
-  const height = generator.valueToCode(block, 'HEIGHT', javascript.Order.ATOMIC) || '0';
+  const shape = block.getFieldValue('COLLISION_SHAPE');
+  const objRef = mode === 'VAR' ? 
+    generator.getVariableName(block.getFieldValue('VAR_NAME')) || 'obj1' : 
+    mode;
+
+  let code = '';
   
-  let code;
-  if (mode === 'VAR') {
-    const varName = generator.getVariableName(block.getFieldValue('VAR_NAME')) || 'obj1';
-    code = `${varName}.boundingWidth = ${width};\n${varName}.boundingHeight = ${height};\n`;
-  } else {
-    // Для режимов object/this/iterated
-    code = `${mode}.boundingWidth = ${width};\n${mode}.boundingHeight = ${height};\n`;
+  if (shape === '0' || shape === '1') {
+    const width = generator.valueToCode(block, 'WIDTH', generator.ORDER_ATOMIC) || '0';
+    const height = generator.valueToCode(block, 'HEIGHT', generator.ORDER_ATOMIC) || '0';
+    code += `${objRef}.boundingWidth = ${width};\n${objRef}.boundingHeight = ${height};\n`;
   }
-  
+
+  switch(shape) {
+    case '0': code += `${objRef}.collisionShape = 0;\n`; break;
+    case '1': code += `${objRef}.collisionShape = 1;\n`; break;
+    case '2': code += `${objRef}.collisionShape = 2;\n`; break;
+    case 'CUSTOM': 
+      const radius = generator.valueToCode(block, 'CUSTOM_RADIUS', generator.ORDER_ATOMIC) || '10';
+      code += `${objRef}.collisionShape = { radius: ${radius} };\n`;
+      break;
+  }
+
   return code;
 };
 

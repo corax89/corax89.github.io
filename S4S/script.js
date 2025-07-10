@@ -25,18 +25,44 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="get_key_pressed"></block>
             <block type="get_key_down"></block>
             <block type="get_axes"></block>
+			<block type="game_pause"></block>
             <block type="get_time"></block>
             <block type="get_memory"></block>
             <block type="get_touch"></block>
             <block type="get_touchxy"></block>
-			<block type="set_timer"></block>
-			<block type="set_interval"></block>
+			<block type="game_vibrate">
+			  <field name="TYPE">SIMPLE</field>
+			  <value name="DURATION">
+				<shadow type="math_number">
+				  <field name="NUM">200</field>
+				</shadow>
+			  </value>
+			</block>
+			<block type="set_timer">
+			  <field name="BODY"></field>
+			  <value name="time">
+				<shadow type="math_number">
+				  <field name="NUM">1000</field>
+				</shadow>
+			  </value>
+			</block>
+			<block type="set_interval">
+			  <field name="CALLBACK"></field>
+			  <value name="INTERVAL">
+				<shadow type="math_number">
+				  <field name="NUM">1000</field>
+				</shadow>
+			  </value>
+			</block>
 			<block type="clear_interval"></block>
             <block type="music_block"></block>
             <block type="play_music"></block>
 			<block type="audio_block"></block>
 			<block type="play_sound"></block>
 			<block type="level_editor"></block>
+			<block type="set_background"></block>
+			<block type="set_background_xy"></block>
+			<block type="set_tile"></block>
 			<block type="get_tile_at"></block>
 			<block type="set_tile_at"></block>
 			<block type="save_vars_with_values"></block>
@@ -55,13 +81,13 @@ const workspace = Blockly.inject('blocklyDiv', {
 			<block type="get_object"></block>
             <block type="get_object_var"></block>
 			<block type="get_colliding_tile_info"></block>
-			<block type="set_object_bounding"></block>
 			<block type="object_onstep"></block>
 			<block type="object_oncollision"></block>
 			<block type="object_iterate"></block>
         </category>
 		<category name="${Blockly.Msg['MOVE']}" colour="190">
 			<block type="set_gravitation"></block>
+			<block type="set_object_bounding"></block>
 			<block type="object_control"></block>
             <block type="object_velocity"></block>
 			<block type="object_teleport"></block>
@@ -83,6 +109,7 @@ const workspace = Blockly.inject('blocklyDiv', {
 			<block type="object_exit_screen"></block>
 			<block type="object_tap_screen"></block>
 			<block type="is_colliding_with_tile"></block>
+			<block type="is_paused"></block>
         </category>
         <category name="${Blockly.Msg['LOOPS']}" colour="120">
             <block type="controls_repeat_ext">
@@ -262,6 +289,9 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="field_colour"></block>
             <block type="draw_text"></block>
             <block type="draw_point"></block>
+			<block type="draw_line"></block>
+			<block type="draw_triangle"></block>
+			<block type="draw_rect"></block>
             <block type="draw_object"></block>
             <block type="draw_image"></block>
             <block type="clear_screen"></block>
