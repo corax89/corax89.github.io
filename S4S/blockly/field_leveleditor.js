@@ -2,11 +2,11 @@
  * Level Editor Field for Blockly with object placement and tile editing
  */
 class FieldLevelEditor extends Blockly.Field {
-	constructor(value, validator, config) {
+    constructor(value, validator, config) {
 		// 1. Сначала вызываем конструктор родительского класса
 		super(value, validator, config);
 
-		// 2. Инициализируем editorConfig как первое свойство
+		// 2. Теперь можно безопасно использовать this
 		this.editorConfig = {
 			gridSize: 32,
 			tileSize: 32,
@@ -23,15 +23,31 @@ class FieldLevelEditor extends Blockly.Field {
 		// 3. Инициализируем остальные свойства
 		this.objects_ = [];
 		this.tileMap_ = []; // 2D массив для тайлов [y][x]
-		this.width_ = 800;
-		this.height_ = 600;
+		this.width_ = 1280;
+		this.height_ = 720;
 		this.imageCache = {};
 		this.tileCache = {};
 		this.firstRender = true;
+		this.editorModal = null;
+		this.offsetX = 0;
+		this.offsetY = 0;
+		this.zoom = 1;
+		this.isObjectHighlighted = false;
+		this.uniqueObjectsAdded = [];
 
 		// 4. Устанавливаем начальное значение через защищенный метод
 		this.doValueUpdate_(value);
 		this.addStyles_();
+	}
+
+	isObjectUnique(protoName) {
+		// Для proto_object_array разрешаем множественные экземпляры
+		if (proto_object_array.some(p => workspace.getVariableById(p.name).name === protoName)) {
+			return true;
+		}
+
+		// Для object_array проверяем, что объект еще не добавлен
+		return !this.objects_.some(obj => obj.protoName === protoName);
 	}
 
 	safeSetValue(value) {
@@ -52,7 +68,7 @@ class FieldLevelEditor extends Blockly.Field {
 			this.width_ = typeof parsed.width === 'number' ? parsed.width : 800;
 			this.height_ = typeof parsed.height === 'number' ? parsed.height : 600;
 
-			// Инициализируем карту тайлов (конвертируем из плоского массива при необходимости)
+			// Всегда инициализируем карту тайлов
 			this.initializeTileMap(parsed.tiles, this.width_, this.height_);
 
 			if (typeof parsed.gridSize === 'number') {
@@ -66,40 +82,64 @@ class FieldLevelEditor extends Blockly.Field {
 			this.resetToDefaults();
 		}
 	}
+	
+	markBufferDirty() {
+		if (this.editorModal) {
+			this.isBufferDirty = true;
+		}
+	}
+
+	updatePaletteForUniqueObject(protoName, isAdded) {
+		const objectPalette = document.querySelector('#object-palette');
+		if (!objectPalette)
+			return;
+
+		objectPalette.querySelectorAll('.object-item').forEach(item => {
+			if (item.dataset.name === protoName) {
+				if (isAdded) {
+					item.classList.add('disabled');
+					// Добавляем значок, если его еще нет
+					if (!item.querySelector('.object-badge')) {
+						const badge = document.createElement('div');
+						badge.className = 'object-badge';
+						badge.textContent = '✓';
+						item.appendChild(badge);
+					}
+				} else {
+					item.classList.remove('disabled');
+					// Удаляем значок, если он есть
+					const badge = item.querySelector('.object-badge');
+					if (badge) {
+						item.removeChild(badge);
+					}
+				}
+			}
+		});
+	}
 
 	doValueUpdate_(newValue) {
 		super.doValueUpdate_(newValue);
 
-		// Parse the value and initialize all properties
 		try {
-			const parsed = JSON.parse(this.getValue());
+			// Парсим текущее значение (не newValue, так как родительский класс уже обновил value_)
+			const parsed = this.value_ ? JSON.parse(this.value_) : {};
+			
 			this.width_ = parsed.width || 800;
 			this.height_ = parsed.height || 600;
 			this.objects_ = Array.isArray(parsed.objects) ? parsed.objects : [];
 
-			// Initialize tile map
-			const tileSize = this.editorConfig.tileSize;
-			const cols = Math.ceil(this.width_ / tileSize);
-			const rows = Math.ceil(this.height_ / tileSize);
-
-			this.tileMap_ = [];
-			for (let y = 0; y < rows; y++) {
-				this.tileMap_[y] = new Array(cols).fill(0);
-			}
-
-			// Fill with existing tiles if available
+			// Всегда инициализируем карту тайлов
 			if (Array.isArray(parsed.tiles)) {
-				if (parsed.tiles.length === cols * rows) {
-					// Flat array format
-					for (let y = 0; y < rows; y++) {
-						for (let x = 0; x < cols; x++) {
-							this.tileMap_[y][x] = parsed.tiles[y * cols + x] || 0;
-						}
-					}
-				} else if (Array.isArray(parsed.tiles[0])) {
-					// 2D array format
-					this.tileMap_ = parsed.tiles;
+				if (parsed.tiles.length > 0) {
+					// Если есть сохраненные тайлы - загружаем их
+					this.initializeTileMap(parsed.tiles, this.width_, this.height_);
+				} else {
+					// Если тайлов нет - создаем пустую карту
+					this.createEmptyTileMap();
 				}
+			} else {
+				// Если данных о тайлах нет - создаем пустую карту
+				this.createEmptyTileMap();
 			}
 
 			if (parsed.gridSize) {
@@ -108,10 +148,21 @@ class FieldLevelEditor extends Blockly.Field {
 			}
 		} catch (e) {
 			console.error('Error parsing initial value:', e);
-			// Fall back to defaults
 			this.resetToDefaults();
 		}
 	}
+
+    // Новый метод для создания пустой карты тайлов
+    createEmptyTileMap() {
+        const tileSize = this.editorConfig.tileSize;
+        const cols = Math.ceil(this.width_ / tileSize);
+        const rows = Math.ceil(this.height_ / tileSize);
+
+        this.tileMap_ = [];
+        for (let y = 0; y < rows; y++) {
+            this.tileMap_[y] = new Array(cols).fill(0);
+        }
+    }
 
 	// Инициализация карты тайлов из сохраненных данных
 	initializeTileMap(tiles, width, height) {
@@ -150,29 +201,112 @@ class FieldLevelEditor extends Blockly.Field {
 		}
 		return flatArray;
 	}
-	
+
 	updatePrototypeSprites() {
-  // Очищаем кеш изображений
-  this.imageCache = {};
-  
-  // Перезагружаем все спрайты прототипов
-  proto_object_array.forEach((proto, index) => {
-    const img = new Image();
-    img.onerror = () => {
-      console.error(`Failed to load image: ${proto.sprite}`);
-      // Запасное изображение при ошибке загрузки
-      img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="red"/><text x="16" y="16" font-family="Arial" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="white">ERR</text></svg>';
-    };
-    img.src = proto.sprite;
-    this.imageCache[index] = img;
-  });
-}
+		// Очищаем кеш изображений
+		this.imageCache = {};
 
+		// Перезагружаем все спрайты прототипов
+		proto_object_array.forEach((proto, index) => {
+			const img = new Image();
+			img.onerror = () => {
+				console.error(`Failed to load image: ${proto.sprite}`);
+				// Запасное изображение при ошибке загрузки
+				img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="red"/><text x="16" y="16" font-family="Arial" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="white">ERR</text></svg>';
+			};
+			img.src = proto.sprite;
+			this.imageCache[index] = img;
+		});
+	}
+
+	/**
+	 * Центрирует вид на указанном объекте с плавной анимацией
+	 * @param {Object} object - Объект, на котором нужно сфокусироваться
+	 */
+	centerViewOnObject(object) {
+		if (!this.editorModal)
+			return;
+
+		const canvasContainer = this.editorModal.querySelector('#editor-canvas-container');
+		const canvas = this.editorModal.querySelector('#editor-canvas');
+		if (!canvasContainer || !canvas)
+			return;
+
+		// Находим прототип объекта
+		const proto = proto_object_array.find(p =>
+				workspace.getVariableById(p.name).name === object.protoName) ||
+			object_array.find(o =>
+				workspace.getVariableById(o.name).name === object.protoName);
+
+		if (!proto)
+			return;
+
+		// Получаем текущие параметры просмотра
+		const zoom = this.zoom;
+		const containerWidth = canvasContainer.clientWidth;
+		const containerHeight = canvasContainer.clientHeight;
+
+		// Рассчитываем центр объекта в мировых координатах
+		const objectCenterX = object.x + proto.width / 2;
+		const objectCenterY = object.y + proto.height / 2;
+
+		// Преобразуем мировые координаты в координаты контейнера с учетом зума
+		const targetViewportX = objectCenterX * zoom;
+		const targetViewportY = objectCenterY * zoom;
+
+		// Вычисляем целевые позиции скролла для центрирования объекта
+		const targetScrollLeft = targetViewportX - containerWidth / 2;
+		const targetScrollTop = targetViewportY - containerHeight / 2;
+
+		// Анимация скролла
+		const animateScroll = () => {
+			const startTime = performance.now();
+			const duration = 500; // 0.5 секунды
+			const startScrollLeft = canvasContainer.scrollLeft;
+			const startScrollTop = canvasContainer.scrollTop;
+			const diffX = targetScrollLeft - startScrollLeft;
+			const diffY = targetScrollTop - startScrollTop;
+
+			const step = (currentTime) => {
+				const elapsed = currentTime - startTime;
+				const progress = Math.min(elapsed / duration, 1);
+
+				// Плавное замедление
+				const easeProgress = easeOutCubic(progress);
+
+				canvasContainer.scrollLeft = startScrollLeft + diffX * easeProgress;
+				canvasContainer.scrollTop = startScrollTop + diffY * easeProgress;
+
+				if (progress < 1) {
+					requestAnimationFrame(step);
+				}
+			};
+
+			requestAnimationFrame(step);
+		};
+
+		function easeOutCubic(t) {
+			return 1 - Math.pow(1 - t, 3);
+		}
+
+		animateScroll();
+	}
+	
+	createEmptyTileMap() {
+		const tileSize = this.editorConfig.tileSize;
+		const cols = Math.ceil(this.width_ / tileSize);
+		const rows = Math.ceil(this.height_ / tileSize);
+
+		this.tileMap_ = [];
+		for (let y = 0; y < rows; y++) {
+			this.tileMap_[y] = new Array(cols).fill(0);
+		}
+	}
+	
 	resetToDefaults() {
-		this.width_ = 800;
-		this.height_ = 600;
+		this.width_ = 1280;
+		this.height_ = 720;
 		this.objects_ = [];
-
 		// Initialize tile map with default size
 		const tileSize = this.editorConfig.tileSize;
 		const cols = Math.ceil(this.width_ / tileSize);
@@ -183,6 +317,7 @@ class FieldLevelEditor extends Blockly.Field {
 			this.tileMap_[y] = new Array(cols).fill(0);
 		}
 
+		this.createEmptyTileMap();
 		super.setValue(this.getDefaultValue());
 	}
 
@@ -197,36 +332,38 @@ class FieldLevelEditor extends Blockly.Field {
 	}
 
 	doClassValidation_(newValue) {
-	  if (!newValue) return this.getDefaultValue();
+		if (!newValue)
+			return this.getDefaultValue();
 
-	  try {
-		const parsed = JSON.parse(newValue);
-		// Конвертируем старые объекты (с protoName) в новые (с protoName)
-		const objects = Array.isArray(parsed.objects) ? parsed.objects.map(obj => {
-		  if (obj.protoName) {
-			return obj; // Уже новый формат
-		  } else if (obj.protoName !== undefined) {
-			// Конвертируем старый формат в новый
-			const proto = proto_object_array[obj.protoName];
-			return proto ? {
-			  protoName: workspace.getVariableById(proto.name).name,
-			  x: obj.x,
-			  y: obj.y
-			} : null;
-		  }
-		  return null;
-		}).filter(Boolean) : [];
+		try {
+			const parsed = JSON.parse(newValue);
+			// Конвертируем старые объекты (с protoName) в новые (с protoName)
+			const objects = Array.isArray(parsed.objects) ? parsed.objects.map(obj => {
+				if (obj.protoName) {
+					return obj; // Уже новый формат
+				} else if (obj.protoName !== undefined) {
+					// Конвертируем старый формат в новый
+					const proto = proto_object_array[obj.protoName];
+					return proto ? {
+						protoName: workspace.getVariableById(proto.name).name,
+						x: obj.x,
+						y: obj.y
+					}
+					 : null;
+				}
+				return null;
+			}).filter(Boolean) : [];
 
-		return JSON.stringify({
-		  objects: objects,
-		  tiles: Array.isArray(parsed.tiles) ? parsed.tiles : this.getTileMapAsFlatArray(),
-		  width: typeof parsed.width === 'number' ? parsed.width : 800,
-		  height: typeof parsed.height === 'number' ? parsed.height : 600,
-		  gridSize: typeof parsed.gridSize === 'number' ? parsed.gridSize : (this.editorConfig ? this.editorConfig.gridSize : 32)
-		});
-	  } catch (e) {
-		return this.getDefaultValue();
-	  }
+			return JSON.stringify({
+				objects: objects,
+				tiles: Array.isArray(parsed.tiles) ? parsed.tiles : this.getTileMapAsFlatArray(),
+				width: typeof parsed.width === 'number' ? parsed.width : 1280,
+				height: typeof parsed.height === 'number' ? parsed.height : 720,
+				gridSize: typeof parsed.gridSize === 'number' ? parsed.gridSize : (this.editorConfig ? this.editorConfig.gridSize : 32)
+			});
+		} catch (e) {
+			return this.getDefaultValue();
+		}
 	}
 
 	setValue(newValue) {
@@ -235,19 +372,12 @@ class FieldLevelEditor extends Blockly.Field {
 	}
 
 	getValue() {
-		// Ensure tileMap_ is initialized
+		// Если tileMap_ не инициализирован - создаем пустую карту
 		if (!this.tileMap_ || this.tileMap_.length === 0) {
-			const tileSize = this.editorConfig.tileSize;
-			const cols = Math.ceil(this.width_ / tileSize);
-			const rows = Math.ceil(this.height_ / tileSize);
-
-			this.tileMap_ = [];
-			for (let y = 0; y < rows; y++) {
-				this.tileMap_[y] = new Array(cols).fill(0);
-			}
+			this.createEmptyTileMap();
 		}
 
-		// Ensure objects_ is initialized
+		// Если objects_ не инициализирован - создаем пустой массив
 		if (!this.objects_) {
 			this.objects_ = [];
 		}
@@ -320,11 +450,53 @@ class FieldLevelEditor extends Blockly.Field {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
-        position: relative;
+        position: absolute;
         overflow: auto;
         width: 100%;
         height: 600px;
+		top: 0;
+		left: 0;
+		transform: none;
       }
+	  #editor-canvas-container::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        
+        #editor-canvas-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+        }
+        
+        #editor-canvas-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        
+        #editor-canvas-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Для Firefox */
+        #editor-canvas-container {
+            scrollbar-width: auto;
+            scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Увеличиваем область захвата для тач-устройств */
+        #editor-canvas-container {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-x pan-y;
+        }
+	  #editor-canvas-container.hand-mode {
+		  cursor: grab;
+		}
+
+		#editor-canvas-container.hand-mode.grabbing {
+		  cursor: grabbing;
+		}
       .level-editor-modal {
         position: fixed;
         top: 0;
@@ -348,7 +520,7 @@ class FieldLevelEditor extends Blockly.Field {
         overflow: auto;
         box-shadow: 0 10px 30px hsla(0, 0%, 0%, 0.3);
         overscroll-behavior: contain;
-        scrollbar-width: thin;
+        scrollbar-width: auto;
       }
       .editor-container::-webkit-scrollbar {
         width: 5px;
@@ -466,7 +638,7 @@ class FieldLevelEditor extends Blockly.Field {
         padding: 10px;
         background: hsl(210, 11%, 98%);
         border-radius: 6px;
-        max-height: 200px;
+        height: 120px;
         overflow-y: auto;
       }
 
@@ -518,7 +690,7 @@ class FieldLevelEditor extends Blockly.Field {
         position: relative;
         width: 100%;
         height: 600px;
-        overflow: auto;
+        overflow: auto !important;
       }
 
       #editor-canvas {
@@ -685,6 +857,27 @@ class FieldLevelEditor extends Blockly.Field {
         border-radius: 2px;
         cursor: pointer;
       }
+	  
+	  .object-item.disabled {
+    opacity: 0.6;
+    position: relative;
+    filter: grayscale(80%);
+  }
+  .object-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
 
       .tile-solid-toggle.active {
         background: rgba(0,255,0,0.7);
@@ -720,7 +913,6 @@ class FieldLevelEditor extends Blockly.Field {
 	  
 	  /* Заменяем иконки в кнопках */
     #select-btn i:before { content: '\\e810'; } /* cursor */
-    #hand-btn i:before { content: '\\e804'; } /* up-hand */
     #delete-btn i:before { content: '\\e83d'; } /* trash */
     #clear-btn i:before { content: '\\e824'; } /* cancel-circled2 */
     #tile-mode-btn i:before { content: '\\e80a'; } /* brush-1 */
@@ -840,7 +1032,9 @@ class FieldLevelEditor extends Blockly.Field {
 			const tempCanvas = document.createElement('canvas');
 			tempCanvas.width = 1;
 			tempCanvas.height = 1;
-			const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+			const tempCtx = tempCanvas.getContext('2d', {
+				willReadFrequently: true
+			});
 
 			const startX = Math.max(0, Math.floor((cols - 16) / 2));
 			const startY = Math.max(0, Math.floor((rows - 16) / 2));
@@ -923,12 +1117,12 @@ class FieldLevelEditor extends Blockly.Field {
 	}
 
 	showEditor_() {
-	  // Обновляем спрайты перед открытием редактора
-	  this.updatePrototypeSprites();
-	  
-	  const modal = this.createEditorModal_();
-	  document.body.appendChild(modal);
-	  this.initializeEditor_(modal);
+		// Обновляем спрайты перед открытием редактора
+		this.updatePrototypeSprites();
+
+		const modal = this.createEditorModal_();
+		document.body.appendChild(modal);
+		this.initializeEditor_(modal);
 	}
 
 	getTilesetFromBlock() {
@@ -960,7 +1154,6 @@ class FieldLevelEditor extends Blockly.Field {
  <div class="tools">
   <div class="tool-buttons">
     <button id="select-btn" class="tool-btn active" title="${Blockly.Msg['TOOL_SELECT_TITLE']}"><i class="icon-cursor"></i></button>
-    <button id="hand-btn" class="tool-btn" title="${Blockly.Msg['TOOL_HAND_TITLE']}"><i class="icon-up-hand"></i></button>
     <button id="delete-btn" class="tool-btn" title="${Blockly.Msg['TOOL_DELETE_TITLE']}"><i class="icon-cancel-circled2"></i></button>
     <button id="clear-btn" class="tool-btn" title="${Blockly.Msg['TOOL_CLEAR_TITLE']}"><i class="icon-trash"></i></button>
     <button id="tile-mode-btn" class="tool-btn" ${!hasTileset ? 'disabled' : ''} title="${hasTileset ? Blockly.Msg['TOOL_TILEMODE_TITLE'] : Blockly.Msg['TOOL_NOTILESET_WARNING']}">
@@ -1043,8 +1236,9 @@ class FieldLevelEditor extends Blockly.Field {
 
 		const savedData = this.value_ ? JSON.parse(this.value_) : {};
 		this.editorConfig.gridSize = savedData.gridSize || 32;
-		this.width_ = savedData.width || 800;
-		this.height_ = savedData.height || 600;
+		this.width_ = savedData.width || 1280;
+		this.height_ = savedData.height || 720;
+		this.editorModal = modal;
 		this.objects_ = Array.isArray(savedData.objects) ? savedData.objects : [];
 		this.selectedTileSolid = false;
 		const solidToggle = modal.querySelector('#tile-solid-toggle');
@@ -1227,23 +1421,7 @@ class FieldLevelEditor extends Blockly.Field {
 
 		// Preload images
 		const preloadImages = () => {
-			const tilesetData = this.getTilesetFromBlock();
-			self.updatePrototypeSprites();
-			if (tilesetData) {
-				if (!self.tileCache.tileset || self.tileCache.tileset.src !== tilesetData) {
-					const tilesetImg = new Image();
-					tilesetImg.onload = () => {
-						self.tileCache.tileset = tilesetImg;
-						updateTilePalette();
-						drawCanvas();
-					};
-					tilesetImg.onerror = () => {
-						console.error('Failed to load tileset image');
-					};
-					tilesetImg.src = tilesetData;
-				}
-			}
-
+			// Загрузка спрайтов для proto_object_array
 			proto_object_array.forEach((proto, index) => {
 				if (!self.imageCache[index]) {
 					const img = new Image();
@@ -1253,6 +1431,20 @@ class FieldLevelEditor extends Blockly.Field {
 					};
 					img.src = proto.sprite;
 					self.imageCache[index] = img;
+				}
+			});
+
+			// Загрузка спрайтов для object_array (со смещением индексов)
+			object_array.forEach((obj, index) => {
+				const cacheIndex = index + proto_object_array.length;
+				if (!self.imageCache[cacheIndex]) {
+					const img = new Image();
+					img.onerror = () => {
+						console.error(`Failed to load image: ${obj.sprite}`);
+						img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="red"/><text x="16" y="16" font-family="Arial" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="white">ERR</text></svg>';
+					};
+					img.src = obj.sprite;
+					self.imageCache[cacheIndex] = img;
 				}
 			});
 		};
@@ -1330,6 +1522,26 @@ class FieldLevelEditor extends Blockly.Field {
 			}
 		};
 
+		const setZoom = (newZoom) => {
+			newZoom = Math.max(self.editorConfig.minZoom, Math.min(self.editorConfig.maxZoom, newZoom));
+
+			if (newZoom !== zoom) {
+				zoom = newZoom;
+				self.zoom = zoom; // Сохраняем в поле класса
+
+				// Обновляем отображение процента
+				zoomValue.textContent = `${Math.round(zoom * 100)}%`;
+
+				// Обновляем размеры canvas
+				canvas.style.width = `${self.width_ * zoom}px`;
+				canvas.style.height = `${self.height_ * zoom}px`;
+
+				// Перерисовываем
+				isBufferDirty = true;
+				drawCanvas();
+			}
+		};
+
 		const updateTilePaletteWithWarning = () => {
 			if (!self.tileCache.tileset)
 				return;
@@ -1380,6 +1592,10 @@ class FieldLevelEditor extends Blockly.Field {
 
 		// Helper functions
 		const updateView = () => {
+			this.zoom = zoom; // Сохраняем текущий масштаб
+			this.offsetX = offsetX; // Сохраняем текущее смещение
+			this.offsetY = offsetY; // Сохраняем текущее смещение
+
 			canvas.style.width = `${this.width_ * zoom}px`;
 			canvas.style.height = `${this.height_ * zoom}px`;
 			canvas.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
@@ -1401,8 +1617,8 @@ class FieldLevelEditor extends Blockly.Field {
 			const scaledHeight = this.height_ * zoom;
 
 			// Устанавливаем смещение так, чтобы верхний левый угол был виден
-			offsetX = 0;  // Начинаем с левого края
-			offsetY = 0;   // Начинаем с верхнего края
+			offsetX = 0; // Начинаем с левого края
+			offsetY = 0; // Начинаем с верхнего края
 
 			// Если уровень меньше контейнера, центрируем (опционально)
 			if (scaledWidth < containerWidth) {
@@ -1423,6 +1639,7 @@ class FieldLevelEditor extends Blockly.Field {
 			const scrollLeft = canvasContainer.scrollLeft;
 			const scrollTop = canvasContainer.scrollTop;
 
+			// Учитываем текущее смещение и масштаб
 			const x = (clientX - rect.left + scrollLeft - offsetX) / zoom;
 			const y = (clientY - rect.top + scrollTop - offsetY) / zoom;
 
@@ -1531,36 +1748,36 @@ class FieldLevelEditor extends Blockly.Field {
 			if (showGrid) {
 				const gridSize = self.editorConfig.gridSize;
 				const gridColor = self.editorConfig.gridColor;
-				
+
 				// Не рисуем сетку если она слишком мелкая (меньше 2px между линиями)
 				const gridScreenSize = gridSize * zoom;
 				if (gridScreenSize >= 2) {
 					targetCtx.strokeStyle = gridColor;
 					targetCtx.lineWidth = 1;
-					
+
 					// Оптимизация: вычисляем только видимые линии
 					const startX = Math.floor(0 / gridSize) * gridSize;
 					const startY = Math.floor(0 / gridSize) * gridSize;
 					const endX = Math.ceil(this.width_ / gridSize) * gridSize;
 					const endY = Math.ceil(this.height_ / gridSize) * gridSize;
-					
+
 					targetCtx.beginPath();
-					
+
 					// Вертикальные линии (только видимые)
 					for (let x = startX; x <= endX; x += gridSize) {
 						targetCtx.moveTo(x, 0);
 						targetCtx.lineTo(x, this.height_);
 					}
-					
+
 					// Горизонтальные линии (только видимые)
 					for (let y = startY; y <= endY; y += gridSize) {
 						targetCtx.moveTo(0, y);
 						targetCtx.lineTo(this.width_, y);
 					}
-					
+
 					targetCtx.stroke();
 				}
-				
+
 				// Сохраняем параметры для других оптимизаций
 				cachedGridSize = gridSize;
 				cachedGridColor = gridColor;
@@ -1585,48 +1802,74 @@ class FieldLevelEditor extends Blockly.Field {
 
 		// Вынесенная функция для рисования объектов
 		const drawObjects = (targetCtx, includeSelection = true) => {
-		  this.objects_.forEach((obj, index) => {
-			// Находим прототип по имени переменной
-			const proto = proto_object_array.find(p => 
-			  workspace.getVariableById(p.name).name === obj.protoName);
-			if (!proto) return;
+			this.objects_.forEach((obj, index) => {
+				// Ищем прототип сначала в proto_object_array, затем в object_array
+				let proto = proto_object_array.find(p =>
+						workspace.getVariableById(p.name).name === obj.protoName);
 
-			const img = this.imageCache[proto_object_array.indexOf(proto)];
-			if (img) {
-			  targetCtx.drawImage(img, obj.x, obj.y, proto.width, proto.height);
+				if (!proto) {
+					proto = object_array.find(o =>
+							workspace.getVariableById(o.name).name === obj.protoName);
+				}
 
-			  if (index === selectedObjectIndex && index === selectedObjectIndex) {
-				targetCtx.strokeStyle = '#00f';
-				targetCtx.lineWidth = 2;
-				targetCtx.strokeRect(obj.x, obj.y, proto.width, proto.height);
-			  }
-			}
-		  });
+				if (!proto)
+					return;
+
+				// Получаем индекс для imageCache (разные для каждого массива)
+				const protoIndex = proto_object_array.indexOf(proto);
+				const objIndex = object_array.indexOf(proto);
+				const img = protoIndex !== -1 ?
+					this.imageCache[protoIndex] :
+					this.imageCache[objIndex + proto_object_array.length]; // Смещаем индексы для object_array
+
+				if (img) {
+					targetCtx.drawImage(img, obj.x, obj.y, proto.width, proto.height);
+
+					// Рисуем выделение если объект выбран
+					if (index === selectedObjectIndex && includeSelection) {
+						if (self.isObjectHighlighted) {
+							targetCtx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+							targetCtx.fillRect(obj.x, obj.y, proto.width, proto.height);
+						}
+
+						targetCtx.strokeStyle = '#00f';
+						targetCtx.lineWidth = 2;
+						targetCtx.strokeRect(obj.x, obj.y, proto.width, proto.height);
+					}
+				}
+			});
 		};
 
 		const drawCanvas = () => {
-		  if (!isTilesetLoaded) {
-			// Режим загрузки: рисуем напрямую на canvas
-			drawBaseCanvasContent(canvas, ctx);
-		  } else {
-			// Режим буферизации: рисуем через bufferCanvas
-			if (isBufferDirty) {
-			  drawBaseCanvasContent(bufferCanvas, bufferCtx);
-			  isBufferDirty = false;
-			}
-			// Копируем буфер на основной холст
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.drawImage(bufferCanvas, 0, 0);
-		  }
+			if (!this.editorModal)
+				return;
 
-		  // Дорисовываем временные элементы (выделение, рамки)
-		  if (tempRect) {
-			ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
-			ctx.fillRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
-			ctx.strokeStyle = '#00FF00';
-			ctx.lineWidth = 2;
-			ctx.strokeRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
-		  }
+			const canvas = this.editorModal.querySelector('#editor-canvas');
+			const ctx = canvas.getContext('2d');
+			if (!canvas || !ctx)
+				return;
+			if (!isTilesetLoaded) {
+				// Режим загрузки: рисуем напрямую на canvas
+				drawBaseCanvasContent(canvas, ctx);
+			} else {
+				// Режим буферизации: рисуем через bufferCanvas
+				if (isBufferDirty) {
+					drawBaseCanvasContent(bufferCanvas, bufferCtx);
+					isBufferDirty = false;
+				}
+				// Копируем буфер на основной холст
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.drawImage(bufferCanvas, 0, 0);
+			}
+
+			// Дорисовываем временные элементы (выделение, рамки)
+			if (tempRect) {
+				ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+				ctx.fillRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+				ctx.strokeStyle = '#00FF00';
+				ctx.lineWidth = 2;
+				ctx.strokeRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+			}
 		};
 
 		// Функция для пометки буфера как устаревшего
@@ -1645,18 +1888,26 @@ class FieldLevelEditor extends Blockly.Field {
 		};
 
 		const findObjectAt = (x, y) => {
-		  for (let i = this.objects_.length - 1; i >= 0; i--) {
-			const obj = this.objects_[i];
-			const proto = proto_object_array.find(p => 
-			  workspace.getVariableById(p.name).name === obj.protoName);
-			if (!proto) continue;
+			// Ищем с конца массива (верхние объекты)
+			for (let i = this.objects_.length - 1; i >= 0; i--) {
+				const obj = this.objects_[i];
 
-			if (x >= obj.x && x <= obj.x + proto.width &&
-				y >= obj.y && y <= obj.y + proto.height) {
-			  return i;
+				// Ищем прототип в обоих массивах
+				let proto = proto_object_array.find(p =>
+						workspace.getVariableById(p.name).name === obj.protoName);
+				if (!proto) {
+					proto = object_array.find(o =>
+							workspace.getVariableById(o.name).name === obj.protoName);
+				}
+				if (!proto)
+					continue;
+
+				if (x >= obj.x && x <= obj.x + proto.width &&
+					y >= obj.y && y <= obj.y + proto.height) {
+					return i;
+				}
 			}
-		  }
-		  return -1;
+			return -1;
 		};
 
 		const snapToGrid = (value) => {
@@ -1665,33 +1916,105 @@ class FieldLevelEditor extends Blockly.Field {
 		};
 
 		const resizeCanvas = (newWidth, newHeight) => {
+			// Проверка валидности размеров
 			if (!newWidth || !newHeight || newWidth < 1 || newHeight < 1) {
-				showSwitchModal('!', 'Invalid dimensions', false, 'ok');
+				showSwitchModal('!', 
+					Blockly.Msg['ERROR_INVALID_DIMENSIONS'], 
+					false, 
+					'OK');
 				return;
 			}
 
-			const oldWidth = this.width_;
-			const oldHeight = this.height_;
+			const tileSize = self.editorConfig.tileSize;
+			const widthRemainder = newWidth % tileSize;
+			const heightRemainder = newHeight % tileSize;
+
+			// Проверка кратности размеров сетке
+			if (widthRemainder !== 0 || heightRemainder !== 0) {
+				const recommendedWidth = newWidth + (tileSize - widthRemainder);
+				const recommendedHeight = newHeight + (tileSize - heightRemainder);
+				
+				const warningMessage = [
+					Blockly.Msg['LEVEL_RESIZE_WARNING'].replace('%1', tileSize),
+					'',
+					`${Blockly.Msg['CURRENT_SIZE']}: ${newWidth} × ${newHeight}`,
+					`${Blockly.Msg['LEVEL_RECOMMENDED_SIZE']}`
+						.replace('%1', recommendedWidth)
+						.replace('%2', recommendedHeight),
+					'',
+					Blockly.Msg['RESIZE_ANYWAY_QUESTION']
+				].join('\n');
+
+				const modal = showSwitchModal(
+					'warning',
+					warningMessage,
+					true,
+					Blockly.Msg['RESIZE_CONFIRM_BUTTON']
+				);
+				
+				modal.onConfirm(() => {
+					performResize(newWidth, newHeight);
+				});
+				
+				modal.onCancel(() => {
+					// Восстанавливаем предыдущие значения в полях ввода
+					widthInput.value = this.width_;
+					heightInput.value = this.height_;
+				});
+				
+				return;
+			}
+			
+			performResize(newWidth, newHeight);
+		};
+
+		const performResize = (newWidth, newHeight) => {
+			// Сбрасываем масштаб и смещение
+			zoom = 1;
+			offsetX = 0;
+			offsetY = 0;
+			self.zoom = zoom;
+			self.offsetX = offsetX;
+			self.offsetY = offsetY;
 
 			// Обновляем размеры
 			this.width_ = newWidth;
 			this.height_ = newHeight;
 
-			// Масштабируем тайлмап (если нужно)
+			// Ресайзим тайлмап
 			const tileSize = self.editorConfig.tileSize;
-			this.tileMap_ = this.rescaleTileMap(
-				oldWidth, oldHeight, tileSize,
-				newWidth, newHeight, tileSize
-			);
+			const newCols = Math.ceil(newWidth / tileSize);
+			const newRows = Math.ceil(newHeight / tileSize);
+			
+			const newTileMap = [];
+			for (let y = 0; y < newRows; y++) {
+				newTileMap[y] = new Array(newCols).fill(0);
+				if (y < this.tileMap_.length) {
+					for (let x = 0; x < Math.min(this.tileMap_[y].length, newCols); x++) {
+						newTileMap[y][x] = this.tileMap_[y][x];
+					}
+				}
+			}
+			this.tileMap_ = newTileMap;
 
-			// Удаляем объекты за пределами нового размера
-			removeOutOfBoundsObjects(newWidth, newHeight);
+			// Обновляем UI и перерисовываем
+			updateAfterResize();
+		};
 
+		const updateAfterResize = () => {
 			// Обновляем размеры canvas
-			canvas.width = newWidth;
-			canvas.height = newHeight;
+			canvas.width = this.width_;
+			canvas.height = this.height_;
+			bufferCanvas.width = this.width_;
+			bufferCanvas.height = this.height_;
 
-			// Перерисовываем (без сброса масштаба/позиции)
+			// Обновляем UI
+			zoomValue.textContent = "100%";
+			widthInput.value = this.width_;
+			heightInput.value = this.height_;
+
+			// Центрируем и перерисовываем
+			centerView();
 			isBufferDirty = true;
 			drawCanvas();
 		};
@@ -1709,9 +2032,8 @@ class FieldLevelEditor extends Blockly.Field {
 
 			// Масштабируем тайлмап (если нужно)
 			this.tileMap_ = this.rescaleTileMap(
-				this.width_, this.height_, oldSize,
-				this.width_, this.height_, newSize
-			);
+					this.width_, this.height_, oldSize,
+					this.width_, this.height_, newSize);
 
 			// Обновляем палитру тайлов (если она зависит от размера)
 			updateTilePalette();
@@ -1762,6 +2084,23 @@ class FieldLevelEditor extends Blockly.Field {
 			self.tileMap_[tileY][tileX] = value;
 			markBufferDirty();
 			return true;
+		};
+
+		const checkBoundaries = () => {
+			const containerWidth = canvasContainer.clientWidth;
+			const containerHeight = canvasContainer.clientHeight;
+			const scaledWidth = self.width_ * zoom;
+			const scaledHeight = self.height_ * zoom;
+
+			// Ограничиваем смещение, чтобы не выходить за границы уровня
+			const maxOffsetX = Math.max(0, scaledWidth - containerWidth);
+			const maxOffsetY = Math.max(0, scaledHeight - containerHeight);
+
+			offsetX = Math.max(0, Math.min(maxOffsetX, offsetX));
+			offsetY = Math.max(0, Math.min(maxOffsetY, offsetY));
+
+			canvasContainer.scrollLeft = offsetX;
+			canvasContainer.scrollTop = offsetY;
 		};
 
 		const drawTileRect = (startX, startY, endX, endY, value) => {
@@ -1839,23 +2178,107 @@ class FieldLevelEditor extends Blockly.Field {
 		};
 
 		// Initialize object palette
-		proto_object_array.forEach((proto) => {
-		  const protoName = workspace.getVariableById(proto.name).name;
-		  const item = document.createElement('div');
-		  item.className = 'object-item';
-		  item.dataset.name = protoName; // Используем имя вместо индекса
+		const buildObjectPalette = () => {
+			objectPalette.innerHTML = '';
 
-		  const preview = document.createElement('div');
-		  preview.className = 'object-preview';
-		  preview.style.backgroundImage = `url(${proto.sprite})`;
+			// 1. Добавляем объекты из proto_object_array (множественное размещение)
+			proto_object_array.forEach((proto) => {
+				const protoName = workspace.getVariableById(proto.name).name;
+				const item = document.createElement('div');
+				item.className = 'object-item';
+				item.dataset.name = protoName;
 
-		  const name = document.createElement('div');
-		  name.className = 'object-name';
-		  name.textContent = protoName + '(h' + proto.width + 'w' + proto.height + ')';
+				const preview = document.createElement('div');
+				preview.className = 'object-preview';
+				preview.style.backgroundImage = `url(${proto.sprite})`;
 
-		  item.appendChild(preview);
-		  item.appendChild(name);
-		  objectPalette.appendChild(item);
+				const name = document.createElement('div');
+				name.className = 'object-name';
+				name.textContent = `${protoName} (${proto.width}x${proto.height})`;
+
+				item.appendChild(preview);
+				item.appendChild(name);
+				objectPalette.appendChild(item);
+			});
+
+			// 2. Добавляем объекты из object_array (уникальное размещение)
+			// 2. Добавляем объекты из object_array (уникальное размещение)
+			object_array.forEach((obj) => {
+				const objName = workspace.getVariableById(obj.name).name;
+				const item = document.createElement('div');
+				item.className = 'object-item';
+				item.dataset.name = objName;
+
+				// Проверяем, был ли уже добавлен этот объект
+				const isAlreadyAdded = this.objects_.some(o => o.protoName === objName);
+				if (isAlreadyAdded) {
+					item.classList.add('disabled');
+					item.title = Blockly.Msg['OBJECT_ALREADY_ADDED'];
+
+					// Находим объект на сцене
+					const sceneObject = this.objects_.find(o => o.protoName === objName);
+
+					// Добавляем обработчик клика
+					item.addEventListener('click', (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+
+						if (sceneObject) {
+							// Вызываем с правильным контекстом
+							this.centerViewOnObject(sceneObject);
+						}
+					});
+
+					// Добавляем значок
+					const badge = document.createElement('div');
+					badge.className = 'object-badge';
+					badge.textContent = '✓';
+					item.appendChild(badge);
+				}
+
+				const preview = document.createElement('div');
+				preview.className = 'object-preview';
+				preview.style.backgroundImage = `url(${obj.sprite})`;
+
+				const name = document.createElement('div');
+				name.className = 'object-name';
+				name.textContent = `${objName} (${obj.width}x${obj.height})`;
+
+				item.appendChild(preview);
+				item.appendChild(name);
+				objectPalette.appendChild(item);
+			});
+		};
+
+		// Вызываем при открытии редактора
+		buildObjectPalette();
+
+		objectPalette.addEventListener('click', function (e) {
+			const item = e.target.closest('.object-item');
+			if (!item || item.classList.contains('disabled'))
+				return;
+
+			const protoName = item.dataset.name;
+
+			// Проверяем тип объекта
+			const isProto = proto_object_array.some(p =>
+					workspace.getVariableById(p.name).name === protoName);
+			const isUnique = object_array.some(o =>
+					workspace.getVariableById(o.name).name === protoName);
+
+			// Для уникальных объектов проверяем, не добавлен ли уже
+			if (isUnique && !self.isObjectUnique(protoName)) {
+				showSwitchModal('!', Blockly.Msg['OBJECT_ALREADY_ADDED'], false, 'ok');
+				item.classList.add('disabled');
+				return;
+			}
+
+			resetSelections();
+			item.classList.add('selected');
+			selectedProtoName = protoName;
+			activateTool(MODES.PLACE_OBJECT);
+			isTileMode = false;
+			canvas.style.cursor = 'crosshair';
 		});
 
 		// Set initial canvas size from stored value
@@ -1869,14 +2292,14 @@ class FieldLevelEditor extends Blockly.Field {
 
 		// Reset selections
 		const resetSelections = () => {
-		  objectPalette.querySelectorAll('.object-item').forEach(item => {
-			item.classList.remove('selected');
-		  });
-		  tilePalette.querySelectorAll('.tile-item').forEach(item => {
-			item.classList.remove('selected');
-		  });
-		  selectedProtoIndex = -1;
-		  selectedProtoName = ''; // Добавляем сброс имени
+			objectPalette.querySelectorAll('.object-item').forEach(item => {
+				item.classList.remove('selected');
+			});
+			tilePalette.querySelectorAll('.tile-item').forEach(item => {
+				item.classList.remove('selected');
+			});
+			selectedProtoIndex = -1;
+			selectedProtoName = ''; // Добавляем сброс имени
 		};
 
 		// Activate tool
@@ -1887,6 +2310,38 @@ class FieldLevelEditor extends Blockly.Field {
 			});
 			if (button) {
 				button.classList.add('active');
+			}
+
+			// Обновляем курсор в зависимости от выбранного инструмента
+			switch (tool) {
+				case MODES.DELETE:
+					canvas.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"%23ff0000\" d=\"M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12z\"/></svg>') 12 12, auto";
+					break;
+				case MODES.SELECT:
+					canvas.style.cursor = 'crosshair';
+					break;
+				case MODES.HAND:
+					canvas.style.cursor = 'grab';
+					break;
+				case MODES.PLACE_OBJECT:
+					canvas.style.cursor = 'crosshair';
+					break;
+				case MODES.TILE_DRAW:
+					tileBrush = MODES.TILE_DRAW;
+					canvas.style.cursor = 'crosshair';
+					break;
+				case MODES.TILE_ERASE:
+					tileBrush = MODES.TILE_ERASE;
+					canvas.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"%23ff0000\" d=\"M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12z\"/></svg>') 12 12, auto";
+					break;
+				case MODES.TILE_FILL:
+					tileBrush = MODES.TILE_FILL;
+					canvas.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%2300ff00' d='M10 4v4h4V4h-4m0 6v4h4v-4h-4m0 6v4h4v-4h-4m-6-8v4h4V8h-4m0 6v4h4v-4h-4m0 6v4h4v-4h-4'/></svg>') 12 12, auto";
+					break;
+				case MODES.TILE_RECT:
+					tileBrush = MODES.TILE_RECT;
+					canvas.style.cursor = "crosshair";
+					break;
 			}
 		};
 
@@ -1899,33 +2354,23 @@ class FieldLevelEditor extends Blockly.Field {
 		const handleMouseMove = (e) => {
 			if (!isMouseDown)
 				return;
+
 			const coords = getPixelCoordinates(e.clientX, e.clientY);
 			updateCursorCoordinates(coords.x, coords.y);
 
-			if (isDragging && selectedObjectIndex !== -1 && currentTool === MODES.SELECT) {
-				const obj = this.objects_[selectedObjectIndex];
-				const proto = proto_object_array.find(p => 
-					workspace.getVariableById(p.name).name === obj.protoName
-				  );
+			if (isPanning) {
+				const dx = e.clientX - lastX;
+				const dy = e.clientY - lastY;
+				lastX = e.clientX;
+				lastY = e.clientY;
 
-				if (proto) {
-					let newX = coords.x - dragStartX;
-					let newY = coords.y - dragStartY;
-
-					if (showGrid) {
-						newX = snapToGrid(newX);
-						newY = snapToGrid(newY);
-					}
-
-					// Ограничиваем позицию в пределах холста
-					obj.x = Math.max(0, Math.min(this.width_ - proto.width, newX));
-					obj.y = Math.max(0, Math.min(this.height_ - proto.height, newY));
-					isBufferDirty = true;
-					drawCanvas();
-				}
+				// Обновляем скролл контейнера вместо трансформации
+				canvasContainer.scrollLeft -= dx;
+				canvasContainer.scrollTop -= dy;
+				e.preventDefault();
 				return;
 			}
-
+			
 			if (isDrawingRect && tileBrush === MODES.TILE_RECT) {
 				const coords = getPixelCoordinates(e.clientX, e.clientY);
 				tempRect.width = coords.x - rectStartX;
@@ -1936,7 +2381,7 @@ class FieldLevelEditor extends Blockly.Field {
 				drawCanvasWithTempRect();
 				return;
 			}
-
+			
 			if (isTileMode && isDragging) {
 				if (tileBrush === MODES.TILE_DRAW && selectedTileIndex !== -1) {
 					const value = selectedTileSolid ? selectedTileIndex + 1000 : selectedTileIndex;
@@ -1953,40 +2398,29 @@ class FieldLevelEditor extends Blockly.Field {
 				return;
 			}
 
-			if (isPanning) {
-				const dx = e.clientX - lastX;
-				const dy = e.clientY - lastY;
-				lastX = e.clientX;
-				lastY = e.clientY;
-
-				offsetX += dx;
-				offsetY += dy;
-
-				canvasContainer.scrollLeft = -offsetX;
-				canvasContainer.scrollTop = -offsetY;
-				updateView();
-				return;
-			}
-
 			if (isDragging && selectedObjectIndex !== -1) {
-				const coords = getPixelCoordinates(e.clientX, e.clientY);
+				// Обработка перемещения объекта
 				const obj = this.objects_[selectedObjectIndex];
+				const proto = proto_object_array.find(p =>
+						workspace.getVariableById(p.name).name === obj.protoName) ||
+					object_array.find(o =>
+						workspace.getVariableById(o.name).name === obj.protoName);
 
-				if (showGrid) {
-					obj.x = snapToGrid(coords.x - dragStartX);
-					obj.y = snapToGrid(coords.y - dragStartY);
-				} else {
-					obj.x = coords.x - dragStartX;
-					obj.y = coords.y - dragStartY;
-				}
-
-				const proto = proto_object_array[obj.protoName];
 				if (proto) {
-					obj.x = Math.max(0, Math.min(this.width_ - proto.width, obj.x));
-					obj.y = Math.max(0, Math.min(this.height_ - proto.height, obj.y));
+					let newX = coords.x - dragStartX;
+					let newY = coords.y - dragStartY;
+
+					if (showGrid) {
+						newX = snapToGrid(newX);
+						newY = snapToGrid(newY);
+					}
+
+					obj.x = Math.max(0, Math.min(this.width_ - proto.width, newX));
+					obj.y = Math.max(0, Math.min(this.height_ - proto.height, newY));
+
+					isBufferDirty = true;
+					drawCanvas();
 				}
-				isBufferDirty = true;
-				requestAnimationFrame(drawCanvasWithTempRect);
 			}
 		};
 
@@ -1996,6 +2430,7 @@ class FieldLevelEditor extends Blockly.Field {
 		modal.querySelector('#tile-solid-toggle').addEventListener('change', function () {
 			selectedTileSolid = this.checked;
 		});
+
 		// Tool selection event listeners
 		modal.querySelectorAll('.tool-btn').forEach(btn => {
 			btn.addEventListener('click', function () {
@@ -2006,29 +2441,56 @@ class FieldLevelEditor extends Blockly.Field {
 							for (let y = 0; y < self.tileMap_.length; y++) {
 								self.tileMap_[y].fill(0);
 							}
+							isBufferDirty = true;
 							drawCanvas();
 						});
 					} else {
 						let modal = showSwitchModal('!', Blockly.Msg['OBJECT_CLEAR'], true, Blockly.Msg['YES']);
 						modal.onConfirm(() => {
+							// Запоминаем какие уникальные объекты были удалены
+							const deletedUniqueObjects = [];
+							self.objects_.forEach(obj => {
+								if (object_array.some(o => workspace.getVariableById(o.name).name === obj.protoName)) {
+									deletedUniqueObjects.push(obj.protoName);
+								}
+							});
+
+							// Очищаем массив объектов
 							self.objects_ = [];
 							selectedObjectIndex = -1;
 							selectedProtoIndex = -1;
+
+							// Восстанавливаем уникальные объекты в палитре
+							deletedUniqueObjects.forEach(protoName => {
+								objectPalette.querySelectorAll('.object-item').forEach(item => {
+									if (item.dataset.name === protoName) {
+										item.classList.remove('disabled');
+										const badge = item.querySelector('.object-badge');
+										if (badge) {
+											item.removeChild(badge);
+										}
+									}
+								});
+							});
+
+							// Сбрасываем все выделения
 							objectPalette.querySelectorAll('.object-item').forEach(i => i.classList.remove('selected'));
+
+							// Принудительно перерисовываем холст
+							isBufferDirty = true;
 							drawCanvas();
 						});
 					}
-					return;
 				}
 
 				if (this.id === 'zoom-out-btn') {
-					zoom = Math.max(self.editorConfig.minZoom, zoom - self.editorConfig.zoomStep);
+					setZoom(zoom - self.editorConfig.zoomStep);
 					updateView();
 					return;
 				}
 
 				if (this.id === 'zoom-in-btn') {
-					zoom = Math.min(self.editorConfig.maxZoom, zoom + self.editorConfig.zoomStep);
+					setZoom(zoom + self.editorConfig.zoomStep);
 					updateView();
 					return;
 				}
@@ -2074,17 +2536,13 @@ class FieldLevelEditor extends Blockly.Field {
 					currentTool = 'select';
 					canvas.style.cursor = 'crosshair';
 					break;
-				case 'hand-btn':
-					currentTool = 'hand';
-					canvas.style.cursor = 'grab';
-					break;
 				case 'delete-btn':
 					currentTool = 'delete';
 					canvas.style.cursor = 'not-allowed';
 					break;
 				}
 
-				if (this.id === 'select-btn' || this.id === 'hand-btn' || this.id === 'delete-btn') {
+				if (this.id === 'select-btn' || this.id === 'delete-btn') {
 					isTileMode = false;
 					tileModeBtn.classList.remove('active');
 					tileTools.style.display = 'none';
@@ -2095,27 +2553,30 @@ class FieldLevelEditor extends Blockly.Field {
 		});
 
 		// Tool handlers
+		let lastSelectClickTime = 0;
 		modal.querySelector('#select-btn').addEventListener('click', function () {
-			resetSelections();
-			activateTool(MODES.SELECT, this);
-			isTileMode = false;
-			tileTools.style.display = 'none';
-			tilePalette.style.display = 'none';
-			objectPalette.style.display = 'grid';
-			canvas.style.cursor = 'crosshair';
+			const now = Date.now();
+			if (now - lastSelectClickTime < 300) { // Двойной клик
+				// Переключаем между режимами SELECT и HAND
+				if (currentTool === MODES.SELECT) {
+					activateTool(MODES.HAND, this);
+					canvasContainer.classList.add('hand-mode');
+					canvas.style.cursor = 'grab';
+				} else {
+					activateTool(MODES.SELECT, this);
+					canvasContainer.classList.remove('hand-mode');
+					canvas.style.cursor = 'crosshair';
+				}
+			}
+			lastSelectClickTime = now;
+			ctx.globalAlpha = 1.0;
 			isBufferDirty = true;
-			drawCanvas(); // Перерисовываем с нормальной прозрачностью
+			drawCanvas(); // Перерисовываем с новой прозрачностью
 		});
 
-		modal.querySelector('#hand-btn').addEventListener('click', function () {
-			resetSelections();
-			activateTool(MODES.HAND, this);
-			isTileMode = false;
-			tileTools.style.display = 'none';
-			tilePalette.style.display = 'none';
-			objectPalette.style.display = 'grid';
-			canvas.style.cursor = 'grab';
-		});
+		let isScrolling = false;
+		let scrollStartX,
+		scrollStartY;
 
 		modal.querySelector('#delete-btn').addEventListener('click', function () {
 			resetSelections();
@@ -2124,7 +2585,11 @@ class FieldLevelEditor extends Blockly.Field {
 			tileTools.style.display = 'none';
 			tilePalette.style.display = 'none';
 			objectPalette.style.display = 'grid';
-			canvas.style.cursor = 'not-allowed';
+			// Явно устанавливаем курсор-корзину
+			canvas.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"%23ff0000\" d=\"M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12z\"/></svg>') 12 12, auto";
+			ctx.globalAlpha = 1.0;
+			isBufferDirty = true;
+			drawCanvas(); // Перерисовываем с новой прозрачностью
 		});
 
 		modal.querySelector('#tile-mode-btn').addEventListener('click', function () {
@@ -2136,6 +2601,7 @@ class FieldLevelEditor extends Blockly.Field {
 			objectPalette.style.display = 'none';
 			canvas.style.cursor = 'crosshair';
 			modal.querySelector('#tile-draw-btn').classList.add('active');
+			tileBrush = MODES.TILE_DRAW;
 			isBufferDirty = true;
 			drawCanvas(); // Перерисовываем с новой прозрачностью
 		});
@@ -2190,15 +2656,12 @@ class FieldLevelEditor extends Blockly.Field {
 		// Canvas container event listeners for panning
 		canvasContainer.addEventListener('mousedown', (e) => {
 			isMouseDown = true;
-			lastPlacedTile = {
-				x: -1,
-				y: -1
-			};
 
-			if ((e.button === 0 && currentTool === MODES.HAND) || e.button === 1) {
+			if (currentTool === MODES.HAND) {
 				isPanning = true;
 				lastX = e.clientX;
 				lastY = e.clientY;
+				canvasContainer.classList.add('grabbing');
 				canvas.style.cursor = 'grabbing';
 				e.preventDefault();
 				return;
@@ -2258,54 +2721,106 @@ class FieldLevelEditor extends Blockly.Field {
 			}
 
 			if (currentTool === MODES.PLACE_OBJECT && selectedProtoName) {
-			  const proto = proto_object_array.find(p => 
-				workspace.getVariableById(p.name).name === selectedProtoName);
-			  if (!proto) return;
+				// Ищем прототип в обоих массивах
+				let proto = proto_object_array.find(p =>
+						workspace.getVariableById(p.name).name === selectedProtoName);
 
-			  let x = showGrid ? snapToGrid(coords.x) : coords.x;
-			  let y = showGrid ? snapToGrid(coords.y) : coords.y;
+				if (!proto) {
+					proto = object_array.find(o =>
+							workspace.getVariableById(o.name).name === selectedProtoName);
+				}
 
-			  x = Math.max(0, Math.min(this.width_ - proto.width, x));
-			  y = Math.max(0, Math.min(this.height_ - proto.height, y));
+				if (!proto)
+					return;
 
-			  this.objects_.push({
-				protoName: selectedProtoName,
-				x: x,
-				y: y
-			  });
-			  isBufferDirty = true;
+				// Для уникальных объектов проверяем еще раз (на случай, если добавление происходит другим способом)
+				if (object_array.some(o =>
+						workspace.getVariableById(o.name).name === selectedProtoName) &&
+					!self.isObjectUnique(selectedProtoName)) {
+					showSwitchModal('!', Blockly.Msg['OBJECT_ALREADY_ADDED'], false, 'ok');
+					return;
+				}
 
-			  drawCanvas();
-			  return;
+				let x = showGrid ? snapToGrid(coords.x) : coords.x;
+				let y = showGrid ? snapToGrid(coords.y) : coords.y;
+
+				x = Math.max(0, Math.min(this.width_ - proto.width, x));
+				y = Math.max(0, Math.min(this.height_ - proto.height, y));
+
+				// Добавляем объект
+				this.objects_.push({
+					protoName: selectedProtoName,
+					x: x,
+					y: y
+				});
+
+				// Если объект уникальный - помечаем его как использованный
+				if (object_array.some(o =>
+						workspace.getVariableById(o.name).name === selectedProtoName)) {
+					objectPalette.querySelectorAll('.object-item').forEach(item => {
+						if (item.dataset.name === selectedProtoName) {
+							item.classList.add('disabled');
+							const badge = document.createElement('div');
+							badge.className = 'object-badge';
+							badge.textContent = '✓';
+							item.appendChild(badge);
+						}
+					});
+				}
+
+				isBufferDirty = true;
+				drawCanvas();
+				return;
 			}
 
 			if (currentTool === MODES.SELECT || currentTool === MODES.DELETE) {
 				const index = findObjectAt(coords.x, coords.y);
 
-				if (currentTool === MODES.DELETE && index !== -1) {
-					this.objects_.splice(index, 1);
-					if (selectedObjectIndex === index)
-						selectedObjectIndex = -1;
-					isBufferDirty = true;
-					drawCanvas();
-					return;
-				}
-
 				if (index !== -1) {
-					selectedObjectIndex = index;
-					isDragging = true;
-					dragStartX = coords.x - this.objects_[index].x;
-					dragStartY = coords.y - this.objects_[index].y;
-				} else {
-					selectedObjectIndex = -1;
+					if (currentTool === MODES.DELETE) {
+						const deletedObj = self.objects_[index];
+						self.objects_.splice(index, 1);
+
+						if (object_array.some(o =>
+								workspace.getVariableById(o.name).name === deletedObj.protoName)) {
+							self.updatePaletteForUniqueObject(deletedObj.protoName, false);
+						}
+
+						selectedObjectIndex = -1;
+						isBufferDirty = true;
+						drawCanvas();
+						e.preventDefault();
+						return;
+					} else {
+						// Если нашли объект - перемещаем его
+						selectedObjectIndex = index;
+						isDragging = true;
+						dragStartX = coords.x - this.objects_[index].x;
+						dragStartY = coords.y - this.objects_[index].y;
+
+						// Подсвечиваем объект
+						self.isObjectHighlighted = true;
+						isBufferDirty = true;
+						drawCanvas();
+					}
+				} else if (currentTool === MODES.SELECT) {
+					// Если объект не найден - переходим в режим перемещения
+					isPanning = true;
+					lastX = e.clientX;
+					lastY = e.clientY;
+					canvasContainer.classList.add('grabbing');
+					canvas.style.cursor = 'grabbing';
 				}
-				isBufferDirty = true;
-				drawCanvas();
 			}
 		});
 
 		document.addEventListener('mouseup', (e) => {
+			if (isPanning) {
+				isPanning = false;
+				canvasContainer.classList.remove('grabbing');
+			}
 			isMouseDown = false;
+
 			if (isDrawingRect && tileBrush === MODES.TILE_RECT) {
 				const coords = getPixelCoordinates(e.clientX, e.clientY);
 				const value = selectedTileSolid ? selectedTileIndex + 1000 : selectedTileIndex;
@@ -2320,7 +2835,345 @@ class FieldLevelEditor extends Blockly.Field {
 				isDrawingRect = false;
 				tempRect = null;
 				isBufferDirty = true;
-				drawCanvas(); // Перерисовываем без временного прямоугольника
+				drawCanvas();
+			}
+
+			if (isDragging && selectedObjectIndex !== -1) {
+				const obj = this.objects_[selectedObjectIndex];
+				if (object_array.some(o =>
+						workspace.getVariableById(o.name).name === obj.protoName)) {
+					this.updatePaletteForUniqueObject(obj.protoName, true);
+				}
+			}
+
+			isPanning = false;
+			isDragging = false;
+			isMouseDown = false;
+			selectedObjectIndex = -1;
+
+			// Восстанавливаем курсор в зависимости от текущего инструмента
+			if (currentTool === MODES.HAND) {
+				canvasContainer.classList.remove('grabbing');
+				canvas.style.cursor = 'grab';
+			} else if (currentTool === MODES.DELETE) {
+				// Оставляем курсор-корзину для инструмента удаления
+				canvas.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"%23ff0000\" d=\"M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12z\"/></svg>') 12 12, auto";
+			} else {
+				canvas.style.cursor = 'crosshair';
+			}
+		});
+
+		// Добавляем обработчики touch-событий для canvasContainer
+		canvasContainer.addEventListener('touchstart', function (e) {
+			if (e.touches.length !== 1)
+				return;
+
+			isMouseDown = true;
+			const touch = e.touches[0];
+			const coords = getPixelCoordinates(touch.clientX, touch.clientY);
+			updateCursorCoordinates(coords.x, coords.y);
+
+			// Если выбран инструмент HAND - начинаем панорамирование
+			if (currentTool === MODES.HAND) {
+				isPanning = true;
+				lastX = touch.clientX;
+				lastY = touch.clientY;
+				canvasContainer.classList.add('grabbing');
+				canvas.style.cursor = 'grabbing';
+				e.preventDefault();
+				return;
+			}
+
+			// Если в режиме выбора (SELECT) и не нашли объект - начинаем панорамирование
+			if (currentTool === MODES.SELECT) {
+				const index = findObjectAt(coords.x, coords.y);
+
+				if (index === -1) {
+					// Если объект не найден - переходим в режим перемещения
+					isPanning = true;
+					lastX = touch.clientX;
+					lastY = touch.clientY;
+					canvasContainer.classList.add('grabbing');
+					canvas.style.cursor = 'grabbing';
+					e.preventDefault();
+					return;
+				}
+			}
+
+			if (isTileMode) {
+				isDragging = true;
+				const coords = getPixelCoordinates(touch.clientX, touch.clientY);
+
+				if (tileBrush === MODES.TILE_DRAW && selectedTileIndex !== -1) {
+					const value = selectedTileSolid ? selectedTileIndex + 1000 : selectedTileIndex;
+					if (setTileAt(coords.x, coords.y, value)) {
+						isBufferDirty = true;
+						drawCanvas();
+					}
+				} else if (tileBrush === MODES.TILE_ERASE) {
+					if (setTileAt(coords.x, coords.y, 0)) {
+						isBufferDirty = true;
+						drawCanvas();
+					}
+				} else if (tileBrush === MODES.TILE_FILL && selectedTileIndex !== -1) {
+					const tile = getTileAt(coords.x, coords.y);
+					if (tile) {
+						const targetValue = tile.value;
+						const newValue = selectedTileSolid ? selectedTileIndex + 1000 : selectedTileIndex;
+
+						if (targetValue !== newValue) {
+							fillTiles(coords.x, coords.y, targetValue, newValue);
+							isBufferDirty = true;
+							drawCanvas();
+						}
+					}
+				} else if (tileBrush === MODES.TILE_RECT) {
+					rectStartX = coords.x;
+					rectStartY = coords.y;
+					isDrawingRect = true;
+					tempRect = {
+						x: rectStartX,
+						y: rectStartY,
+						width: 0,
+						height: 0
+					};
+				}
+				e.preventDefault();
+				return;
+			}
+
+			if (currentTool === MODES.PLACE_OBJECT && selectedProtoName) {
+				let proto = proto_object_array.find(p =>
+						workspace.getVariableById(p.name).name === selectedProtoName);
+
+				if (!proto) {
+					proto = object_array.find(o =>
+							workspace.getVariableById(o.name).name === selectedProtoName);
+				}
+
+				if (!proto)
+					return;
+
+				if (object_array.some(o =>
+						workspace.getVariableById(o.name).name === selectedProtoName) &&
+					!self.isObjectUnique(selectedProtoName)) {
+					showSwitchModal('!', Blockly.Msg['OBJECT_ALREADY_ADDED'], false, 'ok');
+					return;
+				}
+
+				let x = showGrid ? snapToGrid(coords.x) : coords.x;
+				let y = showGrid ? snapToGrid(coords.y) : coords.y;
+
+				x = Math.max(0, Math.min(self.width_ - proto.width, x));
+				y = Math.max(0, Math.min(self.height_ - proto.height, y));
+
+				self.objects_.push({
+					protoName: selectedProtoName,
+					x: x,
+					y: y
+				});
+
+				if (object_array.some(o =>
+						workspace.getVariableById(o.name).name === selectedProtoName)) {
+					objectPalette.querySelectorAll('.object-item').forEach(item => {
+						if (item.dataset.name === selectedProtoName) {
+							item.classList.add('disabled');
+							const badge = document.createElement('div');
+							badge.className = 'object-badge';
+							badge.textContent = '✓';
+							item.appendChild(badge);
+						}
+					});
+				}
+
+				isBufferDirty = true;
+				drawCanvas();
+				e.preventDefault();
+				return;
+			}
+
+			if (currentTool === MODES.SELECT || currentTool === MODES.DELETE) {
+				const index = findObjectAt(coords.x, coords.y);
+
+				if (currentTool === MODES.DELETE && index !== -1) {
+					const deletedObj = self.objects_[index];
+					self.objects_.splice(index, 1);
+
+					if (object_array.some(o =>
+							workspace.getVariableById(o.name).name === deletedObj.protoName)) {
+						self.updatePaletteForUniqueObject(deletedObj.protoName, false);
+					}
+
+					selectedObjectIndex = -1;
+					isBufferDirty = true;
+					drawCanvas();
+					e.preventDefault();
+					return;
+				}
+
+				if (index !== -1) {
+					selectedObjectIndex = index;
+					isDragging = true;
+					dragStartX = coords.x - self.objects_[index].x;
+					dragStartY = coords.y - self.objects_[index].y;
+				} else {
+					selectedObjectIndex = -1;
+				}
+				isBufferDirty = true;
+				drawCanvas();
+			}
+		}, {
+			passive: false
+		});
+
+		canvasContainer.addEventListener('touchmove', function (e) {
+			if (!isMouseDown)
+				return;
+
+			const touch = e.touches[0];
+			const coords = getPixelCoordinates(touch.clientX, touch.clientY);
+			updateCursorCoordinates(coords.x, coords.y);
+
+			// Обработка панорамирования
+			if (isPanning && (currentTool === MODES.HAND || currentTool === MODES.SELECT)) {
+				const dx = touch.clientX - lastX;
+				const dy = touch.clientY - lastY;
+				lastX = touch.clientX;
+				lastY = touch.clientY;
+
+				canvasContainer.scrollLeft -= dx;
+				canvasContainer.scrollTop -= dy;
+				e.preventDefault();
+				return;
+			}
+
+			if (isDragging && selectedObjectIndex !== -1 && currentTool === MODES.SELECT) {
+				const obj = self.objects_[selectedObjectIndex];
+				const proto = proto_object_array.find(p =>
+						workspace.getVariableById(p.name).name === obj.protoName) ||
+					object_array.find(o =>
+						workspace.getVariableById(o.name).name === obj.protoName);
+
+				if (proto) {
+					let newX = coords.x - dragStartX;
+					let newY = coords.y - dragStartY;
+
+					if (showGrid) {
+						newX = snapToGrid(newX);
+						newY = snapToGrid(newY);
+					}
+
+					const wasMoved = obj.x !== newX || obj.y !== newY;
+					obj.x = Math.max(0, Math.min(self.width_ - proto.width, newX));
+					obj.y = Math.max(0, Math.min(self.height_ - proto.height, newY));
+
+					if (wasMoved && object_array.some(o =>
+							workspace.getVariableById(o.name).name === obj.protoName)) {
+						self.updatePaletteForUniqueObject(obj.protoName, true);
+					}
+
+					isBufferDirty = true;
+					drawCanvas();
+				}
+				e.preventDefault();
+				return;
+			}
+
+			if (isDrawingRect && tileBrush === MODES.TILE_RECT) {
+				tempRect.width = coords.x - rectStartX;
+				tempRect.height = coords.y - rectStartY;
+				isBufferDirty = true;
+				drawCanvasWithTempRect();
+				e.preventDefault();
+				return;
+			}
+
+			if (isTileMode && isDragging) {
+				if (tileBrush === MODES.TILE_DRAW && selectedTileIndex !== -1) {
+					const value = selectedTileSolid ? selectedTileIndex + 1000 : selectedTileIndex;
+					if (setTileAt(coords.x, coords.y, value)) {
+						isBufferDirty = true;
+						drawCanvas();
+					}
+				} else if (tileBrush === MODES.TILE_ERASE) {
+					if (setTileAt(coords.x, coords.y, 0)) {
+						isBufferDirty = true;
+						drawCanvas();
+					}
+				}
+				e.preventDefault();
+				return;
+			}
+		}, {
+			passive: false
+		});
+
+		canvasContainer.addEventListener('touchleave', function (e) {
+			if (isPanning) {
+				const continuePan = (touch) => {
+					if (isPanning && (currentTool === MODES.HAND || currentTool === MODES.SELECT)) {
+						const dx = touch.clientX - lastX;
+						const dy = touch.clientY - lastY;
+						lastX = touch.clientX;
+						lastY = touch.clientY;
+
+						canvasContainer.scrollLeft -= dx;
+						canvasContainer.scrollTop -= dy;
+					}
+				};
+
+				const stopPan = () => {
+					if (isPanning) {
+						canvasContainer.classList.remove('grabbing');
+						canvas.style.cursor = currentTool === MODES.HAND ? 'grab' : 'crosshair';
+					}
+					isPanning = false;
+					isDragging = false;
+					isMouseDown = false;
+					document.removeEventListener('touchmove', continuePan);
+					document.removeEventListener('touchend', stopPan);
+				};
+
+				document.addEventListener('touchmove', function (e) {
+					if (e.touches.length === 1) {
+						continuePan(e.touches[0]);
+					}
+				});
+				document.addEventListener('touchend', stopPan);
+			}
+		});
+
+		canvasContainer.addEventListener('touchend', function (e) {
+			if (isPanning && (currentTool === MODES.HAND || currentTool === MODES.SELECT)) {
+				isPanning = false;
+				canvasContainer.classList.remove('grabbing');
+				canvas.style.cursor = currentTool === MODES.HAND ? 'grab' : 'crosshair';
+			}
+
+			if (isDrawingRect && tileBrush === MODES.TILE_RECT) {
+				const touch = e.changedTouches[0];
+				const coords = getPixelCoordinates(touch.clientX, touch.clientY);
+				const value = selectedTileSolid ? selectedTileIndex + 1000 : selectedTileIndex;
+
+				drawTileRect(
+					rectStartX,
+					rectStartY,
+					coords.x,
+					coords.y,
+					value);
+
+				isDrawingRect = false;
+				tempRect = null;
+				isBufferDirty = true;
+				drawCanvas();
+			}
+
+			if (isDragging && selectedObjectIndex !== -1) {
+				const obj = self.objects_[selectedObjectIndex];
+				if (object_array.some(o =>
+						workspace.getVariableById(o.name).name === obj.protoName)) {
+					self.updatePaletteForUniqueObject(obj.protoName, true);
+				}
 			}
 
 			isPanning = false;
@@ -2328,96 +3181,35 @@ class FieldLevelEditor extends Blockly.Field {
 			isMouseDown = false;
 
 			if (currentTool === MODES.HAND) {
+				canvasContainer.classList.remove('grabbing');
 				canvas.style.cursor = 'grab';
-			} else {
-				canvas.style.cursor = 'crosshair';
-			}
-		});
-
-		// Touch events
-		canvasContainer.addEventListener('touchstart', function (e) {
-			if (e.touches.length === 1) {
-				if (currentTool === MODES.HAND) {
-					isPanning = true;
-					lastX = e.touches[0].clientX;
-					lastY = e.touches[0].clientY;
-					e.preventDefault();
-				}
-				const touch = e.touches[0];
-				const mouseEvent = new MouseEvent('mousedown', {
-					clientX: touch.clientX,
-					clientY: touch.clientY,
-					button: 0
-				});
-				this.dispatchEvent(mouseEvent);
-				e.preventDefault();
-			} else if (e.touches.length === 2) {
-				const touch1 = e.touches[0];
-				const touch2 = e.touches[1];
-				lastX = (touch1.clientX + touch2.clientX) / 2;
-				lastY = (touch1.clientY + touch2.clientY) / 2;
-				e.preventDefault();
-			}
-		});
-
-		canvasContainer.addEventListener('touchmove', function (e) {
-			if (isPanning && e.touches.length === 1) {
-				const dx = e.touches[0].clientX - lastX;
-				const dy = e.touches[0].clientY - lastY;
-				lastX = e.touches[0].clientX;
-				lastY = e.touches[0].clientY;
-
-				offsetX += dx;
-				offsetY += dy;
-
-				canvasContainer.scrollLeft = -offsetX;
-				canvasContainer.scrollTop = -offsetY;
-				updateView();
-				e.preventDefault();
-			} else if (e.touches.length === 2) {
-				const touch1 = e.touches[0];
-				const touch2 = e.touches[1];
-				const currentX = (touch1.clientX + touch2.clientX) / 2;
-				const currentY = (touch1.clientY + touch2.clientY) / 2;
-
-				const dx = currentX - lastX;
-				const dy = currentY - lastY;
-
-				offsetX += dx;
-				offsetY += dy;
-
-				canvasContainer.scrollLeft = -offsetX;
-				canvasContainer.scrollTop = -offsetY;
-
-				updateView();
-
-				lastX = currentX;
-				lastY = currentY;
-				e.preventDefault();
 			}
 		});
 
 		canvasContainer.addEventListener('mouseleave', function () {
 			if (isPanning) {
 				const continuePan = (e) => {
-					if (isPanning) {
+					if (isPanning && currentTool === MODES.HAND) {
 						const dx = e.clientX - lastX;
 						const dy = e.clientY - lastY;
 						lastX = e.clientX;
 						lastY = e.clientY;
 
-						offsetX += dx;
-						offsetY += dy;
-
-						canvasContainer.scrollLeft = -offsetX;
-						canvasContainer.scrollTop = -offsetY;
-						updateView();
+						// Просто скроллим контейнер вместо изменения трансформации
+						canvasContainer.scrollLeft -= dx;
+						canvasContainer.scrollTop -= dy;
+						e.preventDefault();
+						return;
 					}
 				};
 
 				document.addEventListener('mousemove', continuePan);
 
 				const stopPan = () => {
+					if (isPanning && currentTool === MODES.HAND) {
+						canvasContainer.classList.remove('grabbing');
+						canvas.style.cursor = 'grab';
+					}
 					isPanning = false;
 					isDragging = false;
 					isMouseDown = false;
@@ -2430,54 +3222,68 @@ class FieldLevelEditor extends Blockly.Field {
 		});
 
 		canvasContainer.addEventListener('touchend', function (e) {
+			if (e.cancelable) {
+				e.preventDefault();
+			}
 			const mouseEvent = new MouseEvent('mouseup');
 			this.dispatchEvent(mouseEvent);
-			e.preventDefault();
 		});
 
 		// Handle mouse wheel for zooming
 		canvasContainer.addEventListener('wheel', function (e) {
+			if (currentTool === MODES.HAND)
+				return;
+
 			e.preventDefault();
+			const delta = -Math.sign(e.deltaY) * 0.1; // Более плавное изменение зума
 
-			const delta = -Math.sign(e.deltaY);
-			const oldZoom = zoom;
+			// Получаем позицию мыши относительно canvas
+			const rect = canvasContainer.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left + canvasContainer.scrollLeft;
+			const mouseY = e.clientY - rect.top + canvasContainer.scrollTop;
 
-			zoom = Math.max(
-					self.editorConfig.minZoom,
-					Math.min(self.editorConfig.maxZoom, zoom + delta * self.editorConfig.zoomStep));
+			// Сохраняем относительное положение мыши до зума
+			const relX = mouseX / (self.width_ * zoom);
+			const relY = mouseY / (self.height_ * zoom);
 
-			if (zoom !== oldZoom) {
-				const rect = canvasContainer.getBoundingClientRect();
-				const mouseX = e.clientX - rect.left;
-				const mouseY = e.clientY - rect.top;
+			// Изменяем зум
+			setZoom(zoom + delta);
 
-				const canvasX = (mouseX - offsetX) / oldZoom;
-				const canvasY = (mouseY - offsetY) / oldZoom;
+			// Вычисляем новые координаты для сохранения позиции мыши
+			const newMouseX = relX * (self.width_ * zoom);
+			const newMouseY = relY * (self.height_ * zoom);
 
-				offsetX = mouseX - canvasX * zoom;
-				offsetY = mouseY - canvasY * zoom;
-
-				canvasContainer.scrollLeft = -offsetX;
-				canvasContainer.scrollTop = -offsetY;
-
-				updateView();
-			}
+			// Корректируем скролл
+			canvasContainer.scrollLeft += newMouseX - mouseX;
+			canvasContainer.scrollTop += newMouseY - mouseY;
 		});
 
-		objectPalette.addEventListener('click', function(e) {
-		  const item = e.target.closest('.object-item');
-		  if (item) {
+		objectPalette.addEventListener('click', function (e) {
+			const item = e.target.closest('.object-item');
+			if (!item || item.classList.contains('disabled'))
+				return;
+
+			const protoName = item.dataset.name;
+
+			// Проверяем тип объекта
+			const isProto = proto_object_array.some(p =>
+					workspace.getVariableById(p.name).name === protoName);
+			const isUnique = object_array.some(o =>
+					workspace.getVariableById(o.name).name === protoName);
+
+			// Для уникальных объектов проверяем, не добавлен ли уже
+			if (isUnique && !self.isObjectUnique(protoName)) {
+				showSwitchModal('!', Blockly.Msg['OBJECT_ALREADY_ADDED'], false, 'ok');
+				item.classList.add('disabled');
+				return;
+			}
+
 			resetSelections();
 			item.classList.add('selected');
-			selectedProtoName = item.dataset.name;
-			selectedProtoIndex = -1; // Сбрасываем индекс, так как работаем с именем
+			selectedProtoName = protoName;
 			activateTool(MODES.PLACE_OBJECT);
 			isTileMode = false;
-			tileTools.style.display = 'none';
-			tilePalette.style.display = 'none';
-			objectPalette.style.display = 'grid';
 			canvas.style.cursor = 'crosshair';
-		  }
 		});
 
 		// Close editor and save
@@ -2499,6 +3305,7 @@ class FieldLevelEditor extends Blockly.Field {
 			drawCanvas();
 		}, 1000);
 	}
+
 }
 
 // Register the field

@@ -507,7 +507,6 @@ function saveToFile() {
 }
 
 function loadJson(file) {
-    try {
         const data = JSON.parse(file);
         
         // Проверяем, есть ли projectSettings в загружаемом файле
@@ -532,10 +531,6 @@ function loadJson(file) {
             // Это старый файл только с кодом
             loadWorkspaceData(data);
         }
-    } catch (e) {
-        console.error("Ошибка в позиции:", e.position);
-        console.log("Контекст ошибки:", file.substring(e.position - 20, e.position + 20));
-    }
 }
 
 // Обработчик загрузки workspace из файла

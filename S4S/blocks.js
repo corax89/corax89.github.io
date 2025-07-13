@@ -423,12 +423,23 @@ Blockly.Blocks['get_key_down'] = {
           ["🅧", "KeyX"],
           ["🅨", "KeyY"]
         ]), "KEY");
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GAMEPAD_NUM'])
+        .appendField(new Blockly.FieldDropdown([
+          ["0", "0"],
+          ["1", "1"],
+          ["2", "2"],
+          ["3", "3"],
+          ["4", "4"]
+        ]), "JOY_ID");
     this.setInputsInline(true);
     this.setOutput(true, 'Boolean');
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#control');
-	this.setFieldValue("ArrowUp", "KEY");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#control');
+    this.setFieldValue("ArrowUp", "KEY");
+    this.setFieldValue("0", "JOY_ID");
   }
 };
+
 
 // Блок проверки нажатия клавиши
 Blockly.Blocks['get_key_pressed'] = {
@@ -441,14 +452,24 @@ Blockly.Blocks['get_key_pressed'] = {
           ["🡇", "ArrowDown"],
           ["🡄", "ArrowLeft"],
           ["🡆", "ArrowRight"],
-		  ["🅐", "KeyA"],
+          ["🅐", "KeyA"],
           ["🅑", "KeyB"],
           ["🅧", "KeyX"],
           ["🅨", "KeyY"]
         ]), "KEY");
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GAMEPAD_NUM'])
+        .appendField(new Blockly.FieldDropdown([
+          ["0", "0"],
+          ["1", "1"],
+          ["2", "2"],
+          ["3", "3"],
+          ["4", "4"]
+        ]), "JOY_ID");
     this.setInputsInline(true);
     this.setOutput(true, 'Boolean');
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+    this.setFieldValue("0", "JOY_ID");
   }
 };
 
@@ -472,6 +493,7 @@ Blockly.Blocks['game_vibrate'] = {
 };
 
 // Блок получения значения оси
+
 Blockly.Blocks['get_axes'] = {
   init: function() {
     this.setColour(60);
@@ -483,9 +505,19 @@ Blockly.Blocks['get_axes'] = {
           ["ось2", "2"],
           ["ось3", "3"]
         ]), "KEY");
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GAMEPAD_NUM'])
+        .appendField(new Blockly.FieldDropdown([
+          ["0", "0"],
+          ["1", "1"],
+          ["2", "2"],
+          ["3", "3"],
+          ["4", "4"]
+        ]), "JOY_ID");
     this.setInputsInline(true);
     this.setOutput(true, 'Number');
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+    this.setFieldValue("0", "JOY_ID");
   }
 };
 
@@ -1186,43 +1218,78 @@ Blockly.Blocks['set_timer'] = {
 
 // ================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ================== //
 function rebuildProtoObjectArray() {
-    // 1. Очищаем массив
+    // 1. Очищаем массивы
     proto_object_array = [];
+    object_array = [];
 
-    // 2. Находим все блоки типа 'new_proto_object'
+    // 2. Находим все блоки типа 'new_proto_object' и 'new_object'
     const blocks = workspace.getAllBlocks();
     const protoBlocks = blocks.filter(block => block.type === 'new_proto_object');
+    const objectBlocks = blocks.filter(block => block.type === 'new_object');
 
-    // 3. Заполняем массив заново с проверкой дубликатов
-    const usedNames = new Set(); // Для отслеживания уже использованных имен
-    
+    // 3. Заполняем массив прототипов с проверкой дубликатов
+    const usedProtoNames = new Set();
     for (const block of protoBlocks) {
-      const objectName = block.getFieldValue('Object');
-      if (!objectName || objectName === 'null') continue; // Пропускаем невалидные
+        const objectName = block.getFieldValue('Object');
+        if (!objectName || objectName === 'null') continue;
 
-      // Проверяем, не существует ли уже такое имя
-      if (usedNames.has(objectName)) {
-        showSwitchModal('error', 'Внимание:%1 дублируется'.replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
-      }
-      usedNames.add(objectName);
+        if (usedProtoNames.has(objectName)) {
+            showSwitchModal('error', 'Внимание:%1 дублируется'.replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
+        }
+        usedProtoNames.add(objectName);
 
-      const spriteBlock = block.getInputTargetBlock('Sprite');
-      let spriteValue = '';
+        const spriteBlock = block.getInputTargetBlock('Sprite');
+        let spriteValue = '';
+        if (spriteBlock && spriteBlock.type === 'field_png') {
+            spriteValue = spriteBlock.getField('IMAGE').getValue();
+        }
 
-      if (spriteBlock && spriteBlock.type === 'field_png') {
-        spriteValue = spriteBlock.getField('IMAGE').getValue();
-      }
-
-      proto_object_array.push({
-        name: objectName,
-        width: getNumberValue(block, 'Width'),
-        height: getNumberValue(block, 'Height'),
-        sprite: spriteValue,
-        onCreate: getConnectedBlocks(block, 'ONCREATE'),
-        blockId: block.id
-      });
+        proto_object_array.push({
+            name: objectName,
+            width: getNumberValue(block, 'Width'),
+            height: getNumberValue(block, 'Height'),
+            sprite: spriteValue,
+            onCreate: getConnectedBlocks(block, 'ONCREATE'),
+            blockId: block.id
+        });
     }
-    //console.log('Массив перестроен. Текущие объекты:', proto_object_array);
+
+    // 4. Заполняем массив объектов
+    const usedObjectNames = new Set();
+    for (const block of objectBlocks) {
+        const objectName = block.getFieldValue('Object');
+        if (!objectName || objectName === 'null') continue;
+
+        if (usedObjectNames.has(objectName)) {
+            showSwitchModal('error', 'Внимание:%1 дублируется'.replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
+        }
+        usedObjectNames.add(objectName);
+
+        const x = getNumberValue(block, 'X');
+        const y = getNumberValue(block, 'Y');
+        const width = getNumberValue(block, 'Width');
+        const height = getNumberValue(block, 'Height');
+        
+        let spriteValue = '';
+        if (block.type === 'new_object') {
+            const spriteBlock = block.getInputTargetBlock('Sprite');
+            if (spriteBlock && spriteBlock.type === 'field_png') {
+                spriteValue = spriteBlock.getField('IMAGE').getValue();
+            }
+        }
+
+        object_array.push({
+            name: objectName,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            sprite: spriteValue,
+            onCreate: getConnectedBlocks(block, 'ONCREATE'),
+            blockId: block.id,
+            isProto: block.type === 'new_object_from_proto'
+        });
+    }
 }
 
 function getNumberValue(block, inputName) {
@@ -1459,7 +1526,7 @@ function resetProtoObjects() {
 Blockly.Blocks['new_object'] = {
   init: function() {
     this.setColour(340);
-	this.appendDummyInput()
+    this.appendDummyInput()
         .appendField(Blockly.Msg['NEW_OBJECT_LABEL']);
     this.appendDummyInput()
         .appendField(new Blockly.FieldVariable('obj1'), 'Object');
@@ -1469,7 +1536,7 @@ Blockly.Blocks['new_object'] = {
     this.appendValueInput("Y")
         .setCheck("Number")
         .appendField(Blockly.Msg['POSITION_Y_LABEL']);
-	
+    
     const widthInput = this.appendValueInput("Width")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
@@ -1477,15 +1544,15 @@ Blockly.Blocks['new_object'] = {
     shadowBlockWidth.setFieldValue('32', 'NUM');
     widthInput.connection.connect(shadowBlockWidth.outputConnection);
     shadowBlockWidth.setShadow(true);
-	
+    
     const heightInput = this.appendValueInput("Height")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
-	const shadowBlockHeight = this.workspace.newBlock('math_number');
+    const shadowBlockHeight = this.workspace.newBlock('math_number');
     shadowBlockHeight.setFieldValue('32', 'NUM');
     heightInput.connection.connect(shadowBlockHeight.outputConnection);
-    shadowBlockHeight.setShadow(true);	
-	
+    shadowBlockHeight.setShadow(true);    
+    
     this.appendValueInput("Sprite")
         .setCheck("type_sprite")
         .appendField(Blockly.Msg['IMAGE_LABEL']);
@@ -1494,6 +1561,13 @@ Blockly.Blocks['new_object'] = {
         .appendField(Blockly.Msg['ON_CREATE_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
+    
+    // Добавляем обработчик изменений для обновления object_array
+    this.setOnChange(function(changeEvent) {
+        if (!changeEvent.blockId || changeEvent.blockId === this.id) {
+            rebuildProtoObjectArray();
+        }
+    });
   }
 };
 
@@ -2176,20 +2250,28 @@ Blockly.Blocks['object_control'] = {
           [Blockly.Msg['STICK1_LABEL'], 'stick1'],
           [Blockly.Msg['BOTH_LABEL'], 'both']
         ]), 'type');
+    
+    // Add gamepad number selection
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GAMEPAD_NUM'])
+        .appendField(new Blockly.FieldDropdown([
+          ["0", "0"],
+          ["1", "1"],
+          ["2", "2"],
+          ["3", "3"],
+          ["4", "4"]
+        ]), 'JOY_ID');
 
-    // Создаем поле для типа игры
     const gameField = new Blockly.FieldDropdown([
       [Blockly.Msg['TDS_LABEL'], 'tds'],
       [Blockly.Msg['PLATFORMER_LABEL'], 'platform']
     ]);
     
-    // Добавляем поле типа игры
     const gameInput = this.appendDummyInput()
         .appendField(gameField, 'game');
     
-    // Создаем отдельный input для кнопки прыжка с надписью
     this.jumpButtonInput = this.appendDummyInput()
-        .appendField(Blockly.Msg['JUMP_BUTTON'])  // Надпись перед выбором кнопки
+        .appendField(Blockly.Msg['JUMP_BUTTON'])
         .appendField(new Blockly.FieldDropdown([
           ["🡅", "ArrowUp"],
           ["🅐", "KeyA"],
@@ -2198,9 +2280,8 @@ Blockly.Blocks['object_control'] = {
           ["🅨", "KeyY"]
         ]), 'jump_button');
     
-    // Добавляем чекбокс для двойного прыжка
     this.doubleJumpInput = this.appendDummyInput()
-		.appendField(Blockly.Msg['DOUBLE_JUMP_LABEL'])
+        .appendField(Blockly.Msg['DOUBLE_JUMP_LABEL'])
         .appendField(new Blockly.FieldCheckbox("FALSE"), 'double_jump');
     
     this.appendValueInput("ValueX")
@@ -2213,14 +2294,13 @@ Blockly.Blocks['object_control'] = {
     this.setNextStatement(true, "Array");
     this.setColour(190);
     
-    // Настраиваем обработчик изменений для gameField
     gameField.setValidator((newValue) => {
       this.updatePlatformerControlsVisibility(newValue);
       return newValue;
     });
     
-    // Инициализируем видимость
     this.updatePlatformerControlsVisibility(this.getFieldValue('game'));
+    this.setFieldValue("0", "JOY_ID");
   },
   
   updatePlatformerControlsVisibility: function(gameType) {
@@ -2864,13 +2944,14 @@ javascript.javascriptGenerator.forBlock['lists_pop_last'] = function(block, gene
 // Генератор для проверки нажатия клавиши
 javascript.javascriptGenerator.forBlock['get_key_down'] = function(block, generator) {
   const button = block.getFieldValue('KEY');
-  return [`Game.getKey("${button}")`, generator.ORDER_ATOMIC];
+  const joyId = block.getFieldValue('JOY_ID');
+  return [`Game.getKey("${button}", ${joyId})`, generator.ORDER_ATOMIC];
 };
 
-// Генератор для проверки нажатия клавиши
 javascript.javascriptGenerator.forBlock['get_key_pressed'] = function(block, generator) {
   const button = block.getFieldValue('KEY');
-  return [`Game.getKeyPress("${button}")`, generator.ORDER_ATOMIC];
+  const joyId = block.getFieldValue('JOY_ID');
+  return [`Game.getKeyPress("${button}", ${joyId})`, generator.ORDER_ATOMIC];
 };
 
 javascript.javascriptGenerator.forBlock['game_vibrate'] = function(block, generator) {
@@ -2894,7 +2975,8 @@ javascript.javascriptGenerator.forBlock['game_vibrate'] = function(block, genera
 // Генератор для получения значения оси
 javascript.javascriptGenerator.forBlock['get_axes'] = function(block, generator) {
   const axis = block.getFieldValue('KEY');
-  return [`Game.getAxes(${axis})`, generator.ORDER_ATOMIC];
+  const joyId = block.getFieldValue('JOY_ID');
+  return [`Game.getAxes(${axis}, ${joyId})`, generator.ORDER_ATOMIC];
 };
 
 // Генератор для рисования точки
@@ -3016,7 +3098,7 @@ javascript.javascriptGenerator.forBlock['play_sound'] = function(block, generato
 };
 // Генератор для редактора уровней
 /*Формат кодирования тайлов:
-    Воторые два числа - размеры сетки (колонки, строки)
+    Вторые два числа - размеры сетки (колонки, строки)
     Обычные тайлы: 0-16382
     Твердые тайлы: 16383-32765 (16383 + исходный ID)
     RLE-кодирование:
@@ -3030,28 +3112,43 @@ javascript.javascriptGenerator.forBlock['level_editor'] = function(block, genera
   // Обработка объектов
   const originalObjects = levelData.objects || [];
   const groupedObjects = {};
+  const simpleObjects = [];
   let hasObjects = false;
 
   originalObjects.forEach(item => {
-    // Ищем прототип по имени (новый формат)
-    const protoIndex = proto_object_array.findIndex(p => 
+    // Сначала ищем в proto_object_array
+    let protoIndex = proto_object_array.findIndex(p => 
       workspace.getVariableById(p.name).name === item.protoName);
     
-    if (protoIndex === -1) {
-      console.warn(`Прототип не найден: ${item.protoName}`);
-      return;
+    if (protoIndex !== -1) {
+      // Объект из proto_object_array
+      if (!groupedObjects[protoIndex]) {
+        groupedObjects[protoIndex] = [];
+      }
+      groupedObjects[protoIndex].push(item.x, item.y);
+      hasObjects = true;
+    } else {
+      // Если не найден в proto_object_array, ищем в object_array
+      let objIndex = object_array.findIndex(o => 
+        workspace.getVariableById(o.name).name === item.protoName);
+      
+      if (objIndex !== -1) {
+        // Объект из object_array
+        simpleObjects.push({
+          name: generator.getVariableName(object_array[objIndex].name),
+          x: item.x,
+          y: item.y
+        });
+        hasObjects = true;
+      } else {
+        console.warn(`Прототип не найден: ${item.protoName}`);
+      }
     }
-
-    if (!groupedObjects[protoIndex]) {
-      groupedObjects[protoIndex] = [];
-    }
-    groupedObjects[protoIndex].push(item.x, item.y);
-    hasObjects = true;
   });
 
-  // Формируем код для объектов (только если они есть)
+  // Формируем код для объектов (proto_object_array)
   let objectsCode = '';
-  if (hasObjects) {
+  if (Object.keys(groupedObjects).length > 0) {
     const objectsArray = Object.keys(groupedObjects).map(protoIndex => ({
       id: generator.getVariableName(proto_object_array[parseInt(protoIndex)].name),
       xy: groupedObjects[protoIndex]
@@ -3059,6 +3156,14 @@ javascript.javascriptGenerator.forBlock['level_editor'] = function(block, genera
     objectsCode = 'Game.addObjectsFromArray(' + 
       JSON.stringify(objectsArray).replace(/"id"\s*:\s*"([a-zA-Z_][a-zA-Z0-9_]*)"/g, '"id": $1') + 
       ');\n';
+  }
+
+  // Формируем код для простых объектов (object_array)
+  let simpleObjectsCode = '';
+  if (simpleObjects.length > 0) {
+    simpleObjectsCode = simpleObjects.map(obj => {
+      return `${obj.name}.x = ${obj.x}; ${obj.name}.y = ${obj.y};`;
+    }).join('\n') + '\n';
   }
 
   // Обработка тайлов с RLE-кодированием (остаётся без изменений)
@@ -3130,6 +3235,7 @@ javascript.javascriptGenerator.forBlock['level_editor'] = function(block, genera
   const result = [];
   if (objectsCode) result.push(objectsCode);
   if (tilesCode) result.push(tilesCode);
+  if (simpleObjectsCode) result.push(simpleObjectsCode);
   
   return result.join('\n') || '// Уровень не содержит объектов и тайлов\n';
 };
@@ -3682,6 +3788,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   const gameType = block.getFieldValue('game');
   const jumpButton = block.getFieldValue('jump_button') || 'ArrowUp';
   const doubleJumpEnabled = block.getFieldValue('double_jump') === 'TRUE';
+  const joyId = block.getFieldValue('JOY_ID');
   const acceleration = 0.2;
 
   const controlFuncName = `${obj}_control`;
@@ -3715,7 +3822,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
         funcCode += '  // Keyboard controls\n';
         funcCode += '  var getKey = Game.getKey;\n';
         funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + ` +
-                   `(getKey("ArrowRight") ? ${speedX} : getKey("ArrowLeft") ? -${speedX} : 0) * ${acceleration};\n`;
+                   `(getKey("ArrowRight", ${joyId}) ? ${speedX} : getKey("ArrowLeft", ${joyId}) ? -${speedX} : 0) * ${acceleration};\n`;
         
         if (gameType === 'platform') {
           if (doubleJumpEnabled) {
@@ -3726,7 +3833,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `  }\n`;
             
             // Обработка нажатия кнопки прыжка
-            funcCode += `  if(getKey("${jumpButton}") && ${obj}_jumpReady) {\n`;
+            funcCode += `  if(getKey("${jumpButton}", ${joyId}) && ${obj}_jumpReady) {\n`;
             funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
             funcCode += `      obj.speedy = -${speedY};\n`;
             funcCode += `      ${obj}_jumpCount++;\n`;
@@ -3735,21 +3842,21 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `    }\n`;
             funcCode += `  }\n`;
             // Сбрасываем jumpReady при отпускании кнопки
-            funcCode += `  if(!getKey("${jumpButton}")) {\n`;
+            funcCode += `  if(!getKey("${jumpButton}"), ${joyId}) {\n`;
             funcCode += `    ${obj}_jumpReady = true;\n`;
             funcCode += `  }\n`;
           } else {
             // Обычный прыжок без двойного
-            funcCode += `  if(getKey("${jumpButton}") && obj.isOnGround && ${obj}_jumpReady) {\n`;
+            funcCode += `  if(getKey("${jumpButton}", ${joyId}) && obj.isOnGround && ${obj}_jumpReady) {\n`;
             funcCode += `    obj.speedy = -${speedY};\n`;
             funcCode += `    ${obj}_jumpReady = false;\n`;
             funcCode += `  }\n`;
-            funcCode += `  if(!getKey("${jumpButton}")) ${obj}_jumpReady = true;\n`;
+            funcCode += `  if(!getKey("${jumpButton}", ${joyId})) ${obj}_jumpReady = true;\n`;
           }
-          funcCode += `  if(getKey("ArrowDown")) obj.speedx *= 0.7;\n`;
+          funcCode += `  if(getKey("ArrowDown", ${joyId})) obj.speedx *= 0.7;\n`;
         } else {
-          funcCode += `  if(getKey("ArrowUp")) obj.speedy = -${speedY};\n`;
-          funcCode += `  if(getKey("ArrowDown")) obj.speedy = ${speedY};\n`;
+          funcCode += `  if(getKey("ArrowUp", ${joyId})) obj.speedy = -${speedY};\n`;
+          funcCode += `  if(getKey("ArrowDown", ${joyId})) obj.speedy = ${speedY};\n`;
         }
         break;
       }
@@ -3762,7 +3869,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
         
         funcCode += `  // Gamepad controls\n`;
         funcCode += `  var getAxes = Game.getAxes;\n`;
-        funcCode += `  var stickX = getAxes(${stickIndex});\n`;
+        funcCode += `  var stickX = getAxes(${stickIndex}, ${joyId});\n`;
         funcCode += `  if(Math.abs(stickX) > 0.3) {\n`;
         funcCode += `    obj.speedx = obj.speedx * (1 - ${acceleration}) + ${speedX} * stickX * ${acceleration};\n`;
         funcCode += `  }\n`;
@@ -3774,7 +3881,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `    ${obj}_hasDoubleJump = true;\n`;
             funcCode += `  }\n`;
             
-            funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+            funcCode += `  var stickY = getAxes(${axisIndex}, ${joyId});\n`;
             funcCode += `  if(stickY < -0.3 && ${obj}_jumpReady) {\n`;
             funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
             funcCode += `      obj.speedy = -${speedY};\n`;
@@ -3785,7 +3892,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `  }\n`;
             funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
           } else {
-            funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+            funcCode += `  var stickY = getAxes(${axisIndex}, ${joyId});\n`;
             funcCode += `  if(stickY < -0.3 && obj.isOnGround && ${obj}_jumpReady) {\n`;
             funcCode += `    obj.speedy = -${speedY};\n`;
             funcCode += `    ${obj}_jumpReady = false;\n`;
@@ -3793,7 +3900,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
           }
         } else {
-          funcCode += `  var stickY = getAxes(${axisIndex});\n`;
+          funcCode += `  var stickY = getAxes(${axisIndex}, ${joyId});\n`;
           funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
           funcCode += `  if(stickY > 0.3) obj.speedy = ${speedY};\n`;
         }
@@ -3803,9 +3910,9 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
       case 'both': {
         funcCode += '  // Combined controls\n';
         funcCode += '  var getKey = Game.getKey, getAxes = Game.getAxes;\n';
-        funcCode += `  var targetSpeedX = getKey("ArrowLeft") ? -${speedX} : ` +
-                   `getKey("ArrowRight") ? ${speedX} : 0;\n`;
-        funcCode += `  var stickX = getAxes(0);\n`;
+        funcCode += `  var targetSpeedX = getKey("ArrowLeft", ${joyId}) ? -${speedX} : ` +
+                   `getKey("ArrowRight", ${joyId}) ? ${speedX} : 0;\n`;
+        funcCode += `  var stickX = getAxes(0, ${joyId});\n`;
         funcCode += `  if(targetSpeedX === 0 && Math.abs(stickX) > 0.3) {\n`;
         funcCode += `    targetSpeedX = ${speedX} * stickX;\n`;
         funcCode += `  }\n`;
@@ -3818,8 +3925,8 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `    ${obj}_hasDoubleJump = true;\n`;
             funcCode += `  }\n`;
             
-            funcCode += `  var stickY = getAxes(1);\n`;
-            funcCode += `  if((getKey("${jumpButton}") || stickY < -0.3) && ${obj}_jumpReady) {\n`;
+            funcCode += `  var stickY = getAxes(1, ${joyId});\n`;
+            funcCode += `  if((getKey("${jumpButton}", ${joyId}) || stickY < -0.3) && ${obj}_jumpReady) {\n`;
             funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
             funcCode += `      obj.speedy = -${speedY};\n`;
             funcCode += `      ${obj}_jumpCount++;\n`;
@@ -3827,19 +3934,19 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
             funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
             funcCode += `    }\n`;
             funcCode += `  }\n`;
-            funcCode += `  if(!(getKey("${jumpButton}") || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
+            funcCode += `  if(!(getKey("${jumpButton}", ${joyId}) || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
           } else {
-            funcCode += `  var stickY = getAxes(1);\n`;
-            funcCode += `  if((getKey("${jumpButton}") || stickY < -0.3) && obj.isOnGround && ${obj}_jumpReady) {\n`;
+            funcCode += `  var stickY = getAxes(1, ${joyId});\n`;
+            funcCode += `  if((getKey("${jumpButton}", ${joyId}) || stickY < -0.3) && obj.isOnGround && ${obj}_jumpReady) {\n`;
             funcCode += `    obj.speedy = -${speedY};\n`;
             funcCode += `    ${obj}_jumpReady = false;\n`;
             funcCode += `  }\n`;
-            funcCode += `  if(!(getKey("${jumpButton}") || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
+            funcCode += `  if(!(getKey("${jumpButton}", ${joyId}) || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
           }
         } else {
-          funcCode += `  if(getKey("ArrowUp")) obj.speedy = -${speedY};\n`;
-          funcCode += `  if(getKey("ArrowDown")) obj.speedy = ${speedY};\n`;
-          funcCode += `  var stickY = getAxes(1);\n`;
+          funcCode += `  if(getKey("ArrowUp", ${joyId})) obj.speedy = -${speedY};\n`;
+          funcCode += `  if(getKey("ArrowDown", ${joyId})) obj.speedy = ${speedY};\n`;
+          funcCode += `  var stickY = getAxes(1, ${joyId});\n`;
           funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
           funcCode += `  if(stickY > 0.3) obj.speedy = ${speedY};\n`;
         }

@@ -1774,14 +1774,20 @@ Game.setGravity = function (v) {
 Game.collision = function g_collision(x1, y1, width1, height1, x2, y2, width2, height2) {
 	return Math.max(x1, x2) <= Math.min(x1 + width1, x2 + width2) && Math.max(y1, y2) <= Math.min(y1 + height1, y2 + height2)
 };
-Game.getKey = function (key) {
-	return !!inputState.keys[key]
+Game.getKey = function (key, id) {
+	if(id == 0)
+		return !!inputState.keys[key];
+	return 0;
 };
-Game.getKeyPress = function (key) {
-	return !!inputState.pressKeys[key]
+Game.getKeyPress = function (key, id) {
+	if(id == 0)
+		return !!inputState.pressKeys[key];
+	return 0;
 };
-Game.getAxes = function (n) {
-	return inputState.axes ? inputState.axes[n] : 0
+Game.getAxes = function (n, id) {
+	if(id == 0)
+		return inputState.axes ? inputState.axes[n] : 0;
+	return 0;
 };
 Game.setScreenX = function (x) {
 	Game.screenx = x
@@ -2885,7 +2891,7 @@ function game_loop() {
 		Game.drawBackground();
 		Game.helper.drawTiles();
 		Game.Particles.update();
-		Game.Particles.draw();
+		
 		Object.keys(inputState.keys).forEach(key => {
 			inputState.pressKeys[key] = 0
 		});
@@ -3029,6 +3035,7 @@ function game_loop() {
 					o.onStep()
 			}
 		}
+		Game.Particles.draw();
 		if (Game.enableTouchInput) {
 			Game.updateSensorKey()
 		}
@@ -3147,11 +3154,11 @@ function initObjectsDebugPanel() {
 			}
 			const displayName = PARAM_TRANSLATIONS[key] || key;
 			return `
-																		                    <div style="display: flex; margin-bottom: 4px; line-height: 1.3;">
-																		                        <span style="color: #aaf; min-width: 120px;">${displayName};:</span>
-																		                        <span style="
-																		                            ${typeof value==="number"?"color: #8f8;":""};
-																		                            ${typeof value==="boolean"?` color: $ {
+			<div style="display: flex; margin-bottom: 4px; line-height: 1.3;">
+				<span style="color: #aaf; min-width: 120px;">${displayName};:</span>
+				<span style="
+					${typeof value==="number"?"color: #8f8;":""};
+					${typeof value==="boolean"?` color: $ {
 				value ? '#8f8' : '#f88'
 			};
 			`:""};
