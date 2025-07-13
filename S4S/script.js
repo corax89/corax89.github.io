@@ -5,7 +5,31 @@ let projectSettings = {
     author: "",
     icon: "data:image/jpeg;base64," + ico,
     enableVirtualGamepad: true,
-    code: null // Здесь будет храниться сериализованная рабочая область
+    keyRemapping: { // Дефолтные значения соответствуют оригинальным
+        "KeyA": "KeyA",
+        "KeyB": "KeyS",
+        "KeyX": "KeyX",
+        "KeyY": "KeyZ",
+        "KeyL": "KeyW",
+        "KeyR": "KeyE",
+        "KeyZL": "KeyQ",
+        "KeyZR": "KeyR",
+        "KeyPlus": "Enter",
+        "KeyMinus": "Backspace",
+        "ArrowLeft": "ArrowLeft",
+        "ArrowUp": "ArrowUp",
+        "ArrowRight": "ArrowRight",
+        "ArrowDown": "ArrowDown",
+        "KeyLStickLeft": "KeyJ",
+        "KeyLStickUp": "KeyI",
+        "KeyLStickRight": "KeyL",
+        "KeyLStickDown": "KeyK",
+        "KeyRStickLeft": "Numpad4",
+        "KeyRStickUp": "Numpad8",
+        "KeyRStickRight": "Numpad6",
+        "KeyRStickDown": "Numpad2"
+    },
+    code: null
 };
 
 const customTheme = Blockly.Theme.defineTheme('transparentTheme', {
@@ -525,6 +549,9 @@ function loadJson(file) {
             if (projectSettings.icon !== undefined) {
                 document.getElementById('icon').src = projectSettings.icon;
             }
+			if (data.keyRemapping) {
+				applyKeyRemapping();
+			}
             // Загружаем рабочую область
             loadWorkspaceData(data.code);
         } else {
@@ -1253,30 +1280,166 @@ function resizeCanvas() {
 
 // Функция для отображения модального окна настроек
 function showSettingsModal() {
-	// Заполняем поля текущими значениями
-	document.getElementById('projectNameInput').value = projectSettings.name;
-	document.getElementById('projectAuthorInput').value = projectSettings.author;
-	document.getElementById('enableVirtualGamepad').checked = projectSettings.enableVirtualGamepad;
-	
-	// Устанавливаем превью иконки
-	const iconPreview = document.getElementById('iconPreview');
-	iconPreview.src = projectSettings.icon;
-	
-	// Показываем модальное окно
-	document.getElementById('settingsModal').style.display = 'flex';
+    // Заполняем основные поля
+    document.getElementById('projectNameInput').value = projectSettings.name;
+    document.getElementById('projectAuthorInput').value = projectSettings.author;
+    document.getElementById('enableVirtualGamepad').checked = projectSettings.enableVirtualGamepad;
+    document.getElementById('iconPreview').src = projectSettings.icon;
+    
+    // Заполняем таблицу переназначения клавиш
+    const keyMappingTable = document.getElementById('keyMappingTable');
+    keyMappingTable.innerHTML = ''; // Очищаем таблицу
+    
+    // Добавляем заголовки
+    const headerRow = keyMappingTable.insertRow();
+    headerRow.innerHTML = '<th>' + Blockly.Msg['KEY_LABEL'] + '</th><th>' + Blockly.Msg['KEY_LABEL_OLD'] + '</th><th>' + Blockly.Msg['KEY_LABEL_NEW'] + '</th>';
+    
+    // Добавляем строки для каждой клавиши
+    for (const [originalKey, currentMapping] of Object.entries(projectSettings.keyRemapping)) {
+        const row = keyMappingTable.insertRow();
+        
+        // Название кнопки
+        const keyNameCell = row.insertCell();
+        keyNameCell.textContent = getKeyDisplayName(originalKey);
+        
+        // Текущее назначение
+        const currentCell = row.insertCell();
+        currentCell.textContent = getKeyDisplayName(currentMapping);
+        
+        // Поле для нового назначения
+        const newCell = row.insertCell();
+        const input = document.createElement('input');
+        input.type = "text";
+        input.value = currentMapping;
+        input.dataset.originalKey = originalKey;
+        input.addEventListener('keydown', function(e) {
+            e.preventDefault();
+            this.value = e.code;
+            currentCell.textContent = getKeyDisplayName(e.code);
+        });
+        newCell.appendChild(input);
+    }
+    
+    // Показываем модальное окно с анимацией
+    const modal = document.getElementById('settingsModal');
+    const modalContent = document.querySelector('.settings-modal-content');
+    
+    modal.style.display = 'flex';
+    modalContent.classList.add('settings-modal-show');
+    modalContent.classList.remove('settings-modal-hide');
 }
 
-// Функция для закрытия модального окна настроек
 function closeSettingsModal() {
-	document.getElementById('settingsModal').style.display = 'none';
+    const modal = document.getElementById('settingsModal');
+    const modalContent = document.querySelector('.settings-modal-content');
+    
+    modalContent.classList.add('settings-modal-hide');
+    modalContent.classList.remove('settings-modal-show');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function getKeyDisplayName(code) {
+    const keyNames = {
+        "KeyA": "A",
+        "KeyS": "B",
+        "KeyX": "X",
+        "KeyZ": "Y",
+        "KeyW": "L",
+        "KeyE": "R",
+        "KeyQ": "ZL",
+        "KeyR": "ZR",
+        "KeyPlus": "+",
+        "KeyMinus": "-",
+        "ArrowLeft": "←",
+        "ArrowUp": "↑",
+        "ArrowRight": "→",
+        "ArrowDown": "↓",
+        "KeyJ": "LStick ←",
+        "KeyI": "LStick ↑",
+        "KeyL": "LStick →",
+        "KeyK": "LStick ↓",
+        "KeyRStickLeft": "RStick ←",
+        "KeyRStickUp": "RStick ↑",
+        "KeyRStickRight": "RStick →",
+        "KeyRStickDown": "RStick ↓",
+    };
+    
+    return keyNames[code] || code;
+};
+
+function applyKeyRemapping() {
+    if (!projectSettings.keyRemapping) return;
+
+    // Применяем переназначения
+    for (const [originalKey, remappedKey] of Object.entries(projectSettings.keyRemapping)) {
+        if (originalKey in Game.helper.keyRemapping && remappedKey) {
+            Game.helper.keyRemapping[originalKey] = remappedKey;
+        }
+    }
+};
+
+function resetKeyMappings() {
+    // Стандартные значения клавиш
+    const defaultKeyMappings = {
+        "KeyA": "KeyA",
+        "KeyB": "KeyS",
+        "KeyX": "KeyX",
+        "KeyY": "KeyZ",
+        "KeyL": "KeyW",
+        "KeyR": "KeyE",
+        "KeyZL": "KeyQ",
+        "KeyZR": "KeyR",
+        "KeyPlus": "Enter",
+        "KeyMinus": "Backspace",
+        "ArrowLeft": "ArrowLeft",
+        "ArrowUp": "ArrowUp",
+        "ArrowRight": "ArrowRight",
+        "ArrowDown": "ArrowDown",
+        "KeyLStickLeft": "KeyJ",
+        "KeyLStickUp": "KeyI",
+        "KeyLStickRight": "KeyL",
+        "KeyLStickDown": "KeyK",
+        "KeyRStickLeft": "Numpad4",
+        "KeyRStickUp": "Numpad8",
+        "KeyRStickRight": "Numpad6",
+        "KeyRStickDown": "Numpad2"
+    };
+
+    // Обновляем projectSettings
+    projectSettings.keyRemapping = JSON.parse(JSON.stringify(defaultKeyMappings));
+    
+    // Обновляем таблицу в модальном окне
+    const inputs = document.querySelectorAll('#keyMappingTable input');
+    inputs.forEach(input => {
+        const originalKey = input.dataset.originalKey;
+        input.value = defaultKeyMappings[originalKey];
+		Game.helper.keyRemapping[originalKey] = defaultKeyMappings[originalKey];
+        // Обновляем отображение текущего значения
+        input.parentElement.previousElementSibling.textContent = getKeyDisplayName(defaultKeyMappings[originalKey]);
+    });
+
+    // Показываем уведомление
+    showSwitchModal('!', Blockly.Msg['KEY_RESETED'], false, 'OK');
 }
 
 // Функция для сохранения настроек
 function saveSettings() {
-	projectSettings.name = document.getElementById('projectNameInput').value || "Untitled";
-	projectSettings.author = document.getElementById('projectAuthorInput').value || "Corax89";
-	projectSettings.enableVirtualGamepad = document.getElementById('enableVirtualGamepad').checked;
-	closeSettingsModal();
+    projectSettings.name = document.getElementById('projectNameInput').value || "Untitled";
+    projectSettings.author = document.getElementById('projectAuthorInput').value || "Corax89";
+    projectSettings.enableVirtualGamepad = document.getElementById('enableVirtualGamepad').checked;
+    
+    // Сохраняем переназначения клавиш
+    const inputs = document.querySelectorAll('#keyMappingTable input');
+    inputs.forEach(input => {
+        const originalKey = input.dataset.originalKey;
+        projectSettings.keyRemapping[originalKey] = input.value;
+		Game.helper.keyRemapping[originalKey] = input.value;
+    });
+    
+    closeSettingsModal();
 }
 
 // Функция для загрузки настроек при старте

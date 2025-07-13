@@ -19,21 +19,6 @@
 	<div class="status" id="statusText">Wait...</div>
 	<div class="library-info" id="libraryInfo"></div>
 </div>
-<div id="switchModal" class="switch-modal">
-	<div id="modalContent" class="switch-modal-content">
-		<div class="switch-modal-header">
-			<span id="modalTitle" class="switch-modal-title">Уведомление системы</span>
-			<span class="switch-modal-close">&times;</span>
-		</div>
-		<div class="switch-modal-body">
-			<p id="modalMessage">Сообщение</p>
-			<div class="switch-modal-buttons">
-				<button id="modalPrimaryBtn" class="switch-btn switch-btn-primary">OK</button>
-				<button id="modalSecondaryBtn" class="switch-btn switch-btn-secondary" style="display: none;">Отмена</button>
-			</div>
-		</div>
-	</div>
-</div>
 <div>
 	<button onclick="changeLanguage('ru')">RU</button>
 	<button onclick="changeLanguage('en')">EN</button>
@@ -69,6 +54,21 @@
 			<a id="help-author" class="dropdown-hlp" href="https://github.com/corax89/" target="_blank"> Author Corax89</a>
 			<a id="help-powered" class="dropdown-hlp" href="https://developers.google.com/blockly" target="_blank"> Powered by Blockly</a>
 			<a id="help-help" class="dropdown-hlp" href="helpen.html" target="_blank"> Help</a>
+		</div>
+	</div>
+</div>
+<div id="switchModal" class="switch-modal" style="z-index:9999">
+	<div id="modalContent" class="switch-modal-content">
+		<div class="switch-modal-header">
+			<span id="modalTitle" class="switch-modal-title">Уведомление системы</span>
+			<span class="switch-modal-close">&times;</span>
+		</div>
+		<div class="switch-modal-body">
+			<p id="modalMessage">Сообщение</p>
+			<div class="switch-modal-buttons">
+				<button id="modalPrimaryBtn" class="switch-btn switch-btn-primary">OK</button>
+				<button id="modalSecondaryBtn" class="switch-btn switch-btn-secondary" style="display: none;">Отмена</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -114,7 +114,7 @@
 <img id="icon" src="" alt="Icon preview">
 <input type="file" id="icoFileInput" accept="image/*">
 <div id="settingsModal" class="switch-modal">
-	<div class="switch-modal-content">
+	<div class="settings-modal-content">
 		<div class="switch-modal-header">
 			<span class="switch-modal-title" id="projectSettings">Project Settings</span>
 			<span class="switch-modal-close" onclick="closeSettingsModal()">&times;</span>
@@ -132,7 +132,7 @@
 				<label id="settingsIconLabel">Icon:</label>
 				<div class="icon-container">
 					<img id="iconPreview" src="" alt="Icon preview" class="icon-preview">
-					<button onclick="document.getElementById('icoFileInput').click()" class="switch-btn">
+					<button onclick="document.getElementById('icoFileInput').click()" id="chose-icon" class="switch-btn">
 						Choose Icon
 					</button>
 				</div>
@@ -144,10 +144,17 @@
 					<label for="enableVirtualGamepad" id="labelEnableVirtualGamepad">Enable Virtual Gamepad (HTML)</label>
 				</label>
 			</div>
+			<div class="settings-section">
+				<h3 id="keyRedefLable">Reassigning buttons (HTML)</h3>
+				<div class="scroll-container">
+					<table id="keyMappingTable" class="key-mapping-table"></table>
+				</div>
+			</div>
 		</div>
 		<div class="switch-modal-footer">
-			<button onclick="saveSettings()" class="switch-btn switch-btn-primary">Save</button>
-			<button onclick="closeSettingsModal()" class="switch-btn">Cancel</button>
+			<button onclick="resetKeyMappings()" class="btn btn-reset" id="buttonKeyReset">Reset key</button>
+			<button onclick="saveSettings()" class="switch-btn switch-btn-primary" id="buttonSave">Save</button>
+			<button onclick="closeSettingsModal()" class="switch-btn" id="buttonCancel">Cancel</button>
 		</div>
 	</div>
 </div>

@@ -26,6 +26,33 @@ var Game = {
 		pause: false
 	}
 };
+
+Game.helper.keyRemapping = {
+    // Стандартные назначения (соответствуют оригинальным)
+    "KeyA": "KeyA",
+	"KeyB": "KeyS",
+	"KeyX": "KeyX",
+	"KeyY": "KeyZ",
+	"KeyL": "KeyW",
+	"KeyR": "KeyE",
+	"KeyZL": "KeyQ",
+	"KeyZR": "KeyR",
+	"KeyPlus": "Enter",
+	"KeyMinus": "Backspace",
+	"ArrowLeft": "ArrowLeft",
+	"ArrowUp": "ArrowUp",
+	"ArrowRight": "ArrowRight",
+	"ArrowDown": "ArrowDown",
+	"KeyLStickLeft": "KeyJ",
+	"KeyLStickUp": "KeyI",
+	"KeyLStickRight": "KeyL",
+	"KeyLStickDown": "KeyK",
+	"KeyRStickLeft": "Numpad4",
+	"KeyRStickUp": "Numpad8",
+	"KeyRStickRight": "Numpad6",
+	"KeyRStickDown": "Numpad2"
+};
+
 // Основной объект Game
 Game.init = function () {
 	// Инициализация массива изображений
@@ -57,13 +84,54 @@ Game.init = function () {
 		touchButtons: {}
 	};
 	document.addEventListener("keydown", e => {
-		if (!inputState.keys[e.code]) {
-			inputState.pressKeys[e.code] = true
+		// Обработка переназначенных клавиш
+		for (const originalKey in Game.helper.keyRemapping) {
+			if (Game.helper.keyRemapping[originalKey] === e.code) {
+				if (!inputState.keys[originalKey]) {
+					inputState.pressKeys[originalKey] = true;
+				}
+				inputState.keys[originalKey] = true;
+				
+				// Обработка осей левого стика
+				if (originalKey === "KeyLStickLeft") {
+					inputState.axes[0] = -1.0; // Left X axis
+				} else if (originalKey === "KeyLStickRight") {
+					inputState.axes[0] = 1.0; // Left X axis
+				} else if (originalKey === "KeyLStickUp") {
+					inputState.axes[1] = -1.0; // Left Y axis (инвертировано)
+				} else if (originalKey === "KeyLStickDown") {
+					inputState.axes[1] = 1.0; // Left Y axis (инвертировано)
+				}
+			}
 		}
-		inputState.keys[e.code] = true
+		
+		// Оригинальное состояние клавиши
+		if (!inputState.keys[e.code]) {
+			inputState.pressKeys[e.code] = true;
+		}
+		inputState.keys[e.code] = true;
 	});
 	document.addEventListener("keyup", e => {
-		inputState.keys[e.code] = false
+		// Обновляем все переназначенные кнопки
+		for (const originalKey in Game.helper.keyRemapping) {
+			if (Game.helper.keyRemapping[originalKey] === e.code) {
+				inputState.keys[originalKey] = false;
+				
+				// Сброс осей левого стика при отпускании клавиш
+				if (originalKey === "KeyLStickLeft" && inputState.axes[0] < 0) {
+					inputState.axes[0] = 0;
+				} else if (originalKey === "KeyLStickRight" && inputState.axes[0] > 0) {
+					inputState.axes[0] = 0;
+				} else if (originalKey === "KeyLStickUp" && inputState.axes[1] < 0) {
+					inputState.axes[1] = 0;
+				} else if (originalKey === "KeyLStickDown" && inputState.axes[1] > 0) {
+					inputState.axes[1] = 0;
+				}
+			}
+		}
+		
+		// Оригинальное состояние клавиши
+		inputState.keys[e.code] = false;
 	});
 	Game.Particles = {
 		list: [],
@@ -1165,7 +1233,7 @@ Game.init = function () {
 			normal: smallestAxis,
 			overlap: minOverlap
 		};
-	}
+	};
 
 	// Вспомогательная функция для определения формы коллизии
 	Game.getCollisionShape = function (obj) {
@@ -1207,7 +1275,7 @@ Game.init = function () {
 			height: obj.height,
 			angle: obj.angle || 0
 		};
-	}
+	};
 
 	Game.checkCircleCircleCollision = function (a, b, shapeA, shapeB) {
 		const dx = shapeB.x - shapeA.x;
@@ -1228,7 +1296,7 @@ Game.init = function () {
 		return {
 			collides: false
 		};
-	}
+	};
 	Game.checkCircleTileCollision = function (obj, circleShape, col, row) {
 		if (row < 0 || row >= Game.helper.tiles.rows || col < 0 || col >= Game.helper.tiles.cols) {
 			return false;
@@ -1463,7 +1531,7 @@ Game.init = function () {
 					}
 				}
 				o.x = x;
-				o.y = y
+				o.y = y;
 				if(o.onCreate)o.onCreate();
 			}
 		}
@@ -1589,7 +1657,7 @@ Game.init = function () {
 // Функция для проверки нажатия на сенсорные кнопки
 function checkTouchButtons(x, y, isPressed) {
 	// Проверяем, включена ли обработка сенсорного ввода
-	if (!Game.enableTouchInput)
+	if (!Game.enableTouchInput || !Game.enableDrawing)
 		return false;
 	// Проверяем все сенсорные кнопки
 	for (const btnId in inputState.touchButtons) {
@@ -1774,14 +1842,18 @@ Game.setGravity = function (v) {
 Game.collision = function g_collision(x1, y1, width1, height1, x2, y2, width2, height2) {
 	return Math.max(x1, x2) <= Math.min(x1 + width1, x2 + width2) && Math.max(y1, y2) <= Math.min(y1 + height1, y2 + height2)
 };
-Game.getKey = function (key, id) {
-	if(id == 0)
-		return !!inputState.keys[key];
-	return 0;
+Game.getKey = function(key, id) {
+    if(id == 0) {
+        const mappedKey = Game.helper.keyRemapping[key] || key;
+        return !!inputState.keys[mappedKey];
+    }
+    return 0;
 };
 Game.getKeyPress = function (key, id) {
-	if(id == 0)
-		return !!inputState.pressKeys[key];
+	if(id == 0){
+		const mappedKey = Game.helper.keyRemapping[key] || key;
+        return !!inputState.pressKeys[mappedKey];
+	}
 	return 0;
 };
 Game.getAxes = function (n, id) {
@@ -2224,6 +2296,7 @@ function reset_game() {
 	Game._isPaused = false;
 	Game.pauseTime = 0;
 	Game.pausedTimers = {};
+	Game.Particles.clear();
 	// Сброс изображений (но сохраняем загруженные)
 	for (let i = 0; i < image_array.length; i++) {
 		if (image_array[i] === -1) { // Если изображение в процессе загрузки
@@ -2866,7 +2939,7 @@ function game_loop() {
 		if (Game.gameLoop) {
 			Game.gameLoop(); // Для отрисовки меню паузы
 		}
-		if (Game.enableTouchInput) {
+		if (Game.enableTouchInput && Game.enableDrawing) {
 			Game.updateSensorKey(); // Обработка сенсорных кнопок
 		}
 		return; // Пропускаем всю остальную логику

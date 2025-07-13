@@ -506,6 +506,9 @@ Blockly.Msg['PARTICLES_PRESET_LABEL'] = 'Предустановленные ча
 Blockly.Msg['GAME_LOOP_LABEL'] = 'Бесконечный игровой цикл';
 Blockly.Msg['CLEAR_SCREEN_OPTION'] = 'очищать экран:';
 Blockly.Msg['EXECUTE_LABEL'] = 'выполнять:';
+Blockly.Msg['KEY_LABEL'] = 'Кнопка';
+Blockly.Msg['KEY_LABEL_OLD'] = 'Текущее назначение';
+Blockly.Msg['KEY_LABEL_NEW'] = 'Новое назначение';
 Blockly.Msg['KEY_PRESSED_LABEL'] = 'Кнопка нажата?';
 Blockly.Msg['KEY_DOWN_LABEL'] = 'Кнопка удерживается?';
 Blockly.Msg['GET_AXIS_LABEL'] = 'Получить значение оси стика';
@@ -637,6 +640,7 @@ Blockly.Msg['WAV_FADE_IN'] = 'Плавное усиление (секунды)';
 Blockly.Msg['WAV_FADE_OUT'] = 'Затухание (секунды)';
 Blockly.Msg['WAV_SPEED'] = 'Скорость';
 Blockly.Msg['WAV_APPLY_CLOSE'] = 'Применить и закрыть';
+Blockly.Msg['APPLY_AND_CLOSE'] = 'Применить и закрыть';
 Blockly.Msg['WAV_LOAD_ERROR'] = 'Ошибка загрузки аудио, невалидный файл';
 Blockly.Msg['WAV_LOAD_DATA_ERROR'] = 'Ошибка загрузки аудио из сохраненных данныъ';
 Blockly.Msg['WAV_LOAD_FILE_ERROR'] = 'Ошибка загрузки аудио, загрузите валидный файл';
@@ -742,6 +746,7 @@ Blockly.Msg['LISTS_APPEND_ITEM'] = 'элемент';
 Blockly.Msg['LISTS_APPEND_TOOLTIP'] = 'Добавляет элемент в конец списка';
 Blockly.Msg['LISTS_POP_LAST_TITLE'] = 'забрать последний элемент из списка';
 Blockly.Msg['LISTS_POP_LAST_TOOLTIP'] = 'Удаляет и возвращает последний элемент списка';
+Blockly.Msg['KEY_RESETED'] = 'Настройки клавиш сброшены к значениям по умолчанию';
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 
@@ -781,7 +786,12 @@ const ruTexts = {
 	'DRAWING_CATEGORY': 'Рисование',
 	'VARIABLES_CATEGORY': 'Переменные',
 	'LOCAL_VARIABLES_CATEGORY': 'Локальные переменные',
-	'FUNCTIONS_CATEGORY': 'Функции'
+	'FUNCTIONS_CATEGORY': 'Функции',
+	'KEY_DEF': 'Переназначение кнопок (HTML)',
+	'BUTTON_RESET': 'Сбросить кнопки',
+	'BUTTON_SAVE': 'Сохранить',
+	'BUTTON_CANCEL': 'Отменить',
+	'BUTTON_ICON': 'Загрузить новую иконку'
 };
 document.getElementById('project-actions').textContent = ruTexts.PROJECT_ACTIONS;
 document.getElementById('project-build').textContent = ruTexts.PROJECT_BUILD;
@@ -806,4 +816,9 @@ document.getElementById('viewObjectstxt').textContent = ruTexts.VIEW_OBJECTS_BTN
 document.querySelector('[data-tab="tab-1"]').textContent = ruTexts.CODE_TAB;
 document.querySelector('[data-tab="tab-2"]').textContent = ruTexts.JS_TAB;
 document.querySelector('[data-tab="tab-3"]').textContent = ruTexts.SCREEN_TAB;
+document.getElementById('keyRedefLable').textContent = ruTexts.KEY_DEF;
+document.getElementById('buttonKeyReset').textContent = ruTexts.BUTTON_RESET;
+document.getElementById('buttonSave').textContent = ruTexts.BUTTON_SAVE;
+document.getElementById('buttonCancel').textContent = ruTexts.BUTTON_CANCEL;
+document.getElementById('chose-icon').textContent = ruTexts.BUTTON_ICON;
 };
