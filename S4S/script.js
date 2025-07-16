@@ -48,20 +48,13 @@ const workspace = Blockly.inject('blocklyDiv', {
         <category name="${Blockly.Msg['GAME']}" colour="60">
             <block type="get_key_pressed"></block>
             <block type="get_key_down"></block>
+			<block type="get_joy_count"></block>
             <block type="get_axes"></block>
 			<block type="game_pause"></block>
             <block type="get_time"></block>
             <block type="get_memory"></block>
             <block type="get_touch"></block>
             <block type="get_touchxy"></block>
-			<block type="game_vibrate">
-			  <field name="TYPE">SIMPLE</field>
-			  <value name="DURATION">
-				<shadow type="math_number">
-				  <field name="NUM">200</field>
-				</shadow>
-			  </value>
-			</block>
 			<block type="set_timer">
 			  <field name="BODY"></field>
 			  <value name="time">

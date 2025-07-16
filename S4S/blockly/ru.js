@@ -460,6 +460,7 @@ Blockly.Msg['OBJECT_PARAM_ISONGROUND'] = 'на поверхности?';
 Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'] = 'столкнувшиеся тайлы';
 Blockly.Msg['OBJECT_PARAM_ANIMATION_SPEED'] = 'скорость анимации';
 Blockly.Msg['OBJECT_PARAM_ANIMATION_LOOP'] = 'зацикливать анимацию';
+Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY'] = 'анимация закончилась?';
 Blockly.Msg['VIBRATE_TITLE'] = 'вибрация';
 Blockly.Msg['VIBRATE_TYPE_SIMPLE'] = 'простая';
 Blockly.Msg['VIBRATE_TYPE_PATTERN'] = 'паттерн';
@@ -747,6 +748,7 @@ Blockly.Msg['LISTS_APPEND_TOOLTIP'] = 'Добавляет элемент в ко
 Blockly.Msg['LISTS_POP_LAST_TITLE'] = 'забрать последний элемент из списка';
 Blockly.Msg['LISTS_POP_LAST_TOOLTIP'] = 'Удаляет и возвращает последний элемент списка';
 Blockly.Msg['KEY_RESETED'] = 'Настройки клавиш сброшены к значениям по умолчанию';
+Blockly.Msg['GET_JOY_COUNT_LABEL'] = 'Получить количество подключенных геймпадов';
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 

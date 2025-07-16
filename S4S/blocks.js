@@ -20,6 +20,7 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'], 'collidingTiles'],
   [Blockly.Msg['OBJECT_PARAM_ANIMATION_SPEED'], 'animationSpeed'],
   [Blockly.Msg['OBJECT_PARAM_ANIMATION_LOOP'], 'animationLoop'],
+  [Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY'], 'isAnimationEnd']
 ];
 
 var ObjectType = [
@@ -421,7 +422,13 @@ Blockly.Blocks['get_key_down'] = {
           ["🅐", "KeyA"],
           ["🅑", "KeyB"],
           ["🅧", "KeyX"],
-          ["🅨", "KeyY"]
+          ["🅨", "KeyY"],
+          ["🅛", "KeyL"],
+          ["🅡", "KeyR"],
+          ["🆉🅛", "KeyZL"],
+          ["🆉🅡", "KeyZR"],
+          ["➕", "KeyPlus"],
+          ["➖", "KeyMinus"]
         ]), "KEY");
     this.appendDummyInput()
         .appendField(Blockly.Msg['GAMEPAD_NUM'])
@@ -455,7 +462,13 @@ Blockly.Blocks['get_key_pressed'] = {
           ["🅐", "KeyA"],
           ["🅑", "KeyB"],
           ["🅧", "KeyX"],
-          ["🅨", "KeyY"]
+          ["🅨", "KeyY"],
+          ["🅛", "KeyL"],
+          ["🅡", "KeyR"],
+          ["🆉🅛", "KeyZL"],
+          ["🆉🅡", "KeyZR"],
+          ["➕", "KeyPlus"],
+          ["➖", "KeyMinus"]
         ]), "KEY");
     this.appendDummyInput()
         .appendField(Blockly.Msg['GAMEPAD_NUM'])
@@ -2637,6 +2650,15 @@ Blockly.Blocks['get_time'] = {
   }
 };
 
+Blockly.Blocks['get_joy_count'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GET_JOY_COUNT_LABEL']);
+    this.setOutput(true, 'Number');
+    this.setColour(60);
+  }
+};
+
 Blockly.Blocks['get_memory'] = {
   init: function() {
     this.appendDummyInput()
@@ -4084,8 +4106,8 @@ javascript.javascriptGenerator.forBlock['object_iterate'] = function(block, gene
 };
 
 // Генератор для получения времени
-javascript.javascriptGenerator.forBlock['get_time'] = function(block, generator) {
-  return ["Date.now()", generator.ORDER_ATOMIC];
+javascript.javascriptGenerator.forBlock['get_joy_count'] = function(block, generator) {
+  return ["Game.getJoystickCount()", generator.ORDER_ATOMIC];
 };
 
 // Генератор для получения памяти

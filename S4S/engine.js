@@ -133,6 +133,7 @@ Game.init = function () {
 		// Оригинальное состояние клавиши
 		inputState.keys[e.code] = false;
 	});
+	Game.getJoystickCount = function(){return 0;};
 	Game.Particles = {
 		list: [],
 		maxParticles: 1e3, // Максимальное количество частиц
@@ -1124,54 +1125,45 @@ Game.init = function () {
 	};
 
 	// Функции проверки и разрешения коллизий
-	Game.checkCollision = function (a, b) {
-		// Определяем формы коллизий для объектов
-		const shapeA = Game.getCollisionShape(a);
-		const shapeB = Game.getCollisionShape(b);
+	Game.checkCollision = function(a, b) {
+    // Определяем формы коллизий для объектов
+    const shapeA = Game.getCollisionShape(a);
+    const shapeB = Game.getCollisionShape(b);
 
-		// Проверяем комбинации форм
-		if (shapeA.type === 'rectangle' && shapeB.type === 'rectangle') {
-			return Game.checkRectRectCollision(a, b, shapeA, shapeB);
-		} else if (shapeA.type === 'circle' && shapeB.type === 'circle') {
-			return Game.checkCircleCircleCollision(a, b, shapeA, shapeB);
-		} else if (shapeA.type === 'rectangle' && shapeB.type === 'circle') {
-			return Game.checkRectCircleCollision(a, b, shapeA, shapeB);
-		} else if (shapeA.type === 'circle' && shapeB.type === 'rectangle') {
-			const result = Game.checkRectCircleCollision(b, a, shapeB, shapeA);
-			// Инвертируем нормаль для корректного направления
-			if (result.collides) {
-				// Добавляем принудительное разделение для склеенных объектов
-				const MIN_SEPARATION = 0.5; // Минимальное расстояние разделения
-				const totalOverlap = result.overlap + MIN_SEPARATION;
+    // Проверяем комбинации форм
+    if (shapeA.type === 'rectangle' && shapeB.type === 'rectangle') {
+        const result = Game.checkRectRectCollision(a, b, shapeA, shapeB);
+        if (result.collides) {
+            Game.resolveCollision(a, b, result);
+        }
+        return result;
+    } else if (shapeA.type === 'circle' && shapeB.type === 'circle') {
+        const result = Game.checkCircleCircleCollision(a, b, shapeA, shapeB);
+        if (result.collides) {
+            Game.resolveCollision(a, b, result);
+        }
+        return result;
+    } else if (shapeA.type === 'rectangle' && shapeB.type === 'circle') {
+        const result = Game.checkRectCircleCollision(a, b, shapeA, shapeB);
+        if (result.collides) {
+            Game.resolveCollision(a, b, result);
+        }
+        return result;
+    } else if (shapeA.type === 'circle' && shapeB.type === 'rectangle') {
+        const result = Game.checkRectCircleCollision(b, a, shapeB, shapeA);
+        if (result.collides) {
+            // Инвертируем нормаль для корректного направления
+            result.normal.x = -result.normal.x;
+            result.normal.y = -result.normal.y;
+            Game.resolveCollision(a, b, result);
+        }
+        return result;
+    }
 
-				// Вычисляем массы объектов (если нет массы, считаем одинаковой)
-				const massA = a.mass || 1;
-				const massB = b.mass || 1;
-				const totalMass = massA + massB;
-
-				// Смещаем объекты пропорционально их массам
-				const moveA = massB / totalMass * totalOverlap;
-				const moveB = massA / totalMass * totalOverlap;
-
-				// Корректируем позиции
-				a.x -= result.normal.x * moveA;
-				a.y -= result.normal.y * moveA;
-				b.x += result.normal.x * moveB;
-				b.y += result.normal.y * moveB;
-
-				// Обновляем collision shapes
-				if (a.updateCollisionShape)
-					a.updateCollisionShape();
-				if (b.updateCollisionShape)
-					b.updateCollisionShape();
-			}
-			return result;
-		}
-
-		return {
-			collides: false
-		};
-	};
+    return {
+        collides: false
+    };
+};
 
 	Game.checkRectRectCollision = function (a, b, shapeA, shapeB) {
 		const angle_a = shapeA.angle * Math.PI / 180;
@@ -1241,27 +1233,27 @@ Game.init = function () {
 			// Прямоугольник (AABB или OBB в зависимости от угла)
 			return {
 				type: 'rectangle',
-				x: obj.x,
-				y: obj.y,
-				width: obj.width,
-				height: obj.height,
+				x: obj.x + (obj.width - obj.boundingWidth) / 2 ,
+				y: obj.y + (obj.height - obj.boundingHeight) / 2,
+				width: obj.boundingWidth,
+				height: obj.boundingHeight,
 				angle: obj.angle || 0
 			};
 		} else if (obj.collisionShape === 2) {
 			// Круг с автоматическим радиусом (по меньшей стороне)
-			const radius = Math.min(obj.width, obj.height) / 2;
+			const radius = Math.min(obj.boundingWidth, obj.boundingHeight) / 2;
 			return {
 				type: 'circle',
-				x: obj.x + obj.width / 2,
-				y: obj.y + obj.height / 2,
+				x: obj.x + (obj.width - obj.boundingWidth) / 2 + obj.boundingWidth / 2,
+				y: obj.y + (obj.height - obj.boundingHeight) / 2 + obj.boundingHeight / 2,
 				radius: radius
 			};
 		} else if (typeof obj.collisionShape === 'object' && obj.collisionShape.radius !== undefined) {
 			// Круг с указанным радиусом
 			return {
 				type: 'circle',
-				x: obj.x + obj.width / 2,
-				y: obj.y + obj.height / 2,
+				x: obj.x + (obj.width - obj.boundingWidth) / 2 + obj.boundingWidth / 2,
+				y: obj.y + (obj.height - obj.boundingHeight) / 2 + obj.boundingHeight / 2,
 				radius: obj.collisionShape.radius
 			};
 		}
@@ -1269,10 +1261,10 @@ Game.init = function () {
 		// По умолчанию - прямоугольник
 		return {
 			type: 'rectangle',
-			x: obj.x,
-			y: obj.y,
-			width: obj.width,
-			height: obj.height,
+			x: obj.x + (obj.width - obj.boundingWidth) / 2 ,
+			y: obj.y + (obj.height - obj.boundingHeight) / 2,
+			width: obj.boundingWidth,
+			height: obj.boundingHeight,
 			angle: obj.angle || 0
 		};
 	};
@@ -1404,97 +1396,86 @@ Game.init = function () {
 	};
 
 	// Проверка столкновения прямоугольник-круг
-	Game.checkRectCircleCollision = function (rect, circle, shapeRect, shapeCircle) {
-		const angle = -shapeRect.angle * Math.PI / 180;
-		const cos = Math.cos(angle);
-		const sin = Math.sin(angle);
+	Game.checkRectCircleCollision = function(rect, circle, shapeRect, shapeCircle) {
+    const angle = -shapeRect.angle * Math.PI / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
 
-		const rectCenterX = shapeRect.x + shapeRect.width / 2;
-		const rectCenterY = shapeRect.y + shapeRect.height / 2;
+    const rectCenterX = shapeRect.x + shapeRect.width / 2;
+    const rectCenterY = shapeRect.y + shapeRect.height / 2;
 
-		// Координаты круга относительно центра прямоугольника
-		const dx = shapeCircle.x - rectCenterX;
-		const dy = shapeCircle.y - rectCenterY;
+    // Координаты круга относительно центра прямоугольника
+    const dx = shapeCircle.x - rectCenterX;
+    const dy = shapeCircle.y - rectCenterY;
 
-		// Поворачиваем координаты круга
-		const rotatedX = dx * cos - dy * sin;
-		const rotatedY = dx * sin + dy * cos;
+    // Поворачиваем координаты круга
+    const rotatedX = dx * cos - dy * sin;
+    const rotatedY = dx * sin + dy * cos;
 
-		// Ближайшая точка на прямоугольнике к кругу
-		let closestX = Math.max(-shapeRect.width / 2, Math.min(rotatedX, shapeRect.width / 2));
-		let closestY = Math.max(-shapeRect.height / 2, Math.min(rotatedY, shapeRect.height / 2));
+    // Ближайшая точка на прямоугольнике к кругу
+    let closestX = Math.max(-shapeRect.width / 2, Math.min(rotatedX, shapeRect.width / 2));
+    let closestY = Math.max(-shapeRect.height / 2, Math.min(rotatedY, shapeRect.height / 2));
 
-		// Проверяем, находится ли центр круга внутри прямоугольника
-		const circleInside = (rotatedX >= -shapeRect.width / 2 && rotatedX <= shapeRect.width / 2 &&
-			rotatedY >= -shapeRect.height / 2 && rotatedY <= shapeRect.height / 2);
+    // Проверяем, находится ли центр круга внутри прямоугольника
+    const circleInside = (rotatedX >= -shapeRect.width / 2 && rotatedX <= shapeRect.width / 2 &&
+        rotatedY >= -shapeRect.height / 2 && rotatedY <= shapeRect.height / 2);
 
-		let distanceX,
-		distanceY;
-		if (circleInside) {
-			// Находим ближайшую грань
-			const distLeft = rotatedX - (-shapeRect.width / 2);
-			const distRight = shapeRect.width / 2 - rotatedX;
-			const distTop = rotatedY - (-shapeRect.height / 2);
-			const distBottom = shapeRect.height / 2 - rotatedY;
+    let distanceX, distanceY;
+    if (circleInside) {
+        // Находим ближайшую грань
+        const distLeft = rotatedX - (-shapeRect.width / 2);
+        const distRight = shapeRect.width / 2 - rotatedX;
+        const distTop = rotatedY - (-shapeRect.height / 2);
+        const distBottom = shapeRect.height / 2 - rotatedY;
 
-			const minDist = Math.min(distLeft, distRight, distTop, distBottom);
+        const minDist = Math.min(distLeft, distRight, distTop, distBottom);
 
-			if (minDist === distLeft) {
-				closestX = -shapeRect.width / 2;
-				closestY = rotatedY;
-			} else if (minDist === distRight) {
-				closestX = shapeRect.width / 2;
-				closestY = rotatedY;
-			} else if (minDist === distTop) {
-				closestX = rotatedX;
-				closestY = -shapeRect.height / 2;
-			} else {
-				closestX = rotatedX;
-				closestY = shapeRect.height / 2;
-			}
+        if (minDist === distLeft) {
+            closestX = -shapeRect.width / 2;
+            closestY = rotatedY;
+        } else if (minDist === distRight) {
+            closestX = shapeRect.width / 2;
+            closestY = rotatedY;
+        } else if (minDist === distTop) {
+            closestX = rotatedX;
+            closestY = -shapeRect.height / 2;
+        } else {
+            closestX = rotatedX;
+            closestY = shapeRect.height / 2;
+        }
 
-			distanceX = rotatedX - closestX;
-			distanceY = rotatedY - closestY;
-		} else {
-			distanceX = rotatedX - closestX;
-			distanceY = rotatedY - closestY;
-		}
+        distanceX = rotatedX - closestX;
+        distanceY = rotatedY - closestY;
+    } else {
+        distanceX = rotatedX - closestX;
+        distanceY = rotatedY - closestY;
+    }
 
-		const distanceSquared = distanceX * distanceX + distanceY * distanceY;
-		const radiusSquared = shapeCircle.radius * shapeCircle.radius;
+    const distanceSquared = distanceX * distanceX + distanceY * distanceY;
+    const radiusSquared = shapeCircle.radius * shapeCircle.radius;
 
-		if (circleInside || distanceSquared < radiusSquared) {
-			const distance = Math.sqrt(distanceSquared);
-			const overlap = shapeCircle.radius - (circleInside ? -distance : distance);
+    if (circleInside || distanceSquared < radiusSquared) {
+        const distance = Math.sqrt(distanceSquared);
+        const overlap = shapeCircle.radius - (circleInside ? -distance : distance);
 
-			// Поворачиваем нормаль обратно в глобальные координаты
-			const globalNormalX = (distanceX / distance) * cos + (distanceY / distance) * sin;
-			const globalNormalY =  - (distanceX / distance) * sin + (distanceY / distance) * cos;
+        // Поворачиваем нормаль обратно в глобальные координаты
+        const globalNormalX = (distanceX / distance) * cos + (distanceY / distance) * sin;
+        const globalNormalY = -(distanceX / distance) * sin + (distanceY / distance) * cos;
 
-			// Коррекция позиции (более агрессивная)
-			const correctionX = globalNormalX * overlap * 1.05;
-			const correctionY = globalNormalY * overlap * 1.05;
+        return {
+            collides: true,
+            normal: {
+                x: globalNormalX,
+                y: globalNormalY
+            },
+            overlap: overlap * 1.2 // Увеличиваем перекрытие для гарантированного разделения
+        };
+    }
 
-			// Применяем коррекцию к кругу
-			shapeCircle.x += correctionX;
-			shapeCircle.y += correctionY;
-			circle.x += correctionX;
-			circle.y += correctionY;
-
-			return {
-				collides: true,
-				normal: {
-					x: globalNormalX,
-					y: globalNormalY
-				},
-				overlap: overlap
-			};
-		}
-
-		return {
-			collides: false
-		};
-	};
+    return {
+        collides: false
+    };
+};
 	Game.addObjectsFromArray = function (objectsArray) {
 		for (var arrIndex = 0; arrIndex < objectsArray.length; arrIndex++) {
 			var obj = objectsArray[arrIndex];
@@ -1570,89 +1551,83 @@ Game.init = function () {
 			obj.isOnGround = true;
 		}
 	};
-	Game.resolveCollision = function (a, b, collisionInfo) {
-		if (a.isStatic && b.isStatic)
-			return;
+	Game.resolveCollision = function(a, b, collisionInfo) {
+    if (a.isStatic && b.isStatic) return;
 
-		const {
-			normal,
-			overlap
-		} = collisionInfo;
-		const maxSpeed = 30.0; // Лимит скорости
+    const { normal, overlap } = collisionInfo;
+    const maxSpeed = 30.0; // Лимит скорости
 
-		// Защита от некорректных данных
-		if (Math.abs(overlap) < 0.001)
-			return;
-		if (Math.abs(normal.x) + Math.abs(normal.y) < 0.001)
-			return;
+    // Защита от некорректных данных
+    if (Math.abs(overlap) < 0.1) return;
+    if (Math.abs(normal.x) + Math.abs(normal.y) < 0.001) return;
 
-		// Коррекция позиции с буфером
-		const buffer = 0.1;
-		const correction = new Vector2(normal.x * (overlap + buffer), normal.y * (overlap + buffer));
-		const totalMass = a.isStatic ? b.mass : b.isStatic ? a.mass : a.mass + b.mass;
-		const aRatio = b.isStatic ? 1 : a.isStatic ? 0 : b.mass / totalMass;
-		const bRatio = a.isStatic ? 1 : b.isStatic ? 0 : a.mass / totalMass;
+    // Усиленная коррекция позиции с увеличенным буфером
+    const buffer = 0.2;
+    const correction = new Vector2(
+        normal.x * (overlap + buffer),
+        normal.y * (overlap + buffer)
+    );
+    
+    const totalMass = a.isStatic ? b.mass : b.isStatic ? a.mass : a.mass + b.mass;
+    const aRatio = b.isStatic ? 1 : a.isStatic ? 0 : b.mass / totalMass;
+    const bRatio = a.isStatic ? 1 : b.isStatic ? 0 : a.mass / totalMass;
 
-		if (!a.isStatic) {
-			a.x -= correction.x * aRatio;
-			a.y -= correction.y * aRatio;
-		}
-		if (!b.isStatic) {
-			b.x += correction.x * bRatio;
-			b.y += correction.y * bRatio;
-		}
+    if (!a.isStatic) {
+        a.x -= correction.x * aRatio;
+        a.y -= correction.y * aRatio;
+        if (a.updateCollisionShape) a.updateCollisionShape();
+    }
+    if (!b.isStatic) {
+        b.x += correction.x * bRatio;
+        b.y += correction.y * bRatio;
+        if (b.updateCollisionShape) b.updateCollisionShape();
+    }
 
-		// Импульс
-		const relativeVelocity = new Vector2(b.speedx - a.speedx, b.speedy - a.speedy);
-		const velocityAlongNormal = Vector2.dot(relativeVelocity, normal);
-		if (velocityAlongNormal > 0)
-			return;
+    // Импульс
+    const relativeVelocity = new Vector2(b.speedx - a.speedx, b.speedy - a.speedy);
+    const velocityAlongNormal = Vector2.dot(relativeVelocity, normal);
+    if (velocityAlongNormal > 0) return;
 
-		const restitution = Math.min(a.restitution, b.restitution);
-		let j =  - (1 + restitution) * velocityAlongNormal;
-		j /= (a.isStatic ? 0 : 1 / Math.max(a.mass, 0.1)) + (b.isStatic ? 0 : 1 / Math.max(b.mass, 0.1));
+    const restitution = Math.min(a.restitution, b.restitution);
+    let j = -(1 + restitution) * velocityAlongNormal;
+    j /= (a.isStatic ? 0 : 1 / Math.max(a.mass, 0.1)) + (b.isStatic ? 0 : 1 / Math.max(b.mass, 0.1));
 
-		const impulse = new Vector2(normal.x * j, normal.y * j);
+    const impulse = new Vector2(normal.x * j, normal.y * j);
 
-		// Функция применения импульса с ограничением скорости
-		const clampSpeed = (obj) => {
-			const speed = Math.sqrt(obj.speedx * obj.speedx + obj.speedy * obj.speedy);
-			if (speed > maxSpeed) {
-				const ratio = maxSpeed / speed;
-				obj.speedx *= ratio;
-				obj.speedy *= ratio;
-			}
-		};
+    // Функция применения импульса с ограничением скорости
+    const clampSpeed = (obj) => {
+        const speed = Math.sqrt(obj.speedx * obj.speedx + obj.speedy * obj.speedy);
+        if (speed > maxSpeed) {
+            const ratio = maxSpeed / speed;
+            obj.speedx *= ratio;
+            obj.speedy *= ratio;
+        }
+        
+        // Гасим микроскорости
+        if (Math.abs(obj.speedx) < 0.01) obj.speedx = 0;
+        if (Math.abs(obj.speedy) < 0.01) obj.speedy = 0;
+    };
 
-		if (!a.isStatic) {
-			a.speedx += -impulse.x / Math.max(a.mass, 0.1);
-			a.speedy += -impulse.y / Math.max(a.mass, 0.1);
-			clampSpeed(a);
-		}
+    if (!a.isStatic) {
+        a.speedx += -impulse.x / Math.max(a.mass, 0.1);
+        a.speedy += -impulse.y / Math.max(a.mass, 0.1);
+        clampSpeed(a);
+    }
 
-		if (!b.isStatic) {
-			b.speedx += impulse.x / Math.max(b.mass, 0.1);
-			b.speedy += impulse.y / Math.max(b.mass, 0.1);
-			clampSpeed(b);
-		}
+    if (!b.isStatic) {
+        b.speedx += impulse.x / Math.max(b.mass, 0.1);
+        b.speedy += impulse.y / Math.max(b.mass, 0.1);
+        clampSpeed(b);
+    }
 
-		// Гасим микроскорости и дополнительно ограничиваем скорость
-		const clampMicroVelocity = (obj) => {
-			if (Math.abs(obj.speedx) < 0.01)
-				obj.speedx = 0;
-			if (Math.abs(obj.speedy) < 0.01)
-				obj.speedy = 0;
-			clampSpeed(obj); // Дополнительная проверка
-		};
-
-		if (!a.isStatic)
-			clampMicroVelocity(a);
-		if (!b.isStatic)
-			clampMicroVelocity(b);
-
-		if (normal.y > 0.5)
-			a.isOnGround = true;
-	};
+    // Обновляем состояние "на земле"
+    if (normal.y > 0.5) {
+        a.isOnGround = true;
+    }
+    if (normal.y < -0.5) {
+        b.isOnGround = true;
+    }
+};
 };
 // Функция для проверки нажатия на сенсорные кнопки
 function checkTouchButtons(x, y, isPressed) {
@@ -1965,6 +1940,7 @@ Game.addObject = function (name, x, y, width, height, sprite) {
 		animationSpeed: 10, // кадров в секунду
 		animationLoop: true,
 		isAnimationPlaying: false,
+		isAnimationEnd: false,
 		// Остальные свойства...
 		speedx: 0,
 		speedy: 0,
@@ -1990,11 +1966,13 @@ Game.addObject = function (name, x, y, width, height, sprite) {
 		if (Array.isArray(this._sprite)) {
 			this.isAnimationPlaying = true;
 			this.currentFrame = 0;
-			this.frameTime = 0
+			this.frameTime = 0;
+			this.isAnimationEnd = false;
 		}
 	};
 	obj.stopAnimation = function () {
-		this.isAnimationPlaying = false
+		this.isAnimationPlaying = false;
+		this.isAnimationEnd = true;
 	};
 	obj.setAnimationFrame = function (frameIndex) {
 		if (Array.isArray(this._sprite)) {
@@ -2907,28 +2885,169 @@ Game.initSensorInput();
 Game.vibrate = function (v) {
 	navigator.vibrate(v)
 };
-Game.updateGamepadKey = function () {
-	const gamepads = navigator.getGamepads();
-	if (gamepads[0]) {
-		// Обработка кнопок геймпада
-		inputState.pressKeys["KeyA"] = !inputState.keys["KeyA"] && gamepads[0].buttons[1].pressed ? 1 : 0;
-		inputState.pressKeys["KeyB"] = !inputState.keys["KeyB"] && gamepads[0].buttons[0].pressed ? 1 : 0;
-		inputState.pressKeys["KeyX"] = !inputState.keys["KeyX"] && gamepads[0].buttons[3].pressed ? 1 : 0;
-		inputState.pressKeys["KeyY"] = !inputState.keys["KeyY"] && gamepads[0].buttons[2].pressed ? 1 : 0;
-		inputState.pressKeys["ArrowUp"] = !inputState.keys["ArrowUp"] && gamepads[0].buttons[12].pressed ? 1 : 0;
-		inputState.pressKeys["ArrowDown"] = !inputState.keys["ArrowDown"] && gamepads[0].buttons[13].pressed ? 1 : 0;
-		inputState.pressKeys["ArrowLeft"] = !inputState.keys["ArrowLeft"] && gamepads[0].buttons[14].pressed ? 1 : 0;
-		inputState.pressKeys["ArrowRight"] = !inputState.keys["ArrowRight"] && gamepads[0].buttons[15].pressed ? 1 : 0;
-		inputState.keys["KeyA"] = gamepads[0].buttons[1].pressed;
-		inputState.keys["KeyB"] = gamepads[0].buttons[0].pressed;
-		inputState.keys["KeyX"] = gamepads[0].buttons[3].pressed;
-		inputState.keys["KeyY"] = gamepads[0].buttons[2].pressed;
-		inputState.keys["ArrowUp"] = gamepads[0].buttons[12].pressed;
-		inputState.keys["ArrowDown"] = gamepads[0].buttons[13].pressed;
-		inputState.keys["ArrowLeft"] = gamepads[0].buttons[14].pressed;
-		inputState.keys["ArrowRight"] = gamepads[0].buttons[15].pressed;
-		inputState.axes = [gamepads[0].axes[0], gamepads[0].axes[1], gamepads[0].axes[2], gamepads[0].axes[3]]
-	}
+Game.updateGamepadKey = function() {
+    const gamepads = navigator.getGamepads();
+    if (!gamepads[0]) return;
+
+    const gamepad = gamepads[0];
+    
+    // Очищаем предыдущие состояния кнопок геймпада
+    for (const key in Game.helper.keyRemapping) {
+        if (inputState.keys[key] !== undefined) {
+            inputState.pressKeys[key] = 0;
+            inputState.keys[key] = 0;
+        }
+    }
+
+    // Стандартные кнопки геймпада (XInput/Switch layout)
+    const buttonMappings = {
+        // Основные кнопки (ABXY)
+        0: "KeyB",  // A (в XInput), B (в Switch)
+        1: "KeyA",  // B (в XInput), A (в Switch)
+        2: "KeyY",  // X (в XInput), Y (в Switch)
+        3: "KeyX",  // Y (в XInput), X (в Switch)
+        
+        // Бумперы и триггеры
+        4: "KeyZL", // L1
+        5: "KeyZR", // R1
+        6: "KeyL",  // L2
+        7: "KeyR",  // R2
+        
+        // Специальные кнопки
+        8: "KeyMinus",  // Select/Back
+        9: "KeyPlus",   // Start
+        
+        // Стики
+        10: "KeyLStick", // Нажатие левого стика
+        11: "KeyRStick", // Нажатие правого стика
+        
+        // D-Pad (обрабатывается через оси)
+        // 12: "ArrowUp",
+        // 13: "ArrowDown",
+        // 14: "ArrowLeft",
+        // 15: "ArrowRight"
+    };
+
+    // Обработка кнопок
+    for (const [buttonIndex, key] of Object.entries(buttonMappings)) {
+        if (gamepad.buttons[buttonIndex]) {
+            const pressed = gamepad.buttons[buttonIndex].pressed;
+            inputState.pressKeys[key] = !inputState.keys[key] && pressed ? 1 : 0;
+            inputState.keys[key] = pressed;
+        }
+    }
+
+    // Обработка D-Pad (обычно это оси 6 и 7)
+    if (gamepad.axes.length >= 8) {
+        // Горизонталь D-Pad (ось 6)
+        if (gamepad.axes[6] < -0.5) {
+            inputState.pressKeys["ArrowLeft"] = !inputState.keys["ArrowLeft"] ? 1 : 0;
+            inputState.keys["ArrowLeft"] = true;
+        } else if (gamepad.axes[6] > 0.5) {
+            inputState.pressKeys["ArrowRight"] = !inputState.keys["ArrowRight"] ? 1 : 0;
+            inputState.keys["ArrowRight"] = true;
+        } else {
+            inputState.keys["ArrowLeft"] = false;
+            inputState.keys["ArrowRight"] = false;
+        }
+
+        // Вертикаль D-Pad (ось 7)
+        if (gamepad.axes[7] < -0.5) {
+            inputState.pressKeys["ArrowUp"] = !inputState.keys["ArrowUp"] ? 1 : 0;
+            inputState.keys["ArrowUp"] = true;
+        } else if (gamepad.axes[7] > 0.5) {
+            inputState.pressKeys["ArrowDown"] = !inputState.keys["ArrowDown"] ? 1 : 0;
+            inputState.keys["ArrowDown"] = true;
+        } else {
+            inputState.keys["ArrowUp"] = false;
+            inputState.keys["ArrowDown"] = false;
+        }
+    } else {
+        // Альтернативная обработка D-Pad через кнопки (если оси недоступны)
+        if (gamepad.buttons[12]) {
+            inputState.pressKeys["ArrowUp"] = !inputState.keys["ArrowUp"] ? 1 : 0;
+            inputState.keys["ArrowUp"] = true;
+        } else {
+            inputState.keys["ArrowUp"] = false;
+        }
+        
+        if (gamepad.buttons[13]) {
+            inputState.pressKeys["ArrowDown"] = !inputState.keys["ArrowDown"] ? 1 : 0;
+            inputState.keys["ArrowDown"] = true;
+        } else {
+            inputState.keys["ArrowDown"] = false;
+        }
+        
+        if (gamepad.buttons[14]) {
+            inputState.pressKeys["ArrowLeft"] = !inputState.keys["ArrowLeft"] ? 1 : 0;
+            inputState.keys["ArrowLeft"] = true;
+        } else {
+            inputState.keys["ArrowLeft"] = false;
+        }
+        
+        if (gamepad.buttons[15]) {
+            inputState.pressKeys["ArrowRight"] = !inputState.keys["ArrowRight"] ? 1 : 0;
+            inputState.keys["ArrowRight"] = true;
+        } else {
+            inputState.keys["ArrowRight"] = false;
+        }
+    }
+
+    // Обработка осей стиков
+    if (gamepad.axes.length >= 4) {
+        // Левый стик (оси 0 и 1)
+        inputState.axes[0] = Math.abs(gamepad.axes[0]) > 0.1 ? gamepad.axes[0] : 0;
+        inputState.axes[1] = Math.abs(gamepad.axes[1]) > 0.1 ? gamepad.axes[1] : 0;
+        
+        // Правый стик (оси 2 и 3)
+        inputState.axes[2] = Math.abs(gamepad.axes[2]) > 0.1 ? gamepad.axes[2] : 0;
+        inputState.axes[3] = Math.abs(gamepad.axes[3]) > 0.1 ? gamepad.axes[3] : 0;
+        
+        // Эмуляция кнопок стиков через оси (для совместимости)
+        if (gamepad.axes[0] < -0.7) {
+            inputState.keys["KeyLStickLeft"] = true;
+            inputState.pressKeys["KeyLStickLeft"] = !inputState.keys["KeyLStickLeft"] ? 1 : 0;
+        } else if (gamepad.axes[0] > 0.7) {
+            inputState.keys["KeyLStickRight"] = true;
+            inputState.pressKeys["KeyLStickRight"] = !inputState.keys["KeyLStickRight"] ? 1 : 0;
+        } else {
+            inputState.keys["KeyLStickLeft"] = false;
+            inputState.keys["KeyLStickRight"] = false;
+        }
+        
+        if (gamepad.axes[1] < -0.7) {
+            inputState.keys["KeyLStickUp"] = true;
+            inputState.pressKeys["KeyLStickUp"] = !inputState.keys["KeyLStickUp"] ? 1 : 0;
+        } else if (gamepad.axes[1] > 0.7) {
+            inputState.keys["KeyLStickDown"] = true;
+            inputState.pressKeys["KeyLStickDown"] = !inputState.keys["KeyLStickDown"] ? 1 : 0;
+        } else {
+            inputState.keys["KeyLStickUp"] = false;
+            inputState.keys["KeyLStickDown"] = false;
+        }
+        
+        if (gamepad.axes[2] < -0.7) {
+            inputState.keys["KeyRStickLeft"] = true;
+            inputState.pressKeys["KeyRStickLeft"] = !inputState.keys["KeyRStickLeft"] ? 1 : 0;
+        } else if (gamepad.axes[2] > 0.7) {
+            inputState.keys["KeyRStickRight"] = true;
+            inputState.pressKeys["KeyRStickRight"] = !inputState.keys["KeyRStickRight"] ? 1 : 0;
+        } else {
+            inputState.keys["KeyRStickLeft"] = false;
+            inputState.keys["KeyRStickRight"] = false;
+        }
+        
+        if (gamepad.axes[3] < -0.7) {
+            inputState.keys["KeyRStickUp"] = true;
+            inputState.pressKeys["KeyRStickUp"] = !inputState.keys["KeyRStickUp"] ? 1 : 0;
+        } else if (gamepad.axes[3] > 0.7) {
+            inputState.keys["KeyRStickDown"] = true;
+            inputState.pressKeys["KeyRStickDown"] = !inputState.keys["KeyRStickDown"] ? 1 : 0;
+        } else {
+            inputState.keys["KeyRStickUp"] = false;
+            inputState.keys["KeyRStickDown"] = false;
+        }
+    }
 };
 // Основной игровой цикл
 function game_loop() {
@@ -3064,7 +3183,8 @@ function game_loop() {
 							o.currentFrame = 0
 						} else {
 							o.currentFrame = o.sprite.length - 1;
-							o.isAnimationPlaying = false
+							o.isAnimationPlaying = false;
+							o.isAnimationEnd = true;
 						}
 					}
 				}
