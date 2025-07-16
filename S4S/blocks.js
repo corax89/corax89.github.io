@@ -4105,6 +4105,10 @@ javascript.javascriptGenerator.forBlock['object_iterate'] = function(block, gene
   return `for(var i=0;i<Game.allObject.length;i++){\nvar object=Game.allObject[i];\nif(object){\n${body}\n}\n};\n`;
 };
 
+javascript.javascriptGenerator.forBlock['get_time'] = function(block, generator) {
+  return ["Date.now()", generator.ORDER_ATOMIC];
+}
+
 // Генератор для получения времени
 javascript.javascriptGenerator.forBlock['get_joy_count'] = function(block, generator) {
   return ["Game.getJoystickCount()", generator.ORDER_ATOMIC];
