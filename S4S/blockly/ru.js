@@ -749,6 +749,7 @@ Blockly.Msg['LISTS_POP_LAST_TITLE'] = 'забрать последний эле�
 Blockly.Msg['LISTS_POP_LAST_TOOLTIP'] = 'Удаляет и возвращает последний элемент списка';
 Blockly.Msg['KEY_RESETED'] = 'Настройки клавиш сброшены к значениям по умолчанию';
 Blockly.Msg['GET_JOY_COUNT_LABEL'] = 'Получить количество подключенных геймпадов';
+Blockly.Msg['ALERT_DUPLICAT'] = 'Внимание:%1 дублируется';
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 

@@ -583,7 +583,6 @@ Blockly.Blocks['camera_follow'] = {
     
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setTooltip("Заставляет камеру плавно следовать за указанным объектом");
     this.setHelpUrl(Blockly.Msg['HELP_A'] + '#camera');
   }
 };
@@ -1247,7 +1246,7 @@ function rebuildProtoObjectArray() {
         if (!objectName || objectName === 'null') continue;
 
         if (usedProtoNames.has(objectName)) {
-            showSwitchModal('error', 'Внимание:%1 дублируется'.replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
+            showSwitchModal('error', Blockly.Msg['ALERT_DUPLICAT'].replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
         }
         usedProtoNames.add(objectName);
 
@@ -1274,7 +1273,7 @@ function rebuildProtoObjectArray() {
         if (!objectName || objectName === 'null') continue;
 
         if (usedObjectNames.has(objectName)) {
-            showSwitchModal('error', 'Внимание:%1 дублируется'.replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
+            showSwitchModal('error', Blockly.Msg['ALERT_DUPLICAT'].replace('%1', workspace.getVariableById(objectName).name), false, 'ok');
         }
         usedObjectNames.add(objectName);
 
@@ -1833,12 +1832,12 @@ Blockly.Blocks['addto_object_var'] = {
 	this.setInputsInline(true);
     // Основное поле с выбором режима
     this.appendDummyInput()
-        .appendField(Blockly.Msg['ADD_TO_PARAM_LABEL'] || 'Добавить к параметру:')
+        .appendField(Blockly.Msg['ADD_TO_PARAM_LABEL'])
         .appendField(new Blockly.FieldDropdown([
-          [Blockly.Msg['OBJECT_BY_VAR_LABEL'] || 'По переменной', 'VAR'],
-          [Blockly.Msg['OBJECT_TYPE_COLLIDED'] || 'Столкнувшийся объект', ' object'],
-          [Blockly.Msg['OBJECT_TYPE_THIS'] || 'Этот объект', 'this'],
-          [Blockly.Msg['OBJECT_TYPE_ITERATED'] || 'Итерируемый объект', 'object']
+          [Blockly.Msg['OBJECT_BY_VAR_LABEL'], 'VAR'],
+          [Blockly.Msg['OBJECT_TYPE_COLLIDED'], ' object'],
+          [Blockly.Msg['OBJECT_TYPE_THIS'], 'this'],
+          [Blockly.Msg['OBJECT_TYPE_ITERATED'], 'object']
         ], this.updateShape_.bind(this)), 'MODE');
 
     // Поле для выбора переменной (изначально скрыто)
@@ -1846,7 +1845,7 @@ Blockly.Blocks['addto_object_var'] = {
         .appendField(new Blockly.FieldVariable(
           Blockly.Msg['DEFAULT_VARIABLE_NAME'] || 'obj1',
           null, null, 'Object'), 'VAR_NAME')
-        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'])
         .setVisible(false);
 
     // Поле для выбора параметра
@@ -2021,15 +2020,15 @@ Blockly.Blocks['delete_object'] = {
 	this.setInputsInline(true);
     // Основной заголовок
     this.appendDummyInput()
-        .appendField(Blockly.Msg['DELETE_OBJECT_LABEL'] || 'Удалить объект:');
+        .appendField(Blockly.Msg['DELETE_OBJECT_LABEL']);
 
     // Переключатель режима (VAR/TYPE)
     this.appendDummyInput('MODE_INPUT')
         .appendField(new Blockly.FieldDropdown([
-          [Blockly.Msg['OBJECT_BY_VAR_LABEL'] || 'По переменной', 'VAR'],
-          [Blockly.Msg['OBJECT_TYPE_COLLIDED'] || 'Столкнувшийся объект', ' object'],
-          [Blockly.Msg['OBJECT_TYPE_THIS'] || 'Этот объект', 'this'],
-          [Blockly.Msg['OBJECT_TYPE_ITERATED'] || 'Итерируемый объект', 'object']
+          [Blockly.Msg['OBJECT_BY_VAR_LABEL'], 'VAR'],
+          [Blockly.Msg['OBJECT_TYPE_COLLIDED'], ' object'],
+          [Blockly.Msg['OBJECT_TYPE_THIS'], 'this'],
+          [Blockly.Msg['OBJECT_TYPE_ITERATED'], 'object']
         ], this.updateShape_.bind(this)), 'MODE');
 
     // Поле для выбора переменной
@@ -2037,7 +2036,7 @@ Blockly.Blocks['delete_object'] = {
         .appendField(new Blockly.FieldVariable(
           Blockly.Msg['DEFAULT_VARIABLE_NAME'] || 'obj1',
           null, null, 'Object'), 'VAR_NAME')
-        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL'])
         .setVisible(false);
 
     this.setPreviousStatement(true, "Array");
@@ -2414,7 +2413,6 @@ Blockly.Blocks['object_teleport'] = {
     
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setTooltip("Мгновенно перемещает объект в указанную точку или к другому объекту");
   },
   
   updateShape_: function(newMode) {
@@ -2532,7 +2530,6 @@ Blockly.Blocks['get_object'] = {
         .setVisible(false);
     
     this.setOutput(true, 'Object');
-    this.setTooltip("Возвращает объект в зависимости от выбранного типа");
   },
   
   updateShape_: function(selectedType) {

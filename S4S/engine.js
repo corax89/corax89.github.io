@@ -81,6 +81,7 @@ Game.init = function () {
 	inputState = {
 		keys: {},
 		pressKeys: {},
+		pressButton: [],
 		mouseButtons: {},
 		axes: [],
 		touchButtons: {}
@@ -89,17 +90,14 @@ Game.init = function () {
 		if (obj === null || typeof obj !== 'object') {
 			return obj;
 		}
-
 		// Создаем копию в зависимости от типа (массив или объект)
 		var copy = Array.isArray(obj) ? [] : {};
-
 		// Копируем каждое свойство
 		for (var key in obj) {
 			if (obj.hasOwnProperty(key)) {
 				copy[key] = Game.helper.deepCopy(obj[key]);
 			}
 		}
-
 		return copy;
 	}
 	document.addEventListener("keydown", e => {
@@ -123,12 +121,7 @@ Game.init = function () {
 				}
 			}
 		}
-
-		// Оригинальное состояние клавиши
-		if (!inputState.keys[e.code]) {
-			inputState.pressKeys[e.code] = true;
-		}
-		inputState.keys[e.code] = true;
+		
 	});
 	document.addEventListener("keyup", e => {
 		// Обновляем все переназначенные кнопки
@@ -148,9 +141,6 @@ Game.init = function () {
 				}
 			}
 		}
-
-		// Оригинальное состояние клавиши
-		inputState.keys[e.code] = false;
 	});
 	Game.getJoystickCount = function () {
 		return 0;
@@ -409,7 +399,7 @@ Game.init = function () {
 		};
 		let cancelBtnRect = null;
 		if (showCancel) {
-			const cancelText = "Отмена";
+			const cancelText = "Cancel";
 			const cancelBtnWidth = Math.max(100, measureTextWidth(cancelText, fontStyle) + btnPadding);
 			const cancelBtnX = primaryBtnX - btnSpacing - cancelBtnWidth;
 			cancelBtnRect = {
@@ -496,7 +486,7 @@ Game.init = function () {
 				ctx.fillText(text, rect.x + rect.w / 2, rect.y + rect.h / 2)
 			}
 			if (showCancel) {
-				drawButton(cancelBtnRect, "Отмена", cancelBtnPressed, true)
+				drawButton(cancelBtnRect, Blockly.Msg["DIALOG_CANCEL"], cancelBtnPressed, true)
 			}
 			drawButton(primaryBtnRect, primaryBtnText, primaryBtnPressed)
 		}
@@ -1966,15 +1956,13 @@ Game.collision = function g_collision(x1, y1, width1, height1, x2, y2, width2, h
 };
 Game.getKey = function (key, id) {
 	if (id == 0) {
-		const mappedKey = Game.helper.keyRemapping[key] || key;
-		return !!inputState.keys[mappedKey];
+		return !!inputState.keys[key];
 	}
 	return 0;
 };
 Game.getKeyPress = function (key, id) {
 	if (id == 0) {
-		const mappedKey = Game.helper.keyRemapping[key] || key;
-		return !!inputState.pressKeys[mappedKey];
+		return !!inputState.pressKeys[key];
 	}
 	return 0;
 };
@@ -2441,6 +2429,7 @@ function reset_game() {
 	inputState = {
 		keys: {},
 		pressKeys: {},
+		pressButton: [],
 		mouseButtons: {},
 		axes: [],
 		touchButtons: {}
@@ -2602,114 +2591,171 @@ Game.virtualGamepad = {
 };
 // Функция обновления состояния сенсорного ввода
 Game.updateSensorKey = function () {
-	// Отрисовка виртуального геймпада
-	function drawGamepad() {
-		if (!Game.enableDrawing || !Game.enableTouchInput)
-			return;
-		// Кнопки ABXY (раскладка Switch)
-		Game.virtualGamepad.buttons.forEach(btn => {
-			// Внешний круг
-			ctx.beginPath();
-			ctx.arc(btn.x, btn.y, btn.r, 0, Math.PI * 2);
-			ctx.fillStyle = btn.active ? "#fff" : btn.color;
-			ctx.fill();
-			// Внутренний круг
-			ctx.beginPath();
-			ctx.arc(btn.x, btn.y, btn.r - 8, 0, Math.PI * 2);
-			ctx.fillStyle = btn.active ? btn.color : "#fff";
-			ctx.fill();
-			// Буква кнопки
-			ctx.fillStyle = btn.active ? "#fff" : btn.color;
-			ctx.font = "bold 20px Arial";
-			ctx.textAlign = "center";
-			ctx.textBaseline = "middle";
-			ctx.fillText(btn.text, btn.x, btn.y)
-		});
-		// D-Pad
-		ctx.save();
-		ctx.translate(Game.virtualGamepad.dpad.x, Game.virtualGamepad.dpad.y);
-		// Центр D-Pad
-		ctx.beginPath();
-		ctx.arc(0, 0, 15, 0, Math.PI * 2);
-		ctx.fillStyle = Game.virtualGamepad.dpad.buttons.some(b => b.active) ? "#fff" : "#777";
-		ctx.fill();
-		// Кнопки D-Pad
-		Game.virtualGamepad.dpad.buttons.forEach(btn => {
-			ctx.fillStyle = btn.active ? "#fff" : "#777";
-			ctx.beginPath();
-			ctx.lineTo(btn.x - btn.w / 2, btn.y - btn.h / 2);
-			ctx.lineTo(btn.x + btn.w / 2, btn.y - btn.h / 2);
-			ctx.lineTo(btn.x + btn.w / 2, btn.y + btn.h / 2);
-			ctx.lineTo(btn.x - btn.w / 2, btn.y + btn.h / 2);
-			ctx.closePath();
-			ctx.fill();
-			// Стрелки
-			ctx.fillStyle = btn.active ? "#000" : "#fff";
-			ctx.font = "20px Arial";
-			ctx.textAlign = "center";
-			ctx.textBaseline = "middle";
-			let arrow = "";
-			if (btn.id === "ArrowUp")
-				arrow = "↑";
-			if (btn.id === "ArrowDown")
-				arrow = "↓";
-			if (btn.id === "ArrowLeft")
-				arrow = "←";
-			if (btn.id === "ArrowRight")
-				arrow = "→";
-			ctx.fillText(arrow, btn.x, btn.y)
-		});
-		ctx.restore();
-		ctx.beginPath();
-		ctx.arc(Game.virtualGamepad.joystickLeft.x, Game.virtualGamepad.joystickLeft.y, Game.virtualGamepad.joystickLeft.r, 0, Math.PI * 2);
-		ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
-		ctx.fill();
-		ctx.strokeStyle = "#aaa";
-		ctx.lineWidth = 2;
-		ctx.stroke();
-		// Left joystick handle
-		ctx.beginPath();
-		ctx.arc(Game.virtualGamepad.joystickLeft.x + Game.virtualGamepad.joystickLeft.handle.x, Game.virtualGamepad.joystickLeft.y + Game.virtualGamepad.joystickLeft.handle.y, Game.virtualGamepad.joystickLeft.handle.r, 0, Math.PI * 2);
-		ctx.fillStyle = Game.virtualGamepad.joystickLeft.active ? "#e60012" : "#e61919";
-		ctx.fill();
-		ctx.strokeStyle = "#c00";
-		ctx.lineWidth = 2;
-		ctx.stroke();
-		// Right joystick
-		ctx.beginPath();
-		ctx.arc(Game.virtualGamepad.joystickRight.x, Game.virtualGamepad.joystickRight.y, Game.virtualGamepad.joystickRight.r, 0, Math.PI * 2);
-		ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
-		ctx.fill();
-		ctx.strokeStyle = "#aaa";
-		ctx.lineWidth = 2;
-		ctx.stroke();
-		// Right joystick handle
-		ctx.beginPath();
-		ctx.arc(Game.virtualGamepad.joystickRight.x + Game.virtualGamepad.joystickRight.handle.x, Game.virtualGamepad.joystickRight.y + Game.virtualGamepad.joystickRight.handle.y, Game.virtualGamepad.joystickRight.handle.r, 0, Math.PI * 2);
-		ctx.fillStyle = Game.virtualGamepad.joystickRight.active ? "#e60012" : "#e61919";
-		ctx.fill();
-		ctx.strokeStyle = "#c00";
-		ctx.lineWidth = 2;
-		ctx.stroke()
-	}
-	// Отрисовка сенсорных кнопок
-	function drawTouchButtons() {
-		if (!Game.enableDrawing || !Game.enableTouchInput)
-			return;
-		for (const btnId in inputState.touchButtons) {
-			const btn = inputState.touchButtons[btnId];
-			ctx.fillStyle = btn.isPressed ? "#4CAF50" : "#8BC34A";
-			ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
-			ctx.fillStyle = "#fff";
-			ctx.font = "16px Arial";
-			ctx.textAlign = "center";
-			ctx.textBaseline = "middle";
-			ctx.fillText(btn.keyCode, btn.x + btn.width / 2, btn.y + btn.height / 2)
-		}
-	}
-	// Отрисовка геймпада и сенсорных кнопок
-	drawGamepad();
-	drawTouchButtons()
+    if (!Game.enableDrawing || !Game.enableTouchInput)
+        return;
+    // Функция для обновления состояния кнопки с учетом ремаппинга
+    function updateButtonState(button, active) {
+        if (button.active !== active) {
+            button.active = active;
+            
+            // Обновляем состояние оригинальной и ремаппированной клавиши
+			if(active && !inputState.keys[button.id])
+            inputState.pressKeys[button.id] = true;
+            inputState.keys[button.id] = active;
+        }
+    }
+
+    // Отрисовка виртуального геймпада
+    function drawGamepad() {
+        // Кнопки ABXY (раскладка Switch)
+        Game.virtualGamepad.buttons.forEach(btn => {
+            // Внешний круг
+            ctx.beginPath();
+            ctx.arc(btn.x, btn.y, btn.r, 0, Math.PI * 2);
+            ctx.fillStyle = btn.active ? "#fff" : btn.color;
+            ctx.fill();
+            // Внутренний круг
+            ctx.beginPath();
+            ctx.arc(btn.x, btn.y, btn.r - 8, 0, Math.PI * 2);
+            ctx.fillStyle = btn.active ? btn.color : "#fff";
+            ctx.fill();
+            // Буква кнопки
+            ctx.fillStyle = btn.active ? "#fff" : btn.color;
+            ctx.font = "bold 20px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(btn.text, btn.x, btn.y);
+        });
+
+        // D-Pad
+        ctx.save();
+        ctx.translate(Game.virtualGamepad.dpad.x, Game.virtualGamepad.dpad.y);
+        // Центр D-Pad
+        ctx.beginPath();
+        ctx.arc(0, 0, 15, 0, Math.PI * 2);
+        ctx.fillStyle = Game.virtualGamepad.dpad.buttons.some(b => b.active) ? "#fff" : "#777";
+        ctx.fill();
+        // Кнопки D-Pad
+        Game.virtualGamepad.dpad.buttons.forEach(btn => {
+            ctx.fillStyle = btn.active ? "#fff" : "#777";
+            ctx.beginPath();
+            ctx.lineTo(btn.x - btn.w / 2, btn.y - btn.h / 2);
+            ctx.lineTo(btn.x + btn.w / 2, btn.y - btn.h / 2);
+            ctx.lineTo(btn.x + btn.w / 2, btn.y + btn.h / 2);
+            ctx.lineTo(btn.x - btn.w / 2, btn.y + btn.h / 2);
+            ctx.closePath();
+            ctx.fill();
+            // Стрелки
+            ctx.fillStyle = btn.active ? "#000" : "#fff";
+            ctx.font = "20px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            let arrow = "";
+            if (btn.id === "ArrowUp") arrow = "↑";
+            if (btn.id === "ArrowDown") arrow = "↓";
+            if (btn.id === "ArrowLeft") arrow = "←";
+            if (btn.id === "ArrowRight") arrow = "→";
+            ctx.fillText(arrow, btn.x, btn.y);
+        });
+        ctx.restore();
+
+        // Left joystick
+        ctx.beginPath();
+        ctx.arc(Game.virtualGamepad.joystickLeft.x, Game.virtualGamepad.joystickLeft.y, Game.virtualGamepad.joystickLeft.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+        ctx.fill();
+        ctx.strokeStyle = "#aaa";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // Left joystick handle
+        ctx.beginPath();
+        ctx.arc(
+            Game.virtualGamepad.joystickLeft.x + Game.virtualGamepad.joystickLeft.handle.x,
+            Game.virtualGamepad.joystickLeft.y + Game.virtualGamepad.joystickLeft.handle.y,
+            Game.virtualGamepad.joystickLeft.handle.r,
+            0, Math.PI * 2
+        );
+        ctx.fillStyle = Game.virtualGamepad.joystickLeft.active ? "#e60012" : "#e61919";
+        ctx.fill();
+        ctx.strokeStyle = "#c00";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Right joystick
+        ctx.beginPath();
+        ctx.arc(Game.virtualGamepad.joystickRight.x, Game.virtualGamepad.joystickRight.y, Game.virtualGamepad.joystickRight.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+        ctx.fill();
+        ctx.strokeStyle = "#aaa";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // Right joystick handle
+        ctx.beginPath();
+        ctx.arc(
+            Game.virtualGamepad.joystickRight.x + Game.virtualGamepad.joystickRight.handle.x,
+            Game.virtualGamepad.joystickRight.y + Game.virtualGamepad.joystickRight.handle.y,
+            Game.virtualGamepad.joystickRight.handle.r,
+            0, Math.PI * 2
+        );
+        ctx.fillStyle = Game.virtualGamepad.joystickRight.active ? "#e60012" : "#e61919";
+        ctx.fill();
+        ctx.strokeStyle = "#c00";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    // Обновление состояния осей стиков с учетом ремаппинга
+    function updateStickAxes(joystick, axisXIndex, axisYIndex, prefix) {
+        const x = joystick.handle.x / joystick.r;
+        const y = joystick.handle.y / joystick.r;
+        
+        inputState.axes[axisXIndex] = x;
+        inputState.axes[axisYIndex] = y;
+        
+        // Обновляем состояния клавиш для стиков с учетом ремаппинга
+        const stickKeys = {
+            Left: `Key${prefix}StickLeft`,
+            Right: `Key${prefix}StickRight`,
+            Up: `Key${prefix}StickUp`,
+            Down: `Key${prefix}StickDown`
+        };
+        
+        // Очищаем предыдущие состояния
+        for (const key in stickKeys) {
+            const originalKey = stickKeys[key];
+            
+            inputState.keys[originalKey] = false;
+        }
+        
+        // Обновляем текущие состояния
+        if (x < -0.5) {
+            const originalKey = stickKeys.Left;
+            inputState.keys[originalKey] = true;
+        } else if (x > 0.5) {
+            const originalKey = stickKeys.Right;
+            inputState.keys[originalKey] = true;
+        }
+        
+        if (y < -0.5) {
+            const originalKey = stickKeys.Up;
+            inputState.keys[originalKey] = true;
+        } else if (y > 0.5) {
+            const originalKey = stickKeys.Down;
+            inputState.keys[originalKey] = true;
+        }
+    }
+
+    // Обновляем состояния осей для джойстиков
+    if (Game.virtualGamepad.joystickLeft.active) {
+        updateStickAxes(Game.virtualGamepad.joystickLeft, 0, 1, "L");
+    }
+    
+    if (Game.virtualGamepad.joystickRight.active) {
+        updateStickAxes(Game.virtualGamepad.joystickRight, 2, 3, "R");
+    }
+
+    // Отрисовка геймпада
+    drawGamepad();
 };
 Game.drawDebugCollisionShape = function (obj) {
 	const shape = Game.getCollisionShape(obj);
@@ -2760,49 +2806,98 @@ Game.drawDebugCollisionShape = function (obj) {
 	ctx.restore();
 };
 // Инициализация сенсорного ввода
-Game.initSensorInput = function () {
-	// Проверка попадания в треугольную кнопку D-Pad
-	function checkDPadHit(x, y, btn) {
-		const centerX = Game.virtualGamepad.dpad.x;
-		const centerY = Game.virtualGamepad.dpad.y;
-		const btnX = centerX + btn.x;
-		const btnY = centerY + btn.y;
-		if (btn.id === "ArrowUp") {
-			return x >= btnX - btn.w / 2 && x <= btnX + btn.w / 2 && y <= btnY + btn.h / 2 && y >= centerY - Game.virtualGamepad.dpad.size / 2
-		}
-		if (btn.id === "ArrowDown") {
-			return x >= btnX - btn.w / 2 && x <= btnX + btn.w / 2 && y >= btnY - btn.h / 2 && y <= centerY + Game.virtualGamepad.dpad.size / 2
-		}
-		if (btn.id === "ArrowLeft") {
-			return y >= btnY - btn.h / 2 && y <= btnY + btn.h / 2 && x <= btnX + btn.w / 2 && x >= centerX - Game.virtualGamepad.dpad.size / 2
-		}
-		if (btn.id === "ArrowRight") {
-			return y >= btnY - btn.h / 2 && y <= btnY + btn.h / 2 && x >= btnX - btn.w / 2 && x <= centerX + Game.virtualGamepad.dpad.size / 2
-		}
-		return false
-	}
-	// Обновление состояния кнопки
-	function updateButtonState(button, active) {
-		if (button.active !== active) {
-			button.active = active;
-			inputState.pressKeys[button.id] = active && !inputState.keys[button.id] ? 1 : 0;
-			inputState.keys[button.id] = active
-		}
-	}
-	// Обновление положения джойстика
-	function updateJoystick(joystick, x, y, axisXIndex, axisYIndex) {
-		let dx = x - joystick.x;
-		let dy = y - joystick.y;
-		const distance = Math.sqrt(dx * dx + dy * dy);
-		if (distance > joystick.r) {
-			dx = dx * joystick.r / distance;
-			dy = dy * joystick.r / distance
-		}
-		joystick.handle.x = dx;
-		joystick.handle.y = dy;
-		inputState.axes[axisXIndex] = dx / joystick.r;
-		inputState.axes[axisYIndex] = dy / joystick.r
-	}
+Game.initSensorInput = function() {
+    // Проверка попадания в треугольную кнопку D-Pad
+    function checkDPadHit(x, y, btn) {
+        const centerX = Game.virtualGamepad.dpad.x;
+        const centerY = Game.virtualGamepad.dpad.y;
+        const btnX = centerX + btn.x;
+        const btnY = centerY + btn.y;
+        if (btn.id === "ArrowUp") {
+            return x >= btnX - btn.w / 2 && x <= btnX + btn.w / 2 && 
+                   y <= btnY + btn.h / 2 && y >= centerY - Game.virtualGamepad.dpad.size / 2;
+        }
+        if (btn.id === "ArrowDown") {
+            return x >= btnX - btn.w / 2 && x <= btnX + btn.w / 2 && 
+                   y >= btnY - btn.h / 2 && y <= centerY + Game.virtualGamepad.dpad.size / 2;
+        }
+        if (btn.id === "ArrowLeft") {
+            return y >= btnY - btn.h / 2 && y <= btnY + btn.h / 2 && 
+                   x <= btnX + btn.w / 2 && x >= centerX - Game.virtualGamepad.dpad.size / 2;
+        }
+        if (btn.id === "ArrowRight") {
+            return y >= btnY - btn.h / 2 && y <= btnY + btn.h / 2 && 
+                   x >= btnX - btn.w / 2 && x <= centerX + Game.virtualGamepad.dpad.size / 2;
+        }
+        return false;
+    }
+
+    // Обновленная функция для обновления состояния кнопки с учетом ремаппинга
+    function updateButtonState(button, active) {
+        if (button.active !== active) {
+            button.active = active;
+            
+            // Получаем ремаппированную клавишу
+            const mappedKey = Game.helper.keyRemapping[button.id] || button.id;
+            
+            // Обновляем состояние оригинальной клавиши
+			if(active && !inputState.keys[button.id])
+            inputState.pressKeys[button.id] = true;
+            inputState.keys[button.id] = active;
+            
+        }
+    }
+
+    // Обновление положения джойстика с учетом ремаппинга
+    function updateJoystick(joystick, x, y, axisXIndex, axisYIndex, prefix) {
+        let dx = x - joystick.x;
+        let dy = y - joystick.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > joystick.r) {
+            dx = dx * joystick.r / distance;
+            dy = dy * joystick.r / distance;
+        }
+        
+        joystick.handle.x = dx;
+        joystick.handle.y = dy;
+        
+        // Обновляем оси
+        inputState.axes[axisXIndex] = dx / joystick.r;
+        inputState.axes[axisYIndex] = dy / joystick.r;
+        
+        // Обновляем состояния клавиш для стиков с учетом ремаппинга
+        const stickKeys = {
+            Left: `Key${prefix}StickLeft`,
+            Right: `Key${prefix}StickRight`,
+            Up: `Key${prefix}StickUp`,
+            Down: `Key${prefix}StickDown`
+        };
+        
+        // Очищаем предыдущие состояния
+        for (const key in stickKeys) {
+            const originalKey = stickKeys[key];
+            
+            inputState.keys[originalKey] = false;
+        }
+        
+        // Обновляем текущие состояния
+        if (dx < -joystick.r * 0.5) {
+            const originalKey = stickKeys.Left;
+            inputState.keys[originalKey] = true;
+        } else if (dx > joystick.r * 0.5) {
+            const originalKey = stickKeys.Right;
+            inputState.keys[originalKey] = true;
+        }
+        
+        if (dy < -joystick.r * 0.5) {
+            const originalKey = stickKeys.Up;
+            inputState.keys[originalKey] = true;
+        } else if (dy > joystick.r * 0.5) {
+            const originalKey = stickKeys.Down;
+            inputState.keys[originalKey] = true;
+        }
+    }
 	// Получение координат с учетом масштабирования canvas
 	function getCanvasCoordinates(clientX, clientY) {
 		if (!Game.enableTouchInput)
@@ -3042,19 +3137,15 @@ Game.vibrate = function (v) {
 };
 Game.updateGamepadKey = function () {
     const gamepads = navigator.getGamepads();
-    if (!gamepads[0])
-        return;
-
-    const gamepad = gamepads[0];
-
-    // Очищаем предыдущие состояния кнопок геймпада
-    for (const key in Game.helper.keyRemapping) {
-        if (inputState.keys[key] !== undefined) {
-            inputState.pressKeys[key] = 0;
-            inputState.keys[key] = 0;
-        }
+	var gamepad;
+    if (gamepads[0]){
+		gamepad = gamepads[0];
     }
-
+	else if (gamepads[1]){
+		gamepad = gamepads[1];
+    }
+	else
+		return;
     // Стандартные кнопки геймпада (XInput/Switch layout)
     const buttonMappings = {
         // Основные кнопки (ABXY)
@@ -3085,14 +3176,16 @@ Game.updateGamepadKey = function () {
     };
 
     // Обработка кнопок (включая D-Pad как кнопки)
-    for (const [buttonIndex, key] of Object.entries(buttonMappings)) {
+    for (const [buttonIndex, originalKey] of Object.entries(buttonMappings)) {
         if (gamepad.buttons[buttonIndex]) {
             const pressed = gamepad.buttons[buttonIndex].pressed;
-            inputState.pressKeys[key] = !inputState.keys[key] && pressed ? 1 : 0;
-            inputState.keys[key] = pressed;
+            const wasPressed = inputState.pressButton[buttonIndex];
+			if(pressed && !wasPressed)
+				inputState.pressKeys[originalKey] = true;
+			inputState.keys[originalKey] = pressed;
+			inputState.pressButton[buttonIndex] = pressed
         }
     }
-
     // Обработка осей стиков (не влияют на кнопки направления)
     if (gamepad.axes.length >= 4) {
         const deadZone = 0.1; // Мёртвая зона для стиков
@@ -3148,10 +3241,6 @@ function game_loop(timestamp) {
 		Game.drawBackground();
 		Game.helper.drawTiles();
 		Game.Particles.update();
-
-		Object.keys(inputState.keys).forEach(key => {
-			inputState.pressKeys[key] = 0
-		});
 		//твймеры
 		var now = Date.now();
 		var timers = Game.duc_helper_global_game_timers.timers;
@@ -3309,6 +3398,9 @@ function game_loop(timestamp) {
 			Game.updateSensorKey()
 		}
 	}
+	Object.keys(inputState.keys).forEach(key => {
+		inputState.pressKeys[key] = false;
+	});
 }
 // Инициализация игры
 Game.init();

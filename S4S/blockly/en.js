@@ -731,6 +731,7 @@ Blockly.Msg['LISTS_POP_LAST_TITLE'] = 'pop last item from list';
 Blockly.Msg['LISTS_POP_LAST_TOOLTIP'] = 'Removes and returns the last item from the list';
 Blockly.Msg['KEY_RESETED'] = 'Key settings are reset to default values';
 Blockly.Msg['GET_JOY_COUNT_LABEL'] = 'Get the number of connected gamepads';
+Blockly.Msg['ALERT_DUPLICAT'] = 'Warning:%1 is duplicate';
 Blockly.Msg['NO'] = 'NO';
 Blockly.Msg['YES'] = 'YES';
 };
