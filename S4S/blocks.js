@@ -3127,66 +3127,66 @@ javascript.javascriptGenerator.forBlock['play_sound'] = function(block, generato
         Числа ≥32768 указывают на повторение следующего тайла
         Фактическое количество повторений = число - 32768*/
 javascript.javascriptGenerator.forBlock['level_editor'] = function(block, generator) {
-  // Получаем значение поля (JSON строку)
-  const sprite = generator.valueToCode(block, 'TILESET', generator.ORDER_ATOMIC);
-  const levelData = JSON.parse(block.getFieldValue('LEVEL_DATA'));
-  
-  // Обработка объектов
-  const originalObjects = levelData.objects || [];
-  const groupedObjects = {};
-  const simpleObjects = [];
-  let hasObjects = false;
-
-  originalObjects.forEach(item => {
-    // Сначала ищем в proto_object_array
-    let protoIndex = proto_object_array.findIndex(p => 
-      workspace.getVariableById(p.name).name === item.protoName);
+    const sprite = generator.valueToCode(block, 'TILESET', generator.ORDER_ATOMIC);
+    const levelData = JSON.parse(block.getFieldValue('LEVEL_DATA'));
     
-    if (protoIndex !== -1) {
-      // Объект из proto_object_array
-      if (!groupedObjects[protoIndex]) {
-        groupedObjects[protoIndex] = [];
-      }
-      groupedObjects[protoIndex].push(item.x, item.y);
-      hasObjects = true;
-    } else {
-      // Если не найден в proto_object_array, ищем в object_array
-      let objIndex = object_array.findIndex(o => 
-        workspace.getVariableById(o.name).name === item.protoName);
-      
-      if (objIndex !== -1) {
-        // Объект из object_array
-        simpleObjects.push({
-          name: generator.getVariableName(object_array[objIndex].name),
-          x: item.x,
-          y: item.y
-        });
-        hasObjects = true;
-      } else {
-        console.warn(`Прототип не найден: ${item.protoName}`);
-      }
+    const originalObjects = levelData.objects || [];
+    const groupedObjects = {};
+    const simpleObjects = [];
+    let hasObjects = false;
+
+    originalObjects.forEach(item => {
+        let protoIndex = proto_object_array.findIndex(p => 
+            workspace.getVariableById(p.name).name === item.protoName);
+        
+        if (protoIndex !== -1) {
+            if (!groupedObjects[protoIndex]) {
+                groupedObjects[protoIndex] = [];
+            }
+            // Добавляем угол поворота после координат
+            groupedObjects[protoIndex].push(
+                item.x, 
+                item.y, 
+                item.angle || 0 // По умолчанию 0 градусов
+            );
+            hasObjects = true;
+        } else {
+            let objIndex = object_array.findIndex(o => 
+                workspace.getVariableById(o.name).name === item.protoName);
+            
+            if (objIndex !== -1) {
+                simpleObjects.push({
+                    name: generator.getVariableName(object_array[objIndex].name),
+                    x: item.x,
+                    y: item.y,
+                    angle: item.angle || 0
+                });
+                hasObjects = true;
+            }
+        }
+    });
+
+    let objectsCode = '';
+    if (Object.keys(groupedObjects).length > 0) {
+        const objectsArray = Object.keys(groupedObjects).map(protoIndex => ({
+            id: generator.getVariableName(proto_object_array[parseInt(protoIndex)].name),
+            xy: groupedObjects[protoIndex]
+        }));
+        objectsCode = 'Game.addObjectsFromArray(' + 
+            JSON.stringify(objectsArray).replace(/"id"\s*:\s*"([a-zA-Z_][a-zA-Z0-9_]*)"/g, '"id": $1') + 
+            ');\n';
     }
-  });
 
-  // Формируем код для объектов (proto_object_array)
-  let objectsCode = '';
-  if (Object.keys(groupedObjects).length > 0) {
-    const objectsArray = Object.keys(groupedObjects).map(protoIndex => ({
-      id: generator.getVariableName(proto_object_array[parseInt(protoIndex)].name),
-      xy: groupedObjects[protoIndex]
-    }));
-    objectsCode = 'Game.addObjectsFromArray(' + 
-      JSON.stringify(objectsArray).replace(/"id"\s*:\s*"([a-zA-Z_][a-zA-Z0-9_]*)"/g, '"id": $1') + 
-      ');\n';
-  }
-
-  // Формируем код для простых объектов (object_array)
-  let simpleObjectsCode = '';
-  if (simpleObjects.length > 0) {
-    simpleObjectsCode = simpleObjects.map(obj => {
-      return `${obj.name}.x = ${obj.x}; ${obj.name}.y = ${obj.y};`;
-    }).join('\n') + '\n';
-  }
+    let simpleObjectsCode = '';
+    if (simpleObjects.length > 0) {
+        simpleObjectsCode = simpleObjects.map(obj => {
+            let code = `${obj.name}.x = ${obj.x}; ${obj.name}.y = ${obj.y};`;
+            if (obj.angle) {
+                code += ` ${obj.name}.angle = ${obj.angle};`;
+            }
+            return code;
+        }).join('\n') + '\n';
+    }
 
   // Обработка тайлов с RLE-кодированием (остаётся без изменений)
   const tileSize = levelData.gridSize || 32;

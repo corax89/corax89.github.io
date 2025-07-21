@@ -32,6 +32,10 @@ class FieldLevelEditor extends Blockly.Field {
 		this.offsetX = 0;
 		this.offsetY = 0;
 		this.zoom = 1;
+		this.rotationAngle = 0;
+        this.isRotating = false;
+		this.lastCursorX = 0;
+		this.lastCursorY = 0;
 		this.isObjectHighlighted = false;
 		this.uniqueObjectsAdded = [];
 
@@ -756,6 +760,50 @@ class FieldLevelEditor extends Blockly.Field {
         background: hsl(210, 11%, 71%);
         color: hsl(0, 0%, 20%);
       }
+	  
+	  .rotation-controls {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			background: rgba(255, 255, 255, 0.9);
+			padding: 5px 10px;
+			border-radius: 20px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+		}
+
+		.rotate-btn {
+			width: 24px;
+			height: 24px;
+			border: none;
+			border-radius: 50%;
+			background: #4285f4;
+			color: white;
+			font-size: 12px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.2s;
+		}
+
+		.rotate-btn:hover {
+			background: #3367d6;
+			transform: scale(1.1);
+		}
+
+		.angle-input {
+			width: 50px;
+			text-align: center;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 2px;
+			font-size: 12px;
+		}
+
+		.angle-input:focus {
+			outline: none;
+			border-color: #4285f4;
+		}
 
       .btn-secondary:hover {
         background: hsl(210, 11%, 65%);
@@ -1788,12 +1836,12 @@ class FieldLevelEditor extends Blockly.Field {
 			if (this.objects_.length > 0) {
 				if (!isTileMode) {
 					targetCtx.globalAlpha = 1.0;
-					drawObjects(targetCtx, false);
+					drawObjects(targetCtx, true);
 				}
 
 				if (isTileMode) {
 					targetCtx.globalAlpha = 0.5;
-					drawObjects(targetCtx, true);
+					drawObjects(targetCtx, false);
 				}
 
 				targetCtx.globalAlpha = 1.0;
@@ -1802,43 +1850,137 @@ class FieldLevelEditor extends Blockly.Field {
 
 		// Вынесенная функция для рисования объектов
 		const drawObjects = (targetCtx, includeSelection = true) => {
-			this.objects_.forEach((obj, index) => {
-				// Ищем прототип сначала в proto_object_array, затем в object_array
-				let proto = proto_object_array.find(p =>
-						workspace.getVariableById(p.name).name === obj.protoName);
+    this.objects_.forEach((obj, index) => {
+        let proto = proto_object_array.find(p =>
+            workspace.getVariableById(p.name).name === obj.protoName);
 
-				if (!proto) {
-					proto = object_array.find(o =>
-							workspace.getVariableById(o.name).name === obj.protoName);
-				}
+        if (!proto) {
+            proto = object_array.find(o =>
+                workspace.getVariableById(o.name).name === obj.protoName);
+        }
 
-				if (!proto)
-					return;
+        if (!proto) return;
 
-				// Получаем индекс для imageCache (разные для каждого массива)
-				const protoIndex = proto_object_array.indexOf(proto);
-				const objIndex = object_array.indexOf(proto);
-				const img = protoIndex !== -1 ?
-					this.imageCache[protoIndex] :
-					this.imageCache[objIndex + proto_object_array.length]; // Смещаем индексы для object_array
+        const protoIndex = proto_object_array.indexOf(proto);
+        const objIndex = object_array.indexOf(proto);
+        const img = protoIndex !== -1 ?
+            this.imageCache[protoIndex] :
+            this.imageCache[objIndex + proto_object_array.length];
 
-				if (img) {
-					targetCtx.drawImage(img, obj.x, obj.y, proto.width, proto.height);
+        if (img) {
+            const angle = obj.angle || 0;
+            
+            if (angle !== 0) {
+                targetCtx.save();
+                targetCtx.translate(obj.x + proto.width/2, obj.y + proto.height/2);
+                targetCtx.rotate(angle * Math.PI / 180);
+                targetCtx.drawImage(
+                    img, 
+                    -proto.width/2, -proto.height/2, 
+                    proto.width, proto.height
+                );
+                targetCtx.restore();
+            } else {
+                targetCtx.drawImage(img, obj.x, obj.y, proto.width, proto.height);
+            }
 
-					// Рисуем выделение если объект выбран
-					if (index === selectedObjectIndex && includeSelection) {
-						if (self.isObjectHighlighted) {
-							targetCtx.fillStyle = 'rgba(0, 255, 255, 0.3)';
-							targetCtx.fillRect(obj.x, obj.y, proto.width, proto.height);
-						}
+            // Рисуем выделение если объект выбран
+            // В методе drawObjects замените блок кода, отвечающий за отрисовку элементов управления поворотом:
+if (index === selectedObjectIndex && includeSelection) {
+    if (self.isObjectHighlighted) {
+        targetCtx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+        targetCtx.fillRect(obj.x, obj.y, proto.width, proto.height);
+    }
 
-						targetCtx.strokeStyle = '#00f';
-						targetCtx.lineWidth = 2;
-						targetCtx.strokeRect(obj.x, obj.y, proto.width, proto.height);
-					}
-				}
-			});
-		};
+    targetCtx.strokeStyle = '#00f';
+    targetCtx.lineWidth = 2;
+    
+    if (angle !== 0) {
+        targetCtx.save();
+        targetCtx.translate(obj.x + proto.width/2, obj.y + proto.height/2);
+        targetCtx.rotate(angle * Math.PI / 180);
+        targetCtx.strokeRect(-proto.width/2, -proto.height/2, proto.width, proto.height);
+        targetCtx.restore();
+    } else {
+        targetCtx.strokeRect(obj.x, obj.y, proto.width, proto.height);
+    }
+
+    // Рисуем кнопки поворота только для выделенного объекта
+    if (!isTileMode) {
+        // Получаем координаты курсора (используем последние известные координаты)
+        const cursorX = self.lastCursorX || 0;
+        const cursorY = (self.lastCursorY || 0) - 20; // Поднимаем на 20px выше курсора
+        
+        // Удаляем старые элементы управления, если они есть
+        if (self.rotationControls) {
+            document.body.removeChild(self.rotationControls);
+        }
+        
+        // Создаем новые элементы управления
+        self.rotationControls = document.createElement('div');
+        self.rotationControls.className = 'rotation-controls';
+        self.rotationControls.style.position = 'fixed';
+        self.rotationControls.style.left = `${cursorX - 60}px`; // Центрируем относительно курсора
+        self.rotationControls.style.top = `${cursorY - 60}px`;
+        self.rotationControls.style.zIndex = '1000';
+        self.rotationControls.style.pointerEvents = 'auto';
+        
+        const leftBtn = document.createElement('button');
+        leftBtn.className = 'rotate-btn left';
+        leftBtn.innerHTML = '&larr;';
+        leftBtn.title = 'Повернуть на 10° влево';
+        leftBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            obj.angle = (obj.angle || 0) - 10;
+            if (obj.angle < 0) obj.angle += 360;
+            updateAngleDisplay();
+            isBufferDirty = true;
+            drawCanvas();
+        });
+        
+        // Поле ввода для ручного ввода угла
+        const angleInput = document.createElement('input');
+        angleInput.type = 'number';
+        angleInput.className = 'angle-input';
+        angleInput.min = '0';
+        angleInput.max = '359';
+        angleInput.value = obj.angle || 0;
+        angleInput.addEventListener('change', (e) => {
+            let newAngle = parseInt(e.target.value);
+            if (isNaN(newAngle)) newAngle = 0;
+            newAngle = (newAngle % 360 + 360) % 360; // Нормализуем угол
+            obj.angle = newAngle;
+            isBufferDirty = true;
+            drawCanvas();
+        });
+        
+        const rightBtn = document.createElement('button');
+        rightBtn.className = 'rotate-btn right';
+        rightBtn.innerHTML = '&rarr;';
+        rightBtn.title = 'Повернуть на 10° вправо';
+        rightBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            obj.angle = (obj.angle || 0) + 10;
+            if (obj.angle >= 360) obj.angle -= 360;
+            updateAngleDisplay();
+            isBufferDirty = true;
+            drawCanvas();
+        });
+        
+        // Функция для обновления поля ввода
+        const updateAngleDisplay = () => {
+            angleInput.value = obj.angle || 0;
+        };
+        
+        self.rotationControls.appendChild(leftBtn);
+        self.rotationControls.appendChild(angleInput);
+        self.rotationControls.appendChild(rightBtn);
+        document.body.appendChild(self.rotationControls);
+    }
+}
+        }
+    });
+};
 
 		const drawCanvas = () => {
 			if (!this.editorModal)
@@ -2292,6 +2434,9 @@ class FieldLevelEditor extends Blockly.Field {
 
 		// Reset selections
 		const resetSelections = () => {
+			if (self.rotationControls) {
+				self.rotationControls.style.display = 'none';
+			}
 			objectPalette.querySelectorAll('.object-item').forEach(item => {
 				item.classList.remove('selected');
 			});
@@ -2357,7 +2502,10 @@ class FieldLevelEditor extends Blockly.Field {
 
 			const coords = getPixelCoordinates(e.clientX, e.clientY);
 			updateCursorCoordinates(coords.x, coords.y);
-
+			
+			self.lastCursorX = e.clientX;
+			self.lastCursorY = e.clientY;
+			
 			if (isPanning) {
 				const dx = e.clientX - lastX;
 				const dy = e.clientY - lastY;
@@ -3295,6 +3443,11 @@ class FieldLevelEditor extends Blockly.Field {
 				tiles: this.getTileMapAsFlatArray(),
 				gridSize: self.editorConfig.gridSize
 			});
+			
+			if (self.rotationControls) {
+				document.body.removeChild(self.rotationControls);
+				self.rotationControls = null;
+			}
 
 			this.forceRerender();
 			document.removeEventListener('mousemove', handleMouseMove);
