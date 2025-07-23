@@ -3801,185 +3801,100 @@ javascript.javascriptGenerator.forBlock['get_window_position'] = function(block,
 // Генератор для управления объектом
 javascript.javascriptGenerator.forBlock['object_control'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
-  const controlType = block.getFieldValue('type');
+  const type = "'" + block.getFieldValue('type') + "'";
   const speedX = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
   const speedY = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
-  const gameType = block.getFieldValue('game');
-  const jumpButton = block.getFieldValue('jump_button') || 'ArrowUp';
+  const gameType = "'" + block.getFieldValue('game') + "'";
+  const jumpButton = "'" + (block.getFieldValue('jump_button') || 'ArrowUp') + "'";
   const doubleJumpEnabled = block.getFieldValue('double_jump') === 'TRUE';
-  const joyId = block.getFieldValue('JOY_ID');
-  const acceleration = 0.2;
+  const joyId = block.getFieldValue('JOY_ID') || 0;
 
-  const controlFuncName = `${obj}_control`;
-  
-  if (!Blockly.JavaScript.definitions_[controlFuncName]) {
-    let funcCode = '';
-    const stateVars = [];
+  // Добавляем функцию управления, если её ещё нет
+  if (!Blockly.JavaScript.definitions_['object_control']) {
+    var funcCode = 'function object_control(obj, type, speedX, speedY, gameType, jumpButton, doubleJumpEnabled, joyId) {\n';
+    funcCode += '  var acceleration = 0.2;\n';
+    funcCode += '  if (!obj.local) obj.local = {};\n';
+    funcCode += '  var loc = obj.local;\n\n';
     
-    if (gameType === 'platform') {
-      stateVars.push(`${obj}_jumpReady = true`);
-      if (doubleJumpEnabled) {
-        stateVars.push(`${obj}_jumpCount = 0`);
-        stateVars.push(`${obj}_hasDoubleJump = false`);
-      }
-    }
+    // Базовая физика
+    funcCode += '  if (gameType !== \'platform\') {\n';
+    funcCode += '    obj.speedx *= 0.95;\n';
+    funcCode += '    obj.speedy *= 0.95;\n';
+    funcCode += '  }\n\n';
     
-    if (stateVars.length) {
-      funcCode += `var ${stateVars.join(', ')};\n`;
-    }
+    // Инициализация состояния для платформера
+    funcCode += '  if (gameType === \'platform\') {\n';
+    funcCode += '    if (loc.jumpReady === undefined) loc.jumpReady = true;\n';
+    funcCode += '    if (doubleJumpEnabled) {\n';
+    funcCode += '      if (loc.jumpCount === undefined) loc.jumpCount = 0;\n';
+    funcCode += '      if (loc.hasDoubleJump === undefined) loc.hasDoubleJump = false;\n';
+    funcCode += '    }\n';
+    funcCode += '  }\n\n';
     
-    funcCode += `function ${controlFuncName}(obj) {\n`;
+    // Обработка управления по X
+    funcCode += '  // X-axis movement\n';
+    funcCode += '  if (type === \'key\' || type === \'both\') {\n';
+    funcCode += '    obj.speedx = obj.speedx * (1 - acceleration) + \n';
+    funcCode += '      (Game.getKey("ArrowRight", joyId) ? speedX : Game.getKey("ArrowLeft", joyId) ? -speedX : 0) * acceleration;\n';
+    funcCode += '  }\n';
+    funcCode += '  if (type === \'stick0\' || type === \'stick1\' || type === \'both\') {\n';
+    funcCode += '    var stickIdx = type === \'stick1\' ? 2 : 0;\n';
+    funcCode += '    var stickX = Game.getAxes(stickIdx, joyId);\n';
+    funcCode += '    if (Math.abs(stickX) > 0.3) {\n';
+    funcCode += '      obj.speedx = obj.speedx * (1 - acceleration) + speedX * stickX * acceleration;\n';
+    funcCode += '    }\n';
+    funcCode += '  }\n\n';
     
-    // Base physics
-    if (gameType !== 'platform') {
-      funcCode += '  obj.speedx *= 0.95;\n';
-      funcCode += '  obj.speedy *= 0.95;\n';
-    }
+    // Обработка управления по Y
+    funcCode += '  // Y-axis movement\n';
+    funcCode += '  if (gameType === \'platform\') {\n';
+    funcCode += '    var shouldJump = false;\n';
+    funcCode += '    if (type === \'key\' || type === \'both\') {\n';
+    funcCode += '      shouldJump = Game.getKey(jumpButton, joyId);\n';
+    funcCode += '    }\n';
+    funcCode += '    if (!shouldJump && (type === \'stick0\' || type === \'stick1\' || type === \'both\')) {\n';
+    funcCode += '      var axisIdx = type === \'stick1\' ? 3 : 1;\n';
+    funcCode += '      shouldJump = Game.getAxes(axisIdx, joyId) < -0.3;\n';
+    funcCode += '    }\n\n';
     
-    switch(controlType) {
-      case 'key': {
-        funcCode += '  // Keyboard controls\n';
-        funcCode += '  var getKey = Game.getKey;\n';
-        funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + ` +
-                   `(getKey("ArrowRight", ${joyId}) ? ${speedX} : getKey("ArrowLeft", ${joyId}) ? -${speedX} : 0) * ${acceleration};\n`;
-        
-        if (gameType === 'platform') {
-          if (doubleJumpEnabled) {
-            // Сбрасываем счетчик прыжков при приземлении
-            funcCode += `  if(obj.isOnGround) {\n`;
-            funcCode += `    ${obj}_jumpCount = 0;\n`;
-            funcCode += `    ${obj}_hasDoubleJump = true;\n`;
-            funcCode += `  }\n`;
-            
-            // Обработка нажатия кнопки прыжка
-            funcCode += `  if(getKey("${jumpButton}", ${joyId}) && ${obj}_jumpReady) {\n`;
-            funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
-            funcCode += `      obj.speedy = -${speedY};\n`;
-            funcCode += `      ${obj}_jumpCount++;\n`;
-            funcCode += `      ${obj}_jumpReady = false;\n`;
-            funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
-            funcCode += `    }\n`;
-            funcCode += `  }\n`;
-            // Сбрасываем jumpReady при отпускании кнопки
-            funcCode += `  if(!getKey("${jumpButton}"), ${joyId}) {\n`;
-            funcCode += `    ${obj}_jumpReady = true;\n`;
-            funcCode += `  }\n`;
-          } else {
-            // Обычный прыжок без двойного
-            funcCode += `  if(getKey("${jumpButton}", ${joyId}) && obj.isOnGround && ${obj}_jumpReady) {\n`;
-            funcCode += `    obj.speedy = -${speedY};\n`;
-            funcCode += `    ${obj}_jumpReady = false;\n`;
-            funcCode += `  }\n`;
-            funcCode += `  if(!getKey("${jumpButton}", ${joyId})) ${obj}_jumpReady = true;\n`;
-          }
-          funcCode += `  if(getKey("ArrowDown", ${joyId})) obj.speedx *= 0.7;\n`;
-        } else {
-          funcCode += `  if(getKey("ArrowUp", ${joyId})) obj.speedy = -${speedY};\n`;
-          funcCode += `  if(getKey("ArrowDown", ${joyId})) obj.speedy = ${speedY};\n`;
-        }
-        break;
-      }
-      
-      // Аналогичные изменения для других типов управления (stick0, stick1, both)
-      case 'stick0': 
-      case 'stick1': {
-        const stickIndex = controlType === 'stick0' ? 0 : 2;
-        const axisIndex = controlType === 'stick0' ? 1 : 3;
-        
-        funcCode += `  // Gamepad controls\n`;
-        funcCode += `  var getAxes = Game.getAxes;\n`;
-        funcCode += `  var stickX = getAxes(${stickIndex}, ${joyId});\n`;
-        funcCode += `  if(Math.abs(stickX) > 0.3) {\n`;
-        funcCode += `    obj.speedx = obj.speedx * (1 - ${acceleration}) + ${speedX} * stickX * ${acceleration};\n`;
-        funcCode += `  }\n`;
-        
-        if (gameType === 'platform') {
-          if (doubleJumpEnabled) {
-            funcCode += `  if(obj.isOnGround) {\n`;
-            funcCode += `    ${obj}_jumpCount = 0;\n`;
-            funcCode += `    ${obj}_hasDoubleJump = true;\n`;
-            funcCode += `  }\n`;
-            
-            funcCode += `  var stickY = getAxes(${axisIndex}, ${joyId});\n`;
-            funcCode += `  if(stickY < -0.3 && ${obj}_jumpReady) {\n`;
-            funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
-            funcCode += `      obj.speedy = -${speedY};\n`;
-            funcCode += `      ${obj}_jumpCount++;\n`;
-            funcCode += `      ${obj}_jumpReady = false;\n`;
-            funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
-            funcCode += `    }\n`;
-            funcCode += `  }\n`;
-            funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
-          } else {
-            funcCode += `  var stickY = getAxes(${axisIndex}, ${joyId});\n`;
-            funcCode += `  if(stickY < -0.3 && obj.isOnGround && ${obj}_jumpReady) {\n`;
-            funcCode += `    obj.speedy = -${speedY};\n`;
-            funcCode += `    ${obj}_jumpReady = false;\n`;
-            funcCode += `  }\n`;
-            funcCode += `  if(stickY >= -0.3) ${obj}_jumpReady = true;\n`;
-          }
-        } else {
-          funcCode += `  var stickY = getAxes(${axisIndex}, ${joyId});\n`;
-          funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
-          funcCode += `  if(stickY > 0.3) obj.speedy = ${speedY};\n`;
-        }
-        break;
-      }
-      
-      case 'both': {
-        funcCode += '  // Combined controls\n';
-        funcCode += '  var getKey = Game.getKey, getAxes = Game.getAxes;\n';
-        funcCode += `  var targetSpeedX = getKey("ArrowLeft", ${joyId}) ? -${speedX} : ` +
-                   `getKey("ArrowRight", ${joyId}) ? ${speedX} : 0;\n`;
-        funcCode += `  var stickX = getAxes(0, ${joyId});\n`;
-        funcCode += `  if(targetSpeedX === 0 && Math.abs(stickX) > 0.3) {\n`;
-        funcCode += `    targetSpeedX = ${speedX} * stickX;\n`;
-        funcCode += `  }\n`;
-        funcCode += `  obj.speedx = obj.speedx * (1 - ${acceleration}) + targetSpeedX * ${acceleration};\n`;
-        
-        if (gameType === 'platform') {
-          if (doubleJumpEnabled) {
-            funcCode += `  if(obj.isOnGround) {\n`;
-            funcCode += `    ${obj}_jumpCount = 0;\n`;
-            funcCode += `    ${obj}_hasDoubleJump = true;\n`;
-            funcCode += `  }\n`;
-            
-            funcCode += `  var stickY = getAxes(1, ${joyId});\n`;
-            funcCode += `  if((getKey("${jumpButton}", ${joyId}) || stickY < -0.3) && ${obj}_jumpReady) {\n`;
-            funcCode += `    if(${obj}_jumpCount === 0 || (${obj}_jumpCount === 1 && ${obj}_hasDoubleJump)) {\n`;
-            funcCode += `      obj.speedy = -${speedY};\n`;
-            funcCode += `      ${obj}_jumpCount++;\n`;
-            funcCode += `      ${obj}_jumpReady = false;\n`;
-            funcCode += `      if(${obj}_jumpCount === 2) ${obj}_hasDoubleJump = false;\n`;
-            funcCode += `    }\n`;
-            funcCode += `  }\n`;
-            funcCode += `  if(!(getKey("${jumpButton}", ${joyId}) || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
-          } else {
-            funcCode += `  var stickY = getAxes(1, ${joyId});\n`;
-            funcCode += `  if((getKey("${jumpButton}", ${joyId}) || stickY < -0.3) && obj.isOnGround && ${obj}_jumpReady) {\n`;
-            funcCode += `    obj.speedy = -${speedY};\n`;
-            funcCode += `    ${obj}_jumpReady = false;\n`;
-            funcCode += `  }\n`;
-            funcCode += `  if(!(getKey("${jumpButton}", ${joyId}) || stickY < -0.3)) ${obj}_jumpReady = true;\n`;
-          }
-        } else {
-          funcCode += `  if(getKey("ArrowUp", ${joyId})) obj.speedy = -${speedY};\n`;
-          funcCode += `  if(getKey("ArrowDown", ${joyId})) obj.speedy = ${speedY};\n`;
-          funcCode += `  var stickY = getAxes(1, ${joyId});\n`;
-          funcCode += `  if(stickY < -0.3) obj.speedy = -${speedY};\n`;
-          funcCode += `  if(stickY > 0.3) obj.speedy = ${speedY};\n`;
-        }
-        break;
-      }
-    }
+    funcCode += '    if (obj.isOnGround) {\n';
+    funcCode += '      loc.jumpCount = 0;\n';
+    funcCode += '      if (doubleJumpEnabled) loc.hasDoubleJump = true;\n';
+    funcCode += '    }\n\n';
     
+    funcCode += '    if (shouldJump && loc.jumpReady) {\n';
+    funcCode += '      var canJump = !doubleJumpEnabled ? (loc.jumpCount === 0) : \n';
+    funcCode += '        (loc.jumpCount === 0 || (loc.jumpCount === 1 && loc.hasDoubleJump));\n';
+    funcCode += '      if (canJump) {\n';
+    funcCode += '        obj.speedy = -speedY;\n';
+    funcCode += '        loc.jumpCount++;\n';
+    funcCode += '        loc.jumpReady = false;\n';
+    funcCode += '        if (doubleJumpEnabled && loc.jumpCount === 2) loc.hasDoubleJump = false;\n';
+    funcCode += '      }\n';
+    funcCode += '    }\n';
+    funcCode += '    if (!shouldJump) loc.jumpReady = true;\n';
+    funcCode += '    if (Game.getKey("ArrowDown", joyId)) obj.speedx *= 0.7;\n';
+    funcCode += '  } else {\n';
+    funcCode += '    // Non-platformer controls\n';
+    funcCode += '    if (type === \'key\' || type === \'both\') {\n';
+    funcCode += '      if (Game.getKey("ArrowUp", joyId)) obj.speedy = -speedY;\n';
+    funcCode += '      if (Game.getKey("ArrowDown", joyId)) obj.speedy = speedY;\n';
+    funcCode += '    }\n';
+    funcCode += '    if (type === \'stick0\' || type === \'stick1\' || type === \'both\') {\n';
+    funcCode += '      var axisIdx = type === \'stick1\' ? 3 : 1;\n';
+    funcCode += '      var stickY = Game.getAxes(axisIdx, joyId);\n';
+    funcCode += '      if (stickY < -0.3) obj.speedy = -speedY;\n';
+    funcCode += '      if (stickY > 0.3) obj.speedy = speedY;\n';
+    funcCode += '    }\n';
+    funcCode += '  }\n';
     funcCode += '}\n';
-    Blockly.JavaScript.definitions_[controlFuncName] = funcCode;
+    
+    Blockly.JavaScript.definitions_['object_control'] = funcCode;
   }
   
-  return `${controlFuncName}(${obj});\n`;
+  return 'object_control(' + obj + ', ' + type + ', ' + speedX + ', ' + speedY + ', ' + 
+         gameType + ', ' + jumpButton + ', ' + doubleJumpEnabled + ', ' + joyId + ');\n';
 };
-
 // Генератор кода для блока перемещения
 javascript.javascriptGenerator.forBlock['object_teleport'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('OBJECT'));
