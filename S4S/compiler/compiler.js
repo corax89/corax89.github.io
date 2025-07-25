@@ -900,6 +900,25 @@ class SafeRomFSParser {
     }
 }
 
+function transliterate(text) {
+  const rusToEng = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+    'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+    'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+    'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
+    'ъ': '_', 'ы': 'y', 'ь': '_', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo',
+    'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M',
+    'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U',
+    'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch',
+    'Ъ': '_', 'Ы': 'Y', 'Ь': '_', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+  };
+
+  return text.split('').map(char => {
+    return rusToEng[char] || char;
+  }).join('');
+}
+
 async function modifyNroFile(fileData_bytes, options = {}) {
     const editor = new NROEditorCore();
     
@@ -1154,7 +1173,7 @@ function buildSwitch(){
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = name + '.nro';
+		a.download = transliterate(name) + '.nro';
 		a.click();
 		
 		// Освобождаем память
@@ -1178,7 +1197,7 @@ function compressJS(code) {
 }
 
 function buildHTML() {
-	reset_game();
+	Game._resetInternal();
 	
 	function serializeObject(obj) {
         const props = [];
@@ -1218,9 +1237,10 @@ const globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function checkTouchButtons(x,y,isPressed){if(!Game.enableTouchInput)return!1;for(const btnId in inputState.touchButtons){const btn=inputState.touchButtons[btnId];
 if(x>=btn.x&&x<=btn.x+btn.width&&y>=btn.y&&y<=btn.y+btn.height){btn.isPressed=isPressed;inputState.keys[btn.keyCode]=isPressed;if(isPressed){inputState.pressKeys[btn.keyCode]=!0};return!0}}return!1}
 ${gameLoopCode}
-Game.initSensorInput();Game.init();Game.enableTouchInput = false;Game.enableDrawing = ${projectSettings.enableVirtualGamepad};canvas.addEventListener('touchstart', () => {Game.enableTouchInput = true;});
-${customScript}
-game_loop();</script></body></html>`;
+Game.initSensorInput();Game.initEngine();Game.enableTouchInput = false;Game.enableDrawing = ${projectSettings.enableVirtualGamepad};canvas.addEventListener('touchstart', () => {Game.enableTouchInput = true;});
+Game.init=function(){
+	${customScript}
+};Game.init();game_loop();</script></body></html>`;
 
     // Создаем и скачиваем файл
     const blob = new Blob([htmlContent], {type: 'text/html'});

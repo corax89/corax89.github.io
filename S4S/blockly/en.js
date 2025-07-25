@@ -732,6 +732,11 @@ Blockly.Msg['LISTS_POP_LAST_TOOLTIP'] = 'Removes and returns the last item from 
 Blockly.Msg['KEY_RESETED'] = 'Key settings are reset to default values';
 Blockly.Msg['GET_JOY_COUNT_LABEL'] = 'Get the number of connected gamepads';
 Blockly.Msg['ALERT_DUPLICAT'] = 'Warning:%1 is duplicate';
+Blockly.Msg['LOAD_VARIABLES'] = 'Load variables and their values';
+Blockly.Msg['SAVE_VARIABLES'] = 'Save variables:';
+Blockly.Msg['VARIABLES_FOR_SAVE'] = 'Variables for save';
+Blockly.Msg['VARIABLE'] = 'Variable';
+Blockly.Msg['RESET'] = 'Reset game';
 Blockly.Msg['NO'] = 'NO';
 Blockly.Msg['YES'] = 'YES';
 };

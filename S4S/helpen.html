@@ -1,547 +1,888 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Blockly Blocks Reference</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Blockly Blocks Reference</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
         }
-        h1, h2 {
-            color: #34A853;;
-            margin-top: 40px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--blockly-green);
-            font-weight: 500;
-        }
-        .blockly-category {
+        h1 {
+            color: #2c3e50;
+            text-align: center;
             margin-bottom: 30px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            background-color: #f9f9f9;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
         }
-        .block {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        h2 {
+            border-bottom: 3px solid;
+            padding: 10px 15px;
+            margin-top: 40px;
             background-color: white;
-            border-left: 5px solid;
-            vertical-align: top;
-            width: 300px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .block-header {
+        h3 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            padding-left: 10px;
+            border-left: 4px solid;
+        }
+        .block-desc {
+            background-color: white;
+            padding: 15px;
+            border-left: 4px solid;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .block-desc:hover {
+            transform: translateX(5px);
+        }
+        .block-desc strong {
+            color: #2c3e50;
+        }
+        .category-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 35px;
+            justify-content: center;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .category-menu a {
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
             font-weight: bold;
-            margin-bottom: 8px;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            white-space: nowrap;
         }
-        .block-description {
-            font-size: 0.9em;
-            color: #555;
+        .category-menu a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-		.param-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
+        .back-to-top {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 30px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+            float: right;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
-        .param-table th {
-            background-color: var(--blockly-gray);
-            text-align: left;
-            padding: 10px;
-            font-weight: 500;
+        .back-to-top:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        
-        .param-table td {
-            padding: 10px;
-            border-bottom: 1px solid #EEE;
-            vertical-align: top;
+        .category-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        
-        .param-table tr:nth-child(even) {
-            background-color: #FFF;
+        @media (max-width: 768px) {
+            .category-menu {
+                flex-direction: column;
+                align-items: center;
+            }
+            .category-menu a {
+                width: 90%;
+                text-align: center;
+            }
         }
-		
-		.example {
-			padding: 10px;
-			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-			background-color: white;
-			vertical-align: top;
-		}
-        .block-color-30 { border-color: #5b80a5; } /* Drawing */
-        .block-color-60 { border-color: #5ba55b; } /* Logic */
-        .block-color-120 { border-color: #a55b80; } /* Game loop */
-        .block-color-160 { border-color: #a55b5b; } /* Sound */
-        .block-color-230 { border-color: #5ba5a5; } /* Variables */
-        .block-color-340 { border-color: #a5805b; } /* Objects */
     </style>
 </head>
 <body>
-    <h1>Blockly Blocks Reference</h1>
-	
-	<h2>Basic Object Parameters</h2>
-	<p>Every object in Blockly has a set of parameters that define its behavior and appearance. Below is a complete list of all available parameters with detailed descriptions:</p>
-	<div class="blockly-category">
-		<table class="param-table">
-			<thead>
-				<tr>
-					<th>Parameter</th>
-					<th>Code</th>
-					<th>Type</th>
-					<th>Description</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td><strong>X</strong></td>
-					<td><span class="code">x</span></td>
-					<td>Number</td>
-					<td>Horizontal coordinate of the object (in pixels). Measured from the left edge of the screen.</td>
-				</tr>
-				<tr>
-					<td><strong>Y</strong></td>
-					<td><span class="code">y</span></td>
-					<td>Number</td>
-					<td>Vertical coordinate of the object (in pixels). Measured from the top edge of the screen.</td>
-				</tr>
-				<tr>
-					<td><strong>Width</strong></td>
-					<td><span class="code">width</span></td>
-					<td>Number</td>
-					<td>Object width in pixels. Determines horizontal collision size.</td>
-				</tr>
-				<tr>
-					<td><strong>Height</strong></td>
-					<td><span class="code">height</span></td>
-					<td>Number</td>
-					<td>Object height in pixels. Determines vertical collision size.</td>
-				</tr>
-				<tr>
-					<td><strong>Speed X</strong></td>
-					<td><span class="code">speedx</span></td>
-					<td>Number</td>
-					<td>Horizontal movement speed (pixels per frame). Positive values - right, negative - left.</td>
-				</tr>
-				<tr>
-					<td><strong>Speed Y</strong></td>
-					<td><span class="code">speedy</span></td>
-					<td>Number</td>
-					<td>Vertical movement speed (pixels per frame). Positive values - down, negative - up.</td>
-				</tr>
-				<tr>
-					<td><strong>Name</strong></td>
-					<td><span class="code">name</span></td>
-					<td>String</td>
-					<td>Contains the name of the object, if the object is created from a prototype then it will have the prototype name</td>
-				</tr>
-				<tr>
-				<tr>
-					<td><strong>Visible</strong></td>
-					<td><span class="code">visible</span></td>
-					<td>Boolean</td>
-					<td>Determines whether the object is visible on screen. When false, the object isn't rendered but still participates in physics.</td>
-				</tr>
-				<tr>
-					<td><strong>Solid</strong></td>
-					<td><span class="code">solid</span></td>
-					<td>Boolean</td>
-					<td>If true, the object will collide with other solid objects. If false - the object will be passable.</td>
-				</tr>
-				<tr>
-					<td><strong>Angle</strong></td>
-					<td><span class="code">angle</span></td>
-					<td>Number</td>
-					<td>Rotation angle in degrees (0-360). Rotation occurs around the object's center.</td>
-				</tr>
-				<tr>
-					<td><strong>Flip</strong></td>
-					<td><span class="code">flip</span></td>
-					<td>Boolean</td>
-					<td>If true, the object's sprite will be horizontally flipped (mirrored).</td>
-				</tr>
-				<tr>
-					<td><strong>Mass</strong></td>
-					<td><span class="code">mass</span></td>
-					<td>Number</td>
-					<td>Object mass for physics calculations. Default is 1.0. Higher mass makes the object harder to move.</td>
-				</tr>
-				<tr>
-					<td><strong>Restitution</strong></td>
-					<td><span class="code">restitution</span></td>
-					<td>Number (0-1)</td>
-					<td>Bounciness coefficient during collisions. 0 - no bounce, 1 - perfectly elastic bounce.</td>
-				</tr>
-				<tr>
-					<td><strong>Is Static</strong></td>
-					<td><span class="code">isStatic</span></td>
-					<td>Boolean</td>
-					<td>If true, the object won't move under physics (like a platform or wall).</td>
-				</tr>
-				<tr>
-					<td><strong>Z-index</strong></td>
-					<td><span class="code">zIndex</span></td>
-					<td>Number</td>
-					<td>Determines rendering order. Objects with higher zIndex are drawn above objects with lower values.</td>
-				</tr>
-				<tr>
-					<td><strong>Is On Ground?</strong></td>
-					<td><span class="code">isOnGround</span></td>
-					<td>Boolean</td>
-					<td>Automatically set to true if the object is standing on another solid object. Read-only.</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+    <h1>Complete Blockly Blocks Reference</h1>
     
-    <div class="blockly-category" id="gameloop">
-        <h2>Game Loop</h2>
-        
-        <div class="block block-color-120">
-            <div class="block-header">Infinite Game Loop</div>
-            <div class="block-description">
-                Main game loop that runs every frame. You can enable/disable screen clearing.
-            </div>
-        </div>
-		
-		<div class="example">
-		</div>
-    </div>
-    
-    <div class="blockly-category" id="control">
-        <h2>Controls</h2>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Is Button Held?</div>
-            <div class="block-description">
-                Checks if the specified button (arrows or A/B/X/Y) is being held.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Is Button Pressed?</div>
-            <div class="block-description">
-                Checks if the specified button was just pressed.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Get Joystick Axis Value</div>
-            <div class="block-description">
-                Returns joystick axis value (-1.0 to 1.0).
-            </div>
-        </div>
-		
-		<div class="example">
-		</div>
-    </div>
-    
-    <div class="blockly-category" id="draw">
-        <h2>Drawing</h2>
-        
-        <div class="block block-color-30">
-            <div class="block-header">Draw Point</div>
-            <div class="block-description">
-                Draws a point at specified coordinates with given color.
-            </div>
-        </div>
-        
-        <div class="block block-color-30">
-            <div class="block-header">Draw Text</div>
-            <div class="block-description">
-                Displays text at specified coordinates with given size and color.
-            </div>
-        </div>
-        
-        <div class="block block-color-30">
-            <div class="block-header">Draw Sprite</div>
-            <div class="block-description">
-                Draws a sprite (image) at specified coordinates with given size.
-            </div>
-        </div>
-        
-        <div class="block block-color-30">
-            <div class="block-header">Clear Screen</div>
-            <div class="block-description">
-                Fills the entire screen with specified color.
-            </div>
-        </div>
-        
-        <div class="block block-color-30">
-            <div class="block-header">Load Sprite</div>
-            <div class="block-description">
-                Allows you to upload or draw a picture.
-            </div>
-        </div>
-        
-        <div class="block block-color-30">
-            <div class="block-header">Color Picker</div>
-            <div class="block-description">
-                Allows selecting a color from palette.
-            </div>
-        </div>
-    </div>
-    
-    <div class="blockly-category">
-        <h2>Objects</h2>
-        
-		<div class="block block-color-340">
-            <div class="block-header">Create a prototype of an object</div>
-            <div class="block-description">
-                The object prototype is used to create objects and in the level editor.
-            </div>
-        </div>
-		
-		<div class="block block-color-340">
-            <div class="block-header">Create a new object from a prototype</div>
-            <div class="block-description">
-                Creates an object with parameters from the prototype at point X Y 
-            </div>
-        </div>
-		
-        <div class="block block-color-340">
-            <div class="block-header">Create New Object</div>
-            <div class="block-description">
-                Creates a new game object with specified parameters (position, size, sprite).
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Clone Object</div>
-            <div class="block-description">
-                Creates a copy of existing object.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Set Object Parameter</div>
-            <div class="block-description">
-                Changes value of object parameter (X, Y, width, height etc.).
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Get Object Parameter</div>
-            <div class="block-description">
-                Returns value of object parameter.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Add to Object Parameter</div>
-            <div class="block-description">
-                Increases object parameter value by specified number.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Do Every Frame</div>
-            <div class="block-description">
-                Sets code that will execute for the object every frame.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Do on Collision</div>
-            <div class="block-description">
-                Sets code that will execute when object collides with another.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Control Object</div>
-            <div class="block-description">
-                Allows controlling object with keys or joystick.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Move to Point</div>
-            <div class="block-description">
-                Makes object move to specified point with given speed.
-            </div>
-        </div>
-        
-        <div class="block block-color-340">
-            <div class="block-header">Iterate All Objects</div>
-            <div class="block-description">
-                Executes code for each existing object.
-            </div>
-        </div>
-    </div>
-    
-    <div class="blockly-category">
-        <h2>Logic</h2>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Check Rectangle Collision</div>
-            <div class="block-description">
-                Checks if two rectangles intersect.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">If Outside Screen</div>
-            <div class="block-description">
-                Checks if object went outside screen boundaries.
-            </div>
-        </div>
-    </div>
-    
-    <div class="blockly-category">
-        <h2>Sound</h2>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Melody Editor</div>
-            <div class="block-description">
-                Allows creating melodies in visual editor.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Play Melody</div>
-            <div class="block-description">
-                Plays melody with specified tempo.
-            </div>
-        </div>
-    </div>
-    
-    <div class="blockly-category">
-        <h2>System</h2>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Execute After</div>
-            <div class="block-description">
-                Executes code after specified time (in milliseconds).
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Get Time</div>
-            <div class="block-description">
-                Returns current time in milliseconds.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Set Gravity</div>
-            <div class="block-description">
-                Sets global gravity for all objects.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Is Touching?</div>
-            <div class="block-description">
-                Checks if user is touching the screen.
-            </div>
-        </div>
-        
-        <div class="block block-color-60">
-            <div class="block-header">Get Touch</div>
-            <div class="block-description">
-                Returns touch screen coordinates.
-            </div>
-        </div>
-    </div>
-    
-    <div class="blockly-category">
-        <h2>Variables</h2>
-        
-        <div class="block block-color-230">
-            <div class="block-header">Create Local Variable</div>
-            <div class="block-description">
-                Creates new variable with specified name and value.
-            </div>
-        </div>
-        
-        <div class="block block-color-230">
-            <div class="block-header">Get Local Variable</div>
-            <div class="block-description">
-                Returns value of local variable.
-            </div>
-        </div>
-    </div>
-    
-    <div class="blockly-category">
-        <h2>Advanced</h2>
-        
-        <div class="block block-color-60">
-            <div class="block-header">JS Code</div>
-            <div class="block-description">
-                Allows inserting arbitrary JavaScript code.
-            </div>
-        </div>
+    <div class="category-menu">
+        <a href="#game" style="background-color: #3c78d8; color: white;">Game</a>
+        <a href="#objects" style="background-color: #674ea7; color: white;">Objects</a>
+        <a href="#move" style="background-color: #bf9000; color: white;">Movement</a>
+        <a href="#logic" style="background-color: #cc0000; color: white;">Logic</a>
+        <a href="#loops" style="background-color: #6aa84f; color: white;">Loops</a>
+        <a href="#math" style="background-color: #e69138; color: white;">Math</a>
+        <a href="#text" style="background-color: #a64d79; color: white;">Text</a>
+        <a href="#lists" style="background-color: #9900ff; color: white;">Lists</a>
+        <a href="#drawing" style="background-color: #1e8449; color: white;">Drawing</a>
+        <a href="#variables" style="background-color: #3d85c6; color: white;">Variables</a>
+        <a href="#procedures" style="background-color: #a64d79; color: white;">Procedures</a>
     </div>
 
-    <!-- Standard Blockly blocks -->
-    <div class="blockly-category">
-        <h2>Standard Blockly Blocks</h2>
+    <!-- Game Category -->
+    <div class="category-container">
+        <h2 id="game" style="border-color: #3c78d8;">Game</h2>
         
-        <div class="block block-color-60">
-            <div class="block-header">Logical Operators</div>
-            <div class="block-description">
-                Blocks for working with boolean values: AND, OR, NOT, comparisons (==, !=, &lt;, &gt;, &lt;=, &gt;=).
-            </div>
+        <h3 style="border-left-color: #3c78d8;">Controls</h3>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Check key press</strong><br>
+            Returns true if the specified key is currently pressed. Supports arrow keys and A/B/X/Y buttons. Can be used for continuous movement while holding a key.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Conditionals</div>
-            <div class="block-description">
-                Blocks for branching logic: if, if-else.
-            </div>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Check key press (once)</strong><br>
+            Returns true only at the moment the key is first pressed, not while holding. Ideal for single actions like jumping or shooting.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Loops</div>
-            <div class="block-description">
-                Blocks for creating loops: while, for, repeat.
-            </div>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Get joystick axis value</strong><br>
+            Returns a value (-1.0 to 1.0) for the specified controller axis (0-3). Axes 0 and 1 are typically the left stick, 2 and 3 are the right stick.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Math Operations</div>
-            <div class="block-description">
-                Blocks for mathematical calculations: +, -, *, /, %, exponent, root, trigonometric functions.
-            </div>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Vibration</strong><br>
+            Activates vibration on supported devices. Can be configured as simple vibration (specifying duration) or complex patterns.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Text</div>
-            <div class="block-description">
-                Blocks for working with strings: concatenation, length, substring, contains check.
-            </div>
+        <h3 style="border-left-color: #3c78d8;">Timers</h3>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Set interval</strong><br>
+            Executes the specified code at regular intervals (in milliseconds). Returns an interval ID that can be used to stop it.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Lists</div>
-            <div class="block-description">
-                Blocks for working with arrays: create list, access by index, add/remove elements, list length.
-            </div>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Clear interval</strong><br>
+            Stops the execution of an interval by its ID. Important to clear intervals when they're no longer needed to prevent memory leaks.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Functions</div>
-            <div class="block-description">
-                Blocks for creating and calling custom functions with parameters and return values.
-            </div>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Set timer</strong><br>
+            Executes code once after the specified time (in milliseconds). Useful for delays and deferred actions.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Variables</div>
-            <div class="block-description">
-                Blocks for creating variables, assigning values and getting variable values.
-            </div>
+        <h3 style="border-left-color: #3c78d8;">Sound and Music</h3>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Music editor</strong><br>
+            Visual editor for creating musical sequences. Allows combining notes of different durations and pitches.
         </div>
         
-        <div class="block block-color-60">
-            <div class="block-header">Comments</div>
-            <div class="block-description">
-                Blocks for adding explanatory comments to code.
-            </div>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Play music</strong><br>
+            Plays music created in the editor at the specified tempo (BPM). Can be used for background music and sound effects.
         </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Sound editor</strong><br>
+            Sound wave generator for creating simple sound effects. Supports different wave forms (sine, square, sawtooth).
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Play sound</strong><br>
+            Plays sound created in the editor. Optimized for short sounds (shots, jumps, collecting items).
+        </div>
+        
+        <h3 style="border-left-color: #3c78d8;">Data Management</h3>
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Save variables</strong><br>
+            Saves current values of specified variables to browser's local storage. Data persists between sessions.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Load variables</strong><br>
+            Restores variable values from local storage. Automatically detects types of saved data.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Multiline JS input</strong><br>
+            Allows inserting pure JavaScript code for complex logic that can't be expressed with blocks. Supports ES5 syntax.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Game loop</strong><br>
+            Main game loop that runs every frame. Contains game state update and rendering logic.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Pause/Resume</strong><br>
+            Pauses or resumes game execution. Can be used to create pause menus.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Check pause</strong><br>
+            Returns true if the game is in paused state.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Set background</strong><br>
+            Sets background image for the game. Can choose display mode: stretch or tile.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3c78d8;">
+            <strong>Set background position</strong><br>
+            Sets background image offset on X and Y axes.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
     </div>
+
+    <!-- Objects Category -->
+    <div class="category-container">
+        <h2 id="objects" style="border-color: #674ea7;">Objects</h2>
+        
+        <h3 style="border-left-color: #674ea7;">Object Creation</h3>
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>New object prototype</strong><br>
+            Creates a template (class) for objects with specified parameters (size, sprite). Prototypes allow creating multiple similar objects.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>New object</strong><br>
+            Creates an object instance with specified coordinates, dimensions and sprite. Can add initialization code in onCreate event.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>New object from prototype</strong><br>
+            Creates an object based on a previously defined prototype, copying all its properties. Saves time when creating similar objects.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Clone object</strong><br>
+            Creates an exact copy of an existing object with all current property values. Useful for enemy spawning or creating copies.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Copy state</strong><br>
+            Copies all properties (except position) from one object to another. Can be used to reset state or synchronize objects.
+        </div>
+        
+        <h3 style="border-left-color: #674ea7;">Object Management</h3>
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Change object parameter</strong><br>
+            Sets new value for specified object property (x, y, speed, visibility etc.). Supports different object types.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Add to parameter</strong><br>
+            Increases (or decreases) object property value by specified amount. Convenient for gradual changes in speed, size etc.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Get object parameter</strong><br>
+            Returns current value of object property. Can be used for state checking or mathematical calculations.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Delete object</strong><br>
+            Completely removes object from game, freeing resources. Important to delete unused objects for performance optimization.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Iterate objects</strong><br>
+            Executes specified code for each object in the game. Can filter objects by name or other properties inside the loop.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Get object</strong><br>
+            Returns reference to object by its type (current, collided, random etc.).
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Set collision bounds</strong><br>
+            Configures collision area shape and size for object (rectangle, circle or automatic calculation).
+        </div>
+        
+        <h3 style="border-left-color: #674ea7;">Object Events</h3>
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>On every frame</strong><br>
+            Code executes every game cycle (typically 60 times per second). Ideal for continuous movement and checks.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>On collision</strong><br>
+            Code executes when object collides with another object. Inside the block, 'object' variable is available - reference to the second object.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Object animation</strong><br>
+            Configures sprite animation for object: frame list, playback speed and looping.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Sprite editor</strong><br>
+            Visual editor for creating and editing object sprites.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Movement Category -->
+    <div class="category-container">
+        <h2 id="move" style="border-color: #bf9000;">Movement</h2>
+        
+        <h3 style="border-left-color: #bf9000;">Physics</h3>
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Set gravity</strong><br>
+            Sets gravity force affecting all objects in the game. Positive values pull down, negative - up.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Control object</strong><br>
+            Configures object control with keyboard or gamepad. Supports several control schemes (platformer, top-down shooter).
+        </div>
+        
+        <h3 style="border-left-color: #bf9000;">Movement</h3>
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Set velocity</strong><br>
+            Sets object movement speed on X and Y axes. Can be used for impulse movement or sudden direction change.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Teleport</strong><br>
+            Instantly moves object to specified coordinates or to another object. Doesn't account for collisions during movement.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Move to point</strong><br>
+            Smoothly moves object to specified coordinates at given speed.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Distance to point</strong><br>
+            Calculates distance between two objects or between object and point. Returns value in pixels.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Camera follow</strong><br>
+            Makes game camera smoothly follow specified object. Can configure camera smoothness and offset.
+        </div>
+        
+        <h3 style="border-left-color: #bf9000;">Positioning</h3>
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Get window position</strong><br>
+            Returns current game camera coordinates (visible area). Useful for UI elements and visibility checks.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Set screen position</strong><br>
+            Moves game camera to specified coordinates. Can be used for cutscenes or static cameras.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Check collision</strong><br>
+            Checks intersection of two rectangular areas. Returns true if areas intersect. Doesn't account for rotation.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Logic Category -->
+    <div class="category-container">
+        <h2 id="logic" style="border-color: #cc0000;">Logic</h2>
+        
+        <h3 style="border-left-color: #cc0000;">Conditions</h3>
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>If-else</strong><br>
+            Standard conditional statement. Executes code based on condition truthiness. Can add any number of "else if" branches.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Comparison</strong><br>
+            Compares two values with selected operator (==, !=, >, <, >=, <=). Returns true or false.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Logical operations</strong><br>
+            Performs AND/OR logic between two conditions. Useful for complex checks.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Negation</strong><br>
+            Inverts boolean value (true becomes false and vice versa). Convenient for "if condition is not met" checks.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Check object name</strong><br>
+            Compares object name with string. Useful for filtering collisions between specific object types.
+        </div>
+        
+        <h3 style="border-left-color: #cc0000;">Special Checks</h3>
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Object off screen</strong><br>
+            Checks if object has completely left game screen boundaries. Can be used for bullet removal or enemy spawning.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Object touch</strong><br>
+            Checks if player has touched specified object (tap/click). Accounts for object rotation and scale.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Collision with tile</strong><br>
+            Checks if object collides with tile of specific type. Useful for determining "dangerous" or "passable" tiles.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Get tile info</strong><br>
+            Returns information about tile the object collided with (coordinates, ID and other parameters).
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Loops Category -->
+    <div class="category-container">
+        <h2 id="loops" style="border-color: #6aa84f;">Loops</h2>
+        
+        <h3 style="border-left-color: #6aa84f;">Basic Loops</h3>
+        <div class="block-desc" style="border-left-color: #6aa84f;">
+            <strong>Repeat</strong><br>
+            Executes code specified number of times. Can set exact count or use variable.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #6aa84f;">
+            <strong>While</strong><br>
+            Executes code while condition is true. Important to ensure condition eventually becomes false to prevent infinite loops.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #6aa84f;">
+            <strong>For loop</strong><br>
+            Classic loop with counter. Allows setting initial value, end condition and counter step.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #6aa84f;">
+            <strong>For each</strong><br>
+            Iterates through all list items. Inside loop, variable with current list item is available.
+        </div>
+        
+        <h3 style="border-left-color: #6aa84f;">Loop Control</h3>
+        <div class="block-desc" style="border-left-color: #6aa84f;">
+            <strong>Break</strong><br>
+            Immediately exits current loop, even if continuation condition is still true. Useful when searching for item in list.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #6aa84f;">
+            <strong>Continue</strong><br>
+            Skips current loop iteration and moves to next one. Convenient for filtering items in loop.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Math Category -->
+    <div class="category-container">
+        <h2 id="math" style="border-color: #e69138;">Math</h2>
+        
+        <h3 style="border-left-color: #e69138;">Basic Operations</h3>
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Number</strong><br>
+            Numeric constant. Can enter integer or decimal number, including negative.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Arithmetic</strong><br>
+            Performs basic arithmetic operations: addition, subtraction, multiplication, division and exponentiation.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Rounding</strong><br>
+            Rounds number by selected rule: up, down, to nearest integer or simply drops fractional part.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Modulo</strong><br>
+            Returns remainder of division of one number by another. Useful for creating cyclic effects and value limiting.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Random number</strong><br>
+            Generates random number in specified range. Can return both integer and decimal values.
+        </div>
+        
+        <h3 style="border-left-color: #e69138;">Trigonometry</h3>
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Sin/Cos/Tan</strong><br>
+            Trigonometric functions. Accept angle in degrees. Useful for circular motion and oscillating effects.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Constants</strong><br>
+            Basic mathematical constants: π (pi), e (natural logarithm base), √2, φ (golden ratio) and others.
+        </div>
+        
+        <h3 style="border-left-color: #e69138;">Limitations</h3>
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Limit range</strong><br>
+            Ensures value stays between specified minimum and maximum. If value goes beyond boundaries, it's set to nearest boundary.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #e69138;">
+            <strong>Number properties</strong><br>
+            Checks various number properties: even, positive, finite (not NaN and not Infinity), divisibility by another number.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Text Category -->
+    <div class="category-container">
+        <h2 id="text" style="border-color: #a64d79;">Text</h2>
+        
+        <h3 style="border-left-color: #a64d79;">String Operations</h3>
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Text</strong><br>
+            String constant. Can enter any text including spaces and special characters.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Concatenate</strong><br>
+            Joins several strings into one. Can specify any number of items and separator between them.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Length</strong><br>
+            Returns number of characters in string. Returns 0 for empty string.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Empty string?</strong><br>
+            Checks if string is empty (contains no characters, not even spaces).
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Change case</strong><br>
+            Converts string to upper or lower case. Accounts for locale with special characters.
+        </div>
+        
+        <h3 style="border-left-color: #a64d79;">Search and Extraction</h3>
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Find position</strong><br>
+            Searches for substring in string and returns position of first match (starting from 0). Returns -1 if substring not found.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Character at index</strong><br>
+            Returns character at specified position in string. Positions are numbered from 0.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Substring</strong><br>
+            Extracts part of string between specified positions. Can set only start position to get string to end.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Trim whitespace</strong><br>
+            Removes spaces and other whitespace characters from start and end of string. Doesn't change spaces inside string.
+        </div>
+        
+        <h3 style="border-left-color: #a64d79;">Output</h3>
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Display text</strong><br>
+            Shows text on game screen at specified coordinates. Can set size, color and text itself.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Request input</strong><br>
+            Shows dialog box requesting text input from user. Returns entered string.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Lists Category -->
+    <div class="category-container">
+        <h2 id="lists" style="border-color: #9900ff;">Lists</h2>
+        
+        <h3 style="border-left-color: #9900ff;">List Creation</h3>
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Empty list</strong><br>
+            Creates new empty array. Can be used for subsequent filling with elements.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Create list</strong><br>
+            Creates list with specified elements. Can add any number of elements of different types.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Repeat item</strong><br>
+            Creates list filled with same item specified number of times. Useful for array initialization.
+        </div>
+        
+        <h3 style="border-left-color: #9900ff;">List Operations</h3>
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>List length</strong><br>
+            Returns number of elements in list. Returns 0 for empty list.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Empty list?</strong><br>
+            Checks if list contains at least one element. Returns true if list is empty.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Find position</strong><br>
+            Searches for element in list and returns its index (starting from 0). Returns -1 if element not found.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Get item</strong><br>
+            Returns list element at specified index. Can get element from end using negative indices.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Set item</strong><br>
+            Replaces list element at specified position with new value. Can use negative indices for counting from end.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Sublist</strong><br>
+            Extracts part of list between specified indices. Can set only start index to get list to end.
+        </div>
+        
+        <h3 style="border-left-color: #9900ff;">List Modification</h3>
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Split string</strong><br>
+            Splits string into list of substrings using specified separator. If no separator, splits by characters.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Add item</strong><br>
+            Adds new item to end of list. Equivalent to push() method in JavaScript.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #9900ff;">
+            <strong>Remove last</strong><br>
+            Removes and returns last item in list. Equivalent to pop() method in JavaScript.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Drawing Category -->
+    <div class="category-container">
+        <h2 id="drawing" style="border-color: #1e8449;">Drawing</h2>
+        
+        <h3 style="border-left-color: #1e8449;">Primitives</h3>
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Color</strong><br>
+            Color palette with preset options. Returns string with hex color code (#RRGGBB).
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Point</strong><br>
+            Draws point (pixel) of specified color at given coordinates. Can be used for creating simple images.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Line</strong><br>
+            Draws line between two points with specified color. Useful for debugging and UI elements.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Rectangle</strong><br>
+            Draws rectangle with fill option. Can be used for backgrounds, panels and other elements.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Triangle</strong><br>
+            Draws triangle by three points with fill option. Useful for creating complex shapes.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Text</strong><br>
+            Outputs text to screen with specified parameters: position, size, color. Supports multiline text.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Image</strong><br>
+            Displays image (sprite) from image editor at specified coordinates and dimensions.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Clear screen</strong><br>
+            Fills entire screen with specified color. Typically called at start of each frame for clearing previous frame.
+        </div>
+        
+        <h3 style="border-left-color: #1e8449;">Animation and Effects</h3>
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Object animation</strong><br>
+            Configures sprite animation for object: frame list, playback speed and looping.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Create particles</strong><br>
+            Generates particle system with configurable parameters: count, color, size, speed, direction, lifetime.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Particle effects</strong><br>
+            Preset particle effects: explosion, fire, smoke, rain, stars, magic. Can configure main effect color.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Clear particles</strong><br>
+            Removes all active particles from screen. Useful when changing levels or restarting game.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Variables Category -->
+    <div class="category-container">
+        <h2 id="variables" style="border-color: #3d85c6;">Variables</h2>
+        
+        <h3 style="border-left-color: #3d85c6;">Global Variables</h3>
+        <div class="block-desc" style="border-left-color: #3d85c6;">
+            <strong>Create variable</strong><br>
+            Declares new global variable and assigns initial value. Accessible from anywhere in program.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3d85c6;">
+            <strong>Get variable</strong><br>
+            Returns value of previously created variable. If variable doesn't exist, returns undefined.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3d85c6;">
+            <strong>Change variable</strong><br>
+            Sets new value for existing variable. Can be used for counters, flags and other mutable data.
+        </div>
+        
+        <h3 style="border-left-color: #3d85c6;">Local Variables</h3>
+        <div class="block-desc" style="border-left-color: #3d85c6;">
+            <strong>Create local</strong><br>
+            Creates variable bound to specific object. Accessible only inside this object via this.local.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3d85c6;">
+            <strong>Add to local</strong><br>
+            Increases value of object's local variable by specified amount. Useful for counters inside objects.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #3d85c6;">
+            <strong>Get local</strong><br>
+            Returns value of object's local variable. If variable doesn't exist, returns undefined.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <!-- Procedures Category -->
+    <div class="category-container">
+        <h2 id="procedures" style="border-color: #a64d79;">Procedures</h2>
+        
+        <h3 style="border-left-color: #a64d79;">Functions</h3>
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Create procedure</strong><br>
+            Defines new function with name and set of parameters. Function body is composed of other blocks.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Call procedure</strong><br>
+            Executes previously created function. Can pass arguments matching function parameters.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Parameters</strong><br>
+            Defines parameters for function. Each parameter has name and can be used inside function.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #a64d79;">
+            <strong>Return value</strong><br>
+            Ends function execution and returns specified value. If not specified, function returns undefined.
+        </div>
+        
+        <a href="#" class="back-to-top">↑ Back to top</a>
+    </div>
+
+    <script>
+        // Add active category highlighting on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('h2');
+            const menuItems = document.querySelectorAll('.category-menu a');
+            const backToTopButtons = document.querySelectorAll('.back-to-top');
+            
+            // Active category highlighting
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= (sectionTop - 100)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                menuItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === '#' + current) {
+                        item.classList.add('active');
+                        item.style.transform = 'scale(1.05)';
+                        item.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                    } else {
+                        item.style.transform = '';
+                        item.style.boxShadow = '';
+                    }
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 20,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Show/hide "Back to top" buttons on scroll
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.pageYOffset;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.body.clientHeight;
+                
+                backToTopButtons.forEach(button => {
+                    if (scrollPosition > windowHeight / 2) {
+                        button.style.opacity = '1';
+                        button.style.visibility = 'visible';
+                    } else {
+                        button.style.opacity = '0';
+                        button.style.visibility = 'hidden';
+                    }
+                });
+            });
+            
+            // Smooth scroll to top when clicking "Back to top"
+            backToTopButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

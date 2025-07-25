@@ -55,6 +55,7 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="get_memory"></block>
             <block type="get_touch"></block>
             <block type="get_touchxy"></block>
+			<block type="game_vibrate"></block>
 			<block type="set_timer">
 			  <field name="BODY"></field>
 			  <value name="time">
@@ -84,6 +85,7 @@ const workspace = Blockly.inject('blocklyDiv', {
 			<block type="set_tile_at"></block>
 			<block type="save_vars_with_values"></block>
 			<block type="load_vars_with_values"></block>
+			<block type="reset"></block>
             <block type="field_multilineinput"></block>
         </category>
         <category name="${Blockly.Msg['OBJECTS']}" colour="340">
@@ -891,10 +893,11 @@ function gameEval(code) {
  * Выполняет сгенерированный код
  */
 function runJS() {
-	reset_game();
-	var code = addWatchdogToCode(getJScode());
+	
+	var code = addWatchdogToCode('Game.init = function () {' + getJScode() + '};');
 	Blockly.JavaScript.INFINITE_LOOP_TRAP = false;
 	Game.helper.pause = false;
+	
 	const result = gameEval(code);
 	if (!result.success) {
 		if (savedLanguage === 'ru')
@@ -902,6 +905,8 @@ function runJS() {
 		else
 			showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
 	}
+	Game._resetInternal();
+	Game.init();
 };
 
 /**

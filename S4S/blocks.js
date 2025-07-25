@@ -169,7 +169,7 @@ Blockly.Blocks['particles_create'] = {
     this.setNextStatement(true);
     this.setColour(30);
     this.setTooltip(Blockly.Msg['PARTICLES_CREATE_TOOLTIP']);
-    this.setHelpUrl('');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -205,7 +205,7 @@ Blockly.Blocks['particles_preset'] = {
     this.setNextStatement(true);
     this.setColour(30);
     this.setTooltip(Blockly.Msg['PARTICLES_PRESET_TOOLTIP']);
-    this.setHelpUrl('');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -218,7 +218,7 @@ Blockly.Blocks['particles_clear'] = {
     this.setNextStatement(true);
     this.setColour(30);
     this.setTooltip(Blockly.Msg['PARTICLES_CLEAR_TOOLTIP']);
-    this.setHelpUrl('');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -258,11 +258,11 @@ Blockly.Blocks['text_print_custom'] = {
 Blockly.Blocks['variables_container'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("Переменные для сохранения");
+        .appendField(Blockly.Msg['VARIABLES_FOR_SAVE']);
     this.appendStatementInput('STACK')
         .setCheck(null);
     this.setColour(60);
-    this.setTooltip("Контейнер для переменных");
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.contextMenu = false;
   }
 };
@@ -270,11 +270,11 @@ Blockly.Blocks['variables_container'] = {
 Blockly.Blocks['variables_get_item'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("переменная");
+        .appendField(Blockly.Msg['VARIABLE']);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(60);
-    this.setTooltip("Элемент переменной");
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.contextMenu = false;
   }
 };
@@ -283,11 +283,10 @@ Blockly.Blocks['variables_get_item'] = {
 Blockly.Blocks['save_vars_with_values'] = {
   init: function() {
     this.itemCount_ = 1;
-    this.setHelpUrl('');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setColour(60);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setTooltip("Сохраняет переменные и их значения в localStorage");
     
     // Иконка мутатора
     this.setMutator(new Blockly.icons.MutatorIcon(['variables_get_item'], this));
@@ -385,7 +384,7 @@ Blockly.Blocks['save_vars_with_values'] = {
         .setAlign(Blockly.ALIGN_RIGHT);
       
       if (j === 0) {
-        input.appendField("Сохранить переменные:");
+        input.appendField(Blockly.Msg['SAVE_VARIABLES']);
       }
     }
     
@@ -396,15 +395,25 @@ Blockly.Blocks['save_vars_with_values'] = {
   }
 };
 
-// 3. Блок для загрузки переменных
+// Блок для загрузки переменных
 Blockly.Blocks['load_vars_with_values'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("Загрузить переменные и их значения");
+        .appendField(Blockly.Msg['LOAD_VARIABLES']);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
-    this.setTooltip("Загружает переменные и их значения из localStorage");
+  }
+};
+
+Blockly.Blocks['reset'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['RESET']);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+    this.setColour(60);
   }
 };
 
@@ -441,7 +450,7 @@ Blockly.Blocks['get_key_down'] = {
         ]), "JOY_ID");
     this.setInputsInline(true);
     this.setOutput(true, 'Boolean');
-    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#control');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setFieldValue("ArrowUp", "KEY");
     this.setFieldValue("0", "JOY_ID");
   }
@@ -481,7 +490,7 @@ Blockly.Blocks['get_key_pressed'] = {
         ]), "JOY_ID");
     this.setInputsInline(true);
     this.setOutput(true, 'Boolean');
-    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setFieldValue("0", "JOY_ID");
   }
 };
@@ -501,6 +510,7 @@ Blockly.Blocks['game_vibrate'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setTooltip(Blockly.Msg['VIBRATE_TITLE']);
   }
 };
@@ -529,7 +539,7 @@ Blockly.Blocks['get_axes'] = {
         ]), "JOY_ID");
     this.setInputsInline(true);
     this.setOutput(true, 'Number');
-    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#control');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setFieldValue("0", "JOY_ID");
   }
 };
@@ -620,7 +630,7 @@ Blockly.Blocks['draw_point'] = {
         .appendField(Blockly.Msg['COLOR_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -647,7 +657,7 @@ Blockly.Blocks['draw_line'] = {
         .appendField(Blockly.Msg['COLOR_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -682,7 +692,7 @@ Blockly.Blocks['draw_triangle'] = {
         .appendField(Blockly.Msg['FILL_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -712,7 +722,7 @@ Blockly.Blocks['draw_rect'] = {
         .appendField(Blockly.Msg['FILL_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -721,6 +731,7 @@ Blockly.Blocks['field_colour'] = {
   init: function() {
     this.setOutput(true, 'Colour');
     this.setColour(30);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.appendDummyInput()
       .appendField(Blockly.Msg['COLOR_LABEL'])
       .appendField(new FieldColour('#000000', null, {
@@ -753,7 +764,7 @@ Blockly.Blocks['field_colour'] = {
 Blockly.Blocks['draw_text'] = {
   init: function() {
     this.setColour(30);
-    this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     
     // Основные поля
     this.appendDummyInput()
@@ -800,7 +811,7 @@ Blockly.Blocks['draw_text'] = {
 // Блок рисования изображения
 Blockly.Blocks['draw_image'] = {
   init: function() {
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + 'html#draw');
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.setColour(30);
     this.appendDummyInput()
         .appendField(Blockly.Msg['DRAW_IMAGE_LABEL']);
@@ -862,6 +873,7 @@ Blockly.Blocks['collision_detect'] = {
 Blockly.Blocks['clear_screen'] = {
   init: function() {
     this.setColour(30);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.appendDummyInput()
         .appendField(Blockly.Msg['CLEAR_SCREEN_LABEL']);
     const colourInput = this.appendValueInput("Colour")
@@ -909,6 +921,7 @@ Blockly.Blocks['play_music'] = {
   init: function() {
     // Основная инициализация блока
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
 	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['PLAY_MUSIC_LABEL']);
@@ -939,6 +952,7 @@ Blockly.Blocks['play_music'] = {
 Blockly.Blocks['play_sound'] = {
   init: function() {
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
 	this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['PLAY_SOUND_LABEL']);
@@ -961,6 +975,7 @@ Blockly.Blocks['level_editor'] = {
         .setCheck("field_png")
         .appendField(Blockly.Msg['LEVEL_EDITOR_TILESET']);
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
 	this.setInputsInline(true);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
@@ -973,6 +988,7 @@ Blockly.Blocks['set_tile'] = {
         .setCheck("field_png")
         .appendField(Blockly.Msg['LEVEL_EDITOR_TILESET']);
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
 	this.setInputsInline(true);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
@@ -1008,6 +1024,7 @@ Blockly.Blocks['is_colliding_with_tile'] = {
 Blockly.Blocks['game_pause'] = {
   init: function() {
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.appendDummyInput()
 		.appendField(Blockly.Msg['PAUSE_RESUME_LABEL'])
         .appendField(new Blockly.FieldDropdown([
@@ -1037,6 +1054,7 @@ Blockly.Blocks['is_paused'] = {
 Blockly.Blocks['set_background'] = {
   init: function() {
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_BACKGROUND_LABEL'])
         .appendField(new Blockly.FieldDropdown([
@@ -1055,6 +1073,7 @@ Blockly.Blocks['set_background'] = {
 Blockly.Blocks['set_background_xy'] = {
   init: function() {
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.appendValueInput("X")
         .setCheck("Number")
         .appendField(Blockly.Msg['SET_BACKGROUND_XY_LABEL_X']);
@@ -1129,7 +1148,7 @@ Blockly.Blocks['get_tile_at'] = {
         .appendField(new Blockly.FieldCheckbox(false), 'SOLID_ONLY');
     
     this.setTooltip(Blockly.Msg['GET_TILE_AT_TOOLTIP']);
-    this.setHelpUrl("");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -1164,7 +1183,7 @@ Blockly.Blocks['set_tile_at'] = {
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
     this.setTooltip(Blockly.Msg['SET_TILE_AT_TOOLTIP']);
-    this.setHelpUrl("");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -1175,6 +1194,7 @@ Blockly.Blocks['field_multilineinput'] = {
       .appendField(Blockly.Msg['JS_CODE_LABEL'])
       .appendField(new FieldMultilineInput('"some code";'), 'FIELDSCRIPT');
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -1194,6 +1214,7 @@ Blockly.Blocks['set_interval'] = {
         .setCheck("Number")
         .appendField(Blockly.Msg['INTERVAL_MS_LABEL']);
     this.setOutput(true, "Number");
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setTooltip(Blockly.Msg['SET_INTERVAL_TOOLTIP']);
   }
 };
@@ -1208,6 +1229,7 @@ Blockly.Blocks['clear_interval'] = {
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setTooltip(Blockly.Msg['CLEAR_INTERVAL_TOOLTIP']);
   }
 };
@@ -1223,6 +1245,7 @@ Blockly.Blocks['set_timer'] = {
         .setCheck("Number")
         .appendField(Blockly.Msg['TIMER_TIME_LABEL']);
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -1477,6 +1500,7 @@ Blockly.Blocks['field_png'] = {
         ), "IMAGE");
     this.setOutput(true, null);
     this.setColour(30);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.setInputsInline(true);
     this.setTooltip("");
     this.setHelpUrl("");
@@ -1521,7 +1545,7 @@ Blockly.Blocks['object_animation'] = {
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
     this.setTooltip(Blockly.Msg['ANIMATION_TOOLTIP'] || 'Управление анимацией объекта');
-    this.setHelpUrl("");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 // ================== ИНТЕГРАЦИОННЫЕ ФУНКЦИИ ================== //
@@ -1644,6 +1668,7 @@ Blockly.Blocks['game_copy_state'] = {
 Blockly.Blocks['draw_object'] = {
   init: function() {
     this.setColour(30);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.appendDummyInput()
         .appendField(Blockly.Msg['DRAW_SPRITE_LABEL']);
     this.appendDummyInput()
@@ -2644,6 +2669,7 @@ Blockly.Blocks['get_time'] = {
         .appendField(Blockly.Msg['GET_TIME_LABEL']);
     this.setOutput(true, 'Number');
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2653,6 +2679,7 @@ Blockly.Blocks['get_joy_count'] = {
         .appendField(Blockly.Msg['GET_JOY_COUNT_LABEL']);
     this.setOutput(true, 'Number');
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2662,6 +2689,7 @@ Blockly.Blocks['get_memory'] = {
         .appendField(Blockly.Msg['GET_MEMORY_LABEL']);
     this.setOutput(true, 'Number');
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2704,6 +2732,7 @@ Blockly.Blocks['get_touch'] = {
         .appendField(Blockly.Msg['HAS_TOUCH_LABEL']);
     this.setOutput(true, 'Boolean');
     this.setColour(60);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2719,6 +2748,7 @@ Blockly.Blocks['get_touchxy'] = {
     this.setOutput(true, 'Number');
     this.setColour(60);
 	this.setInputsInline(true);
+	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2911,8 +2941,8 @@ javascript.javascriptGenerator.forBlock['save_vars_with_values'] = function(bloc
   }
 
   // Определение имени проекта
-  var projectName = (typeof projectSettings !== 'undefined' && projectSettings.name) 
-                  ? projectSettings.name : 'myProject';
+  var projectName = transliterate((typeof projectSettings !== 'undefined' && projectSettings.name) 
+                  ? projectSettings.name : 'myProject');
 
   // Финальный код
   return 'try{\n' +
@@ -2928,7 +2958,7 @@ javascript.javascriptGenerator.forBlock['save_vars_with_values'] = function(bloc
 javascript.javascriptGenerator.forBlock['load_vars_with_values'] = function(block, generator) {
 
   // Генерация кода загрузки
-  return '  var savedData = Game.load("' + (projectSettings ? projectSettings.name : 'myProject') + '");\n' +
+  return '  var savedData = Game.load("' + transliterate(projectSettings ? projectSettings.name : 'myProject') + '");\n' +
       '  if (savedData) {\n' +
       '    var parsedData = JSON.parse(savedData);\n' +
       '    for (var varName in parsedData) {\n' +
@@ -2938,7 +2968,7 @@ javascript.javascriptGenerator.forBlock['load_vars_with_values'] = function(bloc
       '                       ? eval(varName) \n' +
       '                       : undefined;\n' +
       '          var newValue = Game.objectDeserialize(parsedData[varName], existing);\n' +
-      '          if (existing === undefined) {\n' +
+      '          if (existing !== undefined) {\n' +
       '            eval(varName + " = newValue");\n' +
       '          }\n' +
       '        } catch (e) {\n' +
@@ -2947,6 +2977,10 @@ javascript.javascriptGenerator.forBlock['load_vars_with_values'] = function(bloc
       '      }\n' +
       '    }\n' +
       '  }\n';
+};
+
+javascript.javascriptGenerator.forBlock['reset'] = function(block, generator) {
+  return '  Game.reset();\n'
 };
 
 javascript.javascriptGenerator.forBlock['lists_append'] = function(block, generator) {

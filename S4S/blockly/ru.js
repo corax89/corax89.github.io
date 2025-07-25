@@ -750,6 +750,11 @@ Blockly.Msg['LISTS_POP_LAST_TOOLTIP'] = 'Удаляет и возвращает 
 Blockly.Msg['KEY_RESETED'] = 'Настройки клавиш сброшены к значениям по умолчанию';
 Blockly.Msg['GET_JOY_COUNT_LABEL'] = 'Получить количество подключенных геймпадов';
 Blockly.Msg['ALERT_DUPLICAT'] = 'Внимание:%1 дублируется';
+Blockly.Msg['LOAD_VARIABLES'] = 'Загрузить переменные и их значения';
+Blockly.Msg['SAVE_VARIABLES'] = 'Сохранить переменные:';
+Blockly.Msg['VARIABLES_FOR_SAVE'] = 'Переменные для сохранения';
+Blockly.Msg['VARIABLE'] = 'Переменная';
+Blockly.Msg['RESET'] = 'Сбросить состояние игры';
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 

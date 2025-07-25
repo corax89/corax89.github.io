@@ -70,7 +70,7 @@ Game.helper.keyRemapping = {
 };
 
 // Основной объект Game
-Game.init = function () {
+Game.initEngine = function () {
 	// Инициализация массива изображений
 	for (let i = 0; i < 1024; i++) {
 		image_array[i] = -1; // Используем -1 для отсутствия изображения
@@ -91,6 +91,9 @@ Game.init = function () {
 		tileSize: 32,
 		sprite: -1, // -1 для отсутствия тайлсета
 		tilesData: {}
+	};
+	Game.debug = function(obj){
+		console.log(obj);
 	};
 	Game.createDefaultKeysState = function (keysSet) {
 		const state = {};
@@ -633,6 +636,39 @@ Game.init = function () {
 			}
 		};
 		return modalPromise
+	};
+	
+	const originalAlert = Game.alert;
+	Game.alert = function(message, title, showCancel = false, primaryBtnText) {
+		Game.alert.isOpen = true;
+		const promise = originalAlert.call(this, message, title, showCancel, primaryBtnText);
+		
+		promise.finally(() => {
+			Game.alert.isOpen = false;
+			// Вызываем обработчик закрытия, если он установлен
+			if (Game.alert.onClose) {
+				Game.alert.onClose();
+			}
+		});
+		
+		return promise;
+	};
+	// Добавляем флаг isOpen в Game.alert
+	Game.alert.isOpen = false;
+
+	// Модифицируем метод close
+	Game.alert.close = function(result = false) {
+		if (this.isOpen) {
+			this.isOpen = false;
+			// Вызываем обработчик закрытия, если он установлен
+			if (this.onClose) {
+				this.onClose();
+			}
+		}
+		// Вызываем оригинальный close
+		if (originalAlert.close) {
+			originalAlert.close(result);
+		}
 	};
 	// Функция для получения позиции касания/клика
 	function getPosition(event) {
@@ -2619,79 +2655,112 @@ function getApproximateMemoryUsage(obj) {
 Game.getMemory = function () {
 	return getApproximateMemoryUsage(Game.allObject) + getApproximateMemoryUsage(image_array) + (Blockly.JavaScript.workspaceToCode(workspace)?.length * 2 || 0)
 };
-function reset_game() {
-	// Очистка таймеров
-	game_helper_timers.length = 0;
-	// Очистка всех игровых объектов
-	Game.allObject.length = 0;
-	Game._isPaused = false;
-	Game.pauseTime = 0;
-	Game.pausedTimers = {};
-	Game.Particles.clear();
-	// Сброс изображений (но сохраняем загруженные)
-	for (let i = 0; i < image_array.length; i++) {
-		if (image_array[i] === -1) { // Если изображение в процессе загрузки
-			image_array[i] = -1; // Сбрасываем
-		}
-		// Загруженные изображения (объекты Image) не сбрасываем
-	}
-	// Сброс состояния ввода
-	Game.resetInputDevices();
-	Game.duc_helper_global_game_timers = {
-		nextId: 1,
-		timers: {},
-		pending: [],
-		length: 0,
-		lengthAvg: 0,
-		timerHistory: [],
-		lastSampleTime: 0
-	};
-	// Сброс состояния касаний
-	Game.virtualGamepad.touches = {};
-	// Сброс кнопок геймпада
-	Game.virtualGamepad.buttons.forEach(btn => {
-		btn.active = false
-	});
-	Game.virtualGamepad.dpad.buttons.forEach(btn => {
-		btn.active = false
-	});
-	// Сброс тайловой системы
-	if (Game.helper.tiles) {
-		Game.helper.tiles.grid = [];
-		Game.helper.tiles.cols = 0;
-		Game.helper.tiles.rows = 0;
-		Game.helper.tiles.tilesData = {}
-	}
-	if (Game.alert.close)
-		Game.alert.close();
-	// Сброс звуков
-	Game.sound_array.length = 0;
-	// Сброс позиции камеры
-	Game.screenx = 0;
-	Game.screeny = 0;
-	// Сброс гравитации
-	gravitation = 0;
-	// Сброс состояния касаний
-	Game.getTouch.istouch = 0;
-	Game.getTouch.x = 0;
-	Game.getTouch.y = 0;
-	// Остановка всей музыки
-	if (globalAudioCtx.state !== "closed") {
-		globalAudioCtx.close().catch(e => console.error("Error closing audio context:", e))
-	}
-	// Очистка очереди мелодий
-	melodyQueue.length = 0;
-	activeMelodies = 0;
-	// Сброс отладочной панели
-	if (objectsDebugPanel) {
-		objectsDebugPanel.update()
-	}
-	// Сброс флагов отладки
-	draw_bounding_box = false;
-	debugShowExpandedObjectsBorder = true;
-	// Сброс игрового цикла
-	Game.gameLoop = function () {}
-}
+Game.reset = function() {
+    // Проверяем, открыто ли окно Game.alert
+    if (Game.alert.isOpen) {
+        // Если открыто, устанавливаем обработчик на закрытие
+        Game.alert.onClose = function() {
+            // Удаляем обработчик
+            delete Game.alert.onClose;
+            // Вызываем сброс после закрытия
+            Game._resetInternal();
+			Game.init();
+        };
+        return;
+    }
+    
+    // Если alert не открыт, сбрасываем сразу
+    Game._resetInternal();
+	Game.init();
+};
+
+// Внутренняя функция сброса
+Game._resetInternal = function() {
+    // Очистка таймеров
+    game_helper_timers.length = 0;
+    
+    // Очистка всех игровых объектов
+    Game.allObject.length = 0;
+    Game._isPaused = false;
+    Game.pauseTime = 0;
+    Game.pausedTimers = {};
+    Game.Particles.clear();
+    
+    // Сброс изображений (но сохраняем загруженные)
+    for (let i = 0; i < image_array.length; i++) {
+        if (image_array[i] === -1) { // Если изображение в процессе загрузки
+            image_array[i] = -1; // Сбрасываем
+        }
+        // Загруженные изображения (объекты Image) не сбрасываем
+    }
+    
+    // Сброс состояния ввода
+    Game.resetInputDevices();
+    Game.duc_helper_global_game_timers = {
+        nextId: 1,
+        timers: {},
+        pending: [],
+        length: 0,
+        lengthAvg: 0,
+        timerHistory: [],
+        lastSampleTime: 0
+    };
+    
+    // Сброс состояния касаний
+    Game.virtualGamepad.touches = {};
+    
+    // Сброс кнопок геймпада
+    Game.virtualGamepad.buttons.forEach(btn => {
+        btn.active = false
+    });
+    Game.virtualGamepad.dpad.buttons.forEach(btn => {
+        btn.active = false
+    });
+    
+    // Сброс тайловой системы
+    if (Game.helper.tiles) {
+        Game.helper.tiles.grid = [];
+        Game.helper.tiles.cols = 0;
+        Game.helper.tiles.rows = 0;
+        Game.helper.tiles.tilesData = {}
+    }
+    
+    // Сброс звуков
+    Game.sound_array.length = 0;
+    
+    // Сброс позиции камеры
+    Game.screenx = 0;
+    Game.screeny = 0;
+    
+    // Сброс гравитации
+    gravitation = 0;
+    
+    // Сброс состояния касаний
+    Game.getTouch.istouch = 0;
+    Game.getTouch.x = 0;
+    Game.getTouch.y = 0;
+    
+    // Остановка всей музыки
+    if (globalAudioCtx.state !== "closed") {
+        globalAudioCtx.close().catch(e => console.error("Error closing audio context:", e))
+    }
+    
+    // Очистка очереди мелодий
+    melodyQueue.length = 0;
+    activeMelodies = 0;
+    
+    // Сброс отладочной панели
+    if (objectsDebugPanel) {
+        objectsDebugPanel.update()
+    }
+    
+    // Сброс флагов отладки
+    draw_bounding_box = false;
+    debugShowExpandedObjectsBorder = true;
+	Game.alert.close();
+	Game.alert.isOpen = false;
+	Game.loop = {};
+};
 // Виртуальный геймпад (стиль Nintendo Switch)
 Game.virtualGamepad = {
 	buttons: [{
@@ -3290,7 +3359,7 @@ Game.initSensorInput = function () {
 };
 Game.helper.error = function (err) {
 	showSwitchModal("error", err, false, "ok");
-	reset_game();
+	Game.reset();
 	Game.gameLoop = function () {}
 };
 Game.pause = function () {
@@ -3607,7 +3676,7 @@ function game_loop(timestamp) {
 	}
 }
 // Инициализация игры
-Game.init();
+Game.initEngine();
 game_loop();
 function initObjectsDebugPanel() {
 	const container = document.getElementById("objectsList");
