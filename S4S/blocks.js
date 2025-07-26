@@ -498,20 +498,29 @@ Blockly.Blocks['get_key_pressed'] = {
 Blockly.Blocks['game_vibrate'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField(Blockly.Msg['VIBRATE_TITLE'])
-        .appendField(new Blockly.FieldDropdown([
-          [Blockly.Msg['VIBRATE_TYPE_SIMPLE'], "SIMPLE"],
-          [Blockly.Msg['VIBRATE_TYPE_PATTERN'], "PATTERN"]
-        ]), "TYPE");
+        .appendField(Blockly.Msg['VIBRATE_TITLE']);
+    
+    // Поле для длительности вибрации
     this.appendValueInput("DURATION")
         .setCheck("Number")
         .appendField(Blockly.Msg['VIBRATE_DURATION']);
+        
+    // Поле для силы слабого мотора (по умолчанию 0.5)
+    this.appendValueInput("WEAK")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['VIBRATE_WEAK']);
+        
+    // Поле для силы сильного мотора (по умолчанию 0.5)
+    this.appendValueInput("STRONG")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['VIBRATE_STRONG']);
+        
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
-    this.setTooltip(Blockly.Msg['VIBRATE_TITLE']);
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+    this.setTooltip(Blockly.Msg['VIBRATE_TOOLTIP']);
   }
 };
 
@@ -3008,21 +3017,10 @@ javascript.javascriptGenerator.forBlock['get_key_pressed'] = function(block, gen
 };
 
 javascript.javascriptGenerator.forBlock['game_vibrate'] = function(block, generator) {
-  // Получаем значение длительности вибрации
   const duration = generator.valueToCode(block, 'DURATION', javascript.Order.ATOMIC) || '0';
-  
-  // Поддержка двух вариантов:
-  // 1. Простая вибрация (число)
-  // 2. Паттерн вибрации (массив)
-  const isPattern = block.getFieldValue('TYPE') === 'PATTERN';
-  
-  if (isPattern) {
-    // Для паттерна генерируем массив
-    return `Game.vibrate([${duration}]);\n`;
-  } else {
-    // Для простой вибрации передаем число
-    return `Game.vibrate(${duration});\n`;
-  }
+  const weak = generator.valueToCode(block, 'WEAK', javascript.Order.ATOMIC) || '0.5';
+  const strong = generator.valueToCode(block, 'STRONG', javascript.Order.ATOMIC) || '0.5';
+  return `Game.vibrate(${duration}, ${weak}, ${strong});\n`;
 };
 
 // Генератор для получения значения оси

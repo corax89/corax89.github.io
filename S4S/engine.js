@@ -3406,8 +3406,24 @@ Game.pauseTime = 0;
 Game.pausedTimers = {};
 // Инициализация сенсорного ввода при запуске игры
 Game.initSensorInput();
-Game.vibrate = function (v) {
-	navigator.vibrate(v)
+Game.vibrate = function(duration, weakMagnitude = 0.5, strongMagnitude = 0.5) {
+    // 1. Базовая вибрация (для телефонов/тач-устройств)
+    if (navigator.vibrate) {
+        navigator.vibrate(duration); // Просто передаем длительность
+    }
+
+    // 2. Вибрация через Gamepad API (если есть геймпад)
+    const gamepads = navigator.getGamepads();
+    for (const gamepad of gamepads) {
+        if (gamepad?.vibrationActuator) {
+            gamepad.vibrationActuator.playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: duration,
+                weakMagnitude: Math.min(1.0, Math.max(0, weakMagnitude)), // Ограничиваем 0-1
+                strongMagnitude: Math.min(1.0, Math.max(0, strongMagnitude)) // Ограничиваем 0-1
+            });
+        }
+    }
 };
 Game.updateGamepadKey = function () {
 	if (!inputState.hasGamepad)
