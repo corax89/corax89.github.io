@@ -34,12 +34,12 @@ var Game = {
 	screenx: 0,
 	screeny: 0,
 	gravitation: 0,
-	enableDrawing: false,
-	enableTouchInput: false,
-	lastFrameTime: 0,
-	deltaTime: 0,
 	helper: {
-		pause: false
+		pause: false,
+		enableDrawing: false,
+		enableTouchInput: false,
+		lastFrameTime: 0,
+		deltaTime: 0,
 	}
 };
 
@@ -179,6 +179,10 @@ Game.initEngine = function () {
 			}
 		}
 	});
+	function getApproximateMemoryUsage(obj) {
+		const jsonString = JSON.stringify(obj);
+		return jsonString.length * 2;
+	}
 	Game.getJoystickCount = function () {
 		return 0;
 	};
@@ -281,7 +285,7 @@ Game.initEngine = function () {
 					const x = offsetX + col * tileSize - Game.screenx;
 					const y = offsetY + row * tileSize - Game.screeny;
 					// Рисуем тайл
-					Draw.image(sprite, x, y, tileSize, tileSize, (tileValue - 1) % (image_array[sprite].width / tileSize) * tileSize, Math.floor((tileValue - 1) / (image_array[sprite].width / tileSize)) * tileSize, tileSize, tileSize)
+					Draw.image(sprite, x, y, tileSize, tileSize, 1, (tileValue - 1) % (image_array[sprite].width / tileSize) * tileSize, Math.floor((tileValue - 1) / (image_array[sprite].width / tileSize)) * tileSize, tileSize, tileSize)
 				}
 			}
 		}
@@ -1979,7 +1983,7 @@ Game.initEngine = function () {
 // Функция для проверки нажатия на сенсорные кнопки
 function checkTouchButtons(x, y, isPressed) {
 	// Проверяем, включена ли обработка сенсорного ввода
-	if (!Game.enableTouchInput || !Game.enableDrawing)
+	if (!Game.helper.enableTouchInput || !Game.helper.enableDrawing)
 		return false;
 	// Проверяем все сенсорные кнопки
 	for (const btnId in inputState.touchButtons) {
@@ -2135,17 +2139,28 @@ Draw.sprite = function (sprite, x, y, size, colour) {
 		}
 	}
 };
-Draw.image = function (n, x, y, width, height, srcX, srcY, srcWidth, srcHeight) {
-	let img = image_array[n];
-	if (img !== -1 && img !== 0) { // Проверяем на -1 вместо 0
-		if (srcX !== undefined && srcY !== undefined && srcWidth !== undefined && srcHeight !== undefined) {
-			// Рисуем часть изображения
-			ctx.drawImage(img, srcX, srcY, srcWidth, srcHeight, x, y, width, height)
-		} else {
-			// Рисуем все изображение
-			ctx.drawImage(img, x, y, width, height)
-		}
-	}
+Draw.image = function (n, x, y, width, height, alpha, srcX, srcY, srcWidth, srcHeight) {
+    let img = image_array[n];
+    if (img !== -1 && img !== 0) {
+        // Сохраняем текущее состояние контекста
+        ctx.save();
+        
+        // Устанавливаем прозрачность, если параметр alpha задан
+        if (alpha !== undefined) {
+            ctx.globalAlpha = alpha;
+        }
+        
+        if (srcX !== undefined && srcY !== undefined && srcWidth !== undefined && srcHeight !== undefined) {
+            // Рисуем часть изображения
+            ctx.drawImage(img, srcX, srcY, srcWidth, srcHeight, x, y, width, height);
+        } else {
+            // Рисуем все изображение
+            ctx.drawImage(img, x, y, width, height);
+        }
+        
+        // Восстанавливаем состояние контекста
+        ctx.restore();
+    }
 };
 Draw.clear_screen = function (color) {
 	ctx.fillStyle = color;
@@ -2647,11 +2662,6 @@ Game._checkQueue = function () {
 		Game._playMelody(nextMelody.melodyString, nextMelody.bpm)
 	}
 };
-// Вспомогательные функции
-function getApproximateMemoryUsage(obj) {
-	const jsonString = JSON.stringify(obj);
-	return jsonString.length * 2
-}
 Game.getMemory = function () {
 	return getApproximateMemoryUsage(Game.allObject) + getApproximateMemoryUsage(image_array) + (Blockly.JavaScript.workspaceToCode(workspace)?.length * 2 || 0)
 };
@@ -2863,7 +2873,7 @@ Game.virtualGamepad = {
 };
 // Функция обновления состояния сенсорного ввода
 Game.updateSensorKey = function () {
-	if (!Game.enableDrawing || !Game.enableTouchInput)
+	if (!Game.helper.enableDrawing || !Game.helper.enableTouchInput)
 		return;
 	// Функция для обновления состояния кнопки с учетом ремаппинга
 	function updateButtonState(button, active) {
@@ -3174,7 +3184,7 @@ Game.initSensorInput = function () {
 	}
 	// Получение координат с учетом масштабирования canvas
 	function getCanvasCoordinates(clientX, clientY) {
-		if (!Game.enableTouchInput)
+		if (!Game.helper.enableTouchInput)
 			return {
 				x: 0,
 				y: 0
@@ -3477,15 +3487,15 @@ Game.updateGamepadKey = function () {
 function game_loop(timestamp) {
 	requestAnimationFrame(game_loop);
 
-	// Рассчитываем deltaTime (в секундах)
-	if (!Game.lastFrameTime)
-		Game.lastFrameTime = timestamp;
-	Game.deltaTime = (timestamp - Game.lastFrameTime) / 1000;
-	Game.lastFrameTime = timestamp;
+	// Рассчитываем helper.deltaTime (в секундах)
+	if (!Game.helper.lastFrameTime)
+		Game.helper.lastFrameTime = timestamp;
+	Game.helper.deltaTime = (timestamp - Game.helper.lastFrameTime) / 1000;
+	Game.helper.lastFrameTime = timestamp;
 
-	// Ограничиваем deltaTime для избежания "прыжков" при долгих паузах
-	if (Game.deltaTime > 0.1 || isNaN(Game.deltaTime))
-		Game.deltaTime = 0.1;
+	// Ограничиваем helper.deltaTime для избежания "прыжков" при долгих паузах
+	if (Game.helper.deltaTime > 0.1 || isNaN(Game.helper.deltaTime))
+		Game.helper.deltaTime = 0.1;
 	// Всегда обновляем ввод, даже во время паузы
 	Game.updateGamepadKey();
 	if (Game._isPaused) {
@@ -3493,7 +3503,7 @@ function game_loop(timestamp) {
 		if (Game.gameLoop) {
 			Game.gameLoop(); // Для отрисовки меню паузы
 		}
-		if (Game.enableTouchInput && Game.enableDrawing) {
+		if (Game.helper.enableTouchInput && Game.helper.enableDrawing) {
 			Game.updateSensorKey(); // Обработка сенсорных кнопок
 		}
 		return; // Пропускаем всю остальную логику
@@ -3577,12 +3587,12 @@ function game_loop(timestamp) {
 		for (var i = 0; i < Game.allObject.length; i++) {
 			var o = Game.allObject[i];
 			if (o.isStatic == 0 && !o.isOnGround) {
-				o.speedy += gravitation * Game.deltaTime * 60;
+				o.speedy += gravitation * Game.helper.deltaTime * 60;
 			}
 
-			// Применяем deltaTime к движению
-			o.x += o.speedx * Game.deltaTime * 60;
-			o.y += o.speedy * Game.deltaTime * 60;
+			// Применяем helper.deltaTime к движению
+			o.x += o.speedx * Game.helper.deltaTime * 60;
+			o.y += o.speedy * Game.helper.deltaTime * 60;
 
 			o.isOnGround = 0;
 			if (o.solid) {
@@ -3615,7 +3625,7 @@ function game_loop(timestamp) {
 		for (var i = 0; i < sortedArray.length; i++) {
 			var o = sortedArray[i];
 			if (o.visible && o.isAnimationPlaying && Array.isArray(o.sprite)) {
-				o.frameTime += Game.deltaTime; // Используем deltaTime вместо фиксированного значения
+				o.frameTime += Game.helper.deltaTime; // Используем helper.deltaTime вместо фиксированного значения
 				const frameDuration = 1 / o.animationSpeed;
 				while (o.frameTime >= frameDuration) {
 					o.frameTime -= frameDuration;
@@ -3646,7 +3656,7 @@ function game_loop(timestamp) {
 					ctx.scale(scaleX, scaleY)
 				}
 				const spriteToDraw = Array.isArray(o.sprite) ? o.sprite[o.currentFrame] : o.sprite;
-				Draw.image(spriteToDraw, -o.width / 2, -o.height / 2, o.width, o.height);
+				Draw.image(spriteToDraw, -o.width / 2, -o.height / 2, o.width, o.height, o.visible);
 				// Отрисовка зеленой рамки для раскрытых объектов
 				if (debugShowExpandedObjectsBorder && objectsDebugPanel && objectsDebugPanel.isObjectExpanded(o)) {
 					ctx.save();
@@ -3671,7 +3681,7 @@ function game_loop(timestamp) {
 			}
 		}
 		Game.Particles.draw();
-		if (Game.enableTouchInput) {
+		if (Game.helper.enableTouchInput) {
 			Game.updateSensorKey()
 		}
 	}

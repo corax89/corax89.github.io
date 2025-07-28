@@ -893,7 +893,7 @@ function gameEval(code) {
  * Выполняет сгенерированный код
  */
 function runJS() {
-	
+	Game._resetInternal();
 	var code = addWatchdogToCode('Game.init = function () {' + getJScode() + '};');
 	Blockly.JavaScript.INFINITE_LOOP_TRAP = false;
 	Game.helper.pause = false;
@@ -905,7 +905,6 @@ function runJS() {
 		else
 			showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
 	}
-	Game._resetInternal();
 	Game.init();
 };
 
@@ -1451,5 +1450,5 @@ window.addEventListener('DOMContentLoaded', loadSettings);
 // Вызывать при загрузке и ресайзе
 window.addEventListener('resize', resizeCanvas);
 // Инициализация мини-карты workspace (должна быть в конце)
-const minimap = new PositionedMinimap(workspace);
+const minimap = new Minimap(workspace);
 minimap.init();

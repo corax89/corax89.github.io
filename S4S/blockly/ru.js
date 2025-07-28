@@ -3,7 +3,7 @@ function setLocaleRu() {
 // This file was automatically generated.  Do not modify.
 
 'use strict';
-
+Blockly.Msg["LOCALE"] = "RU";
 Blockly.Msg["ADD_COMMENT"] = "Добавить комментарий";
 Blockly.Msg["CANNOT_DELETE_VARIABLE_PROCEDURE"] = "Невозможно удалить переменную '%1', поскольку она является частью определения функции '%2'";
 Blockly.Msg["CHANGE_VALUE_TITLE"] = "Измените значение:";

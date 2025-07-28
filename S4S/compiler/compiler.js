@@ -1237,7 +1237,7 @@ const globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function checkTouchButtons(x,y,isPressed){if(!Game.enableTouchInput)return!1;for(const btnId in inputState.touchButtons){const btn=inputState.touchButtons[btnId];
 if(x>=btn.x&&x<=btn.x+btn.width&&y>=btn.y&&y<=btn.y+btn.height){btn.isPressed=isPressed;inputState.keys[btn.keyCode]=isPressed;if(isPressed){inputState.pressKeys[btn.keyCode]=!0};return!0}}return!1}
 ${gameLoopCode}
-Game.initSensorInput();Game.initEngine();Game.enableTouchInput = false;Game.enableDrawing = ${projectSettings.enableVirtualGamepad};canvas.addEventListener('touchstart', () => {Game.enableTouchInput = true;});
+Game.initSensorInput();Game.initEngine();Game.helper.enableTouchInput = false;Game.helper.enableDrawing = ${projectSettings.enableVirtualGamepad};canvas.addEventListener('touchstart', () => {Game.enableTouchInput = true;});
 Game.init=function(){
 	${customScript}
 };Game.init();game_loop();</script></body></html>`;

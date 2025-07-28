@@ -3,7 +3,7 @@ function setLocaleEn() {
 // This file was automatically generated.  Do not modify.
 
 'use strict';
-
+Blockly.Msg["LOCALE"] = "EN";
 Blockly.Msg["ADD_COMMENT"] = "Add Comment";
 Blockly.Msg["CANNOT_DELETE_VARIABLE_PROCEDURE"] = "Can't delete the variable '%1' because it's part of the definition of the function '%2'";
 Blockly.Msg["CHANGE_VALUE_TITLE"] = "Change value:";
