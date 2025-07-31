@@ -94,6 +94,11 @@
 					<label for="bothToggle" id="drawGeympadtxt">draw geympad</label>
 				</label>
 				<label class="checkbox-container">
+					<input type="checkbox" id="keyPreviewToggle" onchange="keyPreviewToggle(this)">
+					<span class="checkbox-custom"></span>
+					<label for="keyPreviewToggle" id="drawGeympadPreview">draw geympad preview</label>
+				</label>
+				<label class="checkbox-container">
 					<input type="checkbox" id="objectsToggleBox" onchange="toggleBoundingBox(this)">
 					<span class="checkbox-custom"></span>
 					<label for="objectsToggleBox" id="viewBoundingBoxtxt">view bounding box</label>
@@ -108,6 +113,7 @@
 				<canvas width="1280" height="720" id="cnv"></canvas>
 				<div id="objectsList"></div>
 			</div>
+			<div id="debug"><div>
 		</div>
 	</div>
 </div>

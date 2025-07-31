@@ -185,6 +185,16 @@ body{
     transition: all 0.3s ease; /* Анимация для плавного скрытия/показа */
 }
 
+#debug{
+	display: inline-block;
+    position: fixed;
+    left: 0;
+    top: 150px;
+    z-index: 9999;
+    background: #eee;
+    opacity: 0.8;
+}
+
 .debug-object-details {
     max-height: 0;
     opacity: 0;
@@ -227,6 +237,7 @@ body{
     height: 80px;
     position: fixed;
     right: 2px;
+	top: 2px;
 	border: 4px solid #FFF;
 	border-radius: 1px;
 	cursor: pointer;

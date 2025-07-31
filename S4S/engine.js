@@ -69,6 +69,231 @@ Game.helper.keyRemapping = {
 	"KeyRStickDown": "Numpad2"
 };
 
+function drawGamepadButtonsPreview() {
+    if (!Game.helper.showGamepadButtons) return;
+
+    const buttonSize = 3;
+    const stickRadius = 6;
+    const thumbRadius = 2;
+    const colors = {
+        pressed: "#00fff0",
+        unpressed: "#333333",
+        background: "#00000066",
+        stickBase: "#444444",
+        stickThumb: "#ffffff"
+    };
+
+    // === НАСТРОЙКИ СМЕЩЕНИЯ СТИКОВ ===
+    const stickOffsetX = -14;
+    const stickOffsetY = 20; //
+
+    // === ЛЕВЫЙ ГЕЙМПАД (устройство 0) ===
+    ctx.fillStyle = colors.background;
+    ctx.fillRect(10, 10, 60, 25);
+
+    // --- D-Pad ---
+    const dpadUpY = 8;
+    const dpadDownY = 18;
+    const dpadLeftX = 7;
+    const dpadRightX = 17;
+    const dpadCenterY = 13;
+
+    const dpadLeft = [
+        { x: 12, y: 8,  key: "ArrowUp" },
+        { x: 12, y: 18, key: "ArrowDown" },
+        { x: 7,  y: 13, key: "ArrowLeft" },
+        { x: 17, y: 13, key: "ArrowRight" }
+    ];
+
+    dpadLeft.forEach(btn => {
+        const isPressed = Game.getKey(btn.key, 0);
+        ctx.fillStyle = isPressed ? colors.pressed : colors.unpressed;
+        ctx.fillRect(btn.x, btn.y, buttonSize, buttonSize);
+    });
+
+    // --- ABXY Кнопки ---
+    const centerX = 38;
+    const leftButtons = [
+        { x: dpadRightX + 26, y: dpadCenterY, key: "KeyA", color: "#2dcd2d" },
+        { x: dpadLeftX + 26,  y: dpadCenterY, key: "KeyY", color: "#f5f518" },
+        { x: centerX, y: dpadUpY,       key: "KeyX", color: "#3a3aff" },
+        { x: centerX, y: dpadDownY,    key: "KeyB", color: "#e61919" }
+    ];
+
+    leftButtons.forEach(btn => {
+        const isPressed = Game.getKey(btn.key, 0);
+        ctx.fillStyle = isPressed ? colors.pressed : btn.color;
+        ctx.fillRect(btn.x, btn.y, buttonSize, buttonSize);
+    });
+
+    // --- Левые триггеры ---
+    const leftTriggers = [
+        { x: 20, y: 2, key: "KeyL", device: 0 },
+        { x: 20, y: 0, key: "KeyZL", device: 0 },
+        { x: 32, y: 2, key: "KeyR", device: 0 },
+        { x: 32, y: 0, key: "KeyZR", device: 0 }
+    ];
+
+    leftTriggers.forEach(trigger => {
+        const isPressed = Game.getKey(trigger.key, trigger.device);
+        ctx.fillStyle = isPressed ? colors.pressed : colors.unpressed;
+        ctx.fillRect(trigger.x, trigger.y, buttonSize * 2, buttonSize);
+    });
+
+    // === СТИКИ ЛЕВОГО ГЕЙМПАДА (устройство 0) ===
+    const leftStickX = Game.getAxes(0, 0);
+    const leftStickY = Game.getAxes(1, 0);
+    const rightStickX = Game.getAxes(2, 0);
+    const rightStickY = Game.getAxes(3, 0);
+
+    // Базовые координаты стиков — смещены относительно левого угла
+    const leftStickBaseX = 25 + stickOffsetX;
+    const leftStickBaseY = 13 + stickOffsetY;
+    const rightStickBaseX = 45 + stickOffsetX;
+    const rightStickBaseY = 13 + stickOffsetY;
+
+    // Левый стик (L-Stick)
+    ctx.strokeStyle = colors.stickBase;
+    ctx.fillStyle = colors.stickBase;
+    ctx.beginPath();
+    ctx.arc(leftStickBaseX, leftStickBaseY, stickRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 0.5;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    const leftThumbX = leftStickBaseX + leftStickX * (stickRadius - thumbRadius);
+    const leftThumbY = leftStickBaseY + leftStickY * (stickRadius - thumbRadius);
+
+    ctx.fillStyle = colors.stickThumb;
+    ctx.beginPath();
+    ctx.arc(leftThumbX, leftThumbY, thumbRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Правый стик (R-Stick)
+    ctx.strokeStyle = colors.stickBase;
+    ctx.fillStyle = colors.stickBase;
+    ctx.beginPath();
+    ctx.arc(rightStickBaseX, rightStickBaseY, stickRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 0.5;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    const rightThumbX = rightStickBaseX + rightStickX * (stickRadius - thumbRadius);
+    const rightThumbY = rightStickBaseY + rightStickY * (stickRadius - thumbRadius);
+
+    ctx.fillStyle = colors.stickThumb;
+    ctx.beginPath();
+    ctx.arc(rightThumbX, rightThumbY, thumbRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+
+    // === ПРАВЫЙ ГЕЙМПАД (устройство 1) ===
+    const offsetX = 28;
+
+    ctx.fillStyle = colors.background;
+    ctx.fillRect(1210 + offsetX, 10, 60, 25);
+
+    // --- Правый D-Pad ---
+    const rightDpadUpY = 8;
+    const rightDpadDownY = 18;
+    const rightDpadLeftX = 1207 + offsetX;
+    const rightDpadRightX = 1217 + offsetX;
+    const rightDpadCenterY = 13;
+    const rightCenterX = 1238 + offsetX;
+
+    const dpadRight = [
+        { x: 1212 + offsetX, y: 8,  key: "ArrowUp" },
+        { x: 1212 + offsetX, y: 18, key: "ArrowDown" },
+        { x: 1207 + offsetX, y: 13, key: "ArrowLeft" },
+        { x: 1217 + offsetX, y: 13, key: "ArrowRight" }
+    ];
+
+    dpadRight.forEach(btn => {
+        const isPressed = Game.getKey(btn.key, 1);
+        ctx.fillStyle = isPressed ? colors.pressed : colors.unpressed;
+        ctx.fillRect(btn.x, btn.y, buttonSize, buttonSize);
+    });
+
+    // --- Правые ABXY ---
+    const rightButtons = [
+        { x: rightDpadRightX + 26, y: rightDpadCenterY, key: "KeyA", color: "#2dcd2d" },
+        { x: rightDpadLeftX + 26,  y: rightDpadCenterY, key: "KeyY", color: "#f5f518" },
+        { x: rightCenterX,    y: rightDpadUpY,     key: "KeyX", color: "#3a3aff" },
+        { x: rightCenterX,    y: rightDpadDownY,   key: "KeyB", color: "#e61919" }
+    ];
+
+    rightButtons.forEach(btn => {
+        const isPressed = Game.getKey(btn.key, 1);
+        ctx.fillStyle = isPressed ? colors.pressed : btn.color;
+        ctx.fillRect(btn.x, btn.y, buttonSize, buttonSize);
+    });
+
+    // --- Правые триггеры ---
+    const rightTriggers = [
+        { x: 1220 + offsetX, y: 2, key: "KeyL", device: 1 },
+        { x: 1220 + offsetX, y: 0, key: "KeyZL", device: 1 },
+        { x: 1232 + offsetX, y: 2, key: "KeyR", device: 1 },
+        { x: 1232 + offsetX, y: 0, key: "KeyZR", device: 1 }
+    ];
+
+    rightTriggers.forEach(trigger => {
+        const isPressed = Game.getKey(trigger.key, trigger.device);
+        ctx.fillStyle = isPressed ? colors.pressed : colors.unpressed;
+        ctx.fillRect(trigger.x, trigger.y, buttonSize * 2, buttonSize);
+    });
+
+    // === СТИКИ ПРАВОГО ГЕЙМПАДА (устройство 1) ===
+    const leftStickX1 = Game.getAxes(0, 1);
+    const leftStickY1 = Game.getAxes(1, 1);
+    const rightStickX1 = Game.getAxes(2, 1);
+    const rightStickY1 = Game.getAxes(3, 1);
+
+    // База позиции для правого геймпада
+    const rightPadBaseX = 1210 + offsetX;
+
+    const rightLeftStickBaseX = rightPadBaseX + 25 + stickOffsetX;
+    const rightLeftStickBaseY = 13 + stickOffsetY;
+    const rightRightStickBaseX = rightPadBaseX + 45 + stickOffsetX;
+    const rightRightStickBaseY = 13 + stickOffsetY;
+
+    // Левый стик (устройство 1)
+    ctx.strokeStyle = colors.stickBase;
+    ctx.fillStyle = colors.stickBase;
+    ctx.beginPath();
+    ctx.arc(rightLeftStickBaseX, rightLeftStickBaseY, stickRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 0.5;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    const leftThumbX1 = rightLeftStickBaseX + leftStickX1 * (stickRadius - thumbRadius);
+    const leftThumbY1 = rightLeftStickBaseY + leftStickY1 * (stickRadius - thumbRadius);
+
+    ctx.fillStyle = colors.stickThumb;
+    ctx.beginPath();
+    ctx.arc(leftThumbX1, leftThumbY1, thumbRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Правый стик (устройство 1)
+    ctx.strokeStyle = colors.stickBase;
+    ctx.fillStyle = colors.stickBase;
+    ctx.beginPath();
+    ctx.arc(rightRightStickBaseX, rightRightStickBaseY, stickRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 0.5;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    const rightThumbX1 = rightRightStickBaseX + rightStickX1 * (stickRadius - thumbRadius);
+    const rightThumbY1 = rightRightStickBaseY + rightStickY1 * (stickRadius - thumbRadius);
+
+    ctx.fillStyle = colors.stickThumb;
+    ctx.beginPath();
+    ctx.arc(rightThumbX1, rightThumbY1, thumbRadius, 0, Math.PI * 2);
+    ctx.fill();
+}
 // Основной объект Game
 Game.initEngine = function () {
 	// Инициализация массива изображений
@@ -92,8 +317,11 @@ Game.initEngine = function () {
 		sprite: -1, // -1 для отсутствия тайлсета
 		tilesData: {}
 	};
+	Game.helper.showGamepadButtons = false;
 	Game.debug = function(obj){
-		console.log(obj);
+		const out = document.getElementById("debug");
+		if(out)
+			out.innerText = JSON.stringify(obj).replace(/\n/g, '<br>');
 	};
 	Game.createDefaultKeysState = function (keysSet) {
 		const state = {};
@@ -135,7 +363,22 @@ Game.initEngine = function () {
 		}
 		return copy;
 	};
-	document.addEventListener("keydown", e => {
+
+	canvas.addEventListener("keypress", function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	}, false);
+
+	canvas.setAttribute("tabindex", "0");
+
+	canvas.addEventListener("mousedown", function() {
+		canvas.focus();
+	});
+
+	canvas.addEventListener("touchstart", function() {
+		canvas.focus();
+	});
+	canvas.addEventListener("keydown", e => {
 		const deviceIndex = inputState.hasGamepad ? 1 : 0;
 		const device = inputState.devices[deviceIndex];
 
@@ -158,8 +401,9 @@ Game.initEngine = function () {
 				}
 			}
 		}
+		e.stopPropagation();
 	});
-	document.addEventListener("keyup", e => {
+	canvas.addEventListener("keyup", e => {
 		const deviceIndex = inputState.hasGamepad ? 1 : 0;
 
 		for (const originalKey in Game.helper.keyRemapping) {
@@ -178,6 +422,8 @@ Game.initEngine = function () {
 				}
 			}
 		}
+		e.preventDefault();
+		e.stopPropagation();
 	});
 	function getApproximateMemoryUsage(obj) {
 		const jsonString = JSON.stringify(obj);
@@ -1986,14 +2232,14 @@ function checkTouchButtons(x, y, isPressed) {
 	if (!Game.helper.enableTouchInput || !Game.helper.enableDrawing)
 		return false;
 	// Проверяем все сенсорные кнопки
-	for (const btnId in inputState.touchButtons) {
-		const btn = inputState.touchButtons[btnId];
+	for (const btnId in inputState.devices[0].touchButtons) {
+		const btn = inputState.devices[0].touchButtons[btnId];
 		if (x >= btn.x && x <= btn.x + btn.width && y >= btn.y && y <= btn.y + btn.height) {
 			// Обновляем состояние кнопки
 			btn.isPressed = isPressed;
-			inputState.keys[btn.keyCode] = isPressed;
+			inputState.devices[0].keys[btn.keyCode] = isPressed;
 			if (isPressed) {
-				inputState.pressKeys[btn.keyCode] = true
+				inputState.devices[0].pressKeys[btn.keyCode] = true
 			}
 			return true; // Прерываем обработку, так как нажатие было на кнопку
 		}
@@ -2002,7 +2248,7 @@ function checkTouchButtons(x, y, isPressed) {
 }
 // Функция для добавления сенсорной кнопки
 Game.addTouchButton = function (id, x, y, width, height, keyCode) {
-	inputState.touchButtons[id] = {
+	inputState.devices[0].touchButtons[id] = {
 		x: x,
 		y: y,
 		width: width,
@@ -2048,12 +2294,12 @@ Game.changeTileInXY = function (x, y, tileId, isSolid) {
 };
 // Функция для удаления сенсорной кнопки
 Game.removeTouchButton = function (id) {
-	if (inputState.touchButtons[id]) {
+	if (inputState.devices[0].touchButtons[id]) {
 		// Сбрасываем состояние кнопки, если она была нажата
-		if (inputState.touchButtons[id].isPressed) {
-			inputState.keys[inputState.touchButtons[id].keyCode] = false
+		if (inputState.devices[0].touchButtons[id].isPressed) {
+			inputState.devices[0].keys[inputState.devices[0].touchButtons[id].keyCode] = false
 		}
-		delete inputState.touchButtons[id]
+		delete inputState.devices[0].touchButtons[id]
 	}
 };
 // Функции для работы с изображениями
@@ -2881,9 +3127,9 @@ Game.updateSensorKey = function () {
 			button.active = active;
 
 			// Обновляем состояние оригинальной и ремаппированной клавиши
-			if (active && !inputState.keys[button.id])
-				inputState.pressKeys[button.id] = true;
-			inputState.keys[button.id] = active;
+			if (active && !inputState.devices[0].keys[button.id])
+				inputState.devices[0].pressKeys[button.id] = true;
+			inputState.devices[0].keys[button.id] = active;
 		}
 	}
 
@@ -2993,8 +3239,8 @@ Game.updateSensorKey = function () {
 		const x = joystick.handle.x / joystick.r;
 		const y = joystick.handle.y / joystick.r;
 
-		inputState.axes[axisXIndex] = x;
-		inputState.axes[axisYIndex] = y;
+		inputState.devices[0].axes[axisXIndex] = x;
+		inputState.devices[0].axes[axisYIndex] = y;
 
 		// Обновляем состояния клавиш для стиков с учетом ремаппинга
 		const stickKeys = {
@@ -3008,24 +3254,24 @@ Game.updateSensorKey = function () {
 		for (const key in stickKeys) {
 			const originalKey = stickKeys[key];
 
-			inputState.keys[originalKey] = false;
+			inputState.devices[0].keys[originalKey] = false;
 		}
 
 		// Обновляем текущие состояния
 		if (x < -0.5) {
 			const originalKey = stickKeys.Left;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		} else if (x > 0.5) {
 			const originalKey = stickKeys.Right;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		}
 
 		if (y < -0.5) {
 			const originalKey = stickKeys.Up;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		} else if (y > 0.5) {
 			const originalKey = stickKeys.Down;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		}
 	}
 
@@ -3125,9 +3371,9 @@ Game.initSensorInput = function () {
 			const mappedKey = Game.helper.keyRemapping[button.id] || button.id;
 
 			// Обновляем состояние оригинальной клавиши
-			if (active && !inputState.keys[button.id])
-				inputState.pressKeys[button.id] = true;
-			inputState.keys[button.id] = active;
+			if (active && !inputState.devices[0].keys[button.id])
+				inputState.devices[0].pressKeys[button.id] = true;
+			inputState.devices[0].keys[button.id] = active;
 
 		}
 	}
@@ -3147,8 +3393,8 @@ Game.initSensorInput = function () {
 		joystick.handle.y = dy;
 
 		// Обновляем оси
-		inputState.axes[axisXIndex] = dx / joystick.r;
-		inputState.axes[axisYIndex] = dy / joystick.r;
+		inputState.devices[0].axes[axisXIndex] = dx / joystick.r;
+		inputState.devices[0].axes[axisYIndex] = dy / joystick.r;
 
 		// Обновляем состояния клавиш для стиков с учетом ремаппинга
 		const stickKeys = {
@@ -3162,24 +3408,24 @@ Game.initSensorInput = function () {
 		for (const key in stickKeys) {
 			const originalKey = stickKeys[key];
 
-			inputState.keys[originalKey] = false;
+			inputState.devices[0].keys[originalKey] = false;
 		}
 
 		// Обновляем текущие состояния
 		if (dx < -joystick.r * 0.5) {
 			const originalKey = stickKeys.Left;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		} else if (dx > joystick.r * 0.5) {
 			const originalKey = stickKeys.Right;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		}
 
 		if (dy < -joystick.r * 0.5) {
 			const originalKey = stickKeys.Up;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		} else if (dy > joystick.r * 0.5) {
 			const originalKey = stickKeys.Down;
-			inputState.keys[originalKey] = true;
+			inputState.devices[0].keys[originalKey] = true;
 		}
 	}
 	// Получение координат с учетом масштабирования canvas
@@ -3275,15 +3521,15 @@ Game.initSensorInput = function () {
 				Game.virtualGamepad.joystickLeft.touchId = null;
 				Game.virtualGamepad.joystickLeft.handle.x = 0;
 				Game.virtualGamepad.joystickLeft.handle.y = 0;
-				inputState.axes[0] = 0;
-				inputState.axes[1] = 0
+				inputState.devices[0].axes[0] = 0;
+				inputState.devices[0].axes[1] = 0
 			} else if (touch.type === "joystickRight") {
 				Game.virtualGamepad.joystickRight.active = false;
 				Game.virtualGamepad.joystickRight.touchId = null;
 				Game.virtualGamepad.joystickRight.handle.x = 0;
 				Game.virtualGamepad.joystickRight.handle.y = 0;
-				inputState.axes[2] = 0;
-				inputState.axes[3] = 0
+				inputState.devices[0].axes[2] = 0;
+				inputState.devices[0].axes[3] = 0
 			}
 			delete Game.virtualGamepad.touches["mouse"]
 		}
@@ -3329,15 +3575,15 @@ Game.initSensorInput = function () {
 					Game.virtualGamepad.joystickLeft.touchId = null;
 					Game.virtualGamepad.joystickLeft.handle.x = 0;
 					Game.virtualGamepad.joystickLeft.handle.y = 0;
-					inputState.axes[0] = 0;
-					inputState.axes[1] = 0
+					inputState.devices[0].axes[0] = 0;
+					inputState.devices[0].axes[1] = 0
 				} else if (touchData.type === "joystickRight") {
 					Game.virtualGamepad.joystickRight.active = false;
 					Game.virtualGamepad.joystickRight.touchId = null;
 					Game.virtualGamepad.joystickRight.handle.x = 0;
 					Game.virtualGamepad.joystickRight.handle.y = 0;
-					inputState.axes[2] = 0;
-					inputState.axes[3] = 0
+					inputState.devices[0].axes[2] = 0;
+					inputState.devices[0].axes[3] = 0
 				}
 				delete Game.virtualGamepad.touches[touch.identifier]
 			}
@@ -3486,6 +3732,7 @@ Game.updateGamepadKey = function () {
 // Основной игровой цикл
 function game_loop(timestamp) {
 	requestAnimationFrame(game_loop);
+	document.getElementById("debug").innerText = '';
 
 	// Рассчитываем helper.deltaTime (в секундах)
 	if (!Game.helper.lastFrameTime)
@@ -3700,6 +3947,9 @@ function game_loop(timestamp) {
 			}
 		}
 	}
+	if (Game.helper.showGamepadButtons) {
+        drawGamepadButtonsPreview();
+    }
 }
 // Инициализация игры
 Game.initEngine();
@@ -3740,6 +3990,7 @@ function initObjectsDebugPanel() {
 		speedy: Blockly.Msg["OBJECT_PARAM_SPEEDY"],
 		visible: Blockly.Msg["OBJECT_PARAM_VISIBLE"],
 		name: Blockly.Msg["OBJECT_PARAM_NAME"],
+		local: Blockly.Msg["OBJECT_PARAM_LOCAL"],
 		solid: Blockly.Msg["OBJECT_PARAM_SOLID"],
 		angle: Blockly.Msg["OBJECT_PARAM_ANGLE"],
 		flip: Blockly.Msg["OBJECT_PARAM_FLIP"],
@@ -3747,7 +3998,9 @@ function initObjectsDebugPanel() {
 		restitution: Blockly.Msg["OBJECT_PARAM_RESTITUTION"],
 		isStatic: Blockly.Msg["OBJECT_PARAM_ISSTATIC"],
 		zIndex: Blockly.Msg["OBJECT_PARAM_ZINDEX"],
-		isOnGround: Blockly.Msg["OBJECT_PARAM_ISONGROUND"]
+		isOnGround: Blockly.Msg["OBJECT_PARAM_ISONGROUND"],
+		currentFrame: Blockly.Msg['OBJECT_PARAM_FRAME'],
+		isAnimationEnd: Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY']
 	};
 	function getObjectId(obj, index) {
 		if (!obj.__debugId) {
@@ -3802,35 +4055,68 @@ function initObjectsDebugPanel() {
 		});
 		return element
 	}
-	function updateObjectDetails(detailsElement, obj) {
-		detailsElement.innerHTML = Object.entries(obj).filter(([key]) => typeof obj[key] !== "function").map(([key, value]) => {
-			let valueStr;
-			try {
-				valueStr = typeof value === "object" ? JSON.stringify(value) : String(value);
-				if (valueStr.length > 100)
-					valueStr = valueStr.substring(0, 100) + "..."
-			} catch {
-				valueStr = "[Complex Data]"
+	function updateObjectDetails(container, obj) {
+		container.innerHTML = ''; // Очищаем содержимое контейнера
+
+		// Получаем список разрешённых ключей из PARAM_TRANSLATIONS
+		const allowedKeys = Object.keys(PARAM_TRANSLATIONS);
+
+		// Фильтруем и сортируем пары [ключ, значение]
+		const filteredAndSortedEntries = Object.entries(obj)
+			.filter(([key]) => allowedKeys.includes(key)) // Оставляем только разрешённые
+			.sort(([a], [b]) => a.localeCompare(b));       // Сортируем по ключу
+
+		filteredAndSortedEntries.forEach(([key, value]) => {
+			const paramDiv = document.createElement('div');
+			paramDiv.style.padding = '2px 0';
+			paramDiv.style.fontSize = '12px';
+			paramDiv.style.borderBottom = '1px solid #555';
+
+			// Определяем цвет в зависимости от типа значения (как в оригинале)
+			let color = '#ffffff'; // По умолчанию белый
+			if (typeof value === 'number') {
+				color = '#4caf50'; // Зеленый для чисел
+			} else if (typeof value === 'boolean') {
+				color = '#2196f3'; // Синий для булевых
+			} else if (typeof value === 'string') {
+				color = '#ff9800'; // Оранжевый для строк
+			} else if (typeof value === 'function') {
+				color = '#9c27b0'; // Фиолетовый для функций
+			} else if (value === null) {
+				color = '#9e9e9e'; // Серый для null
+			} else if (Array.isArray(value)) {
+				color = '#e91e63'; // Розовый для массивов
 			}
-			const displayName = PARAM_TRANSLATIONS[key] || key;
-			return `
-									<div style="display: flex; margin-bottom: 4px; line-height: 1.3;">
-										<span style="color: #aaf; min-width: 120px;">${displayName};:</span>
-										<span style="
-											${typeof value==="number"?"color: #8f8;":""};
-											${typeof value==="boolean"?` color: $ {
-				value ? '#8f8' : '#f88'
-			};
-			`:""};
-                            ${typeof value==="string"?"color: #f8f;":""};
-                            ${value===null?"color: #888;":""};
-                            word-break: break-all;
-                        ">
-                            ${valueStr};
-                        </span>
-                    </div>
-                `
-		}).join("")
+
+			// Получаем переведенное имя параметра из PARAM_TRANSLATIONS
+			// key - это оригинальное имя (например, "x"), displayName - переведенное
+			const displayName = PARAM_TRANSLATIONS[key] || key; // На случай, если перевод отсутствует
+
+			// Имя параметра (светло-серый)
+			const keySpan = document.createElement('span');
+			keySpan.textContent = displayName + ': '; // Используем переведенное имя
+			keySpan.style.color = '#bbbbbb';
+
+			// Значение параметра (с цветом по типу)
+			const valueSpan = document.createElement('span');
+			valueSpan.style.color = color;
+			// Для функций показываем упрощенное представление
+			if (typeof value === 'function') {
+				valueSpan.textContent = '[Function]';
+			} else {
+				// Используем JSON.stringify для красивого отображения объектов и массивов
+				try {
+					valueSpan.textContent = JSON.stringify(value);
+				} catch (e) {
+					// Если stringify не удался, показываем toString
+					valueSpan.textContent = String(value);
+				}
+			}
+
+			paramDiv.appendChild(keySpan);
+			paramDiv.appendChild(valueSpan);
+			container.appendChild(paramDiv);
+		});
 	}
 	function updateObjectsList() {
 		if (!Game.allObject)

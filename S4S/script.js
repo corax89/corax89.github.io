@@ -412,8 +412,12 @@ Blockly.getMainWorkspace().addChangeListener(function (event) {
 
 function toggleBoth(checkbox) {
 	// Обновить оба параметра игры
-	Game.enableDrawing = checkbox.checked;
-	Game.enableTouchInput = checkbox.checked;
+	Game.helper.enableDrawing = checkbox.checked;
+	Game.helper.enableTouchInput = checkbox.checked;
+}
+
+function keyPreviewToggle(checkbox) {
+	Game.helper.showGamepadButtons = checkbox.checked;
 }
 
 function toggleBoundingBox(checkbox) {

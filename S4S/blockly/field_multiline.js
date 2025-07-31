@@ -565,44 +565,48 @@ class FieldMultilineInput extends Blockly.FieldTextInput {
         }
     }
 
-    showCompletionPopup(input, cursorPos, itemsToShow = null) {
-		this.hideCompletionPopup();
-    
-		const items = itemsToShow || this.completionItems_;
-		if (items.length === 0) return;
-		
-		// Сохраняем, какие подсказки показываем
-		this.currentCompletionSource_ = items === this.drawCompletionItems_ ? 'draw' : 'game';
+        showCompletionPopup(input, cursorPos, itemsToShow = null) {
+        this.hideCompletionPopup();
+        // --- ИЗМЕНЕНИЕ 1: Сохраняем текущий список автозавершения ---
+        this.currentCompletionItems_ = itemsToShow || this.completionItems_;
+        // --- ---
+        if (this.currentCompletionItems_.length === 0) return;
         
+        // --- ИЗМЕНЕНИЕ 2: Определяем источник на основе текста перед курсором ---
+        const textBeforeCursor = input.value.substring(0, cursorPos);
+        if (textBeforeCursor.includes('Draw.')) {
+            this.currentCompletionSource_ = 'draw';
+        } else {
+            // По умолчанию предполагаем Game, если не Draw
+            this.currentCompletionSource_ = 'game';
+        }
+        // --- ---
+
         // Создаем popup
         this.completionPopup_ = document.createElement('div');
         this.completionPopup_.className = 'blocklyCompletionPopup';
-        
         // Добавляем элементы автозавершения
-        items.forEach((item, index) => {
+        // --- ИЗМЕНЕНИЕ 3: Используем this.currentCompletionItems_ ---
+        this.currentCompletionItems_.forEach((item, index) => {
+        // --- ---
             const itemElement = document.createElement('div');
             itemElement.className = 'blocklyCompletionItem';
             if (index === 0) itemElement.classList.add('blocklyCompletionItemSelected');
-            
             itemElement.innerHTML = `
                 <span class="blocklyCompletionMethod">${item.name}</span>
                 <span class="blocklyCompletionArgs">(${item.args.join(', ')})</span>
                 <span class="blocklyCompletionDescription"> - ${item.description}</span>
             `;
-            
             itemElement.addEventListener('click', () => {
                 this.currentCompletionIndex_ = index;
                 this.applyCompletion();
             });
-            
             this.completionPopup_.appendChild(itemElement);
         });
-        
-        // Позиционируем popup
+        // Позиционируем popup (остальной код без изменений)
         const rect = input.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        
         this.completionPopup_.style.position = 'absolute';
         this.completionPopup_.style.left = `${rect.left + scrollLeft}px`;
         this.completionPopup_.style.top = `${rect.bottom + scrollTop}px`;
@@ -613,7 +617,6 @@ class FieldMultilineInput extends Blockly.FieldTextInput {
         this.completionPopup_.style.border = '1px solid #ccc';
         this.completionPopup_.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
         this.completionPopup_.style.padding = '4px 0';
-        
         document.body.appendChild(this.completionPopup_);
         this.currentCompletionIndex_ = 0;
     }
@@ -627,82 +630,71 @@ class FieldMultilineInput extends Blockly.FieldTextInput {
     }
 
     navigateCompletion(direction) {
-        if (!this.completionPopup_ || this.completionItems_.length === 0) return;
-        
+        if (!this.completionPopup_ || !this.currentCompletionItems_ || this.currentCompletionItems_.length === 0) return;
         const items = this.completionPopup_.querySelectorAll('.blocklyCompletionItem');
         items[this.currentCompletionIndex_].classList.remove('blocklyCompletionItemSelected');
-        
         this.currentCompletionIndex_ += direction;
-        
         if (this.currentCompletionIndex_ < 0) {
             this.currentCompletionIndex_ = items.length - 1;
         } else if (this.currentCompletionIndex_ >= items.length) {
             this.currentCompletionIndex_ = 0;
         }
-        
         items[this.currentCompletionIndex_].classList.add('blocklyCompletionItemSelected');
         items[this.currentCompletionIndex_].scrollIntoView({ block: 'nearest' });
     }
 
-    applyCompletion() {
-		if (!this.completionPopup_ || this.currentCompletionIndex_ === -1) return;
-		
-		const input = this.htmlInput_;
-		const cursorPos = input.selectionStart;
-		const textBeforeCursor = input.value.substring(0, cursorPos);
-		
-		// Определяем, какой массив использовать (Game или Draw)
-		let itemsArray;
-		let prefix;
-		
-		if (textBeforeCursor.includes('Draw.')) {
-			itemsArray = this.drawCompletionItems_;
-			prefix = 'Draw.';
-		} else {
-			itemsArray = this.completionItems_;
-			prefix = 'Game.';
-		}
-		
-		// Проверяем, что itemsArray существует и содержит элементы
-		if (!itemsArray || itemsArray.length === 0) {
-			this.hideCompletionPopup();
-			return;
-		}
-		
-		// Получаем выбранный элемент
-		const selectedItem = itemsArray[this.currentCompletionIndex_];
-		if (!selectedItem) {
-			this.hideCompletionPopup();
-			return;
-		}
-		
-		// Находим позицию после префикса (Game. или Draw.)
-		const prefixPos = textBeforeCursor.lastIndexOf(prefix);
-		if (prefixPos === -1) {
-			this.hideCompletionPopup();
-			return;
-		}
-		
-		const insertPos = prefixPos + prefix.length;
-		
-		// Заменяем текст
-		input.value = 
-			input.value.substring(0, insertPos) + 
-			selectedItem.name + 
-			(selectedItem.args.length > 0 ? '()' : '') + 
-			input.value.substring(cursorPos);
-			
-		// Устанавливаем курсор внутри скобок, если есть аргументы
-		const newCursorPos = insertPos + selectedItem.name.length + 
-			(selectedItem.args.length > 0 ? 1 : 0);
-		
-		input.setSelectionRange(newCursorPos, newCursorPos);
-		this.hideCompletionPopup();
-		
-		// Триггерим событие input для обновления
-		const event = new Event('input', { bubbles: true });
-		input.dispatchEvent(event);
-	}
+        applyCompletion() {
+        if (!this.completionPopup_ || this.currentCompletionIndex_ === -1) return;
+        const input = this.htmlInput_;
+        const cursorPos = input.selectionStart;
+        const textBeforeCursor = input.value.substring(0, cursorPos);
+
+        // --- ИЗМЕНЕНИЕ 1: Используем сохраненный список автозавершения ---
+        // Проверяем, что currentCompletionItems_ существует и содержит элементы
+        if (!this.currentCompletionItems_ || this.currentCompletionItems_.length === 0) {
+            this.hideCompletionPopup();
+            return;
+        }
+
+        // Получаем выбранный элемент из правильного (текущего отфильтрованного) списка
+        const selectedItem = this.currentCompletionItems_[this.currentCompletionIndex_];
+        // --- ---
+
+        if (!selectedItem) {
+            this.hideCompletionPopup();
+            return;
+        }
+
+        // Определяем префикс (Game. или Draw.) на основе источника
+        // --- ИЗМЕНЕНИЕ 2: Используем currentCompletionSource_ ---
+        const prefix = this.currentCompletionSource_ === 'draw' ? 'Draw.' : 'Game.';
+        // --- ---
+
+        // Находим позицию после префикса (Game. или Draw.)
+        const prefixPos = textBeforeCursor.lastIndexOf(prefix);
+        if (prefixPos === -1) {
+            this.hideCompletionPopup();
+            return;
+        }
+        const insertPos = prefixPos + prefix.length;
+
+        // Заменяем текст
+        input.value =
+            input.value.substring(0, insertPos) +
+            selectedItem.name +
+            (selectedItem.args.length > 0 ? '()' : '') +
+            input.value.substring(cursorPos);
+
+        // Устанавливаем курсор внутри скобок, если есть аргументы
+        const newCursorPos = insertPos + selectedItem.name.length +
+            (selectedItem.args.length > 0 ? 1 : 0);
+        input.setSelectionRange(newCursorPos, newCursorPos);
+        this.hideCompletionPopup();
+
+        // Триггерим событие input для обновления
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+    }
 
     showEditor_(e, quietInput) {
         super.showEditor_(e, quietInput);

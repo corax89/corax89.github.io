@@ -461,6 +461,8 @@ Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'] = 'столкнувшиеся тай
 Blockly.Msg['OBJECT_PARAM_ANIMATION_SPEED'] = 'скорость анимации';
 Blockly.Msg['OBJECT_PARAM_ANIMATION_LOOP'] = 'зацикливать анимацию';
 Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY'] = 'анимация закончилась?';
+Blockly.Msg['OBJECT_PARAM_LOCAL'] = 'локальные переменные';
+Blockly.Msg['OBJECT_PARAM_FRAME'] = 'текущий кадр';
 Blockly.Msg['VIBRATE_TITLE'] = "Вибрация";
 Blockly.Msg['VIBRATE_DURATION'] = "длительность (мс)";
 Blockly.Msg['VIBRATE_WEAK'] = "слабый мотор (0-1)";
@@ -781,6 +783,7 @@ const ruTexts = {
 	'JS_TAB': 'JS',
 	'SCREEN_TAB': 'Экран',
 	'DRAW_GEYMPAD_BTN':'виртуальный геймпад',
+	'DRAW_GEYMPAD_PRESS_BTN':'показать нажимаемые кнопки',
 	'VIEW_BOX_BTN':'ограничивающие рамки',
 	'VIEW_OBJECTS_BTN':'список объектов',
 	'CODE_OUTPUT_PLACEHOLDER': '// Здесь будет сгенерированный код',
@@ -820,6 +823,7 @@ document.getElementById('labelEnableVirtualGamepad').textContent = ruTexts.GAMEP
 document.getElementById('build-html-btn').textContent = ruTexts.BUILD_HTML_BTN;
 document.getElementById('build-switch-btn').textContent = ruTexts.BUILD_GAME_BTN;
 document.getElementById('drawGeympadtxt').textContent = ruTexts.DRAW_GEYMPAD_BTN;
+document.getElementById('drawGeympadPreview').textContent = ruTexts.DRAW_GEYMPAD_PRESS_BTN;
 document.getElementById('viewBoundingBoxtxt').textContent = ruTexts.VIEW_BOX_BTN;
 document.getElementById('viewObjectstxt').textContent = ruTexts.VIEW_OBJECTS_BTN;
 document.querySelector('[data-tab="tab-1"]').textContent = ruTexts.CODE_TAB;
