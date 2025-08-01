@@ -2934,7 +2934,7 @@ Game.reset = function() {
 Game._resetInternal = function() {
     // Очистка таймеров
     game_helper_timers.length = 0;
-    
+    Game.Background.sprite = -1;
     // Очистка всех игровых объектов
     Game.allObject.length = 0;
     Game._isPaused = false;
@@ -3732,7 +3732,7 @@ Game.updateGamepadKey = function () {
 // Основной игровой цикл
 function game_loop(timestamp) {
 	requestAnimationFrame(game_loop);
-	document.getElementById("debug").innerText = '';
+	if(document.getElementById("debug")) document.getElementById("debug").innerText = '';
 
 	// Рассчитываем helper.deltaTime (в секундах)
 	if (!Game.helper.lastFrameTime)
@@ -3955,248 +3955,459 @@ function game_loop(timestamp) {
 Game.initEngine();
 game_loop();
 function initObjectsDebugPanel() {
-	const container = document.getElementById("objectsList");
-	if (!container) {
-		console.error('Элемент с id="objectsList" не найден');
-		return
-	}
-	container.style.overflowY = "auto";
-	container.style.backgroundColor = "rgba(40, 40, 40, 0.9)";
-	container.style.color = "#e0e0e0";
-	container.style.fontFamily = "monospace";
-	container.style.fontSize = "13px";
-	container.style.width = 0;
-	container.style.opacity = 0;
-	const expandedStates = new Map;
-	const objectElements = new Map;
-	let lastObjectCount = 0;
-	// Создаем элемент для отображения счетчика
-	const counterElement = document.createElement("div");
-	counterElement.style.padding = "6px 8px";
-	counterElement.style.background = "#222";
-	counterElement.style.borderBottom = "1px solid #444";
-	counterElement.style.fontWeight = "bold";
-	counterElement.style.position = "sticky";
-	counterElement.style.top = "0";
-	counterElement.style.zIndex = "1";
-	container.appendChild(counterElement);
-	// Маппинг стандартных параметров объекта на переводы
-	const PARAM_TRANSLATIONS = {
-		x: Blockly.Msg["OBJECT_PARAM_X"],
-		y: Blockly.Msg["OBJECT_PARAM_Y"],
-		width: Blockly.Msg["OBJECT_PARAM_WIDTH"],
-		height: Blockly.Msg["OBJECT_PARAM_HEIGHT"],
-		speedx: Blockly.Msg["OBJECT_PARAM_SPEEDX"],
-		speedy: Blockly.Msg["OBJECT_PARAM_SPEEDY"],
-		visible: Blockly.Msg["OBJECT_PARAM_VISIBLE"],
-		name: Blockly.Msg["OBJECT_PARAM_NAME"],
-		local: Blockly.Msg["OBJECT_PARAM_LOCAL"],
-		solid: Blockly.Msg["OBJECT_PARAM_SOLID"],
-		angle: Blockly.Msg["OBJECT_PARAM_ANGLE"],
-		flip: Blockly.Msg["OBJECT_PARAM_FLIP"],
-		mass: Blockly.Msg["OBJECT_PARAM_MASS"],
-		restitution: Blockly.Msg["OBJECT_PARAM_RESTITUTION"],
-		isStatic: Blockly.Msg["OBJECT_PARAM_ISSTATIC"],
-		zIndex: Blockly.Msg["OBJECT_PARAM_ZINDEX"],
-		isOnGround: Blockly.Msg["OBJECT_PARAM_ISONGROUND"],
-		currentFrame: Blockly.Msg['OBJECT_PARAM_FRAME'],
-		isAnimationEnd: Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY']
-	};
-	function getObjectId(obj, index) {
-		if (!obj.__debugId) {
-			obj.__debugId = `obj_${index};_${Date.now()};_${Math.random().toString(36).substr(2,6)};`
+    const container = document.getElementById("objectsList");
+    if (!container) {
+        console.error('Элемент с id="objectsList" не найден');
+        return;
+    }
+
+    // Стили контейнера
+    container.style.overflowY = "auto";
+    container.style.backgroundColor = "rgba(40, 40, 40, 0.9)";
+    container.style.color = "#e0e0e0";
+    container.style.fontFamily = "monospace";
+    container.style.fontSize = "13px";
+    container.style.width = 0;
+    container.style.opacity = 0;
+
+    const expandedStates = new Map();     // раскрытие объектов
+    const varExpandedStates = new Map();  // раскрытие переменных
+    const objectElements = new Map();     // кэш DOM-элементов объектов
+    let lastObjectCount = 0;
+    let lastVarCount = 0;
+    let lastUpdateTime = 0;
+    const UPDATE_INTERVAL = 200; // 5 раз в секунду
+
+    // === СЧЕТЧИК В ВЕРХНЕЙ ЧАСТИ ===
+    const counterElement = document.createElement("div");
+    counterElement.style.padding = "6px 8px";
+    counterElement.style.background = "#222";
+    counterElement.style.borderBottom = "1px solid #444";
+    counterElement.style.fontWeight = "bold";
+    counterElement.style.position = "sticky";
+    counterElement.style.top = "0";
+    counterElement.style.zIndex = "1";
+    container.appendChild(counterElement);
+
+    // === БЛОК ДЛЯ ПЕРЕМЕННЫХ ===
+    const variablesContainer = document.createElement("div");
+    variablesContainer.id = "debug-variables-section";
+    variablesContainer.style.marginTop = "12px";
+    container.appendChild(variablesContainer);
+
+    // === ПЕРЕВОДЫ ПАРАМЕТРОВ ОБЪЕКТОВ (отсортированы один раз) ===
+    const PARAM_TRANSLATIONS = {
+        x: Blockly.Msg["OBJECT_PARAM_X"],
+        y: Blockly.Msg["OBJECT_PARAM_Y"],
+        width: Blockly.Msg["OBJECT_PARAM_WIDTH"],
+        height: Blockly.Msg["OBJECT_PARAM_HEIGHT"],
+        speedx: Blockly.Msg["OBJECT_PARAM_SPEEDX"],
+        speedy: Blockly.Msg["OBJECT_PARAM_SPEEDY"],
+        visible: Blockly.Msg["OBJECT_PARAM_VISIBLE"],
+        name: Blockly.Msg["OBJECT_PARAM_NAME"],
+        local: Blockly.Msg["OBJECT_PARAM_LOCAL"],
+        solid: Blockly.Msg["OBJECT_PARAM_SOLID"],
+        angle: Blockly.Msg["OBJECT_PARAM_ANGLE"],
+        flip: Blockly.Msg["OBJECT_PARAM_FLIP"],
+        mass: Blockly.Msg["OBJECT_PARAM_MASS"],
+        restitution: Blockly.Msg["OBJECT_PARAM_RESTITUTION"],
+        isStatic: Blockly.Msg["OBJECT_PARAM_ISSTATIC"],
+        zIndex: Blockly.Msg["OBJECT_PARAM_ZINDEX"],
+        isOnGround: Blockly.Msg["OBJECT_PARAM_ISONGROUND"],
+        currentFrame: Blockly.Msg['OBJECT_PARAM_FRAME'],
+        isAnimationEnd: Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY']
+    };
+
+    const sortedAllowedKeys = Object.keys(PARAM_TRANSLATIONS).sort();
+
+    // === ГЕНЕРАЦИЯ УНИКАЛЬНОГО ID ДЛЯ ОБЪЕКТА ===
+    function getObjectId(obj, index) {
+        if (!obj.__debugId) {
+            obj.__debugId = `obj_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        }
+        return obj.__debugId;
+    }
+
+    // === БЕЗОПАСНАЯ СТРОКА (вместо JSON.stringify) ===
+    function safeStringify(value, maxLength = 50) {
+        if (value === null) return 'null';
+        if (typeof value === 'undefined') return 'undefined';
+        if (typeof value === 'function') return '[Function]';
+        if (typeof value === 'object') {
+            try {
+                const str = JSON.stringify(value);
+                return str.length > maxLength ? str.slice(0, maxLength) + '…' : str;
+            } catch (e) {
+                return Object.prototype.toString.call(value);
+            }
+        }
+        return String(value);
+    }
+
+    // === СОЗДАНИЕ ЭЛЕМЕНТА ОБЪЕКТА ===
+    function createObjectElement(obj, id) {
+        const element = document.createElement("div");
+        element.className = "debug-object";
+        element.dataset.objId = id;
+        element.style.marginBottom = "8px";
+        element.style.border = "1px solid #444";
+        element.style.overflow = "hidden";
+
+        const isExpanded = expandedStates.get(id) || false;
+
+        // Заголовок
+        const header = document.createElement("div");
+        header.className = "debug-object-header";
+        header.style.padding = "6px 8px";
+        header.style.background = "#333";
+        header.style.display = "flex";
+        header.style.justifyContent = "space-between";
+        header.style.alignItems = "center";
+        header.style.cursor = "pointer";
+        header.style.userSelect = "none";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.style.color = "#6af";
+        nameSpan.textContent = obj.name || `Object ${id.split("_")[1]}`;
+
+        const arrowSpan = document.createElement("span");
+        arrowSpan.className = "debug-object-arrow";
+        arrowSpan.style.fontSize = "10px";
+        arrowSpan.textContent = isExpanded ? "▼" : "▶";
+
+        header.appendChild(nameSpan);
+        header.appendChild(arrowSpan);
+
+        // Детали
+        const details = document.createElement("div");
+        details.className = "debug-object-details";
+        details.style.padding = "8px";
+        details.style.background = "#2a2a2a";
+        details.style.borderTop = "1px solid #444";
+        if (isExpanded) details.classList.add("expanded");
+
+        updateObjectDetails(details, obj);
+
+        element.appendChild(header);
+        element.appendChild(details);
+
+        // Клик по заголовку
+        header.addEventListener("click", (e) => {
+            const newState = !expandedStates.get(id);
+            expandedStates.set(id, newState);
+            arrowSpan.textContent = newState ? "▼" : "▶";
+            if (newState) {
+                details.classList.add("expanded");
+            } else {
+                details.classList.remove("expanded");
+            }
+            e.stopPropagation();
+        });
+
+        return element;
+    }
+
+    // === ОБНОВЛЕНИЕ ДЕТАЛЕЙ ОБЪЕКТА (без пересоздания DOM) ===
+    function updateObjectDetails(container, obj) {
+        // Если контейнер уже содержит правильные элементы — обновляем значения
+        const existingChildren = container.children;
+        const keyToElement = {};
+
+        for (let child of existingChildren) {
+            const keySpan = child.querySelector("span:first-child");
+            if (keySpan) {
+                const text = keySpan.textContent;
+                const key = Object.entries(PARAM_TRANSLATIONS)
+                    .find(([, trans]) => text.startsWith(trans + ":"))?.[0];
+                if (key) keyToElement[key] = child;
+            }
+        }
+
+        // Обновляем или создаём
+        const fragment = document.createDocumentFragment();
+        let changed = false;
+
+        sortedAllowedKeys.forEach((key) => {
+            if (!(key in obj)) return;
+
+            const value = obj[key];
+            const displayName = PARAM_TRANSLATIONS[key] || key;
+            const color = typeof value === 'number' ? '#4caf50' :
+                         typeof value === 'boolean' ? '#2196f3' :
+                         typeof value === 'string' ? '#ff9800' :
+                         typeof value === 'function' ? '#9c27b0' :
+                         value === null ? '#9e9e9e' :
+                         Array.isArray(value) ? '#e91e63' : '#ffffff';
+
+            let stringValue;
+            if (typeof value === 'function') {
+                stringValue = '[Function]';
+            } else {
+                stringValue = safeStringify(value, 50);
+            }
+
+            let paramDiv = keyToElement[key];
+            if (!paramDiv) {
+                paramDiv = document.createElement('div');
+                paramDiv.style.padding = '2px 0';
+                paramDiv.style.fontSize = '12px';
+                paramDiv.style.borderBottom = '1px solid #555';
+
+                const keySpan = document.createElement('span');
+                keySpan.textContent = displayName + ': ';
+                keySpan.style.color = '#bbbbbb';
+
+                const valueSpan = document.createElement('span');
+                valueSpan.style.color = color;
+                valueSpan.textContent = stringValue;
+
+                paramDiv.appendChild(keySpan);
+                paramDiv.appendChild(valueSpan);
+                fragment.appendChild(paramDiv);
+                changed = true;
+            } else {
+                const valueSpan = paramDiv.querySelector('span:last-child');
+                if (valueSpan.textContent !== stringValue || valueSpan.style.color !== color) {
+                    valueSpan.textContent = stringValue;
+                    valueSpan.style.color = color;
+                }
+            }
+        });
+
+        // Удаляем старые ключи, которых больше нет
+        for (let [key, el] of Object.entries(keyToElement)) {
+            if (!sortedAllowedKeys.includes(key) || !(key in obj)) {
+                container.removeChild(el);
+                changed = true;
+            }
+        }
+
+        if (fragment.hasChildNodes()) {
+            container.appendChild(fragment);
+        }
+    }
+
+    // === ОБНОВЛЕНИЕ ПЕРЕМЕННЫХ ===
+	function updateVariablesSection() {
+		const globalVars = Game.helper.globalArray;
+		if (!globalVars || typeof globalVars !== 'object') {
+			variablesContainer.innerHTML = '<div style="padding:6px;color:#aaa;text-align:center;">No global variables</div>';
+			return;
 		}
-		return obj.__debugId
-	}
-	function createObjectElement(obj, id) {
-		const element = document.createElement("div");
-		element.className = "debug-object";
-		element.dataset.objId = id;
-		element.style.marginBottom = "8px";
-		element.style.border = "1px solid #444";
-		element.style.overflow = "hidden";
-		const isExpanded = expandedStates.get(id) || false;
-		const header = document.createElement("div");
-		header.className = "debug-object-header";
-		header.style.padding = "6px 8px";
-		header.style.background = "#333";
-		header.style.display = "flex";
-		header.style.justifyContent = "space-between";
-		header.style.alignItems = "center";
-		header.style.cursor = "pointer";
-		header.style.userSelect = "none";
-		const nameSpan = document.createElement("span");
-		nameSpan.style.color = "#6af";
-		nameSpan.textContent = obj.name || `Object ${id.split("_")[1]};`;
-		const arrowSpan = document.createElement("span");
-		arrowSpan.className = "debug-object-arrow";
-		arrowSpan.style.fontSize = "10px";
-		arrowSpan.textContent = isExpanded ? "▼" : "▶";
-		header.appendChild(nameSpan);
-		header.appendChild(arrowSpan);
-		const details = document.createElement("div");
-		details.className = "debug-object-details";
-		details.style.padding = "8px";
-		details.style.background = "#2a2a2a";
-		details.style.borderTop = "1px solid #444";
-		updateObjectDetails(details, obj);
-		element.appendChild(header);
-		element.appendChild(details);
-		header.addEventListener("click", e => {
-			const newState = !(expandedStates.get(id) || false);
-			expandedStates.set(id, newState);
-			if (newState) {
-				details.classList.add("expanded")
-			} else {
-				details.classList.remove("expanded")
-			}
-			arrowSpan.textContent = newState ? "▼" : "▶";
-			e.stopPropagation()
-		});
-		return element
-	}
-	function updateObjectDetails(container, obj) {
-		container.innerHTML = ''; // Очищаем содержимое контейнера
 
-		// Получаем список разрешённых ключей из PARAM_TRANSLATIONS
-		const allowedKeys = Object.keys(PARAM_TRANSLATIONS);
+		const varKeys = Object.keys(globalVars);
+		const currentVarCount = varKeys.length;
 
-		// Фильтруем и сортируем пары [ключ, значение]
-		const filteredAndSortedEntries = Object.entries(obj)
-			.filter(([key]) => allowedKeys.includes(key)) // Оставляем только разрешённые
-			.sort(([a], [b]) => a.localeCompare(b));       // Сортируем по ключу
+		// Ищем существующие элементы
+		let sectionHeader = variablesContainer.querySelector('.debug-vars-header');
+		let details = variablesContainer.querySelector('.debug-vars-details');
+		const isExpanded = varExpandedStates.get('vars') || false;
 
-		filteredAndSortedEntries.forEach(([key, value]) => {
-			const paramDiv = document.createElement('div');
-			paramDiv.style.padding = '2px 0';
-			paramDiv.style.fontSize = '12px';
-			paramDiv.style.borderBottom = '1px solid #555';
+		// === СОЗДАНИЕ ЗАГОЛОВКА (один раз) ===
+		if (!sectionHeader) {
+			sectionHeader = document.createElement('div');
+			sectionHeader.className = 'debug-vars-header';
+			sectionHeader.style.padding = '6px 8px';
+			sectionHeader.style.background = '#333';
+			sectionHeader.style.display = 'flex';
+			sectionHeader.style.justifyContent = 'space-between';
+			sectionHeader.style.alignItems = 'center';
+			sectionHeader.style.cursor = 'pointer';
+			sectionHeader.style.userSelect = 'none';
+			sectionHeader.style.marginBottom = '8px';
 
-			// Определяем цвет в зависимости от типа значения (как в оригинале)
-			let color = '#ffffff'; // По умолчанию белый
-			if (typeof value === 'number') {
-				color = '#4caf50'; // Зеленый для чисел
-			} else if (typeof value === 'boolean') {
-				color = '#2196f3'; // Синий для булевых
-			} else if (typeof value === 'string') {
-				color = '#ff9800'; // Оранжевый для строк
-			} else if (typeof value === 'function') {
-				color = '#9c27b0'; // Фиолетовый для функций
-			} else if (value === null) {
-				color = '#9e9e9e'; // Серый для null
-			} else if (Array.isArray(value)) {
-				color = '#e91e63'; // Розовый для массивов
-			}
+			const titleSpan = document.createElement('span');
+			titleSpan.textContent = 'Global Variables';
+			titleSpan.style.color = '#ffeb3b';
 
-			// Получаем переведенное имя параметра из PARAM_TRANSLATIONS
-			// key - это оригинальное имя (например, "x"), displayName - переведенное
-			const displayName = PARAM_TRANSLATIONS[key] || key; // На случай, если перевод отсутствует
+			const arrowSpan = document.createElement('span');
+			arrowSpan.className = 'debug-vars-arrow';
+			arrowSpan.style.fontSize = '10px';
+			arrowSpan.textContent = isExpanded ? '▼' : '▶';
 
-			// Имя параметра (светло-серый)
-			const keySpan = document.createElement('span');
-			keySpan.textContent = displayName + ': '; // Используем переведенное имя
-			keySpan.style.color = '#bbbbbb';
+			sectionHeader.appendChild(titleSpan);
+			sectionHeader.appendChild(arrowSpan);
 
-			// Значение параметра (с цветом по типу)
-			const valueSpan = document.createElement('span');
-			valueSpan.style.color = color;
-			// Для функций показываем упрощенное представление
-			if (typeof value === 'function') {
-				valueSpan.textContent = '[Function]';
-			} else {
-				// Используем JSON.stringify для красивого отображения объектов и массивов
-				try {
-					valueSpan.textContent = JSON.stringify(value);
-				} catch (e) {
-					// Если stringify не удался, показываем toString
-					valueSpan.textContent = String(value);
-				}
-			}
+			variablesContainer.appendChild(sectionHeader);
 
-			paramDiv.appendChild(keySpan);
-			paramDiv.appendChild(valueSpan);
-			container.appendChild(paramDiv);
-		});
-	}
-	function updateObjectsList() {
-		if (!Game.allObject)
-			return;
-		if (!Game.helper.debug)
-			return;
-		const currentObjects = Game.allObject;
-		const currentCount = currentObjects.length;
-		// Обновляем счетчик объектов
-		counterElement.textContent = `Objects: ${currentCount}; Timers: ${Game.duc_helper_global_game_timers.length} (avg: ${Game.duc_helper_global_game_timers.lengthAvg})`;
-		// Очищаем expandedStates от удаленных объектов
-		const currentIds = new Set;
-		currentObjects.forEach((obj, index) => {
-			const id = getObjectId(obj, index);
-			currentIds.add(id)
-		});
-		// Удаляем состояния для объектов, которых больше нет
-		expandedStates.forEach((_, id) => {
-			if (!currentIds.has(id)) {
-				expandedStates.delete(id)
-			}
-		});
-		// Сохраняем текущие состояния перед обновлением
-		const prevExpandedStates = new Map(expandedStates);
-		const prevObjectElements = new Map(objectElements);
-		if (currentCount === lastObjectCount) {
-			// Обновляем только существующие элементы
-			currentObjects.forEach((obj, index) => {
-				const id = getObjectId(obj, index);
-				const element = objectElements.get(id);
-				if (element) {
-					const nameSpan = element.querySelector(".debug-object-header span:first-child");
-					if (nameSpan)
-						nameSpan.textContent = obj.name || `Object ${index};`;
-					const details = element.querySelector(".debug-object-details");
-					if (details && expandedStates.get(id)) {
-						updateObjectDetails(details, obj)
-					}
+			// === ЕДИНСТВЕННЫЙ ОБРАБОТЧИК КЛИКА ===
+			sectionHeader.addEventListener('click', () => {
+				const newState = !varExpandedStates.get('vars');
+				varExpandedStates.set('vars', newState);
+				arrowSpan.textContent = newState ? '▼' : '▶';
+				if (newState) {
+					details.classList.add('expanded');
+					// Принудительно обновляем содержимое при раскрытии
+					updateVariablesContent();
+				} else {
+					details.classList.remove('expanded');
 				}
 			});
-			return
 		}
-		// Полная перерисовка при изменении количества объектов
-		// Сохраняем счетчик и очищаем остальное содержимое
-		const children = Array.from(container.children);
-		children.forEach(child => {
-			if (child !== counterElement) {
-				container.removeChild(child)
-			}
-		});
-		objectElements.clear();
-		currentObjects.forEach((obj, index) => {
-			const id = getObjectId(obj, index);
-			const wasExpanded = prevExpandedStates.get(id) || false;
-			expandedStates.set(id, wasExpanded);
-			const element = createObjectElement(obj, id);
-			container.appendChild(element);
-			objectElements.set(id, element);
-			// Восстанавливаем состояние раскрытия
-			if (wasExpanded) {
-				const details = element.querySelector(".debug-object-details");
-				details.classList.add("expanded");
-				const arrow = element.querySelector(".debug-object-arrow");
-				if (arrow)
-					arrow.textContent = "▼"
-			}
-		});
-		lastObjectCount = currentCount
+
+		// === СОЗДАНИЕ КОНТЕЙНЕРА ДЕТАЛЕЙ (один раз) ===
+		if (!details) {
+			details = document.createElement('div');
+			details.className = 'debug-vars-details';
+			details.style.padding = '8px';
+			details.style.background = '#2a2a2a';
+			details.style.border = '1px solid #444';
+			details.style.marginBottom = '12px';
+			variablesContainer.appendChild(details);
+		}
+
+		// === ОБНОВЛЕНИЕ СОДЕРЖИМОГО (только если раскрыто или первый раз) ===
+		function updateVariablesContent() {
+			details.innerHTML = '';
+			const fragment = document.createDocumentFragment();
+			varKeys.sort().forEach(key => {
+				const value = globalVars[key];
+				const div = document.createElement('div');
+				div.style.padding = '2px 0';
+				div.style.fontSize = '12px';
+				div.style.borderBottom = '1px solid #555';
+
+				let color = typeof value === 'number' ? '#4caf50' :
+						   typeof value === 'boolean' ? '#2196f3' :
+						   typeof value === 'string' ? '#ff9800' :
+						   value === null ? '#9e9e9e' :
+						   Array.isArray(value) ? '#e91e63' :
+						   typeof value === 'object' ? '#8bc34a' :
+						   '#ffffff';
+
+				const keySpan = document.createElement('span');
+				keySpan.textContent = key + ': ';
+				keySpan.style.color = '#bbbbbb';
+
+				const valueSpan = document.createElement('span');
+				valueSpan.style.color = color;
+
+				// Безопасное отображение значений (как в оптимизированной версии)
+				let stringValue;
+				if(value){
+					try {
+						stringValue = JSON.stringify(value);
+						if (stringValue.length > 50) {
+							stringValue = stringValue.substring(0, 50) + '…';
+							valueSpan.title = JSON.stringify(value); // Подсказка при наведении
+						}
+					} catch (e) {
+						stringValue = String(value).substring(0, 50) + '…';
+						valueSpan.title = String(value);
+					}
+				}
+				valueSpan.textContent = stringValue;
+
+				div.appendChild(keySpan);
+				div.appendChild(valueSpan);
+				fragment.appendChild(div);
+			});
+			details.appendChild(fragment);
+		}
+
+		// Обновляем содержимое только если раскрыто ИЛИ если DOM ещё пуст
+		if (isExpanded || details.children.length === 0) {
+			updateVariablesContent();
+		}
+
+		lastVarCount = currentVarCount;
 	}
-	function isObjectExpanded(obj) {
-		const id = obj.__debugId;
-		return id ? expandedStates.get(id) : false
-	}
-	Game.helper.debug = false;
-	updateObjectsList();
-	return {
-		update: updateObjectsList,
-		isObjectExpanded: isObjectExpanded,
-		getExpandedStates: () => expandedStates,
-		getObjectElements: () => objectElements
-	}
+
+    // === ОБНОВЛЕНИЕ ОБЩЕГО СПИСКА (с дебаунсом и проверкой видимости) ===
+    function updateObjectsList() {
+        const now = Date.now();
+        if (now - lastUpdateTime < UPDATE_INTERVAL) return;
+        if (!Game.allObject || !Game.helper.debug) return;
+        if (container.style.width === '0px' || container.style.opacity === '0') return;
+
+        lastUpdateTime = now;
+
+        const currentObjects = Game.allObject;
+        const currentCount = currentObjects.length;
+
+        // Обновляем счётчик
+        const timerInfo = Game.duc_helper_global_game_timers;
+        const timerCount = Array.isArray(timerInfo) ? timerInfo.length : 0;
+        const avgTime = timerInfo.lengthAvg !== undefined ? timerInfo.lengthAvg.toFixed(2) : '?';
+        counterElement.textContent = `Objects: ${currentCount} | Vars: ${Object.keys(Game.helper.globalArray || {}).length} | Timers: ${timerCount} (avg: ${avgTime})`;
+
+        // === ОБНОВЛЕНИЕ ОБЪЕКТОВ ===
+        const currentIds = new Set();
+        const indexMap = new Map();
+
+        currentObjects.forEach((obj, index) => {
+            const id = getObjectId(obj, index);
+            currentIds.add(id);
+            indexMap.set(id, { obj, index });
+        });
+
+        // Удаляем устаревшие состояния
+        for (const id of expandedStates.keys()) {
+            if (!currentIds.has(id)) {
+                expandedStates.delete(id);
+            }
+        }
+
+        // Добавляем новые объекты
+        for (const [id, { obj }] of indexMap) {
+            if (!objectElements.has(id)) {
+                const element = createObjectElement(obj, id);
+                container.appendChild(element);
+                objectElements.set(id, element);
+            }
+        }
+
+        // Удаляем удалённые объекты
+        for (const [id, element] of objectElements) {
+            if (!currentIds.has(id)) {
+                container.removeChild(element);
+                objectElements.delete(id);
+                expandedStates.delete(id);
+            }
+        }
+
+        // Обновляем существующие
+        for (const [id, { obj }] of indexMap) {
+            const element = objectElements.get(id);
+            if (element) {
+                const nameSpan = element.querySelector(".debug-object-header span:first-child");
+                if (nameSpan) {
+                    const expectedName = obj.name || `Object ${indexMap.get(id).index}`;
+                    if (nameSpan.textContent !== expectedName) {
+                        nameSpan.textContent = expectedName;
+                    }
+                }
+                const details = element.querySelector(".debug-object-details");
+                if (details && expandedStates.get(id)) {
+                    updateObjectDetails(details, obj);
+                }
+            }
+        }
+
+        lastObjectCount = currentCount;
+
+        // === ОБНОВЛЕНИЕ ПЕРЕМЕННЫХ ===
+        updateVariablesSection();
+    }
+
+    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
+    function isObjectExpanded(obj) {
+        return obj.__debugId ? expandedStates.get(obj.__debugId) : false;
+    }
+
+    // Инициализация
+    Game.helper.debug = false;
+    updateObjectsList(); // Первый вызов
+
+    return {
+        update: updateObjectsList,
+        isObjectExpanded,
+        getExpandedStates: () => new Map(expandedStates),
+        getObjectElements: () => new Map(objectElements),
+        getVarExpandedState: () => varExpandedStates.get('vars'),
+        getGlobalVars: () => ({ ...Game.helper.globalArray })
+    };
 }
+
+// Инициализация панели
 const objectsDebugPanel = initObjectsDebugPanel();

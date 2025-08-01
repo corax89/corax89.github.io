@@ -760,6 +760,7 @@ function addWatchdogToCode(code) {
             const __startTime = Date.now();
             return () => {
                 if (Date.now() - __startTime > 1000) {
+					showSwitchModal('error', "${Blockly.Msg['ERROR_INFINITE_LOOP']}",false,'OK');
                     throw new Error("${Blockly.Msg['ERROR_INFINITE_LOOP']}");
                 }
             };
@@ -879,39 +880,96 @@ function translateError(error) {
 }
 
 function gameEval(code) {
-	try {
-		const safeEval = (code) => new Function(code)();
-		safeEval(code);
-		return {
-			success: true
-		};
-	} catch (e) {
-		return {
-			success: false,
-			error: e.message,
-			stack: e.stack
-		};
-	}
+  try {
+    eval(code); // Да, eval — но в вашем случае он уже используется
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message, stack: e.stack };
+  }
 }
 /**
  * Выполняет сгенерированный код
  */
 function runJS() {
-	Game._resetInternal();
-	var code = addWatchdogToCode('Game.init = function () {' + getJScode() + '};');
-	Blockly.JavaScript.INFINITE_LOOP_TRAP = false;
-	Game.helper.pause = false;
-	
-	const result = gameEval(code);
-	if (!result.success) {
-		if (savedLanguage === 'ru')
-			showSwitchModal('ошибка', 'Программа прервана:%1'.replace('%1', translateError(result.error)), false, 'ok');
-		else
-			showSwitchModal('error', 'badCode%1'.replace('%1', result.error), false, 'ok');
-	}
-	Game.init();
-};
+  Game._resetInternal();
 
+  const workspace = Blockly.getMainWorkspace();
+  const allVariables = workspace.getAllVariables();
+  const localVarIds = new Set(Blockly.Variables.localVars || []);
+
+  // Убедимся, что генератор инициализирован
+  if (!Blockly.JavaScript.variableDB_) {
+    Blockly.JavaScript.init(workspace);
+  }
+
+  // Подготовим массив пар: { originalName, generatedName }
+  const globalVarMappings = allVariables
+    .filter(variable => !localVarIds.has(variable.id))
+    .map(variable => {
+      const generatedName = Blockly.JavaScript.getVariableName(variable.id);
+      return {
+        originalName: variable.name,     // оригинальное имя из блока
+        generatedName: generatedName     // имя, которое используется в JS
+      };
+    })
+    .filter(mapping => mapping.generatedName && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(mapping.generatedName));
+
+  const userCode = getJScode();
+
+  // Генерируем код для сбора значений по сгенерированным именам,
+  // но сохраняем их под оригинальными именами
+  const collectionCode = `
+  ;!function() {
+    Game.helper.globalArray = {};
+
+    const mappings = ${JSON.stringify(globalVarMappings)};
+
+    mappings.forEach(function(mapping) {
+      const originalName = mapping.originalName;
+      const generatedName = mapping.generatedName;
+
+      Object.defineProperty(Game.helper.globalArray, originalName, {
+        enumerable: true,
+        configurable: true,
+        get: function() {
+          try {
+            // Способ 1: безопасный доступ через typeof + eval
+            return eval(\`typeof \${generatedName} !== 'undefined' ? \${generatedName} : undefined\`);
+          } catch (e) {
+            // На всякий случай
+            return undefined;
+          }
+        }
+      });
+    });
+  }();
+`;
+
+  const initCode = 'Game.init = function () {' + 
+    addWatchdogToCode(userCode + collectionCode) + 
+    '}';
+
+  Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+  Game.helper.pause = false;
+
+  const result = gameEval(initCode);
+
+  if (!result.success) {
+    const userMessage = savedLanguage === 'ru'
+      ? 'Программа прервана: ' + translateError(result.error)
+      : 'badCode: ' + result.error;
+
+    showSwitchModal(
+      savedLanguage === 'ru' ? 'ошибка' : 'error',
+      userMessage,
+      false,
+      'ok'
+    );
+    return;
+  }
+
+  Game.init();
+}
 /**
  * Изменяет размер изображения и возвращает его в base64
  * @param {File} file - Файл изображения
