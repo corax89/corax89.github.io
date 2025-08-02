@@ -78,7 +78,7 @@ function drawGamepadButtonsPreview() {
     const colors = {
         pressed: "#00fff0",
         unpressed: "#333333",
-        background: "#00000066",
+        background: "#ffffff66",
         stickBase: "#444444",
         stickThumb: "#ffffff"
     };
@@ -89,7 +89,7 @@ function drawGamepadButtonsPreview() {
 
     // === ЛЕВЫЙ ГЕЙМПАД (устройство 0) ===
     ctx.fillStyle = colors.background;
-    ctx.fillRect(10, 10, 60, 25);
+    ctx.fillRect(1, 1, 50, 40);
 
     // --- D-Pad ---
     const dpadUpY = 8;
@@ -193,7 +193,7 @@ function drawGamepadButtonsPreview() {
     const offsetX = 28;
 
     ctx.fillStyle = colors.background;
-    ctx.fillRect(1210 + offsetX, 10, 60, 25);
+    ctx.fillRect(1200 + offsetX, 1, 50, 40);
 
     // --- Правый D-Pad ---
     const rightDpadUpY = 8;
@@ -293,7 +293,7 @@ function drawGamepadButtonsPreview() {
     ctx.beginPath();
     ctx.arc(rightThumbX1, rightThumbY1, thumbRadius, 0, Math.PI * 2);
     ctx.fill();
-}
+};
 // Основной объект Game
 Game.initEngine = function () {
 	// Инициализация массива изображений
@@ -3992,8 +3992,20 @@ function initObjectsDebugPanel() {
     // === БЛОК ДЛЯ ПЕРЕМЕННЫХ ===
     const variablesContainer = document.createElement("div");
     variablesContainer.id = "debug-variables-section";
-    variablesContainer.style.marginTop = "12px";
-    container.appendChild(variablesContainer);
+    variablesContainer.style.position = "sticky";
+    variablesContainer.style.top = "28px"; /* под счётчиком */
+    variablesContainer.style.zIndex = "2";
+    variablesContainer.style.backgroundColor = "rgba(42, 42, 42, 0.95)";
+    variablesContainer.style.border = "1px solid #444";
+    variablesContainer.style.maxHeight = "33vh"; /* максимум треть экрана */
+    variablesContainer.style.display = "flex";
+    variablesContainer.style.flexDirection = "column";
+    variablesContainer.style.overflow = "hidden"; /* 🔴 УБИРАЕМ внешнюю прокрутку, оставляем только внутреннюю */
+    variablesContainer.style.padding = "0";
+    variablesContainer.style.marginBottom = "12px";
+
+    // Вставляем сразу после счётчика
+    container.insertBefore(variablesContainer, counterElement.nextSibling);
 
     // === ПЕРЕВОДЫ ПАРАМЕТРОВ ОБЪЕКТОВ (отсортированы один раз) ===
     const PARAM_TRANSLATIONS = {
@@ -4189,129 +4201,144 @@ function initObjectsDebugPanel() {
 
     // === ОБНОВЛЕНИЕ ПЕРЕМЕННЫХ ===
 	function updateVariablesSection() {
-		const globalVars = Game.helper.globalArray;
-		if (!globalVars || typeof globalVars !== 'object') {
-			variablesContainer.innerHTML = '<div style="padding:6px;color:#aaa;text-align:center;">No global variables</div>';
-			return;
-		}
+    const globalVars = Game.helper.globalArray;
+    if (!globalVars || typeof globalVars !== 'object') {
+        variablesContainer.innerHTML = '<div style="padding:6px;color:#aaa;text-align:center;">No global variables</div>';
+        return;
+    }
 
-		const varKeys = Object.keys(globalVars);
-		const currentVarCount = varKeys.length;
+    // Фильтруем ключи: исключаем переменные со значением undefined
+    const varKeys = Object.keys(globalVars).filter(key => globalVars[key] !== undefined);
+    const currentVarCount = varKeys.length;
 
-		// Ищем существующие элементы
-		let sectionHeader = variablesContainer.querySelector('.debug-vars-header');
-		let details = variablesContainer.querySelector('.debug-vars-details');
-		const isExpanded = varExpandedStates.get('vars') || false;
+    // Ищем существующие элементы
+    let sectionHeader = variablesContainer.querySelector('.debug-vars-header');
+    let details = variablesContainer.querySelector('.debug-vars-details');
+    const isExpanded = varExpandedStates.get('vars') || false;
 
-		// === СОЗДАНИЕ ЗАГОЛОВКА (один раз) ===
-		if (!sectionHeader) {
-			sectionHeader = document.createElement('div');
-			sectionHeader.className = 'debug-vars-header';
-			sectionHeader.style.padding = '6px 8px';
-			sectionHeader.style.background = '#333';
-			sectionHeader.style.display = 'flex';
-			sectionHeader.style.justifyContent = 'space-between';
-			sectionHeader.style.alignItems = 'center';
-			sectionHeader.style.cursor = 'pointer';
-			sectionHeader.style.userSelect = 'none';
-			sectionHeader.style.marginBottom = '8px';
+    // === СОЗДАНИЕ ЗАГОЛОВКА (один раз) ===
+    if (!sectionHeader) {
+        sectionHeader = document.createElement('div');
+        sectionHeader.className = 'debug-vars-header';
+        sectionHeader.style.padding = '6px 8px';
+        sectionHeader.style.background = '#333';
+        sectionHeader.style.display = 'flex';
+        sectionHeader.style.justifyContent = 'space-between';
+        sectionHeader.style.alignItems = 'center';
+        sectionHeader.style.cursor = 'pointer';
+        sectionHeader.style.userSelect = 'none';
+        sectionHeader.style.marginBottom = '8px';
 
-			const titleSpan = document.createElement('span');
-			titleSpan.textContent = 'Global Variables';
-			titleSpan.style.color = '#ffeb3b';
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = Blockly.Msg['VARIABLES'];
+        titleSpan.style.color = '#ffeb3b';
 
-			const arrowSpan = document.createElement('span');
-			arrowSpan.className = 'debug-vars-arrow';
-			arrowSpan.style.fontSize = '10px';
-			arrowSpan.textContent = isExpanded ? '▼' : '▶';
+        const arrowSpan = document.createElement('span');
+        arrowSpan.className = 'debug-vars-arrow';
+        arrowSpan.style.fontSize = '10px';
+        arrowSpan.textContent = isExpanded ? '▼' : '▶';
 
-			sectionHeader.appendChild(titleSpan);
-			sectionHeader.appendChild(arrowSpan);
+        sectionHeader.appendChild(titleSpan);
+        sectionHeader.appendChild(arrowSpan);
 
-			variablesContainer.appendChild(sectionHeader);
+        variablesContainer.appendChild(sectionHeader);
 
-			// === ЕДИНСТВЕННЫЙ ОБРАБОТЧИК КЛИКА ===
-			sectionHeader.addEventListener('click', () => {
-				const newState = !varExpandedStates.get('vars');
-				varExpandedStates.set('vars', newState);
-				arrowSpan.textContent = newState ? '▼' : '▶';
-				if (newState) {
-					details.classList.add('expanded');
-					// Принудительно обновляем содержимое при раскрытии
-					updateVariablesContent();
-				} else {
-					details.classList.remove('expanded');
-				}
-			});
-		}
+        // === ЕДИНСТВЕННЫЙ ОБРАБОТЧИК КЛИКА ===
+        sectionHeader.addEventListener('click', () => {
+            const newState = !varExpandedStates.get('vars');
+            varExpandedStates.set('vars', newState);
+            arrowSpan.textContent = newState ? '▼' : '▶';
+            if (newState) {
+                details.classList.add('expanded');
+                updateVariablesContent(); // Обновляем при раскрытии
+            } else {
+                details.classList.remove('expanded');
+            }
+        });
+    }
 
-		// === СОЗДАНИЕ КОНТЕЙНЕРА ДЕТАЛЕЙ (один раз) ===
-		if (!details) {
-			details = document.createElement('div');
-			details.className = 'debug-vars-details';
-			details.style.padding = '8px';
-			details.style.background = '#2a2a2a';
-			details.style.border = '1px solid #444';
-			details.style.marginBottom = '12px';
-			variablesContainer.appendChild(details);
-		}
+    // === СОЗДАНИЕ КОНТЕЙНЕРА ДЕТАЛЕЙ (один раз) ===
+    if (!details) {
+        details = document.createElement('div');
+        details.className = 'debug-vars-details';
+        details.style.flex = "1";
+        details.style.padding = "8px";
+        details.style.background = "#2a2a2a";
+        details.style.border = "1px solid #444";
+        details.style.overflowY = "auto";   /* 🔴 Прокрутка ТОЛЬКО здесь */
+        details.style.overflowX = "hidden";
+        details.style.maxHeight = "100%";  /* Занимает всё доступное пространство */
+        variablesContainer.appendChild(details);
+    }
 
-		// === ОБНОВЛЕНИЕ СОДЕРЖИМОГО (только если раскрыто или первый раз) ===
-		function updateVariablesContent() {
-			details.innerHTML = '';
-			const fragment = document.createDocumentFragment();
-			varKeys.sort().forEach(key => {
-				const value = globalVars[key];
-				const div = document.createElement('div');
-				div.style.padding = '2px 0';
-				div.style.fontSize = '12px';
-				div.style.borderBottom = '1px solid #555';
+    // === ОБНОВЛЕНИЕ СОДЕРЖИМОГО ===
+    function updateVariablesContent() {
+        details.innerHTML = '';
+        const fragment = document.createDocumentFragment();
 
-				let color = typeof value === 'number' ? '#4caf50' :
-						   typeof value === 'boolean' ? '#2196f3' :
-						   typeof value === 'string' ? '#ff9800' :
-						   value === null ? '#9e9e9e' :
-						   Array.isArray(value) ? '#e91e63' :
-						   typeof value === 'object' ? '#8bc34a' :
-						   '#ffffff';
+        varKeys.sort().forEach(key => {
+            const value = globalVars[key];
+            const div = document.createElement('div');
+            div.style.padding = '2px 0';
+            div.style.fontSize = '12px';
+            div.style.borderBottom = '1px solid #555';
 
-				const keySpan = document.createElement('span');
-				keySpan.textContent = key + ': ';
-				keySpan.style.color = '#bbbbbb';
+            let color = typeof value === 'number' ? '#4caf50' :
+                       typeof value === 'boolean' ? '#2196f3' :
+                       typeof value === 'string' ? '#ff9800' :
+                       value === null ? '#9e9e9e' :
+                       Array.isArray(value) ? '#e91e63' :
+                       typeof value === 'object' ? '#8bc34a' :
+                       '#ffffff';
 
-				const valueSpan = document.createElement('span');
-				valueSpan.style.color = color;
+            const keySpan = document.createElement('span');
+            keySpan.textContent = key + ': ';
+            keySpan.style.color = '#bbbbbb';
 
-				// Безопасное отображение значений (как в оптимизированной версии)
-				let stringValue;
-				if(value){
-					try {
-						stringValue = JSON.stringify(value);
-						if (stringValue.length > 50) {
-							stringValue = stringValue.substring(0, 50) + '…';
-							valueSpan.title = JSON.stringify(value); // Подсказка при наведении
-						}
-					} catch (e) {
-						stringValue = String(value).substring(0, 50) + '…';
-						valueSpan.title = String(value);
-					}
-				}
-				valueSpan.textContent = stringValue;
+            const valueSpan = document.createElement('span');
+            valueSpan.style.color = color;
 
-				div.appendChild(keySpan);
-				div.appendChild(valueSpan);
-				fragment.appendChild(div);
-			});
-			details.appendChild(fragment);
-		}
+            // Безопасное отображение значений
+            let stringValue;
+            try {
+                stringValue = JSON.stringify(value);
+                if (stringValue && stringValue.length > 50) {
+                    stringValue = stringValue.substring(0, 50) + '…';
+                    valueSpan.title = JSON.stringify(value); // Подсказка при наведении
+                }
+            } catch (e) {
+                stringValue = String(value).substring(0, 50) + '…';
+                valueSpan.title = String(value);
+            }
 
-		// Обновляем содержимое только если раскрыто ИЛИ если DOM ещё пуст
-		if (isExpanded || details.children.length === 0) {
-			updateVariablesContent();
-		}
+            valueSpan.textContent = stringValue;
 
-		lastVarCount = currentVarCount;
-	}
+            div.appendChild(keySpan);
+            div.appendChild(valueSpan);
+            fragment.appendChild(div);
+        });
+
+        details.appendChild(fragment);
+
+        // Сообщение, если после фильтрации нет переменных
+        if (varKeys.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.color = '#aaa';
+            emptyDiv.style.fontSize = '12px';
+            emptyDiv.style.textAlign = 'center';
+            emptyDiv.textContent = 'No defined variables';
+            details.innerHTML = '';
+            details.appendChild(emptyDiv);
+        }
+    }
+
+    // Обновляем содержимое, если раскрыто или контейнер пуст
+    if (isExpanded || details.children.length === 0) {
+        updateVariablesContent();
+    }
+
+    lastVarCount = currentVarCount;
+}
 
     // === ОБНОВЛЕНИЕ ОБЩЕГО СПИСКА (с дебаунсом и проверкой видимости) ===
     function updateObjectsList() {
@@ -4329,7 +4356,7 @@ function initObjectsDebugPanel() {
         const timerInfo = Game.duc_helper_global_game_timers;
         const timerCount = Array.isArray(timerInfo) ? timerInfo.length : 0;
         const avgTime = timerInfo.lengthAvg !== undefined ? timerInfo.lengthAvg.toFixed(2) : '?';
-        counterElement.textContent = `Objects: ${currentCount} | Vars: ${Object.keys(Game.helper.globalArray || {}).length} | Timers: ${timerCount} (avg: ${avgTime})`;
+        counterElement.textContent = `${Blockly.Msg['OBJECTS']}: ${currentCount} | ${Blockly.Msg['VARIABLES']}: ${Object.keys(Game.helper.globalArray || {}).length} | ${Blockly.Msg['TIMERS']}: ${avgTime}`;
 
         // === ОБНОВЛЕНИЕ ОБЪЕКТОВ ===
         const currentIds = new Set();

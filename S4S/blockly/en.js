@@ -738,6 +738,7 @@ Blockly.Msg['SAVE_VARIABLES'] = 'Save variables:';
 Blockly.Msg['VARIABLES_FOR_SAVE'] = 'Variables for save';
 Blockly.Msg['VARIABLE'] = 'Variable';
 Blockly.Msg['RESET'] = 'Reset game';
+Blockly.Msg['TIMERS'] = 'Timers';
 Blockly.Msg['NO'] = 'NO';
 Blockly.Msg['YES'] = 'YES';
 };

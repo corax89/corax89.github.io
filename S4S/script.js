@@ -558,7 +558,27 @@ function loadJson(file) {
             loadWorkspaceData(data);
         }
 }
-
+function activateFirstTab() {
+    const firstTab = document.querySelector('.tabs__btn');
+    const firstTabId = firstTab?.getAttribute('data-tab');
+    
+    if (firstTab && firstTabId) {
+        // Убираем активные классы у всех
+        document.querySelectorAll('.tabs__btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelectorAll('.tabs__item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Активируем первую вкладку
+        firstTab.classList.add('active');
+        document.getElementById(firstTabId).classList.add('active');
+        
+        // Обновляем размеры canvas под активную вкладку
+        resizeCanvas();
+    }
+}
 // Обработчик загрузки workspace из файла
 document.getElementById('loadFile').addEventListener('change', function (e) {
 	const file = e.target.files[0];
@@ -617,8 +637,11 @@ function loadWorkspaceData(workspaceData) {
     // 1. Очищаем текущую рабочую область
     workspace.clear();
     
-    // 2. Сбрасываем массив локальных переменных
+    // 2. Сбрасываем массив переменных
     Blockly.Variables.localVars = [];
+	workspace.getAllVariables().forEach(variable => {
+        workspace.deleteVariableById(variable.id);
+    });
     
     // 3. Парсим XML/JSON и предварительно собираем ВСЕ переменные
     if (typeof workspaceData === 'string') {
@@ -679,6 +702,7 @@ function loadWorkspaceData(workspaceData) {
                 block.setShadow(true);
             }
         });
+		activateFirstTab();
     }, 100);
 }
 

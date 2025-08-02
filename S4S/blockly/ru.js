@@ -758,6 +758,7 @@ Blockly.Msg['SAVE_VARIABLES'] = 'Сохранить переменные:';
 Blockly.Msg['VARIABLES_FOR_SAVE'] = 'Переменные для сохранения';
 Blockly.Msg['VARIABLE'] = 'Переменная';
 Blockly.Msg['RESET'] = 'Сбросить состояние игры';
+Blockly.Msg['TIMERS'] = 'Таймеры';
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 
