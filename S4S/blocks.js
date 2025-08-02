@@ -3847,9 +3847,9 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   // Добавляем функцию управления, если её ещё нет
   if (!Blockly.JavaScript.definitions_['object_control']) {
     const funcCode = `function object_control(obj, type, speedX, speedY, gameType, jumpButton, doubleJumpEnabled, joyId) {
-  const acceleration = 0.2;
+  var acceleration = 0.2;
   if (!obj.local) obj.local = {};
-  const loc = obj.local;
+  var loc = obj.local;
 
   // Базовая физика (только для topdown)
   if (gameType === 0) {
@@ -3867,18 +3867,18 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   }
 
   // X-axis movement with proper deceleration
-  let movingX = 0;
+  var movingX = 0;
   if (type === 0 || type === 3) {
-    const right = Game.getKey("ArrowRight", joyId);
-    const left = Game.getKey("ArrowLeft", joyId);
+    var right = Game.getKey("ArrowRight", joyId);
+    var left = Game.getKey("ArrowLeft", joyId);
     if (right || left) {
       obj.speedx = obj.speedx * (1 - acceleration) + (right ? speedX : -speedX) * acceleration;
       movingX = 1;
     }
   }
   if ((type === 1 || type === 2 || type === 3) && !movingX) {
-    const stickIdx = type === 2 ? 2 : 0;
-    const stickX = Game.getAxes(stickIdx, joyId);
+    var stickIdx = type === 2 ? 2 : 0;
+    var stickX = Game.getAxes(stickIdx, joyId);
     if (Math.abs(stickX) > 0.3) {
       obj.speedx = obj.speedx * (1 - acceleration) + speedX * stickX * acceleration;
       movingX = 1;
@@ -3891,7 +3891,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
 
   // Y-axis movement
   if (gameType === 1) {
-    let shouldJump = 0;
+    var shouldJump = 0;
 
     // Проверяем прыжок с клавиатуры
     if ((type === 0 || type === 3) && Game.getKey(jumpButton, joyId)) {
@@ -3900,7 +3900,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
 
     // Проверяем прыжок со стика только если не было прыжка с клавиатуры
     if (!shouldJump && (type === 1 || type === 2 || type === 3)) {
-      const axisIdx = type === 2 ? 3 : 1;
+      var axisIdx = type === 2 ? 3 : 1;
       if (Game.getAxes(axisIdx, joyId) < -0.3) {
         shouldJump = 1;
       }
@@ -3912,7 +3912,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
     }
 
     if (shouldJump && loc.jumpReady) {
-      const canJump = !doubleJumpEnabled ? (loc.jumpCount === 0) : 
+      var canJump = !doubleJumpEnabled ? (loc.jumpCount === 0) : 
         (loc.jumpCount === 0 || (loc.jumpCount === 1 && loc.hasDoubleJump));
       if (canJump) {
         obj.speedy = -speedY;
@@ -3925,7 +3925,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
     if (Game.getKey("ArrowDown", joyId)) obj.speedx *= 0.7;
   } else {
     // Non-platformer controls with deceleration
-    let movingY = 0;
+    var movingY = 0;
     if (type === 0 || type === 3) {
       if (Game.getKey("ArrowUp", joyId)) {
         obj.speedy = -speedY;
@@ -3937,8 +3937,8 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
       }
     }
     if ((type === 1 || type === 2 || type === 3) && !movingY) {
-      const axisIdx = type === 2 ? 3 : 1;
-      const stickY = Game.getAxes(axisIdx, joyId);
+      var axisIdx = type === 2 ? 3 : 1;
+      var stickY = Game.getAxes(axisIdx, joyId);
       if (stickY < -0.3) {
         obj.speedy = -speedY;
         movingY = 1;
