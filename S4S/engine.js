@@ -425,7 +425,7 @@ Game.initEngine = function () {
 		e.preventDefault();
 		e.stopPropagation();
 	});
-	function getApproximateMemoryUsage(obj) {
+	Game.helper.getApproximateMemoryUsage = function(obj) {
 		const jsonString = JSON.stringify(obj);
 		return jsonString.length * 2;
 	}
@@ -2909,7 +2909,75 @@ Game._checkQueue = function () {
 	}
 };
 Game.getMemory = function () {
-	return getApproximateMemoryUsage(Game.allObject) + getApproximateMemoryUsage(image_array) + (Blockly.JavaScript.workspaceToCode(workspace)?.length * 2 || 0)
+    // Вспомогательная функция для оценки размера объекта
+    const estimate = (obj) => {
+        if (obj === null || obj === undefined) return 0;
+        try {
+            return JSON.stringify(obj).length * 2; // грубая, но практичная оценка в байтах
+        } catch (e) {
+            return 0;
+        }
+    };
+
+    let total = 0;
+
+    // 1. Игровые объекты
+    total += estimate(Game.allObject);
+
+    // 2. Массив изображений
+    total += estimate(image_array);
+
+    // 3. Тайловая система
+    if (Game.helper?.tiles) {
+        total += estimate(Game.helper.tiles.grid);
+        total += estimate(Game.helper.tiles.solidMap);
+    };
+
+    // 4. Таймеры
+    total += estimate(Game.duc_helper_global_game_timers.timers);
+    total += estimate(Game.duc_helper_global_game_timers.pending);
+    total += estimate(game_helper_timers);
+
+    // 5. Частицы
+    if (Game.Particles?.list) {
+        total += estimate(Game.Particles.list);
+    };
+
+    // 6. Состояние ввода
+    total += estimate(inputState);
+
+    // 7. Виртуальный геймпад
+    if (Game.virtualGamepad) {
+        total += estimate(Game.virtualGamepad);
+    };
+
+    // 8. Глобальные переменные
+    if (Game.helper?.globalArray) {
+        total += estimate(Game.helper.globalArray);
+    };
+
+    // 9. Код из Blockly
+    const blocklyCode = Blockly.JavaScript.workspaceToCode(workspace);
+    total += (blocklyCode?.length || 0) * 2;
+
+    // 10. Аудио: очередь и активные мелодии
+    total += estimate(melodyQueue);
+    total += estimate(activeMelodies);
+
+    // 11. Контекст аудио (условно, так как не сериализуется)
+    if (globalAudioCtx) {
+        total += 1024; // приблизительно: AudioContext, Oscillators и буферы
+    };
+
+    // 12. Состояние отладки (раскрытые объекты и переменные)
+    if (objectsDebugPanel?.getExpandedStates) {
+        total += estimate(objectsDebugPanel.getExpandedStates());
+    };
+    if (objectsDebugPanel?.getVarExpandedState) {
+        total += 16; // минимальный объём состояния
+    };
+
+    return Math.round(total); // возвращаем целое число — общий объём памяти в байтах
 };
 Game.reset = function() {
     // Проверяем, открыто ли окно Game.alert
