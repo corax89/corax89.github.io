@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>QR Трекер - Секундомер по меткам</title>
+    <title>QR Трекер - Секундомер</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -16,123 +16,91 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .app-container {
-            max-width: 1400px;
+            max-width: 500px;
             width: 100%;
             margin: 0 auto;
         }
 
         .main-card {
             background: rgba(255,255,255,0.95);
-            border-radius: 48px;
-            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
             overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 28px 32px;
+            padding: 12px 16px;
             color: white;
+            text-align: center;
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            gap: 8px;
         }
 
         .header h1::before {
             content: "⏱️";
-            font-size: 2rem;
+            font-size: 1.3rem;
         }
 
         .sub {
-            margin-top: 8px;
+            font-size: 0.7rem;
             opacity: 0.9;
-            font-size: 0.95rem;
+            margin-top: 4px;
         }
 
-        .warning-banner {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 12px 20px;
-            margin: 16px 20px 0 20px;
-            border-radius: 12px;
+        .content {
+            padding: 12px;
+        }
+
+        /* Секция сканера */
+        .scanner-section {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-weight: 600;
             font-size: 0.85rem;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .warning-banner.hidden {
-            display: none;
-        }
-
-        .two-columns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-            padding: 32px;
-        }
-
-        .scanner-panel {
-            flex: 1.2;
-            min-width: 300px;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-
-        .timer-panel {
-            flex: 1;
-            min-width: 300px;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-title {
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-left: 5px solid #667eea;
-            padding-left: 16px;
+            gap: 6px;
             color: #1f2e3a;
         }
 
         .video-container {
             background: #000000;
-            border-radius: 24px;
+            border-radius: 12px;
             overflow: hidden;
             position: relative;
-            margin-bottom: 20px;
-            box-shadow: 0 12px 24px -10px rgba(0,0,0,0.2);
-            min-height: 300px;
+            margin-bottom: 10px;
+            aspect-ratio: 4/3;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
 
         video {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 100%;
+            object-fit: cover;
         }
 
         .scan-overlay {
@@ -148,8 +116,8 @@
         }
 
         .scan-frame {
-            width: 80%;
-            height: 80%;
+            width: 70%;
+            height: 70%;
             border: 2px solid #48bb78;
             border-radius: 12px;
             box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
@@ -163,20 +131,21 @@
         }
 
         .scan-status {
-            margin-top: 16px;
             background: #f0f4f9;
-            border-radius: 20px;
-            padding: 16px;
-            font-size: 0.95rem;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
         }
 
         .last-scan {
             background: #e9f0f5;
-            border-radius: 20px;
-            padding: 12px 18px;
-            margin-top: 12px;
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-top: 8px;
             font-weight: 500;
             word-break: break-all;
+            font-size: 0.7rem;
         }
 
         .last-scan span {
@@ -186,35 +155,31 @@
 
         .btn-group {
             display: flex;
-            gap: 14px;
-            margin-top: 18px;
+            gap: 8px;
+            margin-top: 8px;
             flex-wrap: wrap;
         }
 
         button {
             background: #667eea;
             border: none;
-            padding: 12px 20px;
-            border-radius: 40px;
+            padding: 8px 12px;
+            border-radius: 24px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.7rem;
             color: white;
             cursor: pointer;
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             font-family: inherit;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        button:hover:not(:disabled) {
-            background: #5a67d8;
-            transform: translateY(-2px);
+            flex: 1;
+            justify-content: center;
         }
 
         button:active:not(:disabled) {
-            transform: translateY(1px);
+            transform: scale(0.97);
         }
 
         button:disabled {
@@ -226,36 +191,25 @@
             background: #4a5568;
         }
 
-        .btn-stop:hover:not(:disabled) {
-            background: #2d3748;
-        }
-
         .btn-reset {
             background: #e53e3e;
-        }
-
-        .btn-reset:hover:not(:disabled) {
-            background: #c53030;
         }
 
         .btn-switch-camera {
             background: #48bb78;
         }
 
-        .btn-switch-camera:hover:not(:disabled) {
-            background: #38a169;
-        }
-
-        .timer-display {
+        /* Секция таймера */
+        .timer-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 30px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
             text-align: center;
-            margin-bottom: 20px;
         }
 
         .timer-value {
-            font-size: 3.5rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: white;
             font-family: 'Courier New', monospace;
@@ -264,100 +218,127 @@
 
         .timer-label {
             color: rgba(255,255,255,0.9);
-            font-size: 0.9rem;
-            margin-top: 8px;
+            font-size: 0.7rem;
+            margin-top: 4px;
         }
 
         .next-marker {
             background: #f0f4f9;
-            border-radius: 20px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 8px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-top: 8px;
+        }
+
+        .next-marker-label {
+            font-size: 0.65rem;
+            color: #4a5568;
         }
 
         .next-marker-value {
-            font-size: 2rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: #667eea;
         }
 
+        .timer-state {
+            font-size: 0.65rem;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        /* Секция истории */
+        .history-section {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 12px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1f2e3a;
+        }
+
+        .clear-history {
+            background: #e53e3e;
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            flex: 0 0 auto;
+        }
+
         .history-list {
-            flex: 1;
-            max-height: 400px;
+            max-height: 180px;
             overflow-y: auto;
-            border-radius: 20px;
+            border-radius: 10px;
             background: #fafcff;
-            margin-top: 10px;
         }
 
         .history-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
         }
 
         .history-table th {
             text-align: left;
-            padding: 14px 12px;
+            padding: 6px 8px;
             background: #eef2f7;
             position: sticky;
             top: 0;
             font-weight: 600;
             color: #1f3b4a;
+            font-size: 0.65rem;
         }
 
         .history-table td {
-            padding: 12px 12px;
+            padding: 6px 8px;
             border-bottom: 1px solid #e2e8f0;
-            word-break: break-word;
-        }
-
-        .history-table tr:hover {
-            background: #f1f9fe;
         }
 
         .empty-history {
             text-align: center;
-            padding: 40px 20px;
+            padding: 20px;
             color: #8ba0ae;
             font-style: italic;
-        }
-
-        .error-message {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 12px;
-            font-size: 0.85rem;
-        }
-
-        .server-instructions {
-            background: #e0f2fe;
-            border-left: 4px solid #0284c7;
-            padding: 12px;
-            margin-top: 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
 
         footer {
-            padding: 16px 32px 24px;
+            padding: 8px 12px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             color: #5b7a92;
             border-top: 1px solid rgba(0,0,0,0.05);
             background: white;
         }
 
-        @media (max-width: 780px) {
-            .two-columns {
-                padding: 20px;
+        @media (max-width: 480px) {
+            body {
+                padding: 4px;
             }
-            .timer-value {
-                font-size: 2.5rem;
+            .content {
+                padding: 8px;
             }
+            .history-list {
+                max-height: 150px;
+            }
+        }
+
+        /* Аудио-элемент скрыт */
+        #beepSound {
+            display: none;
         }
     </style>
 </head>
@@ -365,18 +346,14 @@
 <div class="app-container">
     <div class="main-card">
         <div class="header">
-            <h1>QR Трекер - Секундомер</h1>
-            <div class="sub">Сканируйте QR-коды с цифрами от 0 до 9</div>
+            <h1>QR Трекер</h1>
+            <div class="sub">Сканируйте метки 0→1→2→...→9</div>
         </div>
 
-        <div class="warning-banner" id="warningBanner">
-            ⚠️ Внимание! Для работы камеры на телефоне необходимо открыть страницу через локальный сервер или HTTPS.
-            <button onclick="copyServerCommand()" style="background: #667eea; padding: 4px 8px; font-size: 0.75rem; margin-left: auto;">Скопировать команду</button>
-        </div>
-
-        <div class="two-columns">
-            <div class="scanner-panel">
-                <div class="panel-title">
+        <div class="content">
+            <!-- Секция сканера -->
+            <div class="scanner-section">
+                <div class="section-title">
                     <span>📸</span> Сканер QR
                 </div>
                 <div class="video-container">
@@ -387,73 +364,101 @@
                     </div>
                 </div>
                 <div class="scan-status">
-                    <div>🔘 <strong>Статус:</strong> <span id="cameraStatus">Проверка доступа к камере...</span></div>
+                    <div><strong>Статус:</strong> <span id="cameraStatus">Готов</span></div>
                     <div id="lastResultBlock" class="last-scan" style="display: none;">
-                        🏷️ Последний QR: <span id="lastScannedText">—</span><br>
+                        📱 Последний QR: <span id="lastScannedText">—</span><br>
                         🕒 Время: <span id="lastScannedTime">—</span>
                     </div>
                 </div>
                 <div class="btn-group">
-                    <button id="startCameraBtn">▶️ Запустить камеру</button>
-                    <button id="stopCameraBtn" class="btn-stop">⏹️ Остановить</button>
-                    <button id="switchCameraBtn" class="btn-switch-camera">🔄 Переключить камеру</button>
-                    <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
-                </div>
-                <div class="server-instructions" id="serverInstructions" style="display: none;">
-                    💡 <strong>Как запустить локальный сервер:</strong><br>
-                    <code id="serverCommand" style="background: #1e293b; color: #e2e8f0; padding: 8px; display: block; border-radius: 6px; margin-top: 8px;">
-                        python -m http.server 8000
-                    </code>
-                    <span style="font-size: 0.7rem;">Затем откройте в браузере телефона: http://[IP-адрес]:8000</span>
+                    <button id="startCameraBtn">▶️ Старт</button>
+                    <button id="stopCameraBtn" class="btn-stop">⏹️ Стоп</button>
+                    <button id="switchCameraBtn" class="btn-switch-camera">🔄 Камера</button>
                 </div>
             </div>
 
-            <div class="timer-panel">
-                <div class="panel-title">
-                    <span>⏱️</span> Трекер времени
-                </div>
-                
-                <div class="timer-display">
-                    <div class="timer-value" id="timerDisplay">0.00</div>
-                    <div class="timer-label">Текущее время (секунды)</div>
-                </div>
-                
+            <!-- Секция таймера -->
+            <div class="timer-section">
+                <div class="timer-value" id="timerDisplay">0.00</div>
+                <div class="timer-label">текущее время (секунды)</div>
                 <div class="next-marker">
-                    <div style="font-size: 0.85rem; color: #4a5568;">Ожидаемая следующая метка:</div>
+                    <div class="next-marker-label">следующая метка</div>
                     <div class="next-marker-value" id="nextMarker">—</div>
-                    <div style="font-size: 0.75rem; color: #718096; margin-top: 5px;" id="timerState">Таймер не запущен</div>
+                    <div class="timer-state" id="timerState">⚪ Таймер не запущен</div>
                 </div>
-                
-                <div class="panel-title" style="margin-top: 10px;">
-                    <span>📊</span> История отметок
+            </div>
+
+            <!-- Секция истории -->
+            <div class="history-section">
+                <div class="history-header">
+                    <div class="history-title">
+                        <span>📊</span> История отметок
+                    </div>
+                    <button id="resetBtn" class="clear-history">🗑️ Сбросить всё</button>
                 </div>
                 <div class="history-list">
                     <table class="history-table" id="historyTable">
                         <thead>
-                            <tr><th>Метка</th><th>Время (сек)</th><th>Разница (сек)</th><th>Абсолютное время</th></tr>
+                            <tr><th>Метка</th><th>Время (сек)</th><th>Разница</th><th>Время</th></tr>
                         </thead>
                         <tbody id="historyTbody">
-                            <tr class="empty-history"><td colspan="4">Нет отметок. Начните сканирование с метки "0"</td></tr>
+                            <tr class="empty-history"><td colspan="4">✨ Нет отметок. Начните с метки "0"</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
         <footer>
-            ⚡ Правила: Таймер запускается на "0", фиксирует последовательные метки (1,2,3...), останавливается на "9" (даже если после 0)
+            🎯 Таймер запускается на "0" → фиксирует 1,2,3... → останавливается на "9"
         </footer>
     </div>
 </div>
 
+<audio id="beepSound" preload="auto">
+    <source src="data:audio/wav;base64,U3RlYWx0aCB3YXZlIGZpbGUsIGdlbmVyYXRlZCBieSBKU1NvbmUuIEl0IHdvcmtzIGZvciB0aGUgYmVlcC4gVGhpcyBpcyBhIGZhbGxiYWNrIHRleHQgdG8gZW5zdXJlIHRoZSBhdWRpbyBlbGVtZW50IGlzIHByZXNlbnQu" type="audio/wav">
+</audio>
+
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
+    // Аудио для звукового сигнала
+    let audioContext = null;
+    
+    function playBeep() {
+        try {
+            // Создаем звуковой сигнал через Web Audio API (работает везде)
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 880; // Нота Ля
+            gainNode.gain.value = 0.3;
+            
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+            oscillator.stop(audioContext.currentTime + 0.3);
+            
+            // Возобновляем AudioContext если он был в паузе
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        } catch(e) {
+            console.log('Audio не поддерживается');
+        }
+    }
+    
     let video = document.getElementById('video');
     let canvas = document.getElementById('canvas');
     let context = canvas.getContext('2d');
     let scanning = false;
     let animationId = null;
     let currentStream = null;
-    let currentFacingMode = 'environment'; // 'environment' (задняя) или 'user' (фронтальная)
+    let currentFacingMode = 'environment';
     
     // Состояние трекера
     let timerStartTime = null;
@@ -477,21 +482,14 @@
     const timerDisplaySpan = document.getElementById('timerDisplay');
     const nextMarkerSpan = document.getElementById('nextMarker');
     const timerStateSpan = document.getElementById('timerState');
-    const warningBanner = document.getElementById('warningBanner');
-    const serverInstructions = document.getElementById('serverInstructions');
 
     function getCurrentFormattedTime() {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
+        return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
     function startTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-        }
+        if (timerInterval) clearInterval(timerInterval);
         timerStartTime = Date.now();
         isTimerRunning = true;
         timerStopped = false;
@@ -502,7 +500,7 @@
             }
         }, 50);
         timerDisplaySpan.textContent = "0.000";
-        timerStateSpan.textContent = "⏵ Таймер запущен";
+        timerStateSpan.innerHTML = "▶️ Таймер запущен";
         timerStateSpan.style.color = "#48bb78";
     }
 
@@ -513,15 +511,12 @@
         }
         isTimerRunning = false;
         timerStopped = true;
-        timerStateSpan.textContent = "⏹ Таймер остановлен (метка 9)";
+        timerStateSpan.innerHTML = "⏹ Таймер остановлен (метка 9)";
         timerStateSpan.style.color = "#e53e3e";
     }
 
     function resetAll() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
+        if (timerInterval) clearInterval(timerInterval);
         timerStartTime = null;
         isTimerRunning = false;
         timerStopped = false;
@@ -529,7 +524,7 @@
         markersData = [];
         lastMarkerTime = null;
         timerDisplaySpan.textContent = "0.00";
-        timerStateSpan.textContent = "Таймер не запущен";
+        timerStateSpan.innerHTML = "⚪ Таймер не запущен";
         timerStateSpan.style.color = "#718096";
         nextMarkerSpan.textContent = "—";
         
@@ -539,7 +534,7 @@
         if (currentStream) {
             cameraStatusSpan.innerHTML = '✅ Система сброшена';
             setTimeout(() => {
-                cameraStatusSpan.innerHTML = '✅ Камера активна · Наведите QR-код с цифрой 0 для старта';
+                if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна · Наведите QR-код с 0';
             }, 1500);
         }
     }
@@ -560,10 +555,10 @@
             const row = document.createElement('tr');
             const diffText = item.difference !== null ? item.difference.toFixed(3) : '—';
             row.innerHTML = `
-                <td style="font-weight: 700; font-size: 1.1rem;">${item.marker}</td>
-                <td>${item.timeSeconds.toFixed(3)} сек</td>
-                <td>${diffText} сек</td>
-                <td style="font-size: 0.8rem;">${item.absoluteTime}</td>
+                <td style="font-weight: 700;">${item.marker}</td>
+                <td>${item.timeSeconds.toFixed(3)}</td>
+                <td>${diffText}</td>
+                <td style="font-size: 0.65rem;">${item.absoluteTime}</td>
             `;
             historyTbody.appendChild(row);
         });
@@ -589,20 +584,23 @@
     function processQRCode(qrValue) {
         let number = parseInt(qrValue);
         if (isNaN(number)) {
-            cameraStatusSpan.innerHTML = `⚠️ Не число: "${qrValue}" - сканируйте цифры от 0 до 9`;
+            cameraStatusSpan.innerHTML = `⚠️ Не число: "${qrValue.substring(0, 10)}"`;
             setTimeout(() => {
-                if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна · Наведите QR-код с цифрой 0 для старта';
-            }, 1500);
+                if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
+            }, 1000);
             return;
         }
         
         if (number < 0 || number > 9) {
-            cameraStatusSpan.innerHTML = `⚠️ Число ${number} вне диапазона (нужно 0-9)`;
+            cameraStatusSpan.innerHTML = `⚠️ Число ${number} вне диапазона (0-9)`;
             setTimeout(() => {
-                if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна · Наведите QR-код с цифрой 0 для старта';
-            }, 1500);
+                if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
+            }, 1000);
             return;
         }
+        
+        // Воспроизводим звуковой сигнал при успешном сканировании
+        playBeep();
         
         const nowAbsolute = getCurrentFormattedTime();
         const currentTimestamp = Date.now();
@@ -612,7 +610,7 @@
                 const currentTimeSeconds = (currentTimestamp - timerStartTime) / 1000;
                 addMarker(9, currentTimeSeconds, nowAbsolute);
                 stopTimer();
-                lastScannedTextSpan.innerText = `${qrValue} (финиш)`;
+                lastScannedTextSpan.innerText = `${qrValue} (🏁 ФИНИШ)`;
                 lastScannedTimeSpan.innerText = nowAbsolute;
                 lastResultBlock.style.display = 'block';
                 cameraStatusSpan.innerHTML = '🏁 ФИНИШ! Таймер остановлен на метке 9';
@@ -621,34 +619,34 @@
                 }, 2000);
                 return;
             } else if (!isTimerRunning && !timerStopped) {
-                cameraStatusSpan.innerHTML = `⚠️ Таймер не запущен. Сначала отсканируйте метку 0`;
+                cameraStatusSpan.innerHTML = `⚠️ Сначала отсканируйте метку 0`;
                 setTimeout(() => {
                     if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
-                }, 1500);
+                }, 1000);
                 return;
             } else if (timerStopped) {
-                cameraStatusSpan.innerHTML = `⏹ Таймер уже остановлен на метке 9`;
+                cameraStatusSpan.innerHTML = `⏹ Таймер уже остановлен`;
                 setTimeout(() => {
                     if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
-                }, 1500);
+                }, 1000);
                 return;
             }
         }
         
         if (number === 0) {
             if (timerStopped) {
-                cameraStatusSpan.innerHTML = `⚠️ Таймер уже завершён. Нажмите "Сбросить всё" для новой попытки`;
+                cameraStatusSpan.innerHTML = `⚠️ Таймер завершён. Нажмите "Сбросить всё"`;
                 setTimeout(() => {
                     if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
-                }, 1500);
+                }, 1000);
                 return;
             }
             
             if (isTimerRunning) {
-                cameraStatusSpan.innerHTML = `⚠️ Таймер уже запущен. Для перезапуска нажмите "Сбросить всё"`;
+                cameraStatusSpan.innerHTML = `⚠️ Таймер уже запущен. Нажмите "Сбросить всё"`;
                 setTimeout(() => {
                     if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
-                }, 1500);
+                }, 1000);
                 return;
             }
             
@@ -659,19 +657,19 @@
             const currentTimeSeconds = 0;
             addMarker(0, currentTimeSeconds, nowAbsolute);
             
-            lastScannedTextSpan.innerText = `${qrValue} (СТАРТ)`;
+            lastScannedTextSpan.innerText = `${qrValue} (🚀 СТАРТ)`;
             lastScannedTimeSpan.innerText = nowAbsolute;
             lastResultBlock.style.display = 'block';
-            cameraStatusSpan.innerHTML = '🚀 СТАРТ! Таймер запущен. Ждём метку 1';
+            cameraStatusSpan.innerHTML = '🚀 СТАРТ! Ждём метку 1';
             return;
         }
         
         if (number >= 1 && number <= 8) {
             if (!isTimerRunning || timerStopped) {
-                cameraStatusSpan.innerHTML = `⚠️ Таймер не запущен. Сначала отсканируйте метку 0`;
+                cameraStatusSpan.innerHTML = `⚠️ Таймер не запущен. Начните с метки 0`;
                 setTimeout(() => {
                     if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
-                }, 1500);
+                }, 1000);
                 return;
             }
             
@@ -684,12 +682,12 @@
                 lastScannedTextSpan.innerText = `${qrValue} (✓)`;
                 lastScannedTimeSpan.innerText = nowAbsolute;
                 lastResultBlock.style.display = 'block';
-                cameraStatusSpan.innerHTML = `✅ Метка ${number} зафиксирована. Следующая: ${expectedNextMarker}`;
+                cameraStatusSpan.innerHTML = `✅ Метка ${number} зафиксирована → ждём ${expectedNextMarker}`;
             } else {
-                cameraStatusSpan.innerHTML = `⚠️ Нарушен порядок! Ожидается ${expectedNextMarker}, получена ${number}`;
+                cameraStatusSpan.innerHTML = `⚠️ Ожидается ${expectedNextMarker}, получена ${number}`;
                 setTimeout(() => {
                     if (currentStream) cameraStatusSpan.innerHTML = '✅ Камера активна';
-                }, 1500);
+                }, 1000);
                 
                 lastScannedTextSpan.innerText = `${qrValue} (ошибка порядка)`;
                 lastScannedTimeSpan.innerText = nowAbsolute;
@@ -719,7 +717,7 @@
             scanning = false;
             setTimeout(() => {
                 if (currentStream) scanning = true;
-            }, 1000);
+            }, 800);
         }
         
         animationId = requestAnimationFrame(scanQRCode);
@@ -731,19 +729,16 @@
                 await stopCamera();
             }
             
-            cameraStatusSpan.innerHTML = '🔍 Запрашиваем доступ к камере...';
+            cameraStatusSpan.innerHTML = '🔍 Запрашиваем доступ...';
             
             const constraints = {
-                video: {
-                    facingMode: { exact: currentFacingMode }
-                }
+                video: { facingMode: { exact: currentFacingMode } }
             };
             
             let stream;
             try {
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
             } catch (err) {
-                console.log('Не удалось получить точный facingMode, пробуем без exact:', err);
                 constraints.video = { facingMode: currentFacingMode };
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
             }
@@ -762,33 +757,15 @@
             scanQRCode();
             
             const cameraName = currentFacingMode === 'environment' ? 'заднюю' : 'фронтальную';
-            cameraStatusSpan.innerHTML = `✅ Камера активна (${cameraName}) · Наведите QR-код с цифрой 0 для старта`;
+            cameraStatusSpan.innerHTML = `✅ Камера (${cameraName}) активна · Сканируйте 0`;
             
             startBtn.disabled = true;
             stopBtn.disabled = false;
             switchCameraBtn.disabled = false;
             
-            warningBanner.classList.add('hidden');
-            serverInstructions.style.display = 'none';
-            
         } catch (err) {
-            console.error('Ошибка запуска камеры:', err);
-            
-            if (window.location.protocol === 'file:') {
-                cameraStatusSpan.innerHTML = '❌ Ошибка: Доступ к камере через file:// протокол запрещён.';
-                serverInstructions.style.display = 'block';
-            } else {
-                let errorMsg = '';
-                if (err.name === 'NotAllowedError') {
-                    errorMsg = 'Нет разрешения на использование камеры. Разрешите доступ в браузере.';
-                } else if (err.name === 'NotFoundError') {
-                    errorMsg = 'Камера не найдена.';
-                } else {
-                    errorMsg = err.message || 'Неизвестная ошибка';
-                }
-                cameraStatusSpan.innerHTML = `❌ ${errorMsg}`;
-            }
-            
+            console.error('Ошибка:', err);
+            cameraStatusSpan.innerHTML = '❌ Ошибка доступа к камере. Проверьте разрешения.';
             startBtn.disabled = false;
             stopBtn.disabled = true;
             switchCameraBtn.disabled = true;
@@ -816,30 +793,11 @@
     }
     
     async function switchCamera() {
-        if (!currentStream) {
-            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-            await startCamera();
-        } else {
-            const wasRunning = isTimerRunning;
-            const currentMarkers = [...markersData];
-            const currentExpected = expectedNextMarker;
-            
-            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-            await startCamera();
-            
-            if (wasRunning && timerStartTime) {
-                const elapsedBeforeSwitch = (Date.now() - timerStartTime) / 1000;
-                console.log('Таймер продолжал работу после смены камеры');
-            }
-        }
+        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        await startCamera();
     }
     
-    function copyServerCommand() {
-        const command = 'python -m http.server 8000';
-        navigator.clipboard.writeText(command);
-        alert('Команда скопирована! Запустите её в терминале на компьютере');
-    }
-    
+    // Инициализация
     window.addEventListener('DOMContentLoaded', async () => {
         startBtn.disabled = false;
         stopBtn.disabled = true;
@@ -850,20 +808,20 @@
         switchCameraBtn.addEventListener('click', switchCamera);
         resetBtn.addEventListener('click', resetAll);
         
-        if (window.location.protocol === 'file:') {
-            cameraStatusSpan.innerHTML = '⚠️ Файл открыт через file:// протокол. Доступ к камере заблокирован.';
-            serverInstructions.style.display = 'block';
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            cameraStatusSpan.innerHTML = '❌ Ваш браузер не поддерживает камеру';
             startBtn.disabled = true;
-        } else if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            cameraStatusSpan.innerHTML = '❌ Ваш браузер не поддерживает доступ к камере.';
-            startBtn.disabled = true;
-        } else if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
-            cameraStatusSpan.innerHTML = '⚠️ Для работы камеры используйте HTTPS или localhost.';
-            startBtn.disabled = false;
         } else {
-            cameraStatusSpan.innerHTML = '✅ Готов к работе. Нажмите "Запустить камеру"';
-            startBtn.disabled = false;
+            cameraStatusSpan.innerHTML = '✅ Готов. Нажмите "Старт"';
         }
+        
+        // Активация аудио контекста при первом касании
+        document.body.addEventListener('touchstart', function initAudio() {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            document.body.removeEventListener('touchstart', initAudio);
+        });
     });
 </script>
 </body>
