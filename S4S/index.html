@@ -1,168 +1,173 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+        <meta charset="UTF-8">
     <title>Scratch4Switch</title>
-	<link href="style.css" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
 </head>
 <body>
 <div class="loader-container">
-	<h2>Load</h2>
-	
-	<div class="progress-container">
-		<div class="progress-bar">
-			<div class="progress" id="progressBar"></div>
-		</div>
-		<div id="progressText" style="text-align: center; margin-top: 5px;">0%</div>
-	</div>
-	
-	<div class="status" id="statusText">Wait...</div>
-	<div class="library-info" id="libraryInfo"></div>
+        <h2>Load</h2>
+        
+        <div class="progress-container">
+                <div class="progress-bar">
+                        <div class="progress" id="progressBar"></div>
+                </div>
+                <div id="progressText" style="text-align: center; margin-top: 5px;">0%</div>
+        </div>
+        
+        <div class="status" id="statusText">Wait...</div>
+        <div class="library-info" id="libraryInfo"></div>
 </div>
 <div>
-	<button onclick="changeLanguage('ru')">RU</button>
-	<button onclick="changeLanguage('en')">EN</button>
-	<div class="dropdown" id="project-dropdown">
-		<button class="dropdown-btn" id="project-actions">Project Actions</button>
-		<div class="dropdown-content">
-			<button id="save-project-btn" onclick="saveToFile()">Save Project</button>
-			<input type="file" id="loadFile" accept=".json" style="display: none;">
-			<button id="load-project-btn" onclick="document.getElementById('loadFile').click()">Load Project</button>
-		</div>
-	</div>
-	
-	<div class="dropdown" id="build-dropdown">
-		<button class="dropdown-btn" id="project-build">Build Options</button>
-		<div class="dropdown-content">
-			<button id="build-html-btn" onclick="buildHTML()">Build HTML Version</button>
-			<button id="build-switch-btn" onclick="buildSwitch()">Build Switch Version</button>
-		</div>
-	</div>
-	<button onclick="showSettingsModal()" id="settingsBtn">
-		Settings
-	</button>
-	<div class="dropdown" id="examples-dropdown">
-		<button class="dropdown-btn" id="examples-name">Examples</button>
-		<div class="dropdown-content">
-			<button onclick="loadExample('space_shooter')">Space shooter</button>
-			<button onclick="loadExample('platform')">Platform</button>
-		</div>
-	</div>
-	<div class="dropdown" id="help-dropdown">
-		<button class="dropdown-btn" id="project-help">?</button>
-		<div class="dropdown-content">
-			<a id="help-author" class="dropdown-hlp" href="https://github.com/corax89/" target="_blank"> Author Corax89</a>
-			<a id="help-powered" class="dropdown-hlp" href="https://developers.google.com/blockly" target="_blank"> Powered by Blockly</a>
-			<a id="help-help" class="dropdown-hlp" href="helpen.html" target="_blank"> Help</a>
-		</div>
-	</div>
+        <button onclick="changeLanguage('ru')">RU</button>
+        <button onclick="changeLanguage('en')">EN</button>
+        <div class="dropdown" id="project-dropdown">
+                <button class="dropdown-btn" id="project-actions">Project Actions</button>
+                <div class="dropdown-content">
+                        <button id="save-project-btn" onclick="saveToFile()">Save Project</button>
+                        <input type="file" id="loadFile" accept=".json" style="display: none;">
+                        <button id="load-project-btn" onclick="document.getElementById('loadFile').click()">Load Project</button>
+                </div>
+        </div>
+        
+        <div class="dropdown" id="build-dropdown">
+                <button class="dropdown-btn" id="project-build">Build Options</button>
+                <div class="dropdown-content">
+                        <button id="build-html-btn" onclick="buildHTML()">Build HTML Version</button>
+                        <button id="build-switch-btn" onclick="buildSwitch()">Build Switch Version</button>
+                </div>
+        </div>
+        <button onclick="showSettingsModal()" id="settingsBtn">
+                Settings
+        </button>
+        <div class="dropdown" id="examples-dropdown">
+                <button class="dropdown-btn" id="examples-name">Examples</button>
+                <div class="dropdown-content">
+                        <button onclick="loadExample('space_shooter')">Space shooter</button>
+                        <button onclick="loadExample('platform')">Platform</button>
+                </div>
+        </div>
+        <div class="dropdown" id="help-dropdown">
+                <button class="dropdown-btn" id="project-help">?</button>
+                <div class="dropdown-content">
+                        <a id="help-author" class="dropdown-hlp" href="https://github.com/corax89/" target="_blank"> Author Corax89</a>
+                        <a id="help-powered" class="dropdown-hlp" href="https://developers.google.com/blockly" target="_blank"> Powered by Blockly</a>
+                        <a id="help-help" class="dropdown-hlp" href="helpen.html" target="_blank"> Help</a>
+                </div>
+        </div>
 </div>
 <div id="switchModal" class="switch-modal" style="z-index:9999">
-	<div id="modalContent" class="switch-modal-content">
-		<div class="switch-modal-header">
-			<span id="modalTitle" class="switch-modal-title">Уведомление системы</span>
-			<span class="switch-modal-close">&times;</span>
-		</div>
-		<div class="switch-modal-body">
-			<p id="modalMessage">Сообщение</p>
-			<div class="switch-modal-buttons">
-				<button id="modalPrimaryBtn" class="switch-btn switch-btn-primary">OK</button>
-				<button id="modalSecondaryBtn" class="switch-btn switch-btn-secondary" style="display: none;">Отмена</button>
-			</div>
-		</div>
-	</div>
+        <div id="modalContent" class="switch-modal-content">
+                <div class="switch-modal-header">
+                        <span id="modalTitle" class="switch-modal-title">Уведомление системы</span>
+                        <span class="switch-modal-close">&times;</span>
+                </div>
+                <div class="switch-modal-body">
+                        <p id="modalMessage">Сообщение</p>
+                        <div class="switch-modal-buttons">
+                                <button id="modalPrimaryBtn" class="switch-btn switch-btn-primary">OK</button>
+                                <button id="modalSecondaryBtn" class="switch-btn switch-btn-secondary" style="display: none;">Отмена</button>
+                        </div>
+                </div>
+        </div>
 </div>
 <div class="tabs">
-	<div class="tabs__nav">
-		<button class="tabs__btn active" data-tab="tab-1" onclick="Game.gameLoop=false;">Code</button>
-		<button class="tabs__btn" data-tab="tab-2" onclick="showCode();Game.gameLoop=false;">JS</button>
-		<button class="tabs__btn" data-tab="tab-3" onclick="runJS()">Screen</button>
-	</div>
-	
-	<div class="tabs__content">
-		<div class="tabs__item active" id="tab-1">
-			<div id="blocklyDiv"></div>
-		</div>
-		<div class="tabs__item" id="tab-2">
-			<div id="codeOutput">// Generated code will appear here</div>
-		</div>
-		<div class="tabs__item" id="tab-3">
-			<div id="gameFlags">
-				<label class="checkbox-container">
-					<input type="checkbox" id="bothToggle" onchange="toggleBoth(this)">
-					<span class="checkbox-custom"></span>
-					<label for="bothToggle" id="drawGeympadtxt">draw geympad</label>
-				</label>
-				<label class="checkbox-container">
-					<input type="checkbox" id="keyPreviewToggle" onchange="keyPreviewToggle(this)">
-					<span class="checkbox-custom"></span>
-					<label for="keyPreviewToggle" id="drawGeympadPreview">draw geympad preview</label>
-				</label>
-				<label class="checkbox-container">
-					<input type="checkbox" id="objectsToggleBox" onchange="toggleBoundingBox(this)">
-					<span class="checkbox-custom"></span>
-					<label for="objectsToggleBox" id="viewBoundingBoxtxt">view bounding box</label>
-				</label>
-				<label class="checkbox-container">
-					<input type="checkbox" id="objectsToggle" onchange="toggleDebug(this)">
-					<span class="checkbox-custom"></span>
-					<label for="objectsToggle" id="viewObjectstxt">view objects</label>
-				</label>
-			</div>
-			<div id="screen-container">
-				<canvas width="1280" height="720" id="cnv"></canvas>
-				<div id="objectsList"></div>
-			</div>
-			<div id="debug"><div>
-		</div>
-	</div>
+        <div class="tabs__nav">
+                <button class="tabs__btn active" data-tab="tab-1" onclick="Game.gameLoop=false;">Code</button>
+                <button class="tabs__btn" data-tab="tab-2" onclick="showCode();Game.gameLoop=false;">JS</button>
+                <button class="tabs__btn" data-tab="tab-3" onclick="runJS()">Screen</button>
+        </div>
+        
+        <div class="tabs__content">
+                <div class="tabs__item active" id="tab-1">
+                        <div id="blocklyDiv"></div>
+                </div>
+                <div class="tabs__item" id="tab-2">
+                        <div id="codeOutput">// Generated code will appear here</div>
+                </div>
+                <div class="tabs__item" id="tab-3">
+                        <div id="gameFlags">
+                                <label class="checkbox-container">
+                                        <input type="checkbox" id="bothToggle" onchange="toggleBoth(this)">
+                                        <span class="checkbox-custom"></span>
+                                        <label for="bothToggle" id="drawGeympadtxt">draw geympad</label>
+                                </label>
+                                <label class="checkbox-container">
+                                        <input type="checkbox" id="keyPreviewToggle" onchange="keyPreviewToggle(this)">
+                                        <span class="checkbox-custom"></span>
+                                        <label for="keyPreviewToggle" id="drawGeympadPreview">draw geympad preview</label>
+                                </label>
+                                <label class="checkbox-container">
+                                        <input type="checkbox" id="objectsToggleBox" onchange="toggleBoundingBox(this)">
+                                        <span class="checkbox-custom"></span>
+                                        <label for="objectsToggleBox" id="viewBoundingBoxtxt">view bounding box</label>
+                                </label>
+                                <label class="checkbox-container">
+                                        <input type="checkbox" id="physicsShapesToggle" onchange="togglePhysicsShapes(this)">
+                                        <span class="checkbox-custom"></span>
+                                        <label for="physicsShapesToggle" id="viewPhysicsShapestxt">view physics shapes</label>
+                                </label>
+                                <label class="checkbox-container">
+                                        <input type="checkbox" id="objectsToggle" onchange="toggleDebug(this)">
+                                        <span class="checkbox-custom"></span>
+                                        <label for="objectsToggle" id="viewObjectstxt">view objects</label>
+                                </label>
+                        </div>
+                        <div id="screen-container">
+                                <canvas width="1280" height="720" id="cnv"></canvas>
+                                <div id="objectsList"></div>
+                        </div>
+                        <div id="debug"><div>
+                </div>
+        </div>
 </div>
 <img id="icon" src="" alt="Icon preview">
 <input type="file" id="icoFileInput" accept="image/*">
 <div id="settingsModal" class="switch-modal">
-	<div class="settings-modal-content">
-		<div class="switch-modal-header">
-			<span class="switch-modal-title" id="projectSettings">Project Settings</span>
-			<span class="switch-modal-close" onclick="closeSettingsModal()">&times;</span>
-		</div>
-		<div class="switch-modal-body">
-			<div class="form-group">
-				<label id="projectName">Project Name:</label>
-				<input type="text" id="projectNameInput" class="switch-input">
-			</div>
-			<div class="form-group">
-				<label id="projectAuthor">Author:</label>
-				<input type="text" id="projectAuthorInput" class="switch-input">
-			</div>
-			<div class="form-group">
-				<label id="settingsIconLabel">Icon:</label>
-				<div class="icon-container">
-					<img id="iconPreview" src="" alt="Icon preview" class="icon-preview">
-					<button onclick="document.getElementById('icoFileInput').click()" id="chose-icon" class="switch-btn">
-						Choose Icon
-					</button>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="checkbox-container">
-					<input type="checkbox" id="enableVirtualGamepad">
-					<span class="checkbox-custom"></span>
-					<label for="enableVirtualGamepad" id="labelEnableVirtualGamepad">Enable Virtual Gamepad (HTML)</label>
-				</label>
-			</div>
-			<div class="settings-section">
-				<h3 id="keyRedefLable">Reassigning buttons (HTML)</h3>
-				<div class="scroll-container">
-					<table id="keyMappingTable" class="key-mapping-table"></table>
-				</div>
-			</div>
-		</div>
-		<div class="switch-modal-footer">
-			<button onclick="resetKeyMappings()" class="btn btn-reset" id="buttonKeyReset">Reset key</button>
-			<button onclick="saveSettings()" class="switch-btn switch-btn-primary" id="buttonSave">Save</button>
-			<button onclick="closeSettingsModal()" class="switch-btn" id="buttonCancel">Cancel</button>
-		</div>
-	</div>
+        <div class="settings-modal-content">
+                <div class="switch-modal-header">
+                        <span class="switch-modal-title" id="projectSettings">Project Settings</span>
+                        <span class="switch-modal-close" onclick="closeSettingsModal()">&times;</span>
+                </div>
+                <div class="switch-modal-body">
+                        <div class="form-group">
+                                <label id="projectName">Project Name:</label>
+                                <input type="text" id="projectNameInput" class="switch-input">
+                        </div>
+                        <div class="form-group">
+                                <label id="projectAuthor">Author:</label>
+                                <input type="text" id="projectAuthorInput" class="switch-input">
+                        </div>
+                        <div class="form-group">
+                                <label id="settingsIconLabel">Icon:</label>
+                                <div class="icon-container">
+                                        <img id="iconPreview" src="" alt="Icon preview" class="icon-preview">
+                                        <button onclick="document.getElementById('icoFileInput').click()" id="chose-icon" class="switch-btn">
+                                                Choose Icon
+                                        </button>
+                                </div>
+                        </div>
+                        <div class="form-group">
+                                <label class="checkbox-container">
+                                        <input type="checkbox" id="enableVirtualGamepad">
+                                        <span class="checkbox-custom"></span>
+                                        <label for="enableVirtualGamepad" id="labelEnableVirtualGamepad">Enable Virtual Gamepad (HTML)</label>
+                                </label>
+                        </div>
+                        <div class="settings-section">
+                                <h3 id="keyRedefLable">Reassigning buttons (HTML)</h3>
+                                <div class="scroll-container">
+                                        <table id="keyMappingTable" class="key-mapping-table"></table>
+                                </div>
+                        </div>
+                </div>
+                <div class="switch-modal-footer">
+                        <button onclick="resetKeyMappings()" class="btn btn-reset" id="buttonKeyReset">Reset key</button>
+                        <button onclick="saveSettings()" class="switch-btn switch-btn-primary" id="buttonSave">Save</button>
+                        <button onclick="closeSettingsModal()" class="switch-btn" id="buttonCancel">Cancel</button>
+                </div>
+        </div>
 </div>
 <!-- Подключаем скрипты Blockly -->
 <script src="loader.js"></script>

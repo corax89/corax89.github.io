@@ -431,6 +431,8 @@ Blockly.Msg['PROCEDURE'] = 'Procedures';
 
 Blockly.Msg['OBJECT_PARAM_X'] = 'X';
 Blockly.Msg['OBJECT_PARAM_Y'] = 'Y';
+Blockly.Msg['OBJECT_PARAM_PREV_X'] = 'prev X';
+Blockly.Msg['OBJECT_PARAM_PREV_Y'] = 'prev Y';
 Blockly.Msg['OBJECT_PARAM_WIDTH'] = 'width';
 Blockly.Msg['OBJECT_PARAM_HEIGHT'] = 'height';
 Blockly.Msg['OBJECT_PARAM_SPEEDX'] = 'speed X';
@@ -444,6 +446,31 @@ Blockly.Msg['OBJECT_PARAM_MASS'] = 'mass';
 Blockly.Msg['OBJECT_PARAM_SPRITE'] = 'sprite';
 Blockly.Msg['OBJECT_PARAM_RESTITUTION'] = 'restitution';
 Blockly.Msg['OBJECT_PARAM_ISSTATIC'] = 'static';
+Blockly.Msg['OBJECT_PARAM_LOCK_ROTATION'] = 'lock rotation';
+Blockly.Msg['OBJECT_PARAM_ROTATION_SPEED'] = 'rotation speed';
+Blockly.Msg['CREATE_PIVOT_JOINT'] = 'pivot joint';
+Blockly.Msg['CREATE_SLIDE_JOINT'] = 'slide joint';
+Blockly.Msg['CREATE_GEAR_JOINT'] = 'gear joint';
+Blockly.Msg['CREATE_RIGID_JOINT'] = 'rigid joint';
+Blockly.Msg['CREATE_CHAIN'] = 'object chain';
+Blockly.Msg['CHAIN_MODE_FIXED'] = 'fixed ends';
+Blockly.Msg['CHAIN_MODE_LOOSE'] = 'loose';
+Blockly.Msg['CHAIN_MODE_ATTACHED'] = 'attached to';
+Blockly.Msg['ATTACH_TO'] = 'to object';
+Blockly.Msg['START_X'] = 'start X';
+Blockly.Msg['COUNT'] = 'count';
+Blockly.Msg['END_X'] = 'end X';
+Blockly.Msg['REMOVE_JOINT'] = 'remove joint';
+Blockly.Msg['OBJECT_A'] = 'obj A';
+Blockly.Msg['OBJECT_B'] = 'obj B';
+Blockly.Msg['PIVOT_X'] = 'pivot X';
+Blockly.Msg['PIVOT_Y'] = 'pivot Y';
+Blockly.Msg['MIN_DIST'] = 'min dist';
+Blockly.Msg['MAX_DIST'] = 'max dist';
+Blockly.Msg['PHASE'] = 'phase';
+Blockly.Msg['RATIO'] = 'ratio';
+Blockly.Msg['JOINT_MODE_CENTER'] = 'center';
+Blockly.Msg['JOINT_MODE_MANUAL'] = 'manual';
 Blockly.Msg['OBJECT_PARAM_ZINDEX'] = 'drawing depth';
 Blockly.Msg['OBJECT_PARAM_ISONGROUND'] = 'is on ground?';
 Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'] = 'colliding tiles';
@@ -744,22 +771,22 @@ Blockly.Msg['YES'] = 'YES';
 };
 
 function changeLanguage(selectedValue) {
-	if (selectedValue === 'ru') {
-		setLocaleRu();
-	} else {
-		setLocaleEn();
-	}
-	// Сохраняем выбранный язык в localStorage
-	localStorage.setItem('selectedLanguage', selectedValue);
-	location.reload();
+        if (selectedValue === 'ru') {
+                setLocaleRu();
+        } else {
+                setLocaleEn();
+        }
+        // Сохраняем выбранный язык в localStorage
+        localStorage.setItem('selectedLanguage', selectedValue);
+        location.reload();
 };
 const savedLanguage = localStorage.getItem('selectedLanguage');
 if (savedLanguage) {
-	if (savedLanguage === 'ru') {
-		setLocaleRu();
-	} else {
-		setLocaleEn();
-	}
+        if (savedLanguage === 'ru') {
+                setLocaleRu();
+        } else {
+                setLocaleEn();
+        }
 }
 else
-	setLocaleEn();
+        setLocaleEn();

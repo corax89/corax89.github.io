@@ -2,6 +2,8 @@
 var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_X'], 'x'],
   [Blockly.Msg['OBJECT_PARAM_Y'], 'y'],
+  [Blockly.Msg['OBJECT_PARAM_PREV_X'] || 'prev X', 'prev_x'],
+  [Blockly.Msg['OBJECT_PARAM_PREV_Y'] || 'prev Y', 'prev_y'],
   [Blockly.Msg['OBJECT_PARAM_WIDTH'], 'width'],
   [Blockly.Msg['OBJECT_PARAM_HEIGHT'], 'height'],
   [Blockly.Msg['OBJECT_PARAM_SPEEDX'], 'speedx'],
@@ -15,6 +17,8 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_MASS'], 'mass'],
   [Blockly.Msg['OBJECT_PARAM_RESTITUTION'], 'restitution'],
   [Blockly.Msg['OBJECT_PARAM_ISSTATIC'], 'isStatic'],
+  [Blockly.Msg['OBJECT_PARAM_LOCK_ROTATION'] || 'lock rotation', 'lockRotation'],
+  [Blockly.Msg['OBJECT_PARAM_ROTATION_SPEED'] || 'rotation speed', 'rotationSpeed'],
   [Blockly.Msg['OBJECT_PARAM_ZINDEX'], 'zIndex'],
   [Blockly.Msg['OBJECT_PARAM_ISONGROUND'], 'isOnGround'],
   [Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'], 'collidingTiles'],
@@ -22,6 +26,32 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_ANIMATION_LOOP'], 'animationLoop'],
   [Blockly.Msg['OBJECT_PARAM_ANIMATION_PLAY'], 'isAnimationEnd']
 ];
+
+// Read-only object properties — managed by the engine, must NOT be set
+// from user code. These are excluded from the setter ("change_object_var")
+// and add-to ("addto_object_var") blocks to prevent users from corrupting
+// engine-internal state.
+//
+// • prev_x / prev_y  — position at end of previous frame; used by the
+//   physics engine's displacement-aware push-out (anti-tunneling).
+//   Engine overwrites them every frame, so any user write is silently
+//   lost in the next frame anyway — better to hide them from the setter.
+// • name              — set at object creation, mutating it post-create
+//   breaks name-based lookups in JS.
+// • collidingTiles    — read-only array, computed by the engine.
+// • isOnGround        — set by physics step; user override is meaningless.
+// • isAnimationEnd    — set by the animation system.
+var _ReadOnlyObjectParams = {
+  'prev_x': true,
+  'prev_y': true,
+  'name': true,
+  'collidingTiles': true,
+  'isOnGround': true,
+  'isAnimationEnd': true
+};
+var ObjectParamWritable = ObjectParam.filter(function(p) {
+  return !_ReadOnlyObjectParams[p[1]];
+});
 
 var ObjectType = [
   [Blockly.Msg['OBJECT_TYPE_COLLIDED'], 'object'],
@@ -130,7 +160,7 @@ function updateAllVarDropdowns() {
 
 Blockly.Blocks['particles_create'] = {
   init: function() {
-	this.appendDummyInput()
+        this.appendDummyInput()
         .appendField(Blockly.Msg['PARTICLES_LABEL']);
     this.appendValueInput('X')
         .setCheck('Number')
@@ -176,7 +206,7 @@ Blockly.Blocks['particles_create'] = {
 // Блок с предустановленными эффектами частиц
 Blockly.Blocks['particles_preset'] = {
   init: function() {
-	this.appendDummyInput()
+        this.appendDummyInput()
         .appendField(Blockly.Msg['PARTICLES_PRESET_LABEL']);
     this.appendValueInput('X')
         .setCheck('Number')
@@ -236,7 +266,7 @@ Blockly.Blocks['game_loop'] = {
     this.setColour(120);
     this.setTooltip("");
     this.setPreviousStatement(true, "Array");
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#gameloop');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#gameloop');
   }
 };
 
@@ -262,7 +292,7 @@ Blockly.Blocks['variables_container'] = {
     this.appendStatementInput('STACK')
         .setCheck(null);
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.contextMenu = false;
   }
 };
@@ -274,7 +304,7 @@ Blockly.Blocks['variables_get_item'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.contextMenu = false;
   }
 };
@@ -412,7 +442,7 @@ Blockly.Blocks['reset'] = {
         .appendField(Blockly.Msg['RESET']);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setColour(60);
   }
 };
@@ -636,7 +666,7 @@ Blockly.Blocks['draw_point'] = {
         .appendField(Blockly.Msg['COLOR_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -663,7 +693,7 @@ Blockly.Blocks['draw_line'] = {
         .appendField(Blockly.Msg['COLOR_LABEL']);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
   }
 };
 
@@ -737,7 +767,7 @@ Blockly.Blocks['field_colour'] = {
   init: function() {
     this.setOutput(true, 'Colour');
     this.setColour(30);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.appendDummyInput()
       .appendField(Blockly.Msg['COLOR_LABEL'])
       .appendField(new FieldColour('#000000', null, {
@@ -758,7 +788,7 @@ Blockly.Blocks['field_colour'] = {
           '#1a002c', '#330058', '#4d0085', '#6600b1', '#8000de', '#9900ff', '#b34dff', '#cc99ff',
           // Розовые/пурпурные оттенки
           '#2c001a', '#580033', '#85004d', '#b10066', '#de0080', '#ff0099', '#ff4db3', '#ff99cc',
-		  // Градиент от чёрного к белому 
+                  // Градиент от чёрного к белому 
           '#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#b3b3b3', '#ffffff'
         ],
         columns: 8
@@ -817,7 +847,7 @@ Blockly.Blocks['draw_text'] = {
 // Блок рисования изображения
 Blockly.Blocks['draw_image'] = {
   init: function() {
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.setColour(30);
     this.appendDummyInput()
         .appendField(Blockly.Msg['DRAW_IMAGE_LABEL']);
@@ -833,7 +863,7 @@ Blockly.Blocks['draw_image'] = {
     this.appendValueInput("Width")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_WIDTH']);
-	this.appendValueInput("Height")
+        this.appendValueInput("Height")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
     this.setPreviousStatement(true, "Array");
@@ -879,13 +909,13 @@ Blockly.Blocks['collision_detect'] = {
 Blockly.Blocks['clear_screen'] = {
   init: function() {
     this.setColour(30);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.appendDummyInput()
         .appendField(Blockly.Msg['CLEAR_SCREEN_LABEL']);
     const colourInput = this.appendValueInput("Colour")
         .setCheck("Colour")
         .appendField(Blockly.Msg['COLOR_LABEL']);
-	// Создаем теневой блок на основе field_colour
+        // Создаем теневой блок на основе field_colour
     const shadowBlockColour = this.workspace.newBlock('field_colour');
     shadowBlockColour.setFieldValue('#000000', 'FIELDCOLOUR'); // Используем ваш ID поля
     colourInput.connection.connect(shadowBlockColour.outputConnection);
@@ -927,8 +957,8 @@ Blockly.Blocks['play_music'] = {
   init: function() {
     // Основная инициализация блока
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
-	this.setInputsInline(true);
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['PLAY_MUSIC_LABEL']);
     
@@ -958,8 +988,8 @@ Blockly.Blocks['play_music'] = {
 Blockly.Blocks['play_sound'] = {
   init: function() {
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
-	this.setInputsInline(true);
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['PLAY_SOUND_LABEL']);
     this.appendValueInput("Number")
@@ -977,12 +1007,12 @@ Blockly.Blocks['level_editor'] = {
     this.appendDummyInput()
       .appendField(Blockly.Msg['LEVEL_EDITOR_LABEL'])
       .appendField(new FieldLevelEditor('{"objects": [],"tiles": [],"width": 800,"height": 600,"gridSize": 32}', null, {}), 'LEVEL_DATA');
-	this.appendValueInput("TILESET")
+        this.appendValueInput("TILESET")
         .setCheck("field_png")
         .appendField(Blockly.Msg['LEVEL_EDITOR_TILESET']);
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
-	this.setInputsInline(true);
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setInputsInline(true);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -990,12 +1020,12 @@ Blockly.Blocks['level_editor'] = {
 
 Blockly.Blocks['set_tile'] = {
   init: function() {
-	this.appendValueInput("TILESET")
+        this.appendValueInput("TILESET")
         .setCheck("field_png")
         .appendField(Blockly.Msg['LEVEL_EDITOR_TILESET']);
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
-	this.setInputsInline(true);
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setInputsInline(true);
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -1030,9 +1060,9 @@ Blockly.Blocks['is_colliding_with_tile'] = {
 Blockly.Blocks['game_pause'] = {
   init: function() {
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.appendDummyInput()
-		.appendField(Blockly.Msg['PAUSE_RESUME_LABEL'])
+                .appendField(Blockly.Msg['PAUSE_RESUME_LABEL'])
         .appendField(new Blockly.FieldDropdown([
           [Blockly.Msg['PAUSE_PAUSE'], 'PAUSE'],
           [Blockly.Msg['PAUSE_RESUME'], 'RESUME']
@@ -1060,7 +1090,7 @@ Blockly.Blocks['is_paused'] = {
 Blockly.Blocks['set_background'] = {
   init: function() {
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_BACKGROUND_LABEL'])
         .appendField(new Blockly.FieldDropdown([
@@ -1079,7 +1109,7 @@ Blockly.Blocks['set_background'] = {
 Blockly.Blocks['set_background_xy'] = {
   init: function() {
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.appendValueInput("X")
         .setCheck("Number")
         .appendField(Blockly.Msg['SET_BACKGROUND_XY_LABEL_X']);
@@ -1200,7 +1230,7 @@ Blockly.Blocks['field_multilineinput'] = {
       .appendField(Blockly.Msg['JS_CODE_LABEL'])
       .appendField(new FieldMultilineInput('"some code";'), 'FIELDSCRIPT');
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -1220,7 +1250,7 @@ Blockly.Blocks['set_interval'] = {
         .setCheck("Number")
         .appendField(Blockly.Msg['INTERVAL_MS_LABEL']);
     this.setOutput(true, "Number");
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setTooltip(Blockly.Msg['SET_INTERVAL_TOOLTIP']);
   }
 };
@@ -1235,7 +1265,7 @@ Blockly.Blocks['clear_interval'] = {
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setTooltip(Blockly.Msg['CLEAR_INTERVAL_TOOLTIP']);
   }
 };
@@ -1251,7 +1281,7 @@ Blockly.Blocks['set_timer'] = {
         .setCheck("Number")
         .appendField(Blockly.Msg['TIMER_TIME_LABEL']);
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
     this.setPreviousStatement(true, "Array");
     this.setNextStatement(true, "Array");
   }
@@ -1380,7 +1410,7 @@ function generateUniqueName(baseName) {
 
 Blockly.Blocks['new_proto_object'] = {
   init: function() {
-	this.variableId = null;
+        this.variableId = null;
     this.setColour(340);
     this.appendDummyInput()
         .appendField(Blockly.Msg['NEW_PROTO_OBJECT_LABEL']);
@@ -1398,15 +1428,15 @@ Blockly.Blocks['new_proto_object'] = {
     shadowBlockWidth.setFieldValue('32', 'NUM');
     widthInput.connection.connect(shadowBlockWidth.outputConnection);
     shadowBlockWidth.setShadow(true);
-	
+        
     const heightInput = this.appendValueInput("Height")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_HEIGHT']);
-	const shadowBlockHeight = this.workspace.newBlock('math_number');
+        const shadowBlockHeight = this.workspace.newBlock('math_number');
     shadowBlockHeight.setFieldValue('32', 'NUM');
     heightInput.connection.connect(shadowBlockHeight.outputConnection);
-    shadowBlockHeight.setShadow(true);	
-	
+    shadowBlockHeight.setShadow(true);  
+        
     this.appendValueInput("Sprite")
         .setCheck("type_sprite")
         .appendField(Blockly.Msg['IMAGE_LABEL']);
@@ -1464,7 +1494,7 @@ Blockly.Blocks['new_proto_object'] = {
     
     return newName;
   },
-	
+        
   saveExtraState: function() {
     const variable = this.getField('Object').getVariable();
     return {
@@ -1476,7 +1506,7 @@ Blockly.Blocks['new_proto_object'] = {
   loadExtraState: function(state) {
     const workspace = this.workspace;
     let variable;
-	this.variableId = state.varId;
+        this.variableId = state.varId;
     
     // Восстанавливаем переменную
     if (state.varId) {
@@ -1506,7 +1536,7 @@ Blockly.Blocks['field_png'] = {
         ), "IMAGE");
     this.setOutput(true, null);
     this.setColour(30);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.setInputsInline(true);
     this.setTooltip("");
     this.setHelpUrl("");
@@ -1616,16 +1646,16 @@ Blockly.Blocks['new_object'] = {
 Blockly.Blocks['new_object_from_proto'] = {
   init: function() {
     this.setColour(340);
-	this.appendDummyInput()
+        this.appendDummyInput()
         .appendField(Blockly.Msg['NEW_OBJECT_FROM_PROTO_LABEL']);
     this.appendDummyInput()
         .appendField(new Blockly.FieldVariable('prototype1'), 'Object')
         .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
     this.appendDummyInput()
         .appendField(Blockly.Msg['CLONE_OBJECT_LABEL2']);
-	this.appendDummyInput()
+        this.appendDummyInput()
         .appendField(new Blockly.FieldVariable('obj1'), 'Object2');
-	this.appendValueInput("X")
+        this.appendValueInput("X")
         .setCheck("Number")
         .appendField(Blockly.Msg['POSITION_X_LABEL']);
     this.appendValueInput("Y")
@@ -1637,11 +1667,161 @@ Blockly.Blocks['new_object_from_proto'] = {
 };
 // ==================== Блоки объектов ====================
 
+// ─── Joint blocks ───
+// Helper: creates the object-selection dropdown used by all joint blocks.
+// Mirrors the style of 'set_object_bounding' (FieldVariable with 'Object' type).
+function _jointAddObjectInputs(block) {
+  block.appendDummyInput('OBJ_INPUT_A')
+    .appendField(Blockly.Msg['OBJECT_A'] || 'obj A')
+    .appendField(new Blockly.FieldVariable('obj1', null, null, 'Object'), 'OBJ_A');
+  block.appendDummyInput('OBJ_INPUT_B')
+    .appendField(Blockly.Msg['OBJECT_B'] || 'obj B')
+    .appendField(new Blockly.FieldVariable('obj2', null, null, 'Object'), 'OBJ_B');
+}
+
+Blockly.Blocks['create_pivot_joint'] = {
+  init: function() {
+    this.setColour(190);
+    this.setInputsInline(true);
+    this.appendDummyInput()
+      .appendField(Blockly.Msg['CREATE_PIVOT_JOINT'] || 'pivot joint')
+      .appendField(new Blockly.FieldDropdown([
+        [Blockly.Msg['JOINT_MODE_CENTER'] || 'center', 'CENTER'],
+        [Blockly.Msg['JOINT_MODE_MANUAL'] || 'manual', 'MANUAL']
+      ], this.updateShape_.bind(this)), 'MODE');
+    _jointAddObjectInputs(this);
+    this.appendDummyInput('MANUAL_INPUT')
+      .appendField(Blockly.Msg['PIVOT_X'] || 'pivot X')
+      .appendField(new Blockly.FieldNumber(0), 'PX')
+      .appendField(Blockly.Msg['PIVOT_Y'] || 'Y')
+      .appendField(new Blockly.FieldNumber(0), 'PY')
+      .setVisible(false);
+    this.setOutput(true, null);
+  },
+  updateShape_: function(mode) {
+    this.getInput('MANUAL_INPUT').setVisible(mode === 'MANUAL');
+    if (this.workspace) this.initSvg();
+  },
+  mutationToDom: function() {
+    var c = document.createElement('mutation');
+    c.setAttribute('mode', this.getFieldValue('MODE'));
+    return c;
+  },
+  domToMutation: function(xml) {
+    this.updateShape_(xml.getAttribute('mode') || 'CENTER');
+  }
+};
+
+Blockly.Blocks['create_slide_joint'] = {
+  init: function() {
+    this.setColour(190);
+    this.setInputsInline(true);
+    this.appendDummyInput()
+      .appendField(Blockly.Msg['CREATE_SLIDE_JOINT'] || 'slide joint')
+      .appendField(new Blockly.FieldDropdown([
+        [Blockly.Msg['JOINT_MODE_CENTER'] || 'center', 'CENTER'],
+        [Blockly.Msg['JOINT_MODE_MANUAL'] || 'manual', 'MANUAL']
+      ], this.updateShape_.bind(this)), 'MODE');
+    _jointAddObjectInputs(this);
+    this.appendDummyInput('MANUAL_INPUT')
+      .appendField('AX').appendField(new Blockly.FieldNumber(0), 'AX')
+      .appendField('AY').appendField(new Blockly.FieldNumber(0), 'AY')
+      .appendField('BX').appendField(new Blockly.FieldNumber(0), 'BX')
+      .appendField('BY').appendField(new Blockly.FieldNumber(0), 'BY')
+      .setVisible(false);
+    this.appendValueInput("MIN").setCheck("Number").appendField(Blockly.Msg['MIN_DIST'] || 'min');
+    this.appendValueInput("MAX").setCheck("Number").appendField(Blockly.Msg['MAX_DIST'] || 'max');
+    this.setOutput(true, null);
+  },
+  updateShape_: function(mode) {
+    this.getInput('MANUAL_INPUT').setVisible(mode === 'MANUAL');
+    if (this.workspace) this.initSvg();
+  },
+  mutationToDom: function() {
+    var c = document.createElement('mutation');
+    c.setAttribute('mode', this.getFieldValue('MODE'));
+    return c;
+  },
+  domToMutation: function(xml) {
+    this.updateShape_(xml.getAttribute('mode') || 'CENTER');
+  }
+};
+
+Blockly.Blocks['create_gear_joint'] = {
+  init: function() {
+    this.setColour(190);
+    this.setInputsInline(true);
+    this.appendDummyInput().appendField(Blockly.Msg['CREATE_GEAR_JOINT'] || 'gear joint');
+    _jointAddObjectInputs(this);
+    this.appendValueInput("PHASE").setCheck("Number").appendField(Blockly.Msg['PHASE'] || 'phase');
+    this.appendValueInput("RATIO").setCheck("Number").appendField(Blockly.Msg['RATIO'] || 'ratio');
+    this.setOutput(true, null);
+  }
+};
+
+Blockly.Blocks['remove_joint'] = {
+  init: function() {
+    this.setColour(190);
+    this.setInputsInline(true);
+    this.appendDummyInput()
+      .appendField(Blockly.Msg['REMOVE_JOINT'] || 'remove joint')
+      .appendField(new Blockly.FieldVariable('joint1'), 'JOINT');
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+  }
+};
+
+// CHAIN — creates a vertical chain of objects from a prototype.
+// Mode: LOOSE (hangs vertically from start point, top link is static),
+//   or ATTACHED (first link is jointed to an existing object/prototype).
+Blockly.Blocks['create_chain'] = {
+  init: function() {
+    this.setColour(190);
+    this.setInputsInline(false);
+    this.appendDummyInput()
+      .appendField(Blockly.Msg['CREATE_CHAIN'] || 'create chain')
+      .appendField(new Blockly.FieldDropdown([
+        [Blockly.Msg['CHAIN_MODE_LOOSE'] || 'loose', 'LOOSE'],
+        [Blockly.Msg['CHAIN_MODE_ATTACHED'] || 'attached to', 'ATTACHED']
+      ], this.updateShape_.bind(this)), 'MODE');
+    this.appendDummyInput('PROTO_INPUT')
+      .appendField(Blockly.Msg['OBJECT_A'] || 'obj A')
+      .appendField(new Blockly.FieldVariable('obj1', null, null, 'Object'), 'OBJ');
+    this.appendDummyInput('START_INPUT')
+      .appendField(Blockly.Msg['START_X'] || 'start X')
+      .appendField(new Blockly.FieldNumber(0), 'SX')
+      .appendField('Y')
+      .appendField(new Blockly.FieldNumber(0), 'SY');
+    this.appendDummyInput('ATTACH_INPUT')
+      .appendField(Blockly.Msg['ATTACH_TO'] || 'attach to')
+      .appendField(new Blockly.FieldVariable('obj2', null, null, 'Object'), 'ATTACH')
+      .setVisible(false);
+    this.appendDummyInput('COUNT_INPUT')
+      .appendField(Blockly.Msg['COUNT'] || 'count')
+      .appendField(new Blockly.FieldNumber(5, 1, 50), 'COUNT');
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+  },
+  updateShape_: function(mode) {
+    this.getInput('START_INPUT').setVisible(mode !== 'ATTACHED');
+    this.getInput('ATTACH_INPUT').setVisible(mode === 'ATTACHED');
+    if (this.workspace) this.initSvg();
+  },
+  mutationToDom: function() {
+    var c = document.createElement('mutation');
+    c.setAttribute('mode', this.getFieldValue('MODE'));
+    return c;
+  },
+  domToMutation: function(xml) {
+    this.updateShape_(xml.getAttribute('mode') || 'LOOSE');
+  }
+};
+
 Blockly.Blocks['clone_object'] = {
   init: function() {
     this.setColour(340);
-	this.setInputsInline(true);
-	this.appendDummyInput()
+        this.setInputsInline(true);
+        this.appendDummyInput()
         .appendField(Blockly.Msg['CLONE_OBJECT_LABEL']);
     this.appendDummyInput()
         .appendField(new Blockly.FieldVariable('obj1'), 'Object')
@@ -1674,7 +1854,7 @@ Blockly.Blocks['game_copy_state'] = {
 Blockly.Blocks['draw_object'] = {
   init: function() {
     this.setColour(30);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#drawing');
     this.appendDummyInput()
         .appendField(Blockly.Msg['DRAW_SPRITE_LABEL']);
     this.appendDummyInput()
@@ -1688,7 +1868,7 @@ Blockly.Blocks['draw_object'] = {
 Blockly.Blocks['change_object_var'] = {
   init: function() {
     // Основное поле с выбором режима
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['CHANGE_PARAM_LABEL'] || 'Изменить параметр:')
         .appendField(new Blockly.FieldDropdown([
@@ -1706,9 +1886,9 @@ Blockly.Blocks['change_object_var'] = {
         .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
         .setVisible(false);
 
-    // Поле для выбора параметра
+    // Поле для выбора параметра (writable — excludes prev_x/prev_y etc.)
     this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(ObjectParam), 'NAME');
+        .appendField(new Blockly.FieldDropdown(ObjectParamWritable), 'NAME');
 
     // Поле для значения
     this.appendValueInput("VALUE")
@@ -1795,7 +1975,7 @@ Blockly.Blocks['if_object_name_equals'] = {
 // Блок для получения значения параметра объекта
 Blockly.Blocks['get_object_var'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     // Основное поле с выбором режима
     this.appendDummyInput()
         .appendField(Blockly.Msg['GET_PARAM_LABEL'] || 'Получить параметр:')
@@ -1808,7 +1988,7 @@ Blockly.Blocks['get_object_var'] = {
 
     // Поле для выбора переменной (изначально скрыто)
     this.appendDummyInput('VAR_INPUT')
-		.appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
+                .appendField(Blockly.Msg['OBJECT_NAME_LABEL'] || 'Объект:')
         .appendField(new Blockly.FieldVariable(
           Blockly.Msg['DEFAULT_VARIABLE_NAME'] || 'obj1',
           null, null, 'Object'), 'VAR_NAME')
@@ -1860,7 +2040,7 @@ Blockly.Blocks['get_object_var'] = {
 // Блок для добавления значения к параметру объекта
 Blockly.Blocks['addto_object_var'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     // Основное поле с выбором режима
     this.appendDummyInput()
         .appendField(Blockly.Msg['ADD_TO_PARAM_LABEL'])
@@ -1879,9 +2059,9 @@ Blockly.Blocks['addto_object_var'] = {
         .appendField(Blockly.Msg['OBJECT_NAME_LABEL'])
         .setVisible(false);
 
-    // Поле для выбора параметра
+    // Поле для выбора параметра (writable — excludes prev_x/prev_y etc.)
     this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(ObjectParam), 'NAME');
+        .appendField(new Blockly.FieldDropdown(ObjectParamWritable), 'NAME');
 
     // Поле для значения
     this.appendValueInput("VALUE")
@@ -2014,7 +2194,7 @@ Blockly.Blocks['set_object_bounding'] = {
 
 Blockly.Blocks['object_onstep'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['EACH_FRAME_LABEL']);
     this.appendDummyInput()
@@ -2031,7 +2211,7 @@ Blockly.Blocks['object_onstep'] = {
 
 Blockly.Blocks['object_oncollision'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['ON_COLLISION_LABEL']);
     this.appendDummyInput()
@@ -2048,7 +2228,7 @@ Blockly.Blocks['object_oncollision'] = {
 
 Blockly.Blocks['delete_object'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     // Основной заголовок
     this.appendDummyInput()
         .appendField(Blockly.Msg['DELETE_OBJECT_LABEL']);
@@ -2138,7 +2318,7 @@ Blockly.Blocks['delete_object'] = {
 
 Blockly.Blocks['object_exit_screen'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     // Сохраняем ссылки на все элементы
     this.varHeader = this.appendDummyInput('VAR_HEADER')
         .appendField(Blockly.Msg['OBJECT_OFFSCREEN_LABEL']);
@@ -2194,7 +2374,7 @@ Blockly.Blocks['object_exit_screen'] = {
 
 Blockly.Blocks['object_tap_screen'] = {
   init: function() {
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     // Сохраняем ссылки на все элементы
     this.varHeader = this.appendDummyInput('VAR_HEADER')
         .appendField(Blockly.Msg['OBJECT_TAPSCREEN_LABEL']);
@@ -2260,7 +2440,7 @@ Blockly.Blocks['lists_append'] = {
     this.setNextStatement(true);
     this.setTooltip(Blockly.Msg['LISTS_APPEND_TOOLTIP']);
     this.setHelpUrl('');
-	this.setColour(255);
+        this.setColour(255);
   }
 };
 
@@ -2273,7 +2453,7 @@ Blockly.Blocks['lists_pop_last'] = {
     this.setOutput(true);
     this.setTooltip(Blockly.Msg['LISTS_POP_LAST_TOOLTIP']);
     this.setHelpUrl('');
-	this.setColour(255);
+        this.setColour(255);
   }
 };
 // ==================== Блоки управления объектами ====================
@@ -2674,7 +2854,7 @@ Blockly.Blocks['get_time'] = {
         .appendField(Blockly.Msg['GET_TIME_LABEL']);
     this.setOutput(true, 'Number');
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2684,7 +2864,7 @@ Blockly.Blocks['get_joy_count'] = {
         .appendField(Blockly.Msg['GET_JOY_COUNT_LABEL']);
     this.setOutput(true, 'Number');
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2694,14 +2874,14 @@ Blockly.Blocks['get_memory'] = {
         .appendField(Blockly.Msg['GET_MEMORY_LABEL']);
     this.setOutput(true, 'Number');
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
 Blockly.Blocks['set_screen_xy'] = {
   init: function() {
     this.setColour(190);
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_SCREEN_POS_LABEL']);
     this.appendDummyInput()
@@ -2720,7 +2900,7 @@ Blockly.Blocks['set_screen_xy'] = {
 Blockly.Blocks['set_gravitation'] = {
   init: function() {
     this.setColour(190);
-	this.setInputsInline(true);
+        this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['SET_GRAVITY_LABEL']);
     this.appendValueInput("Value")
@@ -2737,7 +2917,7 @@ Blockly.Blocks['get_touch'] = {
         .appendField(Blockly.Msg['HAS_TOUCH_LABEL']);
     this.setOutput(true, 'Boolean');
     this.setColour(60);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2752,8 +2932,8 @@ Blockly.Blocks['get_touchxy'] = {
         ]), 'XY');
     this.setOutput(true, 'Number');
     this.setColour(60);
-	this.setInputsInline(true);
-	this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+        this.setInputsInline(true);
+        this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
   }
 };
 
@@ -2776,13 +2956,13 @@ Blockly.Blocks['create_local_var'] = {
   },
 
   validateVarName: function(newName) {
-	  const oldName = this.getFieldValue('VAR_NAME');
-	  // Добавляем новую переменную, если её нет
-	  if (newName && !Blockly.Variables.localVars.includes(newName)) {
-		Blockly.Variables.localVars.push(newName);
-	  }
-	  return newName;
-	},
+          const oldName = this.getFieldValue('VAR_NAME');
+          // Добавляем новую переменную, если её нет
+          if (newName && !Blockly.Variables.localVars.includes(newName)) {
+                Blockly.Variables.localVars.push(newName);
+          }
+          return newName;
+        },
 
   // Сохраняем имя переменной в mutation
   mutationToDom: function() {
@@ -3537,11 +3717,11 @@ function isES5Compatible(code) {
 javascript.javascriptGenerator.forBlock['field_multilineinput'] = function(block, generator) {
   const code = block.getFieldValue('FIELDSCRIPT');
   if(!isES5Compatible(code)) {
-	  block.setWarningText(Blockly.Msg['WARNING_ES5']);
-	  showSwitchModal('warning', Blockly.Msg['WARNING_ES5'], false, 'ok');
-	  Blockly.JavaScript.lastError = true;
-	  return null;
-	}
+          block.setWarningText(Blockly.Msg['WARNING_ES5']);
+          showSwitchModal('warning', Blockly.Msg['WARNING_ES5'], false, 'ok');
+          Blockly.JavaScript.lastError = true;
+          return null;
+        }
   block.setWarningText(null);
   return code;
 };
@@ -3612,8 +3792,67 @@ javascript.javascriptGenerator.forBlock['new_object_from_proto'] = function(bloc
   const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || 0;
   const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || 0;
   
-  let code = `${obj2}=Game.addObject(${obj1}.name,0,0,${obj1}.width,${obj1}.height,0);\nfor(var key in ${obj1}){if(${obj1}.hasOwnProperty(key)){${obj2}[key]=${obj1}[key];}};${obj2}.x=${x};${obj2}.y=${y};\nif(${obj2}.onCreate)${obj2}.onCreate();\n`;
+  let code = `${obj2}=Game.addObject(${obj1}.name,0,0,${obj1}.width,${obj1}.height,0);\nfor(var key in ${obj1}){if(${obj1}.hasOwnProperty(key)){${obj2}[key]=Game.helper.deepCopy(${obj1}[key]);}};${obj2}.x=${x};${obj2}.y=${y};\nif(${obj2}.onCreate)${obj2}.onCreate();\n`;
   return code;
+};
+
+// ─── Joint code generators ───
+javascript.javascriptGenerator.forBlock['create_pivot_joint'] = function(block, generator) {
+  var a = generator.getVariableName(block.getFieldValue('OBJ_A'));
+  var b = generator.getVariableName(block.getFieldValue('OBJ_B'));
+  var mode = block.getFieldValue('MODE');
+  if (mode === 'CENTER') {
+    return ['Game.physics.createPivotJoint(' + a + ',' + b + ',(' + a + '.x+' + a + '.width/2),(' + a + '.y+' + a + '.height/2))', javascript.Order.ATOMIC];
+  } else {
+    var px = block.getFieldValue('PX') || '0';
+    var py = block.getFieldValue('PY') || '0';
+    return ['Game.physics.createPivotJoint(' + a + ',' + b + ',' + px + ',' + py + ')', javascript.Order.ATOMIC];
+  }
+};
+javascript.javascriptGenerator.forBlock['create_slide_joint'] = function(block, generator) {
+  var a = generator.getVariableName(block.getFieldValue('OBJ_A'));
+  var b = generator.getVariableName(block.getFieldValue('OBJ_B'));
+  var mode = block.getFieldValue('MODE');
+  var mn = generator.valueToCode(block, 'MIN', generator.ORDER_ATOMIC) || '0';
+  var mx = generator.valueToCode(block, 'MAX', generator.ORDER_ATOMIC) || '0';
+  if (mode === 'CENTER') {
+    var ax = '(' + a + '.x+' + a + '.width/2)';
+    var ay = '(' + a + '.y+' + a + '.height/2)';
+    var bx = '(' + b + '.x+' + b + '.width/2)';
+    var by = '(' + b + '.y+' + b + '.height/2)';
+    return ['Game.physics.createSlideJoint(' + a + ',' + b + ',' + ax + ',' + ay + ',' + bx + ',' + by + ',' + mn + ',' + mx + ')', javascript.Order.ATOMIC];
+  } else {
+    var ax2 = block.getFieldValue('AX') || '0';
+    var ay2 = block.getFieldValue('AY') || '0';
+    var bx2 = block.getFieldValue('BX') || '0';
+    var by2 = block.getFieldValue('BY') || '0';
+    return ['Game.physics.createSlideJoint(' + a + ',' + b + ',' + ax2 + ',' + ay2 + ',' + bx2 + ',' + by2 + ',' + mn + ',' + mx + ')', javascript.Order.ATOMIC];
+  }
+};
+javascript.javascriptGenerator.forBlock['create_gear_joint'] = function(block, generator) {
+  var a = generator.getVariableName(block.getFieldValue('OBJ_A'));
+  var b = generator.getVariableName(block.getFieldValue('OBJ_B'));
+  var ph = generator.valueToCode(block, 'PHASE', generator.ORDER_ATOMIC) || '0';
+  var rt = generator.valueToCode(block, 'RATIO', generator.ORDER_ATOMIC) || '1';
+  return ['Game.physics.createGearJoint(' + a + ',' + b + ',' + ph + ',' + rt + ')', javascript.Order.ATOMIC];
+};
+javascript.javascriptGenerator.forBlock['remove_joint'] = function(block, generator) {
+  var j = generator.getVariableName(block.getFieldValue('JOINT'));
+  return 'Game.physics.removeJoint(' + j + ');\n';
+};
+
+javascript.javascriptGenerator.forBlock['create_chain'] = function(block, generator) {
+  var proto = generator.getVariableName(block.getFieldValue('OBJ'));
+  var mode = block.getFieldValue('MODE');
+  var count = block.getFieldValue('COUNT') || '5';
+  if (mode === 'ATTACHED') {
+    var attach = generator.getVariableName(block.getFieldValue('ATTACH'));
+    return 'Game.physics.createChain(' + proto + ',0,0,' + count + ',undefined,undefined,' + attach + ');\n';
+  } else {
+    var sx2 = block.getFieldValue('SX') || '0';
+    var sy2 = block.getFieldValue('SY') || '0';
+    return 'Game.physics.createChain(' + proto + ',' + sx2 + ',' + sy2 + ',' + count + ');\n';
+  }
 };
 
 // Генератор для клонирования объекта
@@ -3773,7 +4012,7 @@ javascript.javascriptGenerator.forBlock['object_tap_screen'] = function(block, g
   const mode = block.getFieldValue('MODE');
   if (!Blockly.JavaScript.definitions_['isPointInRotatedSquare']) {
     Blockly.JavaScript.definitions_['isPointInRotatedSquare'] = 
-		`function isPointInRotatedSquare(obj) {
+                `function isPointInRotatedSquare(obj) {
   if(!Game.getTouch.istouch)
     return false;
   var angleRad = obj.angle * Math.PI / 180;

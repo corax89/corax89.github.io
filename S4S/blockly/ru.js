@@ -442,6 +442,8 @@ Blockly.Msg['DRAWING'] = 'Рисование';
 Blockly.Msg['PROCEDURE'] = 'Процедуры';
 Blockly.Msg['OBJECT_PARAM_X'] = 'X';
 Blockly.Msg['OBJECT_PARAM_Y'] = 'Y';
+Blockly.Msg['OBJECT_PARAM_PREV_X'] = 'пред. X';
+Blockly.Msg['OBJECT_PARAM_PREV_Y'] = 'пред. Y';
 Blockly.Msg['OBJECT_PARAM_WIDTH'] = 'ширина';
 Blockly.Msg['OBJECT_PARAM_HEIGHT'] = 'высота';
 Blockly.Msg['OBJECT_PARAM_SPEEDX'] = 'скорость X';
@@ -455,6 +457,31 @@ Blockly.Msg['OBJECT_PARAM_MASS'] = 'масса';
 Blockly.Msg['OBJECT_PARAM_SPRITE'] = 'спрайт';
 Blockly.Msg['OBJECT_PARAM_RESTITUTION'] = 'упругость';
 Blockly.Msg['OBJECT_PARAM_ISSTATIC'] = 'статичность';
+Blockly.Msg['OBJECT_PARAM_LOCK_ROTATION'] = 'блокировка вращения';
+Blockly.Msg['OBJECT_PARAM_ROTATION_SPEED'] = 'скорость вращения';
+Blockly.Msg['CREATE_PIVOT_JOINT'] = 'шарнирное соединение';
+Blockly.Msg['CREATE_SLIDE_JOINT'] = 'гибкая цепь';
+Blockly.Msg['CREATE_GEAR_JOINT'] = 'жёсткая фиксация';
+Blockly.Msg['CREATE_RIGID_JOINT'] = 'жёсткая фиксация';
+Blockly.Msg['CREATE_CHAIN'] = 'цепь из объектов';
+Blockly.Msg['CHAIN_MODE_FIXED'] = 'закреплена';
+Blockly.Msg['CHAIN_MODE_LOOSE'] = 'свободная';
+Blockly.Msg['CHAIN_MODE_ATTACHED'] = 'прикреплена к';
+Blockly.Msg['ATTACH_TO'] = 'к объекту';
+Blockly.Msg['START_X'] = 'начало X';
+Blockly.Msg['COUNT'] = 'количество';
+Blockly.Msg['END_X'] = 'конец X';
+Blockly.Msg['REMOVE_JOINT'] = 'удалить соединение';
+Blockly.Msg['OBJECT_A'] = 'объект A';
+Blockly.Msg['OBJECT_B'] = 'объект B';
+Blockly.Msg['PIVOT_X'] = 'точка X';
+Blockly.Msg['PIVOT_Y'] = 'точка Y';
+Blockly.Msg['MIN_DIST'] = 'мин. расст.';
+Blockly.Msg['MAX_DIST'] = 'макс. расст.';
+Blockly.Msg['PHASE'] = 'фаза';
+Blockly.Msg['RATIO'] = 'передат. число';
+Blockly.Msg['JOINT_MODE_CENTER'] = 'по центру';
+Blockly.Msg['JOINT_MODE_MANUAL'] = 'вручную';
 Blockly.Msg['OBJECT_PARAM_ZINDEX'] = 'очередь рисования';
 Blockly.Msg['OBJECT_PARAM_ISONGROUND'] = 'на поверхности?';
 Blockly.Msg['OBJECT_PARAM_COLLIDING_TILES'] = 'столкнувшиеся тайлы';
@@ -763,48 +790,48 @@ Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
 
 const ruTexts = {
-	'INTERFACE_TITLE': 'Blockly с JavaScript',
-	'PROJECT_ACTIONS': 'Проект',
-	'PROJECT_BUILD': 'Собрать',
-	'HELP_AUTHOR': 'Автор Corax89',
-	'HELP_POWERED': 'Использует Blockly',
-	'HELP_HELP': 'Справка',
-	'EXAMPLES': 'Примеры',
-	'SAVE_PROJECT_BTN': 'Сохранить проект',
-	'LOAD_PROJECT_BTN': 'Загрузить проект',
-	'SETTINGS_BTN': 'Настройки',
-	'SETTINGS_TITTLE': 'Настройки проекта',
-	'GAME_NAME_PLACEHOLDER': 'Название игры',
-	'GAME_AUTHOR_PLACEHOLDER': 'Автор',
-	'SET_ICON': 'Иконка игры',
-	'GAMEPAD_LABEL': 'Виртуальный геймпад (для HTML)',
-	'BUILD_GAME_BTN': 'Собрать игру для Switch',
-	'BUILD_HTML_BTN': 'Собрать игру для Web',
-	'CODE_TAB': 'Код',
-	'JS_TAB': 'JS',
-	'SCREEN_TAB': 'Экран',
-	'DRAW_GEYMPAD_BTN':'виртуальный геймпад',
-	'DRAW_GEYMPAD_PRESS_BTN':'показать нажимаемые кнопки',
-	'VIEW_BOX_BTN':'ограничивающие рамки',
-	'VIEW_OBJECTS_BTN':'список объектов',
-	'CODE_OUTPUT_PLACEHOLDER': '// Здесь будет сгенерированный код',
-	'ICON_PREVIEW_ALT': 'Превью иконки',
-	'GAME_CATEGORY': 'Игра',
-	'OBJECTS_CATEGORY': 'Объекты',
-	'LOGIC_CATEGORY': 'Логика',
-	'LOOPS_CATEGORY': 'Циклы',
-	'MATH_CATEGORY': 'Математика',
-	'TEXT_CATEGORY': 'Текст',
-	'LISTS_CATEGORY': 'Списки',
-	'DRAWING_CATEGORY': 'Рисование',
-	'VARIABLES_CATEGORY': 'Переменные',
-	'LOCAL_VARIABLES_CATEGORY': 'Локальные переменные',
-	'FUNCTIONS_CATEGORY': 'Функции',
-	'KEY_DEF': 'Переназначение кнопок (HTML)',
-	'BUTTON_RESET': 'Сбросить кнопки',
-	'BUTTON_SAVE': 'Сохранить',
-	'BUTTON_CANCEL': 'Отменить',
-	'BUTTON_ICON': 'Загрузить новую иконку'
+        'INTERFACE_TITLE': 'Blockly с JavaScript',
+        'PROJECT_ACTIONS': 'Проект',
+        'PROJECT_BUILD': 'Собрать',
+        'HELP_AUTHOR': 'Автор Corax89',
+        'HELP_POWERED': 'Использует Blockly',
+        'HELP_HELP': 'Справка',
+        'EXAMPLES': 'Примеры',
+        'SAVE_PROJECT_BTN': 'Сохранить проект',
+        'LOAD_PROJECT_BTN': 'Загрузить проект',
+        'SETTINGS_BTN': 'Настройки',
+        'SETTINGS_TITTLE': 'Настройки проекта',
+        'GAME_NAME_PLACEHOLDER': 'Название игры',
+        'GAME_AUTHOR_PLACEHOLDER': 'Автор',
+        'SET_ICON': 'Иконка игры',
+        'GAMEPAD_LABEL': 'Виртуальный геймпад (для HTML)',
+        'BUILD_GAME_BTN': 'Собрать игру для Switch',
+        'BUILD_HTML_BTN': 'Собрать игру для Web',
+        'CODE_TAB': 'Код',
+        'JS_TAB': 'JS',
+        'SCREEN_TAB': 'Экран',
+        'DRAW_GEYMPAD_BTN':'виртуальный геймпад',
+        'DRAW_GEYMPAD_PRESS_BTN':'показать нажимаемые кнопки',
+        'VIEW_BOX_BTN':'ограничивающие рамки',
+        'VIEW_OBJECTS_BTN':'список объектов',
+        'CODE_OUTPUT_PLACEHOLDER': '// Здесь будет сгенерированный код',
+        'ICON_PREVIEW_ALT': 'Превью иконки',
+        'GAME_CATEGORY': 'Игра',
+        'OBJECTS_CATEGORY': 'Объекты',
+        'LOGIC_CATEGORY': 'Логика',
+        'LOOPS_CATEGORY': 'Циклы',
+        'MATH_CATEGORY': 'Математика',
+        'TEXT_CATEGORY': 'Текст',
+        'LISTS_CATEGORY': 'Списки',
+        'DRAWING_CATEGORY': 'Рисование',
+        'VARIABLES_CATEGORY': 'Переменные',
+        'LOCAL_VARIABLES_CATEGORY': 'Локальные переменные',
+        'FUNCTIONS_CATEGORY': 'Функции',
+        'KEY_DEF': 'Переназначение кнопок (HTML)',
+        'BUTTON_RESET': 'Сбросить кнопки',
+        'BUTTON_SAVE': 'Сохранить',
+        'BUTTON_CANCEL': 'Отменить',
+        'BUTTON_ICON': 'Загрузить новую иконку'
 };
 document.getElementById('project-actions').textContent = ruTexts.PROJECT_ACTIONS;
 document.getElementById('project-build').textContent = ruTexts.PROJECT_BUILD;

@@ -1,8 +1,8 @@
 // Список скриптов для загрузки (ваш список)
 const scripts = [
-	{ name: 'Examples', path: 'examples.js' },
-	{ name: 'LZ-String', path: 'compiler/lz-string.min.js' },
-	{ name: 'File Data', path: 'compiler/fileData.js'},
+        { name: 'Examples', path: 'examples.js' },
+        { name: 'LZ-String', path: 'compiler/lz-string.min.js' },
+        { name: 'File Data', path: 'compiler/fileData.js'},
     { name: 'Blockly Core', path: 'blockly/blockly_compressed.js' },
     { name: 'Blockly Blocks', path: 'blockly/blocks_compressed.js' },
     { name: 'Blockly JavaScript', path: 'blockly/javascript_compressed.js' },
@@ -13,12 +13,13 @@ const scripts = [
     { name: 'Music Field', path: 'blockly/field_music.js' },
     { name: 'WAV Field', path: 'blockly/field_wav.js' },
     { name: 'PNG Field', path: 'blockly/field_png.js' },
-	{ name: 'Level editor Field', path: 'blockly/field_leveleditor.js' },
+        { name: 'Level editor Field', path: 'blockly/field_leveleditor.js' },
     { name: 'Minimap', path: 'blockly/minimap.js' },
     { name: 'Scroll', path: 'blockly/scroll.js' },
     { name: 'Copy/Paste', path: 'blockly/copypast.js' },
     { name: 'Custom Blocks', path: 'blocks.js' },
     { name: 'Engine', path: 'engine.js' },
+    { name: 'Engine Full String', path: 'engine_full.js' },
     { name: 'Compiler', path: 'compiler/compiler.js' },
     { name: 'Main Script', path: 'script.js' }
 ];
