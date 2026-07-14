@@ -1995,6 +1995,115 @@ Blockly.Blocks['create_chain'] = {
   }
 };
 
+// Блок "Есть ли тайлы между точками/объектами" — ray cast.
+// Проверяет линию между двумя точками (или объектами) на наличие твёрдых тайлов.
+// Возвращает: true/false (есть ли стена) или координаты первого тайла-стены.
+Blockly.Blocks['raycast_tiles'] = {
+  init: function() {
+    this.setColour(210);
+    this.setInputsInline(true);
+    this.setOutput(true, ['Boolean', 'Number']);
+
+    // Режим возврата: булево или координаты
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['RAYCAST_LABEL'] || 'Тайлы между');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['RAYCAST_MODE_BOOL'] || 'есть ли стена', 'BOOL'],
+          [Blockly.Msg['RAYCAST_MODE_X'] || 'X стены', 'X'],
+          [Blockly.Msg['RAYCAST_MODE_Y'] || 'Y стены', 'Y']
+        ]), 'RETURN_MODE');
+
+    // Точка A: по координатам, объекту или this
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['RAYCAST_POINT'] || 'точка', 'POINT'],
+          [Blockly.Msg['RAYCAST_OBJECT'] || 'объект', 'OBJECT'],
+          [Blockly.Msg['RAYCAST_THIS'] || 'этот объект', 'THIS']
+        ], (newVal) => this.updateShapeA_(newVal)), 'MODE_A');
+    this.appendDummyInput('VAR_A_INPUT')
+        .appendField(new Blockly.FieldVariable('obj1'), 'OBJ_A')
+        .setVisible(false);
+    this.appendValueInput("AX")
+        .setCheck("Number")
+        .appendField('X1');
+    this.appendValueInput("AY")
+        .setCheck("Number")
+        .appendField('Y1');
+
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['AND_LABEL'] || 'и');
+
+    // Точка B: по координатам, объекту или this
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['RAYCAST_POINT'] || 'точка', 'POINT'],
+          [Blockly.Msg['RAYCAST_OBJECT'] || 'объект', 'OBJECT'],
+          [Blockly.Msg['RAYCAST_THIS'] || 'этот объект', 'THIS']
+        ], (newVal) => this.updateShapeB_(newVal)), 'MODE_B');
+    this.appendDummyInput('VAR_B_INPUT')
+        .appendField(new Blockly.FieldVariable('obj2'), 'OBJ_B')
+        .setVisible(false);
+    this.appendValueInput("BX")
+        .setCheck("Number")
+        .appendField('X2');
+    this.appendValueInput("BY")
+        .setCheck("Number")
+        .appendField('Y2');
+
+    // Теневые блоки
+    var shadowAX = this.workspace.newBlock('math_number');
+    shadowAX.setFieldValue('0', 'NUM'); shadowAX.setShadow(true); shadowAX.initSvg();
+    this.getInput('AX').connection.connect(shadowAX.outputConnection); shadowAX.render();
+    var shadowAY = this.workspace.newBlock('math_number');
+    shadowAY.setFieldValue('0', 'NUM'); shadowAY.setShadow(true); shadowAY.initSvg();
+    this.getInput('AY').connection.connect(shadowAY.outputConnection); shadowAY.render();
+    var shadowBX = this.workspace.newBlock('math_number');
+    shadowBX.setFieldValue('100', 'NUM'); shadowBX.setShadow(true); shadowBX.initSvg();
+    this.getInput('BX').connection.connect(shadowBX.outputConnection); shadowBX.render();
+    var shadowBY = this.workspace.newBlock('math_number');
+    shadowBY.setFieldValue('100', 'NUM'); shadowBY.setShadow(true); shadowBY.initSvg();
+    this.getInput('BY').connection.connect(shadowBY.outputConnection); shadowBY.render();
+
+    this.setTooltip(function() {
+      var ru = typeof savedLanguage !== 'undefined' && savedLanguage === 'ru';
+      return ru
+        ? 'Проверяет линию между двумя точками/объектами на наличие твёрдых тайлов. Возвращает true/false (есть стена) или X/Y первого тайла-стены.'
+        : 'Checks the line between two points/objects for solid tiles. Returns true/false (wall found) or X/Y of the first wall tile.';
+    }.bind(this));
+
+    this.updateShapeA_(this.getFieldValue('MODE_A') || 'POINT');
+    this.updateShapeB_(this.getFieldValue('MODE_B') || 'POINT');
+  },
+
+  updateShapeA_: function(mode) {
+    var vi = this.getInput('VAR_A_INPUT');
+    var xi = this.getInput('AX'), yi = this.getInput('AY');
+    if (vi) vi.setVisible(mode === 'OBJECT');
+    if (xi) xi.setVisible(mode === 'POINT');
+    if (yi) yi.setVisible(mode === 'POINT');
+    // THIS — ни переменная, ни координаты не нужны.
+  },
+
+  updateShapeB_: function(mode) {
+    var vi = this.getInput('VAR_B_INPUT');
+    var xi = this.getInput('BX'), yi = this.getInput('BY');
+    if (vi) vi.setVisible(mode === 'OBJECT');
+    if (xi) xi.setVisible(mode === 'POINT');
+    if (yi) yi.setVisible(mode === 'POINT');
+  },
+
+  saveExtraState: function() {
+    return { modeA: this.getFieldValue('MODE_A'), modeB: this.getFieldValue('MODE_B') };
+  },
+
+  loadExtraState: function(state) {
+    if (!state) return;
+    if (state.modeA) { this.setFieldValue(state.modeA, 'MODE_A'); this.updateShapeA_(state.modeA); }
+    if (state.modeB) { this.setFieldValue(state.modeB, 'MODE_B'); this.updateShapeB_(state.modeB); }
+  }
+};
+
 Blockly.Blocks['clone_object'] = {
   init: function() {
     this.setColour(340);
@@ -3044,6 +3153,146 @@ Blockly.Blocks['object_velocity'] = {
   }
 };
 
+// Блок "Идти к цели с обходом тайлов".
+// Двигает объект к точке (X, Y) или к другому объекту, огибая твёрдые тайлы.
+// Алгоритм — потенциальные поля (steering): seek-вектор к цели +
+// вектор отталкивания от ближайших твёрдых тайлов. Без A* и без построения карты.
+Blockly.Blocks['object_move_to_target'] = {
+  init: function() {
+    this.setInputsInline(true);
+    this.setColour(190);
+
+    // Заголовок
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['MOVE_TO_TARGET_LABEL'] || 'Идти к цели с обходом');
+
+    // Выбор объекта, который двигается: по переменной / this
+    var modeField = new Blockly.FieldDropdown([
+      [Blockly.Msg['OBJECT_BY_VAR_LABEL'] || 'конкретного', 'VAR'],
+      [Blockly.Msg['THIS_OBJECT_LABEL'] || 'этого объекта', 'THIS']
+    ], (newMode) => this.updateShape_(newMode));
+    this.appendDummyInput('MODE_INPUT')
+        .appendField(modeField, 'MODE');
+    this.appendDummyInput('VAR_INPUT')
+        .appendField(new Blockly.FieldVariable('obj1'), 'Object');
+
+    // Выбор типа цели: точка (X, Y) или другой объект (по переменной)
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['MOVE_TO_TARGET_POINT'] || 'к точке', 'POINT'],
+          [Blockly.Msg['MOVE_TO_TARGET_OBJ'] || 'к объекту', 'OBJECT']
+        ], (newTarget) => this.updateTargetShape_(newTarget)), 'TARGET_MODE');
+
+    // Входы для точки (по умолчанию видны)
+    this.appendValueInput("TX")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_X']);
+    this.appendValueInput("TY")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['OBJECT_PARAM_Y']);
+
+    // Вход для целевого объекта (скрыт по умолчанию)
+    this.appendDummyInput('TARGET_VAR_INPUT')
+        .appendField(new Blockly.FieldVariable('obj2'), 'TargetObject')
+        .setVisible(false);
+
+    // Скорость движения
+    this.appendValueInput("SPEED")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['SPEED_LABEL'] || 'скорость');
+
+    // Размер окна поиска пути (сторона квадрата тайлов для локального A*)
+    this.appendValueInput("SEARCH_SIZE")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['MOVE_TO_TARGET_SEARCH'] || 'размер поиска');
+
+    // Чекбокс отладки: если включён — генерирует код с визуализацией
+    // пути на canvas. Если выключен — компактный код без отладки.
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['MOVE_TO_TARGET_DEBUG'] || 'отладка')
+        .appendField(new Blockly.FieldCheckbox("FALSE"), "DEBUG");
+
+    // Теневые блоки для значений по умолчанию
+    var shadowX = this.workspace.newBlock('math_number');
+    shadowX.setFieldValue('640', 'NUM');
+    shadowX.setShadow(true); shadowX.initSvg();
+    this.getInput('TX').connection.connect(shadowX.outputConnection);
+    shadowX.render();
+
+    var shadowY = this.workspace.newBlock('math_number');
+    shadowY.setFieldValue('360', 'NUM');
+    shadowY.setShadow(true); shadowY.initSvg();
+    this.getInput('TY').connection.connect(shadowY.outputConnection);
+    shadowY.render();
+
+    var shadowSpeed = this.workspace.newBlock('math_number');
+    shadowSpeed.setFieldValue('3', 'NUM');
+    shadowSpeed.setShadow(true); shadowSpeed.initSvg();
+    this.getInput('SPEED').connection.connect(shadowSpeed.outputConnection);
+    shadowSpeed.render();
+
+    var shadowSearch = this.workspace.newBlock('math_number');
+    shadowSearch.setFieldValue('15', 'NUM');
+    shadowSearch.setShadow(true); shadowSearch.initSvg();
+    this.getInput('SEARCH_SIZE').connection.connect(shadowSearch.outputConnection);
+    shadowSearch.render();
+
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+
+    // Динамическая подсказка
+    this.setTooltip(function() {
+      var ru = typeof savedLanguage !== 'undefined' && savedLanguage === 'ru';
+      return ru
+        ? 'Двигает объект к цели по центрам тайлов (локальный A*, 4-направленный). Скорость — пикс/кадр, размер поиска — сторона квадрата тайлов (min 3, по умолчанию 15). Отладка — включает визуализацию пути на canvas (увеличивает размер кода).'
+        : 'Moves the object toward the target through tile centers (local A*, 4-directional). Speed — px/frame, search size — tile square side (min 3, default 15). Debug — enables path visualization on canvas (increases code size).';
+    }.bind(this));
+
+    this.updateShape_(this.getFieldValue('MODE') || 'VAR');
+  },
+
+  // Переключение видимости поля переменной объекта (VAR / THIS)
+  updateShape_: function(newMode) {
+    var varInput = this.getInput('VAR_INPUT');
+    if (varInput) varInput.setVisible(newMode === 'VAR');
+  },
+
+  // Переключение между целью-точкой и целью-объектом
+  updateTargetShape_: function(newTarget) {
+    var tx = this.getInput('TX');
+    var ty = this.getInput('TY');
+    var tvar = this.getInput('TARGET_VAR_INPUT');
+    if (newTarget === 'OBJECT') {
+      if (tx) tx.setVisible(false);
+      if (ty) ty.setVisible(false);
+      if (tvar) tvar.setVisible(true);
+    } else {
+      if (tx) tx.setVisible(true);
+      if (ty) ty.setVisible(true);
+      if (tvar) tvar.setVisible(false);
+    }
+  },
+
+  saveExtraState: function() {
+    return {
+      mode: this.getFieldValue('MODE'),
+      targetMode: this.getFieldValue('TARGET_MODE')
+    };
+  },
+
+  loadExtraState: function(state) {
+    if (!state) return;
+    if (state.mode) {
+      this.setFieldValue(state.mode, 'MODE');
+      this.updateShape_(state.mode);
+    }
+    if (state.targetMode) {
+      this.setFieldValue(state.targetMode, 'TARGET_MODE');
+      this.updateTargetShape_(state.targetMode);
+    }
+  }
+};
+
 // Блок для получения объекта
 Blockly.Blocks['get_object'] = {
   init: function() {
@@ -3875,11 +4124,19 @@ javascript.javascriptGenerator.forBlock['get_tile_at'] = function(block, generat
   const solidOnly = block.getFieldValue('SOLID_ONLY') === 'TRUE';
   
   // Добавляем функцию получения тайла, если она еще не определена
+  // Используем Game.isTileSolid для проверки твёрдости — работает и на web,
+  // и на Switch (где Game.helper.tiles.solidTiles не существует).
   if (!Blockly.JavaScript.definitions_['getTileAt']) {
-    Blockly.JavaScript.definitions_['getTileAt'] = 
+    Blockly.JavaScript.definitions_['getTileAt'] =
       `function getTileAt(x, y, solidOnly) {
         var tileId = Game.getTileInXY(x, y);
-        return solidOnly ? (Game.helper.tiles.solidTiles.has(tileId) ? tileId : 0) : tileId;
+        if (!solidOnly) return tileId;
+        // solidOnly: возвращаем tileId только если тайл твёрдый
+        if (typeof Game.isTileSolid === 'function') {
+          return Game.isTileSolid(x, y) ? tileId : 0;
+        }
+        // Fallback: проверяем бит твёрдости (Switch: tileValue < 0)
+        return (tileId !== undefined && tileId < 0) ? tileId : 0;
       }`;
   }
   
@@ -4634,6 +4891,417 @@ javascript.javascriptGenerator.forBlock['object_velocity'] = function(block, gen
   return `Game.setVelocityTowards(${obj}, ${x}, ${y}, ${speed});\n`;
 };
 
+// Генератор для блока "Идти к цели с обходом тайлов".
+// Регистрирует переиспользуемую функцию __sg_moveToward через definitions_
+// (попадает в код ровно один раз) и генерирует короткий однострочный вызов.
+//
+// Алгоритм — локальный A* на окне searchSize × searchSize тайлов вокруг
+// объекта. В отличие от whisker/potential fields, A* находит путь ВОКРУГ
+// углов и тупиков, а не только на один шаг вперёд.
+//
+//   1. Берём квадрат searchSize × searchSize тайлов с центром на объекте.
+//   2. Цель: тайл цели, если внутри окна; иначе — ближайший крайний тайл
+//      окна в направлении цели.
+//   3. Запускаем A* (8-направленный, с предотвращением срезания углов)
+//      от тайла объекта до тайла цели в пределах окна.
+//   4. Если путь найден — берём ПЕРВЫЙ шаг пути и двигаемся к центру
+//      этого тайла.
+//   5. Если путь не найден (цель за стеной в пределах окна) — движемся
+//      напрямую к цели (скольжение вдоль стены).
+//
+// Производительность: A* на 7×7 = 49 тайлах — микросекунды. Даже 15×15
+// (225 тайлов) тривиально. Окно пересчитывается каждый кадр, но это
+// допустимо, т.к. окно маленькое.
+javascript.javascriptGenerator.forBlock['object_move_to_target'] = function(block, generator) {
+  const mode = block.getFieldValue('MODE');
+  const targetMode = block.getFieldValue('TARGET_MODE');
+  const debugOn = block.getFieldValue('DEBUG') === 'TRUE';
+
+  let obj;
+  if (mode === 'VAR') {
+    obj = generator.getVariableName(block.getFieldValue('Object'));
+  } else {
+    obj = 'this';
+  }
+
+  let targetX, targetY;
+  if (targetMode === 'OBJECT') {
+    const targetObj = generator.getVariableName(block.getFieldValue('TargetObject'));
+    targetX = '(' + targetObj + '.x + ' + targetObj + '.width / 2)';
+    targetY = '(' + targetObj + '.y + ' + targetObj + '.height / 2)';
+  } else {
+    const tx = generator.valueToCode(block, 'TX', generator.ORDER_ATOMIC) || '0';
+    const ty = generator.valueToCode(block, 'TY', generator.ORDER_ATOMIC) || '0';
+    targetX = tx;
+    targetY = ty;
+  }
+
+  const speed = generator.valueToCode(block, 'SPEED', generator.ORDER_ATOMIC) || '0';
+  const searchSize = generator.valueToCode(block, 'SEARCH_SIZE', generator.ORDER_ATOMIC) || '15';
+
+  // Регистрируем переиспользуемую функцию ровно один раз.
+  // Если хотя бы один блок включил отладку — регистрируем debug-версию.
+  // Иначе — компактную.
+  if (debugOn && !Blockly.JavaScript.definitions_['__sg_moveToward']) {
+    Blockly.JavaScript.definitions_['__sg_moveToward'] = __sg_moveToward_debug_src;
+    Blockly.JavaScript.definitions_['__sg_drawDebug'] = __sg_drawDebug_src;
+    Blockly.JavaScript.definitions_['__sg_debugEnabled'] = 'var __sg_debugEnabled = true;';
+  } else if (!Blockly.JavaScript.definitions_['__sg_moveToward']) {
+    Blockly.JavaScript.definitions_['__sg_moveToward'] = __sg_moveToward_compact_src;
+  }
+
+  return `__sg_moveToward(${obj}, ${targetX}, ${targetY}, ${speed}, ${searchSize});\n`;
+};
+
+// ===== Компактная версия (без отладки) =====
+// Нет __dbg, нет __sg_drawDebug, нет BFS, нет console.log.
+// Объект двигается строго по центрам тайлов: сначала выравнивается на
+// центр текущего тайла, потом идёт к центру следующего тайла пути.
+var __sg_moveToward_compact_src =
+`function __sg_moveToward(obj, targetX, targetY, speed, searchSize) {
+  if (!obj || typeof targetX !== 'number' || typeof targetY !== 'number') return;
+  if (!(speed > 0)) return;
+  searchSize = Math.max(3, Math.floor(searchSize) || 15);
+  if (searchSize % 2 === 0) searchSize++;
+  var cx = obj.x + (obj.width || 0) / 2, cy = obj.y + (obj.height || 0) / 2;
+  var dx = targetX - cx, dy = targetY - cy, dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist < 0.5) { obj.speedx = 0; obj.speedy = 0; obj._sgTarget = null; return; }
+
+  // ===== ПЛАТФОРМО-НЕЗАВИСИМАЯ ПРОВЕРКА ТВЁРДОСТИ ТАЙЛОВ =====
+  // Game.isTileSolid(col, row) доступен на обеих платформах:
+  //   Web (engine.js): проверяет Game.helper.tiles.solidMap
+  //   Switch (main.c): проверяет бит 31 в tileSystem.grid[row][col]
+  // Fallback: Game.getTileInXY + проверка бита твёрдости (tv < 0).
+  var _ts = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.tileSize) ? Game.helper.tiles.tileSize : 32;
+  var _rows = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.rows) ? Game.helper.tiles.rows : 1000;
+  var _cols = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.cols) ? Game.helper.tiles.cols : 1000;
+  var _hasWebTiles = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.grid && Game.helper.tiles.solidMap);
+  var _hasIsTileSolid = (typeof Game !== 'undefined' && typeof Game.isTileSolid === 'function');
+  var _hasGetTileInXY = (typeof Game !== 'undefined' && typeof Game.getTileInXY === 'function');
+  function isSolid(col, row) {
+    if (col < 0 || row < 0 || row >= _rows || col >= _cols) return true;
+    if (_hasIsTileSolid) return !!Game.isTileSolid(col, row);
+    if (_hasWebTiles) return !!Game.helper.tiles.solidMap[row + '_' + col];
+    if (_hasGetTileInXY) { var tv = Game.getTileInXY(col, row); return tv !== undefined && tv !== null && tv < 0; }
+    return false;
+  }
+  // Нет никаких API тайлов — движемся напрямую.
+  if (!_hasIsTileSolid && !_hasWebTiles && !_hasGetTileInXY) {
+    obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; obj._sgTarget = null; return;
+  }
+  var ts = _ts;
+
+  // ===== ПАМЯТЬ ТЕКУЩЕЙ ЦЕЛИ ШАГА =====
+  // Запоминаем целевой тайл шага на объекте, чтобы A* не пересчитывался
+  // каждый кадр (что вызывало колебание).
+  //
+  // СБРОС ЦЕЛИ происходит когда:
+  // 1. Объект достиг центра тайла (tdist <= speed*0.5) → выравниваемся
+  // 2. Объект НЕ прогрессирует к цели 3 кадра подряд (застрял) → пересчёт
+  // 3. Прошло больше 15 кадров (страховочный тайм-аут) → пересчёт
+  //
+  // Проверка прогресса: сравниваем tdist с предыдущим кадром. Если tdist
+  // не уменьшается — объект застрял (стена блокирует), сбрасываем цель.
+  var col0 = Math.floor(cx / ts), row0 = Math.floor(cy / ts);
+  var colT = Math.floor(targetX / ts), rowT = Math.floor(targetY / ts);
+
+  if (obj._sgTarget) {
+    var tCol = obj._sgTarget.c, tRow = obj._sgTarget.r;
+    var tCx = tCol * ts + ts / 2, tCy = tRow * ts + ts / 2;
+    var tdx = tCx - cx, tdy = tCy - cy, tdist = Math.sqrt(tdx * tdx + tdy * tdy);
+    obj._sgTarget.frames = (obj._sgTarget.frames || 0) + 1;
+    // Проверка прогресса: стал ли объект ближе к цели, чем в прошлый кадр?
+    var prevDist = obj._sgTarget.prevDist || tdist;
+    var stuck = tdist >= prevDist - 0.1;  // не приблизились более чем на 0.1px
+    obj._sgTarget.prevDist = tdist;
+    obj._sgTarget.stuckCount = stuck ? (obj._sgTarget.stuckCount || 0) + 1 : 0;
+
+    // Сброс если: тайм-аут 15 кадров, ИЛИ застрял 3 кадра подряд
+    if (obj._sgTarget.frames > 15 || obj._sgTarget.stuckCount > 3) {
+      obj._sgTarget = null;
+    } else if (tdist > speed * 0.5) {
+      // Ещё не достигли — двигаемся к запомненной цели.
+      // ДВИЖЕНИЕ РАЗДЕЛЕНО НА ДВЕ ПОЛОВИНЫ:
+      //   obj.x += vx/2  — прямое перемещение (обходит _blocked* флаги,
+      //                    предотвращает застревание на углах)
+      //   obj.speedx = vx/2 — скорость для физического движка
+      // Итого: vx/2 + vx/2 = vx — корректная одинарная скорость.
+      var halfVx = (tdx / tdist) * speed * 0.5, halfVy = (tdy / tdist) * speed * 0.5;
+      obj.x += halfVx; obj.y += halfVy;
+      obj.speedx = halfVx; obj.speedy = halfVy;
+      return;
+    } else {
+      // Достигли запомненной цели. ВЫРАВНИВАЕМ объект точно в центр тайла.
+      obj.x = tCol * ts + ts / 2 - (obj.width || 0) / 2;
+      obj.y = tRow * ts + ts / 2 - (obj.height || 0) / 2;
+      obj.speedx = 0; obj.speedy = 0;
+      obj._sgTarget = null;
+      cx = obj.x + (obj.width || 0) / 2; cy = obj.y + (obj.height || 0) / 2;
+      col0 = Math.floor(cx / ts); row0 = Math.floor(cy / ts);
+    }
+  }
+
+  // Пересчёт пути через A*
+  if (col0 === colT && row0 === rowT) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; return; }
+  var half = Math.floor(searchSize / 2);
+  var rMin = row0 - half, rMax = row0 + half, cMin = col0 - half, cMax = col0 + half;
+  if (rMin < 0) rMin = 0; if (cMin < 0) cMin = 0;
+  if (rMax >= _rows) rMax = _rows - 1; if (cMax >= _cols) cMax = _cols - 1;
+  var goalR = Math.max(rMin, Math.min(rMax, rowT)), goalC = Math.max(cMin, Math.min(cMax, colT));
+  // solid() использует isSolid() (платформо-независимая)
+  function solid(r, c) { if (r < rMin || r > rMax || c < cMin || c > cMax) return true; return isSolid(c, r); }
+  if (solid(row0, col0)) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; return; }
+  if (solid(goalR, goalC)) {
+    var bestR = -1, bestC = -1, bestD = Infinity;
+    for (var r = rMin; r <= rMax; r++) for (var c = cMin; c <= cMax; c++) {
+      if (solid(r, c)) continue;
+      var d = (r - goalR) * (r - goalR) + (c - goalC) * (c - goalC);
+      if (d < bestD) { bestD = d; bestR = r; bestC = c; }
+    }
+    if (bestR === -1) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; return; }
+    goalR = bestR; goalC = bestC;
+  }
+  var startKey = row0 + '_' + col0, goalKey = goalR + '_' + goalC;
+  var open = [{ r: row0, c: col0, g: 0, f: 0 }], closed = {}, gScore = {}, cameFrom = {};
+  gScore[startKey] = 0;
+  var dirs = [[-1,0,1],[1,0,1],[0,-1,1],[0,1,1]];
+  var found = false, maxIter = searchSize * searchSize * 4;
+  for (var iter = 0; iter < maxIter && open.length > 0; iter++) {
+    var minIdx = 0;
+    for (var i = 1; i < open.length; i++) if (open[i].f < open[minIdx].f) minIdx = i;
+    var cur = open.splice(minIdx, 1)[0], curKey = cur.r + '_' + cur.c;
+    if (curKey === goalKey) { found = true; break; }
+    closed[curKey] = true;
+    for (var d = 0; d < dirs.length; d++) {
+      var nr = cur.r + dirs[d][0], nc = cur.c + dirs[d][1], cost = dirs[d][2];
+      if (solid(nr, nc)) continue;
+      var nKey = nr + '_' + nc;
+      if (closed[nKey]) continue;
+      var tg = cur.g + cost;
+      if (gScore[nKey] === undefined || tg < gScore[nKey]) {
+        gScore[nKey] = tg; cameFrom[nKey] = curKey;
+        var h = Math.abs(nr - goalR) + Math.abs(nc - goalC);
+        open.push({ r: nr, c: nc, g: tg, f: tg + h });
+      }
+    }
+  }
+  if (!found) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; return; }
+  var path = [], key = goalKey;
+  for (var pstep = 0; pstep < maxIter && key && key !== startKey; pstep++) {
+    var p = key.split('_'); path.unshift({ r: parseInt(p[0], 10), c: parseInt(p[1], 10) }); key = cameFrom[key];
+  }
+  if (path.length === 0) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; return; }
+
+  // ЗАПОМИНАЕМ первый тайл пути как текущую цель шага.
+  var next = path[0];
+  obj._sgTarget = { r: next.r, c: next.c, frames: 0, prevDist: 0, stuckCount: 0 };
+  var tx2 = next.c * ts + ts / 2, ty2 = next.r * ts + ts / 2;
+  var sdx = tx2 - cx, sdy = ty2 - cy, sdist = Math.sqrt(sdx * sdx + sdy * sdy);
+  if (sdist < 0.5) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; obj._sgTarget = null; return; }
+  // ДВИЖЕНИЕ РАЗДЕЛЕНО НАПОПОЛАМ (см. комментарий выше).
+  var halfVx2 = (sdx / sdist) * speed * 0.5, halfVy2 = (sdy / sdist) * speed * 0.5;
+  obj.x += halfVx2; obj.y += halfVy2;
+  obj.speedx = halfVx2; obj.speedy = halfVy2;
+}`;
+
+// ===== Debug-версия (с визуализацией) =====
+var __sg_moveToward_debug_src =
+`function __sg_moveToward(obj, targetX, targetY, speed, searchSize) {
+  var __dbg = { cx: 0, cy: 0, targetX: 0, targetY: 0, path: [], window: null, goal: null, stepTarget: null, found: false, startTile: null, velocity: { x: 0, y: 0 } };
+  if (!obj || typeof targetX !== 'number' || typeof targetY !== 'number') { __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  if (!(speed > 0)) { __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  searchSize = Math.max(3, Math.floor(searchSize) || 15);
+  if (searchSize % 2 === 0) searchSize++;
+  var cx = obj.x + (obj.width || 0) / 2, cy = obj.y + (obj.height || 0) / 2;
+  var dx = targetX - cx, dy = targetY - cy, dist = Math.sqrt(dx * dx + dy * dy);
+  __dbg.cx = cx; __dbg.cy = cy; __dbg.targetX = targetX; __dbg.targetY = targetY;
+  if (dist < 0.5) { obj.speedx = 0; obj.speedy = 0; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  // ПЛАТФОРМО-НЕЗАВИСИМАЯ проверка твёрдости (Web + Switch)
+  var _ts = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.tileSize) ? Game.helper.tiles.tileSize : 32;
+  var _rows = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.rows) ? Game.helper.tiles.rows : 1000;
+  var _cols = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.cols) ? Game.helper.tiles.cols : 1000;
+  var _hasIsTileSolid = (typeof Game !== 'undefined' && typeof Game.isTileSolid === 'function');
+  var _hasGetTileInXY = (typeof Game !== 'undefined' && typeof Game.getTileInXY === 'function');
+  function isSolid(col, row) {
+    if (col < 0 || row < 0 || row >= _rows || col >= _cols) return true;
+    if (_hasIsTileSolid) return !!Game.isTileSolid(col, row);
+    if (_hasGetTileInXY) { var tv = Game.getTileInXY(col, row); return tv !== undefined && tv !== null && tv < 0; }
+    return false;
+  }
+  if (!_hasIsTileSolid && !_hasWebTiles && !_hasGetTileInXY) {
+    obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed;
+    __dbg.velocity = { x: obj.speedx, y: obj.speedy }; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return;
+  }
+  var ts = _ts;
+  var col0 = Math.floor(cx / ts), row0 = Math.floor(cy / ts);
+  var colT = Math.floor(targetX / ts), rowT = Math.floor(targetY / ts);
+  __dbg.startTile = { r: row0, c: col0 };
+
+  // ===== ПАМЯТЬ ТЕКУЩЕЙ ЦЕЛИ ШАГА (с прогресс-детекцией) =====
+  // При движении к запомненному тайлу используем ПРЕДЫДУЩИЕ отладочные
+  // данные (obj._sgDbg) как основу, обновляя только позицию объекта и
+  // stepTarget. Это предотвращает мигание отладки между пересчётами A*.
+  var _prevDbg = obj._sgDbg || null;
+  if (_prevDbg) {
+    __dbg.window = _prevDbg.window;
+    __dbg.goal = _prevDbg.goal;
+    __dbg.closed = _prevDbg.closed;
+    __dbg.fScore = _prevDbg.fScore;
+    __dbg.bfsDist = _prevDbg.bfsDist;
+    __dbg.bfsReached = _prevDbg.bfsReached;
+    __dbg.iterations = _prevDbg.iterations;
+    __dbg.path = _prevDbg.path;
+    __dbg.found = _prevDbg.found;
+  }
+  if (obj._sgTarget) {
+    var tCol = obj._sgTarget.c, tRow = obj._sgTarget.r;
+    var tCx = tCol * ts + ts / 2, tCy = tRow * ts + ts / 2;
+    var tdx = tCx - cx, tdy = tCy - cy, tdist = Math.sqrt(tdx * tdx + tdy * tdy);
+    __dbg.stepTarget = { x: tCx, y: tCy };
+    __dbg.found = true;
+    obj._sgTarget.frames = (obj._sgTarget.frames || 0) + 1;
+    var prevDist = obj._sgTarget.prevDist || tdist;
+    var stuck = tdist >= prevDist - 0.1;
+    obj._sgTarget.prevDist = tdist;
+    obj._sgTarget.stuckCount = stuck ? (obj._sgTarget.stuckCount || 0) + 1 : 0;
+    if (obj._sgTarget.frames > 15 || obj._sgTarget.stuckCount > 3) {
+      obj._sgTarget = null;
+      __dbg.stepTarget = null;
+      __dbg.path = [];
+    } else if (tdist > speed * 0.5) {
+      var dHalfVx = (tdx / tdist) * speed * 0.5, dHalfVy = (tdy / tdist) * speed * 0.5;
+      obj.x += dHalfVx; obj.y += dHalfVy;
+      obj.speedx = dHalfVx; obj.speedy = dHalfVy;
+      __dbg.velocity = { x: obj.speedx, y: obj.speedy }; __sg_drawDebug(__dbg); obj._sgDbg = __dbg;
+      return;
+    } else {
+      obj.x = tCol * ts + ts / 2 - (obj.width || 0) / 2;
+      obj.y = tRow * ts + ts / 2 - (obj.height || 0) / 2;
+      obj.speedx = 0; obj.speedy = 0;
+      obj._sgTarget = null;
+      cx = obj.x + (obj.width || 0) / 2; cy = obj.y + (obj.height || 0) / 2;
+      col0 = Math.floor(cx / ts); row0 = Math.floor(cy / ts);
+      __dbg.startTile = { r: row0, c: col0 };
+      __dbg.cx = cx; __dbg.cy = cy;
+      __dbg.stepTarget = null;
+      __dbg.path = [];
+    }
+  }
+
+  if (col0 === colT && row0 === rowT) {
+    obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed;
+    __dbg.velocity = { x: obj.speedx, y: obj.speedy }; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return;
+  }
+  var half = Math.floor(searchSize / 2);
+  var rMin = row0 - half, rMax = row0 + half, cMin = col0 - half, cMax = col0 + half;
+  if (rMin < 0) rMin = 0; if (cMin < 0) cMin = 0;
+  if (rMax >= _rows) rMax = _rows - 1; if (cMax >= _cols) cMax = _cols - 1;
+  __dbg.window = { rMin: rMin, rMax: rMax, cMin: cMin, cMax: cMax, ts: ts };
+  var goalR = Math.max(rMin, Math.min(rMax, rowT)), goalC = Math.max(cMin, Math.min(cMax, colT));
+  function solid(r, c) { if (r < rMin || r > rMax || c < cMin || c > cMax) return true; return isSolid(c, r); }
+  if (solid(row0, col0)) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; __dbg.goal = { r: goalR, c: goalC }; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  if (solid(goalR, goalC)) {
+    var bestR = -1, bestC = -1, bestD = Infinity;
+    for (var r = rMin; r <= rMax; r++) for (var c = cMin; c <= cMax; c++) {
+      if (solid(r, c)) continue;
+      var d = (r - goalR) * (r - goalR) + (c - goalC) * (c - goalC);
+      if (d < bestD) { bestD = d; bestR = r; bestC = c; }
+    }
+    if (bestR === -1) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+    goalR = bestR; goalC = bestC;
+  }
+  __dbg.goal = { r: goalR, c: goalC };
+  var startKey = row0 + '_' + col0, goalKey = goalR + '_' + goalC;
+  var open = [{ r: row0, c: col0, g: 0, f: 0 }], closed = {}, gScore = {}, fScore = {}, cameFrom = {};
+  gScore[startKey] = 0; fScore[startKey] = 0;
+  var dirs = [[-1,0,1],[1,0,1],[0,-1,1],[0,1,1]];
+  var found = false, maxIter = searchSize * searchSize * 4;
+  for (var iter = 0; iter < maxIter && open.length > 0; iter++) {
+    var minIdx = 0;
+    for (var i = 1; i < open.length; i++) if (open[i].f < open[minIdx].f) minIdx = i;
+    var cur = open.splice(minIdx, 1)[0], curKey = cur.r + '_' + cur.c;
+    if (curKey === goalKey) { found = true; break; }
+    closed[curKey] = true;
+    for (var d = 0; d < dirs.length; d++) {
+      var nr = cur.r + dirs[d][0], nc = cur.c + dirs[d][1], cost = dirs[d][2];
+      if (solid(nr, nc)) continue;
+      var nKey = nr + '_' + nc;
+      if (closed[nKey]) continue;
+      var tg = cur.g + cost;
+      if (gScore[nKey] === undefined || tg < gScore[nKey]) {
+        gScore[nKey] = tg; cameFrom[nKey] = curKey;
+        var h = Math.abs(nr - goalR) + Math.abs(nc - goalC); var tf = tg + h;
+        fScore[nKey] = tf; open.push({ r: nr, c: nc, g: tg, f: tf });
+      }
+    }
+  }
+  __dbg.closed = closed; __dbg.fScore = fScore; __dbg.openLeft = open.length; __dbg.iterations = iter;
+  if (__sg_debugEnabled) {
+    var bfsDist = {}, bfsQueue = [{ r: row0, c: col0, d: 0 }]; bfsDist[startKey] = 0;
+    var bfsDirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var bi = 0; bi < 1000 && bi < bfsQueue.length; bi++) {
+      var bc = bfsQueue[bi];
+      for (var bd = 0; bd < 4; bd++) {
+        var bnr = bc.r + bfsDirs[bd][0], bnc = bc.c + bfsDirs[bd][1], bnKey = bnr + '_' + bnc;
+        if (solid(bnr, bnc)) continue;
+        if (bfsDist[bnKey] !== undefined) continue;
+        bfsDist[bnKey] = bc.d + 1; bfsQueue.push({ r: bnr, c: bnc, d: bc.d + 1 });
+      }
+    }
+    __dbg.bfsDist = bfsDist; __dbg.bfsReached = Object.keys(bfsDist).length;
+  }
+  if (!found) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; __dbg.velocity = { x: obj.speedx, y: obj.speedy }; __dbg.found = false; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  var path = [], key = goalKey;
+  for (var pstep = 0; pstep < maxIter && key && key !== startKey; pstep++) {
+    var p = key.split('_'); path.unshift({ r: parseInt(p[0], 10), c: parseInt(p[1], 10) }); key = cameFrom[key];
+  }
+  if (path.length === 0) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  __dbg.path = path; __dbg.found = true;
+  var next = path[0];
+  obj._sgTarget = { r: next.r, c: next.c, frames: 0, prevDist: 0, stuckCount: 0 };
+  var tx2 = next.c * ts + ts / 2, ty2 = next.r * ts + ts / 2;
+  __dbg.stepTarget = { x: tx2, y: ty2 };
+  var sdx = tx2 - cx, sdy = ty2 - cy, sdist = Math.sqrt(sdx * sdx + sdy * sdy);
+  if (sdist < 0.5) { obj.speedx = (dx / dist) * speed; obj.speedy = (dy / dist) * speed; obj._sgTarget = null; __sg_drawDebug(__dbg); obj._sgDbg = __dbg; return; }
+  var dHalfVx2 = (sdx / sdist) * speed * 0.5, dHalfVy2 = (sdy / sdist) * speed * 0.5;
+  obj.x += dHalfVx2; obj.y += dHalfVy2;
+  obj.speedx = dHalfVx2; obj.speedy = dHalfVy2;
+  __dbg.velocity = { x: obj.speedx, y: obj.speedy }; __sg_drawDebug(__dbg); obj._sgDbg = __dbg;
+}`;
+
+// ===== Функция отладочной отрисовки =====
+var __sg_drawDebug_src =
+`var __sg_debugEnabled = true;
+function __sg_drawDebug(dbg) {
+  if (!__sg_debugEnabled) return;
+  if (typeof g_ctx === 'undefined' || !g_ctx) return;
+  if (typeof Game === 'undefined' || !Game) return;
+  var sx = Game.screenx || 0, sy = Game.screeny || 0;
+  var ts = dbg.window ? dbg.window.ts : 32;
+  g_ctx.save(); g_ctx.lineWidth = 2;
+  if (dbg.window) {
+    var w = dbg.window, wx = w.cMin * ts - sx, wy = w.rMin * ts - sy;
+    var ww = (w.cMax - w.cMin + 1) * ts, wh = (w.rMax - w.rMin + 1) * ts;
+    g_ctx.strokeStyle = 'rgba(255,255,0,0.6)'; g_ctx.strokeRect(wx, wy, ww, wh);
+    var _t = (Game.helper && Game.helper.tiles) ? Game.helper.tiles : null;
+    if (_t && _t.solidMap) for (var r = w.rMin; r <= w.rMax; r++) for (var c = w.cMin; c <= w.cMax; c++) {
+      if (_t.solidMap[r + '_' + c]) { var tx = c * ts - sx, ty = r * ts - sy; g_ctx.fillStyle = 'rgba(255,0,0,0.5)'; g_ctx.fillRect(tx, ty, ts, ts); g_ctx.strokeStyle = 'rgba(255,255,0,0.9)'; g_ctx.lineWidth = 2; g_ctx.strokeRect(tx + 2, ty + 2, ts - 4, ts - 4); }
+    }
+    if (dbg.bfsDist) for (var bk in dbg.bfsDist) { if (!dbg.bfsDist.hasOwnProperty(bk)) continue; var bp = bk.split('_'), br = parseInt(bp[0], 10), bc2 = parseInt(bp[1], 10), bd = dbg.bfsDist[bk]; var hue = Math.max(0, 240 - bd * 20); g_ctx.fillStyle = 'hsla(' + hue + ',100%,50%,0.3)'; g_ctx.fillRect(bc2 * ts - sx, br * ts - sy, ts, ts); }
+    if (dbg.fScore && ts >= 16) { g_ctx.fillStyle = 'rgba(255,255,255,0.95)'; g_ctx.font = '8px monospace'; g_ctx.textAlign = 'center'; g_ctx.textBaseline = 'middle'; for (var fk in dbg.fScore) { if (!dbg.fScore.hasOwnProperty(fk)) continue; var fp = fk.split('_'), fr = parseInt(fp[0], 10), fc = parseInt(fp[1], 10); g_ctx.fillText(dbg.fScore[fk].toFixed(1), fc * ts + ts / 2 - sx, fr * ts + ts / 2 - sy); } g_ctx.textAlign = 'start'; g_ctx.textBaseline = 'alphabetic'; }
+  }
+  if (dbg.startTile) { g_ctx.strokeStyle = 'rgba(0,255,0,0.8)'; g_ctx.strokeRect(dbg.startTile.c * ts - sx, dbg.startTile.r * ts - sy, ts, ts); }
+  if (dbg.goal) { g_ctx.strokeStyle = 'rgba(0,150,255,0.8)'; g_ctx.strokeRect(dbg.goal.c * ts - sx, dbg.goal.r * ts - sy, ts, ts); }
+  if (dbg.path && dbg.path.length > 0) { g_ctx.strokeStyle = 'rgba(0,255,0,0.9)'; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); for (var pi = 0; pi < dbg.path.length; pi++) g_ctx.lineTo(dbg.path[pi].c * ts + ts / 2 - sx, dbg.path[pi].r * ts + ts / 2 - sy); g_ctx.stroke(); g_ctx.fillStyle = 'rgba(0,255,0,1)'; for (var pi2 = 0; pi2 < dbg.path.length; pi2++) { g_ctx.beginPath(); g_ctx.arc(dbg.path[pi2].c * ts + ts / 2 - sx, dbg.path[pi2].r * ts + ts / 2 - sy, 3, 0, Math.PI * 2); g_ctx.fill(); } }
+  if (dbg.stepTarget) { g_ctx.fillStyle = 'rgba(255,0,255,1)'; g_ctx.beginPath(); g_ctx.arc(dbg.stepTarget.x - sx, dbg.stepTarget.y - sy, 5, 0, Math.PI * 2); g_ctx.fill(); g_ctx.strokeStyle = 'rgba(255,0,255,0.6)'; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); g_ctx.lineTo(dbg.stepTarget.x - sx, dbg.stepTarget.y - sy); g_ctx.stroke(); }
+  g_ctx.strokeStyle = 'rgba(255,255,0,0.4)'; g_ctx.setLineDash([5, 5]); g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); g_ctx.lineTo(dbg.targetX - sx, dbg.targetY - sy); g_ctx.stroke(); g_ctx.setLineDash([]);
+  if (dbg.velocity && (dbg.velocity.x !== 0 || dbg.velocity.y !== 0)) { g_ctx.strokeStyle = 'rgba(255,255,0,1)'; g_ctx.lineWidth = 3; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); g_ctx.lineTo(dbg.cx + dbg.velocity.x * 5 - sx, dbg.cy + dbg.velocity.y * 5 - sy); g_ctx.stroke(); }
+  g_ctx.strokeStyle = 'rgba(255,255,255,0.9)'; g_ctx.lineWidth = 1; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - 6 - sx, dbg.cy - sy); g_ctx.lineTo(dbg.cx + 6 - sx, dbg.cy - sy); g_ctx.moveTo(dbg.cx - sx, dbg.cy - 6 - sy); g_ctx.lineTo(dbg.cx - sx, dbg.cy + 6 - sy); g_ctx.stroke();
+  if (dbg.window) { g_ctx.fillStyle = dbg.found ? 'rgba(0,255,0,1)' : 'rgba(255,100,100,1)'; g_ctx.font = '12px monospace'; var st = dbg.found ? 'PATH FOUND' : 'NO PATH'; if (dbg.iterations !== undefined) st += ' (iter=' + dbg.iterations + ' bfs=' + (dbg.bfsReached || 0) + ')'; g_ctx.fillText(st, dbg.cx - sx + 10, dbg.cy - sy - 10); }
+  g_ctx.restore();
+}`;
+
+
 // Генератор кода для блока получения объекта
 javascript.javascriptGenerator.forBlock['get_object'] = function(block, generator) {
   const type = block.getFieldValue('TYPE');
@@ -4701,6 +5369,89 @@ javascript.javascriptGenerator.forBlock['if_object_name_equals'] = function(bloc
   const name = generator.valueToCode(block, 'NAME', generator.ORDER_ATOMIC) || '""';
   
   return [`(${objectType}.name === ${name})`, javascript.Order.ATOMIC];
+};
+
+// Генератор для блока "Тайлы между" (ray cast).
+// Использует алгоритм Брезенхэма для проверки тайлов вдоль линии.
+// Регистрирует переиспользуемую функцию __sg_raycastTiles через definitions_.
+javascript.javascriptGenerator.forBlock['raycast_tiles'] = function(block, generator) {
+  const returnMode = block.getFieldValue('RETURN_MODE');
+  const modeA = block.getFieldValue('MODE_A');
+  const modeB = block.getFieldValue('MODE_B');
+
+  // Координаты точки A
+  let ax, ay;
+  if (modeA === 'OBJECT') {
+    const objA = generator.getVariableName(block.getFieldValue('OBJ_A'));
+    ax = '(' + objA + '.x + ' + objA + '.width / 2)';
+    ay = '(' + objA + '.y + ' + objA + '.height / 2)';
+  } else if (modeA === 'THIS') {
+    ax = '(this.x + this.width / 2)';
+    ay = '(this.y + this.height / 2)';
+  } else {
+    ax = generator.valueToCode(block, 'AX', generator.ORDER_ATOMIC) || '0';
+    ay = generator.valueToCode(block, 'AY', generator.ORDER_ATOMIC) || '0';
+  }
+
+  // Координаты точки B
+  let bx, by;
+  if (modeB === 'OBJECT') {
+    const objB = generator.getVariableName(block.getFieldValue('OBJ_B'));
+    bx = '(' + objB + '.x + ' + objB + '.width / 2)';
+    by = '(' + objB + '.y + ' + objB + '.height / 2)';
+  } else if (modeB === 'THIS') {
+    bx = '(this.x + this.width / 2)';
+    by = '(this.y + this.height / 2)';
+  } else {
+    bx = generator.valueToCode(block, 'BX', generator.ORDER_ATOMIC) || '0';
+    by = generator.valueToCode(block, 'BY', generator.ORDER_ATOMIC) || '0';
+  }
+
+  // Регистрируем переиспользуемую функцию ровно один раз.
+  if (!Blockly.JavaScript.definitions_['__sg_raycastTiles']) {
+    Blockly.JavaScript.definitions_['__sg_raycastTiles'] =
+`function __sg_raycastTiles(x1, y1, x2, y2) {
+  // Алгоритм Брезенхэма — проходит по всем тайлам на линии от (x1,y1) до (x2,y2).
+  // Возвращает: { hit: true/false, x: pixelX, y: pixelY } — первый твёрдый тайл.
+  // Платформо-независимая проверка твёрдости: Game.isTileSolid или Game.getTileInXY.
+  var _ts = (typeof Game !== 'undefined' && Game.helper && Game.helper.tiles && Game.helper.tiles.tileSize) ? Game.helper.tiles.tileSize : 32;
+  var _hasIsTileSolid = (typeof Game !== 'undefined' && typeof Game.isTileSolid === 'function');
+  var _hasGetTileInXY = (typeof Game !== 'undefined' && typeof Game.getTileInXY === 'function');
+  function _isSolid(col, row) {
+    if (col < 0 || row < 0) return false;
+    if (_hasIsTileSolid) return !!Game.isTileSolid(col, row);
+    if (_hasGetTileInXY) { var tv = Game.getTileInXY(col, row); return tv !== undefined && tv !== null && tv < 0; }
+    return false;
+  }
+  // Конвертируем пиксели в координаты тайлов.
+  var c1 = Math.floor(x1 / _ts), r1 = Math.floor(y1 / _ts);
+  var c2 = Math.floor(x2 / _ts), r2 = Math.floor(y2 / _ts);
+  // Брезенхэм.
+  var dc = Math.abs(c2 - c1), dr = Math.abs(r2 - r1);
+  var sc = c1 < c2 ? 1 : -1, sr = r1 < r2 ? 1 : -1;
+  var err = dc - dr;
+  var cc = c1, rr = r1;
+  while (true) {
+    if (_isSolid(cc, rr)) {
+      return { hit: true, x: cc * _ts + _ts / 2, y: rr * _ts + _ts / 2 };
+    }
+    if (cc === c2 && rr === r2) break;
+    var e2 = 2 * err;
+    if (e2 > -dr) { err -= dr; cc += sc; }
+    if (e2 < dc) { err += dc; rr += sr; }
+  }
+  return { hit: false, x: 0, y: 0 };
+}`;
+  }
+
+  // Генерируем вызов в зависимости от режима возврата.
+  if (returnMode === 'BOOL') {
+    return [`__sg_raycastTiles(${ax}, ${ay}, ${bx}, ${by}).hit`, javascript.Order.ATOMIC];
+  } else if (returnMode === 'X') {
+    return [`__sg_raycastTiles(${ax}, ${ay}, ${bx}, ${by}).x`, javascript.Order.ATOMIC];
+  } else {
+    return [`__sg_raycastTiles(${ax}, ${ay}, ${bx}, ${by}).y`, javascript.Order.ATOMIC];
+  }
 };
 
 // Генератор для получения расстояния

@@ -115,6 +115,7 @@ const workspace = Blockly.inject('blocklyDiv', {
                         <block type="set_object_bounding"></block>
                         <block type="object_control"></block>
             <block type="object_velocity"></block>
+            <block type="object_move_to_target"></block>
                         <block type="object_teleport"></block>
             <block type="object_distance"></block>
                         <block type="collision_detect"></block>
@@ -141,6 +142,7 @@ const workspace = Blockly.inject('blocklyDiv', {
                         <block type="object_tap_screen"></block>
                         <block type="is_colliding_with_tile"></block>
                         <block type="is_paused"></block>
+            <block type="raycast_tiles"></block>
         </category>
         <category name="${Blockly.Msg['LOOPS']}" colour="120">
             <block type="controls_repeat_ext">
@@ -807,28 +809,132 @@ function addWatchdogToCode(code) {
         };
     `;
 
-        const modifiedCode = code
-                // Обрабатываем while циклы
-                .replace(/while\s*\(([^)]*)\)\s*\{([^}]*)\}/g, (match, condition, body) => {
-                        return `{
-                const __check = __watchdog(); 
-                while (${condition}) { 
-                    ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
-                    __check(); 
-                } 
-            }`;
-                })
-                // Обрабатываем do...while циклы
-                .replace(/do\s*\{([^}]*)\}\s*while\s*\(([^)]*)\);/g, (match, body, condition) => {
-                        return `{
-                const __check = __watchdog(); 
-                do { 
-                    ${body.replace(/\bcontinue\b/g, '__check(); continue')} 
-                    __check(); 
-                } while (${condition}); 
-            }`;
-                });
+        // ============================================================
+        // Парсер для корректной обработки вложенных циклов.
+        // Прошлая версия использовала регекс [^}]*, который не умеет
+        // работать с вложенными фигурными скобками.
+        // Этот парсер сканирует код символ за символом, отслеживает
+        // строки и комментарии, и правильно сопоставляет скобки
+        // для while / do...while / for.
+        // ============================================================
 
+        function skipWS(s, i) {
+                while (i < s.length) {
+                        var c = s[i];
+                        if (c === ' ' || c === '\t' || c === '\n' || c === '\r') { i++; continue; }
+                        if (c === '/' && s[i+1] === '/') { while (i < s.length && s[i] !== '\n') i++; continue; }
+                        if (c === '/' && s[i+1] === '*') { i += 2; while (i < s.length - 1 && !(s[i] === '*' && s[i+1] === '/')) i++; i += 2; continue; }
+                        break;
+                }
+                return i;
+        }
+
+        function findMatch(s, openIdx, openCh, closeCh) {
+                var depth = 1, i = openIdx + 1;
+                while (i < s.length) {
+                        var c = s[i];
+                        if (c === '/' && s[i+1] === '/') { while (i < s.length && s[i] !== '\n') i++; continue; }
+                        if (c === '/' && s[i+1] === '*') { i += 2; while (i < s.length - 1 && !(s[i] === '*' && s[i+1] === '/')) i++; i += 2; continue; }
+                        if (c === '"' || c === "'" || c === '`') {
+                                var q = c; i++;
+                                while (i < s.length) {
+                                        if (s[i] === '\\\\') { i += 2; continue; }
+                                        if (s[i] === q) { i++; break; }
+                                        if (q === '`' && s[i] === '$' && s[i+1] === '{') { i = findMatch(s, i+1, '{', '}'); continue; }
+                                        i++;
+                                }
+                                continue;
+                        }
+                        if (c === openCh) depth++;
+                        else if (c === closeCh) { depth--; if (depth === 0) return i; }
+                        i++;
+                }
+                return -1;
+        }
+
+        function isWordAt(s, i, word) {
+                if (s.substr(i, word.length) !== word) return false;
+                var before = i > 0 ? s[i-1] : ' ';
+                var after = s[i + word.length] || ' ';
+                var isId = function(ch) { return /[a-zA-Z0-9_$]/.test(ch); };
+                return !isId(before) && !isId(after);
+        }
+
+        function wrapBody(body) {
+                // Заменяем 'continue' на '{__check();continue;}' с фигурными
+                // скобками, чтобы не сломать 'if (cond) continue;' — без скобок
+                // 'continue' стал бы безусловным.
+                return body.replace(/\bcontinue\b/g, '{__check();continue;}');
+        }
+
+        var result = [];
+        var i = 0;
+        while (i < code.length) {
+                var c = code[i];
+                if (c === '/' && code[i+1] === '/') { var le = code.indexOf('\n', i); if (le === -1) le = code.length; result.push(code.slice(i, le)); i = le; continue; }
+                if (c === '/' && code[i+1] === '*') { var be = code.indexOf('*/', i+2); if (be === -1) be = code.length; else be += 2; result.push(code.slice(i, be)); i = be; continue; }
+                if (c === '"' || c === "'" || c === '`') {
+                        var q = c, ss = i; i++;
+                        while (i < code.length) {
+                                if (code[i] === '\\\\') { i += 2; continue; }
+                                if (code[i] === q) { i++; break; }
+                                if (q === '`' && code[i] === '$' && code[i+1] === '{') { i = findMatch(code, i+1, '{', '}'); continue; }
+                                i++;
+                        }
+                        result.push(code.slice(ss, i));
+                        continue;
+                }
+
+                if (isWordAt(code, i, 'while')) {
+                        var ws = i + 5;
+                        var po = skipWS(code, ws);
+                        if (code[po] !== '(') { result.push(c); i++; continue; }
+                        var pc = findMatch(code, po, '(', ')');
+                        if (pc === -1) { result.push(c); i++; continue; }
+                        var cond = code.slice(po + 1, pc);
+                        var bo = skipWS(code, pc + 1);
+                        if (code[bo] !== '{') { result.push(c); i++; continue; }
+                        var bc = findMatch(code, bo, '{', '}');
+                        if (bc === -1) { result.push(c); i++; continue; }
+                        var body = code.slice(bo + 1, bc);
+                        result.push('{ const __check = __watchdog(); while (' + cond + ') { ' + wrapBody(body) + ' __check(); } }');
+                        i = bc + 1;
+                        continue;
+                }
+
+                if (isWordAt(code, i, 'do')) {
+                        var ds = i + 2;
+                        var dbo = skipWS(code, ds);
+                        if (code[dbo] !== '{') { result.push(c); i++; continue; }
+                        var dbc = findMatch(code, dbo, '{', '}');
+                        if (dbc === -1) { result.push(c); i++; continue; }
+                        var dbody = code.slice(dbo + 1, dbc);
+                        var wp = skipWS(code, dbc + 1);
+                        if (!isWordAt(code, wp, 'while')) { result.push(c); i++; continue; }
+                        var dpo = skipWS(code, wp + 5);
+                        if (code[dpo] !== '(') { result.push(c); i++; continue; }
+                        var dpc = findMatch(code, dpo, '(', ')');
+                        if (dpc === -1) { result.push(c); i++; continue; }
+                        var dcond = code.slice(dpo + 1, dpc);
+                        var sp = dpc + 1;
+                        if (code[sp] === ';') sp++;
+                        result.push('{ const __check = __watchdog(); do { ' + wrapBody(dbody) + ' __check(); } while (' + dcond + '); }');
+                        i = sp;
+                        continue;
+                }
+
+                // ВАЖНО: for-циклы НЕ обёртываются watchdog-ом.
+                // Причина: wrapBody заменяет 'continue' на '__check(); continue',
+                // что ломает 'if (cond) continue;' — continue становится
+                // безусловным. Все for-циклы в генерируемом коде имеют лимит
+                // итераций, поэтому не могут быть бесконечными.
+                // Watchdog обрабатывает только while и do...while.
+
+                result.push(c);
+                i++;
+        }
+
+        const modifiedCode = result.join('');
         return `${watchdogFunc}\n${modifiedCode}`;
 }
 

@@ -774,6 +774,20 @@ Blockly.Msg['YES'] = 'YES';
 Blockly.Msg['LOGIC_YESNO_TRUE'] = 'Yes';
 Blockly.Msg['LOGIC_YESNO_FALSE'] = 'No';
 Blockly.Msg['LOGIC_YESNO_TOOLTIP'] = 'Returns 1 (Yes) or 0 (No). Handy for numeric object properties.';
+// Labels for the "Move to target with tile avoidance" block
+Blockly.Msg['MOVE_TO_TARGET_LABEL'] = 'Move to target with avoidance';
+Blockly.Msg['MOVE_TO_TARGET_POINT'] = 'to point';
+Blockly.Msg['MOVE_TO_TARGET_OBJ'] = 'to object';
+Blockly.Msg['MOVE_TO_TARGET_SEARCH'] = 'search size';
+Blockly.Msg['MOVE_TO_TARGET_DEBUG'] = 'debug';
+// Labels for the "Tiles between" (raycast) block
+Blockly.Msg['RAYCAST_LABEL'] = 'Tiles between';
+Blockly.Msg['RAYCAST_MODE_BOOL'] = 'wall exists';
+Blockly.Msg['RAYCAST_MODE_X'] = 'wall X';
+Blockly.Msg['RAYCAST_MODE_Y'] = 'wall Y';
+Blockly.Msg['RAYCAST_POINT'] = 'point';
+Blockly.Msg['RAYCAST_OBJECT'] = 'object';
+Blockly.Msg['RAYCAST_THIS'] = 'this object';
 };
 
 function changeLanguage(selectedValue) {

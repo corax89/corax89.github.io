@@ -2689,20 +2689,50 @@ Game.physics = {
         var ts = Game.helper.tiles.tileSize;
         var rows = Game.helper.tiles.rows;
         var cols = Game.helper.tiles.cols;
+        // Merge solid tiles into maximal rectangles (both horizontal AND vertical).
+        // This prevents objects from catching on seams between vertically-stacked
+        // tiles — e.g. a wall 2 tiles tall becomes one 1×2 rectangle instead of
+        // two separate 1×1 tiles, so a moving object slides along it smoothly.
+        //
+        // Algorithm: greedy rectangle expansion.
+        //   1. Find an unprocessed solid tile (top-left corner of a rectangle).
+        //   2. Expand right as far as possible (all tiles in the row are solid).
+        //   3. Expand down as far as possible (all tiles in the expanded rows are solid).
+        //   4. Mark all tiles in the rectangle as processed, create a physics shape.
+        var processed = {};
         for (var row = 0; row < rows; row++) {
-            var col = 0;
-            while (col < cols) {
-                if (!Game.helper.tiles.solidMap[row + '_' + col]) { col++; continue; }
-                var runStart = col;
-                while (col < cols && Game.helper.tiles.solidMap[row + '_' + col]) { col++; }
-                var runEnd = col;
-                var runWidth = (runEnd - runStart) * ts;
-                var centerX = runStart * ts + runWidth * 0.5;
-                var centerY = row * ts + ts * 0.5;
+            for (var col = 0; col < cols; col++) {
+                if (processed[row + '_' + col]) continue;
+                if (!Game.helper.tiles.solidMap[row + '_' + col]) continue;
+                // Found top-left corner. Expand right.
+                var w = 1;
+                while (col + w < cols && Game.helper.tiles.solidMap[row + '_' + (col + w)] && !processed[row + '_' + (col + w)]) w++;
+                // Expand down — all tiles in the row range must be solid.
+                var h = 1;
+                var canExpand = true;
+                while (canExpand && row + h < rows) {
+                    for (var c = col; c < col + w; c++) {
+                        if (!Game.helper.tiles.solidMap[(row + h) + '_' + c] || processed[(row + h) + '_' + c]) {
+                            canExpand = false;
+                            break;
+                        }
+                    }
+                    if (canExpand) h++;
+                }
+                // Mark all tiles in the rectangle as processed.
+                for (var r = row; r < row + h; r++) {
+                    for (var c = col; c < col + w; c++) {
+                        processed[r + '_' + c] = true;
+                    }
+                }
+                // Create one physics shape for the entire rectangle.
+                var rectW = w * ts, rectH = h * ts;
+                var centerX = col * ts + rectW * 0.5;
+                var centerY = row * ts + rectH * 0.5;
                 var staticBody = cpBodyNewStatic();
                 cpBodySetPosition(staticBody, cpv(centerX, centerY));
                 cpSpaceAddBody(this.space, staticBody);
-                var shape = cpBoxShapeNew(staticBody, runWidth, ts, 0);
+                var shape = cpBoxShapeNew(staticBody, rectW, rectH, 0);
                 cpShapeSetFriction(shape, 0.8);
                 cpShapeSetElasticity(shape, 0.0);
                 cpShapeSetUserData(shape, -1);
@@ -3016,37 +3046,51 @@ Game.physics = {
         obj._blockedUp = false;
         obj._blockedRight = false;
         obj._blockedLeft = false;
-        // Check each tile the object overlaps.
+        // FIX: Merge all overlapping solid tiles into a SINGLE bounding box
+        // before computing push-out. This prevents the object from catching
+        // on seams between vertically-stacked tiles (e.g. a wall 2 tiles tall
+        // would otherwise push the object in conflicting directions at the
+        // seam between the two tiles).
+        var mergedLeft = Infinity, mergedRight = -Infinity;
+        var mergedTop = Infinity, mergedBottom = -Infinity;
+        var anySolid = false;
         for (var r = top; r <= bottom; r++) {
             for (var c = left; c <= right; c++) {
                 if (!isSolid(c, r)) continue;
-                // Found a solid tile overlapping the object.
+                anySolid = true;
                 var tileLeft = c * ts;
                 var tileRight = (c + 1) * ts;
                 var tileTop = r * ts;
                 var tileBottom = (r + 1) * ts;
-                var pushL = (obj.x + obj.width) - tileLeft;  // push left
-                var pushR = tileRight - obj.x;                // push right
-                var pushU = (obj.y + obj.height) - tileTop;   // push up
-                var pushD = tileBottom - obj.y;                // push down
-                var minPush = Math.min(pushL, pushR, pushU, pushD);
-                if (minPush === pushU) {
-                    obj._blockedUp = true;
-                    obj.y = tileTop - obj.height;
-                    if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
-                } else if (minPush === pushD) {
-                    obj._blockedDown = true;
-                    obj.y = tileBottom;
-                    if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
-                } else if (minPush === pushL) {
-                    obj._blockedRight = true;
-                    obj.x = tileLeft - obj.width;
-                    if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
-                } else if (minPush === pushR) {
-                    obj._blockedLeft = true;
-                    obj.x = tileRight;
-                    if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
-                }
+                if (tileLeft < mergedLeft) mergedLeft = tileLeft;
+                if (tileRight > mergedRight) mergedRight = tileRight;
+                if (tileTop < mergedTop) mergedTop = tileTop;
+                if (tileBottom > mergedBottom) mergedBottom = tileBottom;
+            }
+        }
+        if (anySolid) {
+            // Compute push-out from the MERGED bounding box.
+            var pushL = (obj.x + obj.width) - mergedLeft;
+            var pushR = mergedRight - obj.x;
+            var pushU = (obj.y + obj.height) - mergedTop;
+            var pushD = mergedBottom - obj.y;
+            var minPush = Math.min(pushL, pushR, pushU, pushD);
+            if (minPush === pushU) {
+                obj._blockedUp = true;
+                obj.y = mergedTop - obj.height;
+                if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
+            } else if (minPush === pushD) {
+                obj._blockedDown = true;
+                obj.y = mergedBottom;
+                if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
+            } else if (minPush === pushL) {
+                obj._blockedRight = true;
+                obj.x = mergedLeft - obj.width;
+                if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
+            } else if (minPush === pushR) {
+                obj._blockedLeft = true;
+                obj.x = mergedRight;
+                if (obj._cpBody) cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5));
             }
         }
         // Also check static game objects (isStatic=1) as solid obstacles.
@@ -8378,6 +8422,16 @@ function game_loop(timestamp) {
                 if (draw_bounding_box) {
                         for (var i = 0; i < sortedArray.length; i++) {
                                 Game.drawDebugCollisionShape(sortedArray[i]);
+                        }
+                }
+                // Pass 3: draw pathfinding debug overlay (__sg_drawDebug).
+                // Stored on obj._sgDbg by __sg_moveToward during onStep, drawn
+                // here AFTER all tiles/sprites so it's always visible on top.
+                if (typeof __sg_drawDebug === 'function') {
+                        for (var i = 0; i < sortedArray.length; i++) {
+                                if (sortedArray[i]._sgDbg) {
+                                        __sg_drawDebug(sortedArray[i]._sgDbg);
+                                }
                         }
                 }
                 Game.Particles.draw();

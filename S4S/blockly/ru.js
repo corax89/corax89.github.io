@@ -794,6 +794,20 @@ Blockly.Msg['YES'] = 'ДА';
 Blockly.Msg['LOGIC_YESNO_TRUE'] = 'Да';
 Blockly.Msg['LOGIC_YESNO_FALSE'] = 'Нет';
 Blockly.Msg['LOGIC_YESNO_TOOLTIP'] = 'Возвращает 1 (Да) или 0 (Нет). Удобно для числовых свойств объектов.';
+// Подписи для блока "Идти к цели с обходом тайлов"
+Blockly.Msg['MOVE_TO_TARGET_LABEL'] = 'Идти к цели с обходом';
+Blockly.Msg['MOVE_TO_TARGET_POINT'] = 'к точке';
+Blockly.Msg['MOVE_TO_TARGET_OBJ'] = 'к объекту';
+Blockly.Msg['MOVE_TO_TARGET_SEARCH'] = 'размер поиска';
+Blockly.Msg['MOVE_TO_TARGET_DEBUG'] = 'отладка';
+// Подписи для блока "Тайлы между" (raycast)
+Blockly.Msg['RAYCAST_LABEL'] = 'Тайлы между';
+Blockly.Msg['RAYCAST_MODE_BOOL'] = 'есть ли стена';
+Blockly.Msg['RAYCAST_MODE_X'] = 'X стены';
+Blockly.Msg['RAYCAST_MODE_Y'] = 'Y стены';
+Blockly.Msg['RAYCAST_POINT'] = 'точка';
+Blockly.Msg['RAYCAST_OBJECT'] = 'объект';
+Blockly.Msg['RAYCAST_THIS'] = 'этот объект';
 
 const ruTexts = {
         'INTERFACE_TITLE': 'Blockly с JavaScript',
