@@ -17,6 +17,7 @@ var ObjectParam = [
   [Blockly.Msg['OBJECT_PARAM_MASS'], 'mass'],
   [Blockly.Msg['OBJECT_PARAM_RESTITUTION'], 'restitution'],
   [Blockly.Msg['OBJECT_PARAM_ISSTATIC'], 'isStatic'],
+  [Blockly.Msg['OBJECT_PARAM_LADDER'] || 'ladder', 'ladder'],
   [Blockly.Msg['OBJECT_PARAM_LOCK_ROTATION'] || 'lock rotation', 'lockRotation'],
   [Blockly.Msg['OBJECT_PARAM_ROTATION_SPEED'] || 'rotation speed', 'rotationSpeed'],
   [Blockly.Msg['OBJECT_PARAM_ZINDEX'], 'zIndex'],
@@ -52,6 +53,183 @@ var _ReadOnlyObjectParams = {
 var ObjectParamWritable = ObjectParam.filter(function(p) {
   return !_ReadOnlyObjectParams[p[1]];
 });
+
+// Карта типов свойств объекта.
+// Используется блоком change_object_var, чтобы подобрать подходящий
+// shadow-блок и тип подключения (setCheck) для значения в зависимости
+// от выбранного свойства:
+//   'boolean' → logic_boolean_yesno (Да/Нет, генерирует 1/0)
+//   'number'  → math_number
+//   'string'  → text
+//   'sprite'  → field_png (выбор изображения из хранилища)
+//   'any'     → без setCheck (любой тип) — запасной вариант.
+//
+// Типы проставлены исходя из того, как движок (engine.js) читает каждое
+// свойство:
+//   • visible / solid / flip / isStatic / ladder / lockRotation —
+//     сравниваются с 0/1, поэтому логический блок Да/Нет подходит идеально.
+//   • animationLoop — в движке хранится как true/false, но if(value)
+//     корректно отрабатывает и 1/0, поэтому тоже Да/Нет.
+//   • sprite — числовой индекс в image_array, но выбирается через
+//     field_png, поэтому тип 'sprite'.
+//   • все остальные (x, y, width, height, speedx, speedy, angle, mass,
+//     restitution, rotationSpeed, zIndex, animationSpeed) — числа.
+var ObjectParamTypes = {
+  // Числовые
+  x: 'number',
+  y: 'number',
+  width: 'number',
+  height: 'number',
+  speedx: 'number',
+  speedy: 'number',
+  angle: 'number',
+  mass: 'number',
+  restitution: 'number',
+  rotationSpeed: 'number',
+  zIndex: 'number',
+  animationSpeed: 'number',
+  // Логические (0/1) — используются с блоком Да/Нет
+  visible: 'boolean',
+  solid: 'boolean',
+  flip: 'boolean',
+  isStatic: 'boolean',
+  ladder: 'boolean',
+  lockRotation: 'boolean',
+  animationLoop: 'boolean',
+  // Спрайт — индекс в image_array, выбирается через field_png
+  sprite: 'sprite'
+};
+
+// Значения по умолчанию для генератора, когда к входу VALUE
+// ничего не подключено. Используется в generator.valueToCode(...) || fallback.
+var ObjectParamDefaults = {
+  boolean: '0',
+  number: '0',
+  string: '""',
+  sprite: '0',
+  any: '0'
+};
+
+// Возвращает тип свойства по его внутреннему имени (x, y, speedx, ...).
+// Если свойство не описано — возвращает 'any'.
+function getObjectParamType(paramName) {
+  return ObjectParamTypes[paramName] || 'any';
+}
+
+// Подсказки (tooltips) для блока change_object_var.
+// Для каждого writable-свойства объекта описано, что оно делает и в каком
+// диапазоне ожидается значение. Подсказка показывается при наведении на блок
+// и автоматически меняется при смене выбранного свойства в dropdown NAME.
+//
+// Каждая запись содержит два варианта текста: ru и en. Выбор языка
+// определяется глобальной переменной savedLanguage (так же, как в остальных
+// местах движка).
+//
+// Диапазоны проставлены исходя из того, как движок (engine.js) использует
+// каждое свойство:
+//   • x, y            — координаты в пикселях, экран 1280×720.
+//   • width, height   — размеры в пикселях, должны быть > 0.
+//   • speedx, speedy  — скорость в пикселях/кадр, любое число.
+//   • sprite          — индекс в image_array, выбирается через field_png.
+//   • visible/solid/isStatic/ladder/lockRotation/animationLoop — 0 или 1.
+//   • flip            — битовая маска SDL: 0/1/2/3.
+//   • angle           — градусы, обычно 0–360.
+//   • mass            — масса, > 0 (движок использует Math.max(mass, 0.1)).
+//   • restitution     — упругость, 0–1.
+//   • rotationSpeed   — градусы/кадр, любое число.
+//   • zIndex          — целое, глубина отрисовки.
+//   • animationSpeed  — кадров/сек, должно быть > 0 (иначе деление на 0).
+var ObjectParamTooltips = {
+  x: {
+    ru: 'Координата X объекта в пикселях. Любое число (экран 0–1280).',
+    en: 'Object X coordinate in pixels. Any number (screen 0–1280).'
+  },
+  y: {
+    ru: 'Координата Y объекта в пикселях. Любое число (экран 0–720).',
+    en: 'Object Y coordinate in pixels. Any number (screen 0–720).'
+  },
+  width: {
+    ru: 'Ширина объекта в пикселях. Положительное число (> 0).',
+    en: 'Object width in pixels. Positive number (> 0).'
+  },
+  height: {
+    ru: 'Высота объекта в пикселях. Положительное число (> 0).',
+    en: 'Object height in pixels. Positive number (> 0).'
+  },
+  speedx: {
+    ru: 'Скорость по X в пикселях/кадр. Любое число (отрицательное — влево).',
+    en: 'X velocity in pixels/frame. Any number (negative = left).'
+  },
+  speedy: {
+    ru: 'Скорость по Y в пикселях/кадр. Любое число (отрицательное — вверх).',
+    en: 'Y velocity in pixels/frame. Any number (negative = up).'
+  },
+  sprite: {
+    ru: 'Индекс спрайта в хранилище изображений (0 и выше). Выбирается через field_png.',
+    en: 'Sprite index in the image store (0+). Selected via field_png.'
+  },
+  visible: {
+    ru: 'Видимость объекта: 1 (Да) — видимый, 0 (Нет) — скрытый.',
+    en: 'Object visibility: 1 (Yes) — visible, 0 (No) — hidden.'
+  },
+  solid: {
+    ru: 'Твёрдость: 1 (Да) — объект сталкивается, 0 (Нет) — сквозной.',
+    en: 'Solidity: 1 (Yes) — collides, 0 (No) — pass-through.'
+  },
+  angle: {
+    ru: 'Угол поворота в градусах. Любое число (обычно 0–360).',
+    en: 'Rotation angle in degrees. Any number (typically 0–360).'
+  },
+  flip: {
+    ru: 'Отражение спрайта (битовая маска): 0 — нет, 1 — по горизонтали, 2 — по вертикали, 3 — оба.',
+    en: 'Sprite flip (bitmask): 0 — none, 1 — horizontal, 2 — vertical, 3 — both.'
+  },
+  mass: {
+    ru: 'Масса объекта. Положительное число (> 0). Движок использует минимум 0.1.',
+    en: 'Object mass. Positive number (> 0). Engine clamps to minimum 0.1.'
+  },
+  restitution: {
+    ru: 'Упругость (bounciness): 0 — нет отскока, 1 — полный отскок. Диапазон 0–1.',
+    en: 'Restitution (bounciness): 0 — no bounce, 1 — full bounce. Range 0–1.'
+  },
+  isStatic: {
+    ru: 'Статичность: 1 (Да) — объект неподвижен, 0 (Нет) — подвержен физике.',
+    en: 'Static: 1 (Yes) — immovable, 0 (No) — affected by physics.'
+  },
+  ladder: {
+    ru: 'Лестница: 1 (Да) — объект является лестницей, 0 (Нет) — обычный объект.',
+    en: 'Ladder: 1 (Yes) — object is a ladder, 0 (No) — normal object.'
+  },
+  lockRotation: {
+    ru: 'Блокировка вращения: 1 (Да) — вращение заблокировано, 0 (Нет) — объект может вращаться.',
+    en: 'Lock rotation: 1 (Yes) — rotation locked, 0 (No) — free rotation.'
+  },
+  rotationSpeed: {
+    ru: 'Скорость вращения в градусах/кадр. Любое число (положительное — по часовой стрелке).',
+    en: 'Rotation speed in degrees/frame. Any number (positive = clockwise).'
+  },
+  zIndex: {
+    ru: 'Глубина отрисовки (z-index). Любое целое число (больше — поверх других).',
+    en: 'Drawing depth (z-index). Any integer (higher = drawn on top).'
+  },
+  animationSpeed: {
+    ru: 'Скорость анимации в кадрах/сек. Положительное число (> 0).',
+    en: 'Animation speed in frames/sec. Positive number (> 0).'
+  },
+  animationLoop: {
+    ru: 'Зацикливание анимации: 1 (Да) — повторять, 0 (Нет) — остановить в конце.',
+    en: 'Animation loop: 1 (Yes) — repeat, 0 (No) — stop at end.'
+  }
+};
+
+// Возвращает текст подсказки для свойства с учётом текущего языка.
+// Используется блоком change_object_var как динамическая подсказка.
+function getObjectParamTooltip(paramName) {
+  var tip = ObjectParamTooltips[paramName];
+  if (!tip) return '';
+  var ru = typeof savedLanguage !== 'undefined' && savedLanguage === 'ru';
+  return ru ? tip.ru : tip.en;
+}
 
 var ObjectType = [
   [Blockly.Msg['OBJECT_TYPE_COLLIDED'], 'object'],
@@ -1887,10 +2065,21 @@ Blockly.Blocks['change_object_var'] = {
         .setVisible(false);
 
     // Поле для выбора параметра (writable — excludes prev_x/prev_y etc.)
+    // Колбэк onChange обновляет тип входа VALUE и shadow-блок при смене
+    // выбранного свойства (например, при выборе "видимость" автоматически
+    // появится блок "Да/Нет", а при выборе "скорость X" — числовой блок).
     this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(ObjectParamWritable), 'NAME');
+        .appendField(new Blockly.FieldDropdown(
+          ObjectParamWritable,
+          (function(newParam) {
+            this.updateValueType_(newParam);
+          }).bind(this)
+        ), 'NAME');
 
-    // Поле для значения
+    // Поле для значения.
+    // Изначально создаётся с типом Number — это тип первого свойства
+    // в списке ObjectParamWritable (x), но updateValueType_ ниже его
+    // сразу подправит под актуальный параметр.
     this.appendValueInput("VALUE")
         .setCheck("Number")
         .appendField(Blockly.Msg['VALUE_LABEL'] || 'Значение:');
@@ -1899,18 +2088,128 @@ Blockly.Blocks['change_object_var'] = {
     this.setNextStatement(true, "Array");
     this.setColour(340);
 
+    // Динамическая подсказка: при наведении на блок показывается описание
+    // и диапазон значений для текущего выбранного свойства.
+    //
+    // ВАЖНО: Blockly вызывает функцию подсказки как a=a() — БЕЗ привязки
+    // this к блоку. Поэтому нужно явно привязать this через .bind(this),
+    // иначе this будет undefined и this.getFieldValue('NAME') выбросит
+    // "this.getFieldValue is not a function". Именно так делает встроенный
+    // хелпер Blockly.Extensions.buildTooltipForDropdown (см. ядро Blockly).
+    this.setTooltip(function() {
+      return getObjectParamTooltip(this.getFieldValue('NAME'));
+    }.bind(this));
+
     // Инициализация видимости
     this.updateShape_(this.getFieldValue('MODE'));
+    // Подбираем shadow-блок и тип входа под параметр по умолчанию.
+    this.updateValueType_(this.getFieldValue('NAME'));
+  },
+
+  // Обновляет тип входа VALUE и подключённый к нему shadow-блок
+  // в зависимости от выбранного свойства (paramName).
+  // Если к входу уже подключён обычный (не shadow) блок пользователя —
+  // не трогаем его, чтобы не разрушать пользовательскую программу.
+  updateValueType_: function(paramName) {
+    var paramType = getObjectParamType(paramName);
+    var valueInput = this.getInput('VALUE');
+    if (!valueInput || !valueInput.connection) return;
+
+    // Проверяем, что к входу подключён именно shadow (или ничего).
+    // Если подключён реальный блок — оставляем как есть.
+    var targetBlock = valueInput.connection.targetBlock();
+    if (targetBlock && !targetBlock.isShadow()) {
+      // Пользователь сам подключил блок — оставляем его. Только при необходимости
+      // расширяем setCheck, чтобы соединение не разорвалось при смене типа.
+      // Ничего не делаем: тип valueInput сохранён в saveExtraState/загрузке.
+      return;
+    }
+
+    // Соответствие типа свойства → имя shadow-блока и его настройки.
+    // shadowConfig: { blockType, fieldName, fieldValue, outputCheck }
+    //   - blockType: какой блок создать как shadow
+    //   - fieldName / fieldValue: какое поле и какое значение выставить
+    //   - outputCheck: какой тип подключения требовать от входа VALUE
+    //                  (null = принимать любой тип)
+    var shadowConfig;
+    switch (paramType) {
+      case 'boolean':
+        // Блок "Да/Нет" генерирует 1/0 — идеально для числовых булевых свойств.
+        shadowConfig = {
+          blockType: 'logic_boolean_yesno',
+          fieldName: 'BOOL',
+          fieldValue: 'TRUE',
+          outputCheck: ['Boolean', 'Number']
+        };
+        break;
+      case 'number':
+        shadowConfig = {
+          blockType: 'math_number',
+          fieldName: 'NUM',
+          fieldValue: '0',
+          outputCheck: 'Number'
+        };
+        break;
+      case 'string':
+        shadowConfig = {
+          blockType: 'text',
+          fieldName: 'TEXT',
+          fieldValue: '',
+          outputCheck: 'String'
+        };
+        break;
+      case 'sprite':
+        // Спрайт — это числовой индекс в image_array, но выбирается
+        // визуально через field_png. Поэтому shadow = field_png.
+        shadowConfig = {
+          blockType: 'field_png',
+          fieldName: null, // field_png использует поле IMAGE без дефолта
+          fieldValue: null,
+          outputCheck: ['Number', 'field_png']
+        };
+        break;
+      default:
+        // 'any' — без shadow, принимаем любой тип.
+        shadowConfig = null;
+    }
+
+    // Отключаем и удаляем старый shadow (если был).
+    if (targetBlock && targetBlock.isShadow()) {
+      targetBlock.dispose(false);
+    }
+
+    if (!shadowConfig) {
+      // 'any' — снимаем ограничение типа.
+      valueInput.setCheck(null);
+      return;
+    }
+
+    // Устанавливаем ограничение типа для входа VALUE.
+    valueInput.setCheck(shadowConfig.outputCheck);
+
+    // Создаём новый shadow-блок и подключаем его к VALUE.
+    // Blockly.Workspace.newBlock создаёт блок, но не рендерит его —
+    // нужно вызвать initSvg + render после подключения.
+    var shadow = this.workspace.newBlock(shadowConfig.blockType);
+    if (shadowConfig.fieldName !== null) {
+      shadow.setFieldValue(shadowConfig.fieldValue, shadowConfig.fieldName);
+    }
+    shadow.setShadow(true);
+    shadow.initSvg();
+    valueInput.connection.connect(shadow.outputConnection);
+    shadow.render();
+    // Перерисовываем текущий блок, чтобы корректно отобразить новый shadow.
+    this.render();
   },
 
   updateShape_: function(selectedMode) {
     // Получаем поле ввода переменной
     var varInput = this.getInput('VAR_INPUT');
-    
+
     // Показываем только если выбран режим VAR
     if (varInput) {
       varInput.setVisible(selectedMode === 'VAR');
-      
+
       // Если нужно, можно обновить список переменных
       if (selectedMode === 'VAR') {
         var varField = this.getField('VAR_NAME');
@@ -1935,7 +2234,33 @@ Blockly.Blocks['change_object_var'] = {
         this.setFieldValue(state.varName, 'VAR_NAME');
       }
       this.updateShape_(state.mode || 'VAR');
+      // Восстанавливаем тип входа VALUE и shadow под текущий параметр.
+      this.updateValueType_(this.getFieldValue('NAME'));
     }
+  }
+};
+
+// Блок "Да/Нет" — аналог стандартного блока "истина/ложь" (logic_boolean),
+// но с подписями "Да/Нет" (Yes/No в английской локали) и генерацией 1/0
+// вместо true/false. Полезен для свойств объекта, которые хранят
+// булевы значения как числа (flip, visible, solid, animationLoop и т.п.).
+Blockly.Blocks['logic_boolean_yesno'] = {
+  init: function() {
+    // Используем тот же стиль, что и у стандартного logic_boolean —
+    // setStyle('logic_blocks') гарантирует точное совпадение цвета
+    // (включая border/secondary) с другими блоками категории "Логика"
+    // и корректно отрабатывает при смене темы.
+    this.setStyle('logic_blocks');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['LOGIC_YESNO_TRUE'] || 'Да', 'TRUE'],
+          [Blockly.Msg['LOGIC_YESNO_FALSE'] || 'Нет', 'FALSE']
+        ]), 'BOOL');
+    // Тот же тип выхода, что и у logic_boolean — может подключаться к любому
+    // входу, ожидающему Boolean, Number или Array.
+    this.setOutput(true, 'Boolean');
+    this.setTooltip(Blockly.Msg['LOGIC_YESNO_TOOLTIP'] || 'Возвращает 1 (Да) или 0 (Нет).');
+    this.setHelpUrl(Blockly.Msg['LOGIC_BOOLEAN_HELPURL'] || '');
   }
 };
 
@@ -2506,6 +2831,10 @@ Blockly.Blocks['object_control'] = {
         .appendField(Blockly.Msg['DOUBLE_JUMP_LABEL'])
         .appendField(new Blockly.FieldCheckbox("FALSE"), 'double_jump');
     
+    this.ladderSpeedInput = this.appendValueInput("ladderSpeed")
+        .setCheck("Number")
+        .appendField(Blockly.Msg['LADDER_SPEED_LABEL'] || 'ladder speed');
+    
     this.appendValueInput("ValueX")
         .setCheck("Number")
         .appendField(Blockly.Msg['OBJECT_PARAM_SPEEDX']);
@@ -2529,6 +2858,7 @@ Blockly.Blocks['object_control'] = {
     const isPlatformer = gameType === 'platform';
     this.jumpButtonInput.setVisible(isPlatformer);
     this.doubleJumpInput.setVisible(isPlatformer);
+    this.ladderSpeedInput.setVisible(isPlatformer);
     
     // Принудительно обновляем отображение блока
     if (this.workspace) {
@@ -3874,21 +4204,6 @@ javascript.javascriptGenerator.forBlock['draw_object'] = function(block, generat
   return `Draw.sprite(${obj}.sprite,${obj}.x,${obj}.y,${obj}.width);\n`;
 };
 
-// Генератор для изменения параметра объекта (объединенный)
-javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, generator) {
-  const mode = block.getFieldValue('MODE');
-  const param = block.getFieldValue('NAME');
-  const value = generator.valueToCode(block, 'Value', generator.ORDER_ATOMIC) || 0;
-  
-  if (mode === 'VAR') {
-    const obj = generator.getVariableName(block.getFieldValue('Object'));
-    return `${obj}.${param}=${value};\n`;
-  } else {
-    const type = block.getFieldValue('TYPE');
-    return `${type}.${param}=${value};\n`;
-  }
-};
-
 // Генератор для получения параметра объекта
 javascript.javascriptGenerator.forBlock['get_object_var'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
@@ -3922,20 +4237,60 @@ javascript.javascriptGenerator.forBlock['addto_object_var'] = function(block, ge
 };
 
 // Генератор для изменения параметра объекта
+//
+// Раньше для каждой установки свойства генерировался встроенный блок
+//   if(obj===undefined||obj===null){Game.alert(...длинное сообщение...);}else{obj.param = value;}
+// что раздувало сгенерированный код и засоряло его одинаковыми проверками.
+// Теперь вся логика проверки и показа ошибки вынесена в одну общую функцию
+// __sg_setObjectProp, которая регистрируется через definitions_ и попадает
+// в сгенерированный код ровно один раз (вместе с другими определениями).
 javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, generator) {
   const mode = block.getFieldValue('MODE');
   const param = block.getFieldValue('NAME');
-  const value = generator.valueToCode(block, 'VALUE', javascript.Order.ATOMIC) || '0';
-  
+  // Fallback по умолчанию зависит от типа свойства: для boolean — '0',
+  // для string — '""', для number/sprite — '0'. Это корректное значение,
+  // если пользователь не подключил ничего к входу VALUE.
+  const paramType = getObjectParamType(param);
+  const fallback = ObjectParamDefaults[paramType] || '0';
+  const value = generator.valueToCode(block, 'VALUE', javascript.Order.ATOMIC) || fallback;
+
+  // Регистрируем общую функцию-помощник ровно один раз.
+  // definitions_ сбрасывается Blockly перед каждой генерацией кода,
+  // поэтому функция всегда определена, когда в ней есть необходимость,
+  // и никогда не дублируется.
+  if (!Blockly.JavaScript.definitions_['__sg_setObjectProp']) {
+    Blockly.JavaScript.definitions_['__sg_setObjectProp'] =
+`function __sg_setObjectProp(obj, propName, value, varName) {
+  if (obj === undefined || obj === null) {
+    var ru = typeof savedLanguage !== 'undefined' && savedLanguage === 'ru';
+    var msg;
+    if (varName) {
+      msg = ru
+        ? 'Ошибка: попытка изменить свойство "' + propName + '" у несуществующего объекта (' + varName + '). Проверьте, что объект создан.'
+        : 'Error: trying to set property "' + propName + '" on a non-existent object (' + varName + '). Check that the object is created.';
+    } else {
+      msg = ru
+        ? 'Ошибка: попытка изменить свойство "' + propName + '" у несуществующего объекта. Используйте этот блок только внутри обработчика столкновения (onCollision).'
+        : 'Error: trying to set property "' + propName + '" on a non-existent object. Use this block only inside a collision handler (onCollision).';
+    }
+    Game.alert(msg, ru ? 'ошибка' : 'error');
+  } else {
+    obj[propName] = value;
+  }
+}`;
+  }
+
   let code;
   if (mode === 'VAR') {
     const varName = generator.getVariableName(block.getFieldValue('VAR_NAME')) || 'obj1';
-    code = `${varName}.${param} = ${value};\n`;
+    // Для именованной переменной передаём её имя — оно попадёт в сообщение об ошибке.
+    code = `__sg_setObjectProp(${varName}, ${JSON.stringify(param)}, ${value}, ${JSON.stringify(varName)});\n`;
   } else {
-    // Для режимов object/this/iterated
-    code = `${mode}.${param} = ${value};\n`;
+    // Для режимов object/this/iterated передаём null вместо varName,
+    // чтобы получить сообщение с подсказкой про onCollision.
+    code = `__sg_setObjectProp(${mode}, ${JSON.stringify(param)}, ${value}, null);\n`;
   }
-  
+
   return code;
 };
 
@@ -4079,13 +4434,14 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   
   const speedX = generator.valueToCode(block, 'ValueX', generator.ORDER_ATOMIC) || 0;
   const speedY = generator.valueToCode(block, 'ValueY', generator.ORDER_ATOMIC) || 0;
+  const ladderSpeed = generator.valueToCode(block, 'ladderSpeed', generator.ORDER_ATOMIC) || 3;
   const jumpButton = "'" + (block.getFieldValue('jump_button') || 'ArrowUp') + "'";
   const doubleJumpEnabled = block.getFieldValue('double_jump') === 'TRUE' ? 1 : 0;
   const joyId = block.getFieldValue('JOY_ID') || 0;
 
   // Добавляем функцию управления, если её ещё нет
   if (!Blockly.JavaScript.definitions_['object_control']) {
-    const funcCode = `function object_control(obj, type, speedX, speedY, gameType, jumpButton, doubleJumpEnabled, joyId) {
+    const funcCode = `function object_control(obj, type, speedX, speedY, gameType, jumpButton, doubleJumpEnabled, joyId, ladderSpeed) {
   var acceleration = 0.2;
   if (!obj.local) obj.local = {};
   var loc = obj.local;
@@ -4103,6 +4459,51 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
       if (loc.jumpCount === undefined) loc.jumpCount = 0;
       if (loc.hasDoubleJump === undefined) loc.hasDoubleJump = 0;
     }
+  }
+
+  // ═══ LADDER CLIMBING ═══
+  if (obj._onLadder) {
+    var ls = ladderSpeed || 3;
+    // JUMP OFF: if jumpButton is pressed, jump off with FULL speedY.
+    // This takes priority over climbing — fixes the "small jump" bug where
+    // jumpButton=ArrowUp also triggered climbUp, blocking the jump.
+    // When jumpButton is ArrowUp, pressing Up = JUMP (not climb up).
+    // Climbing up via ArrowUp is sacrificed; user climbs up via stick or
+    // by NOT pressing jumpButton (if jumpButton is a different key).
+    if (Game.getKey(jumpButton, joyId)) {
+      obj.speedy = -speedY;
+      obj._onLadder = null;
+      loc.jumpReady = 0;
+      return;
+    }
+    var climbUp = 0, climbDown = 0, climbLeft = 0, climbRight = 0;
+    // Keyboard — but skip ArrowUp for climbing if it's the jumpButton
+    if (type === 0 || type === 3) {
+      if (jumpButton !== "ArrowUp" && Game.getKey("ArrowUp", joyId)) climbUp = 1;
+      if (Game.getKey("ArrowDown", joyId)) climbDown = 1;
+      if (Game.getKey("ArrowLeft", joyId)) climbLeft = 1;
+      if (Game.getKey("ArrowRight", joyId)) climbRight = 1;
+    }
+    // Stick
+    if (!climbUp && !climbDown && (type === 1 || type === 2 || type === 3)) {
+      var sAxis = type === 2 ? 3 : 1;
+      var sY = Game.getAxes(sAxis, joyId);
+      if (sY < -0.3) climbUp = 1;
+      if (sY > 0.3) climbDown = 1;
+    }
+    if (!climbLeft && !climbRight && (type === 1 || type === 2 || type === 3)) {
+      var sAxisX = type === 2 ? 2 : 0;
+      var sX = Game.getAxes(sAxisX, joyId);
+      if (sX < -0.3) climbLeft = 1;
+      if (sX > 0.3) climbRight = 1;
+    }
+    obj.speedy = 0;
+    if (climbUp) obj.speedy = -ls;
+    if (climbDown) obj.speedy = ls;
+    obj.speedx = 0;
+    if (climbLeft) obj.speedx = -ls * 0.7;
+    if (climbRight) obj.speedx = ls * 0.7;
+    return;
   }
 
   // X-axis movement with proper deceleration
@@ -4197,7 +4598,7 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
     Blockly.JavaScript.definitions_['object_control'] = funcCode;
   }
   
-  return `object_control(${obj}, ${type}, ${speedX}, ${speedY}, ${gameType}, ${jumpButton}, ${doubleJumpEnabled}, ${joyId});\n`;
+  return `object_control(${obj}, ${type}, ${speedX}, ${speedY}, ${gameType}, ${jumpButton}, ${doubleJumpEnabled}, ${joyId}, ${ladderSpeed});\n`;
 };
 // Генератор кода для блока перемещения
 javascript.javascriptGenerator.forBlock['object_teleport'] = function(block, generator) {
@@ -4283,6 +4684,15 @@ javascript.javascriptGenerator.forBlock['object_animation'] = function(block, ge
   return `${obj}.sprite = ${frames};\n` +
          `${obj}.animationSpeed = ${speed};\n` +
          `${obj}.animationLoop = ${loop};\n`;
+};
+
+// Генератор кода для блока "Да/Нет" (logic_boolean_yesno).
+// Возвращает 1 для "Да" и 0 для "Нет" — в отличие от стандартного logic_boolean,
+// который возвращает true/false. Это удобно для числовых свойств объектов
+// (flip, visible, solid, animationLoop и т.п.).
+javascript.javascriptGenerator.forBlock['logic_boolean_yesno'] = function(block, generator) {
+  const isYes = block.getFieldValue('BOOL') === 'TRUE';
+  return [isYes ? '1' : '0', javascript.Order.ATOMIC];
 };
 
 // Генератор кода для блока проверки имени объекта

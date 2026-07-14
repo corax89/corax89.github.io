@@ -95,7 +95,13 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="clone_object"></block>
                         <block type="game_copy_state"></block>
             <block type="delete_object"></block>
-            <block type="change_object_var"></block>
+            <block type="change_object_var">
+                <value name="VALUE">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
             <block type="addto_object_var"></block>
                         <block type="get_object"></block>
             <block type="get_object_var"></block>
@@ -127,6 +133,7 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="logic_operation"></block>
             <block type="logic_negate"></block>
             <block type="logic_boolean"></block>
+            <block type="logic_boolean_yesno"></block>
             <block type="logic_null"></block>
             <block type="logic_ternary"></block>
                         <block type="if_object_name_equals"></block>

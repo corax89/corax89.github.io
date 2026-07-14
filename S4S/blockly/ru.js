@@ -457,6 +457,7 @@ Blockly.Msg['OBJECT_PARAM_MASS'] = 'масса';
 Blockly.Msg['OBJECT_PARAM_SPRITE'] = 'спрайт';
 Blockly.Msg['OBJECT_PARAM_RESTITUTION'] = 'упругость';
 Blockly.Msg['OBJECT_PARAM_ISSTATIC'] = 'статичность';
+Blockly.Msg['OBJECT_PARAM_LADDER'] = 'лестница';
 Blockly.Msg['OBJECT_PARAM_LOCK_ROTATION'] = 'блокировка вращения';
 Blockly.Msg['OBJECT_PARAM_ROTATION_SPEED'] = 'скорость вращения';
 Blockly.Msg['CREATE_PIVOT_JOINT'] = 'шарнирное соединение';
@@ -507,6 +508,7 @@ Blockly.Msg['PLATFORMER_LABEL'] = 'платформер';
 Blockly.Msg['TDS_LABEL'] = 'вид сверху';
 Blockly.Msg['JUMP_BUTTON'] = 'кнопка для прыжка';
 Blockly.Msg['DOUBLE_JUMP_LABEL'] = 'двойной прыжок';
+Blockly.Msg['LADDER_SPEED_LABEL'] = 'скорость по лестнице';
 Blockly.Msg['PARTICLES_CREATE_X'] = 'X позиция';
 Blockly.Msg['PARTICLES_CREATE_Y'] = 'Y позиция';
 Blockly.Msg['PARTICLES_CREATE_COUNT'] = 'количество';
@@ -788,6 +790,10 @@ Blockly.Msg['RESET'] = 'Сбросить состояние игры';
 Blockly.Msg['TIMERS'] = 'Таймеры';
 Blockly.Msg['NO'] = 'НЕТ';
 Blockly.Msg['YES'] = 'ДА';
+// Подписи и подсказка для блока "Да/Нет" (logic_boolean_yesno)
+Blockly.Msg['LOGIC_YESNO_TRUE'] = 'Да';
+Blockly.Msg['LOGIC_YESNO_FALSE'] = 'Нет';
+Blockly.Msg['LOGIC_YESNO_TOOLTIP'] = 'Возвращает 1 (Да) или 0 (Нет). Удобно для числовых свойств объектов.';
 
 const ruTexts = {
         'INTERFACE_TITLE': 'Blockly с JavaScript',

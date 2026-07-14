@@ -2615,17 +2615,14 @@ Game.physics = {
         // If solid=0, make sensor — detects collisions but no physical response.
         // NOTE: obj.solid may not be set yet at this point (default is 1).
         // We also check sensor in syncToBody/syncFromBody as a fallback.
-        if (obj.solid === 0) cpShapeSetSensor(shape, true);
+        if (obj.solid === 0 || obj.ladder === 1) cpShapeSetSensor(shape, true);
         cpSpaceAddShape(this.space, shape);
         obj._cpBody = body;
         obj._cpShape = shape;
-        // Track the width/height the shape was created with, so syncToBody
-        // can detect changes and recreate the shape.
         shape._lastWidth = w;
         shape._lastHeight = h;
-        // Also update sensor status if solid changes later.
         obj._checkSensor = function() {
-            if (this._cpShape) cpShapeSetSensor(this._cpShape, this.solid === 0);
+            if (this._cpShape) cpShapeSetSensor(this._cpShape, this.solid === 0 || this.ladder === 1);
         };
         obj._blockedRight = false;
         obj._blockedLeft = false;
@@ -2659,7 +2656,7 @@ Game.physics = {
         cpShapeSetElasticity(shape, Math.min(obj.restitution || 0.1, 0.5));
         // FIX: Store OBJECT REFERENCE (not index) — same as createBody.
         cpShapeSetUserData(shape, obj);
-        if (obj.solid === 0) cpShapeSetSensor(shape, true);
+        if (obj.solid === 0 || obj.ladder === 1) cpShapeSetSensor(shape, true);
         // Preserve chain collision group across shape recreation.
         // Without this, recreateShape (called when width/height changes)
         // creates a new shape with default filter, and chain links would
@@ -2778,6 +2775,12 @@ Game.physics = {
         // Chipmunk uses body mass when resolving overlaps.
         var vx = obj.speedx * 60;
         var vy = obj.speedy * 60;
+        // Ladder: cancel gravity by zeroing body velocity. Climber position is JS-controlled.
+        if (obj._onLadder) {
+            cpBodySetVelocity(obj._cpBody, cpv(0, 0));
+            cpBodySetAngularVelocity(obj._cpBody, 0);
+            return;
+        }
         if (obj.solid !== 0) {
             if (obj._blockedRight && vx > 0) vx = 0;
             if (obj._blockedLeft && vx < 0) vx = 0;
@@ -2837,6 +2840,45 @@ Game.physics = {
     syncFromBody: function(obj) {
         if (!obj._cpBody) return;
         if (obj.isStatic) return;
+        // LADDER CLIMBING: horizontal anchor to ladder body + vertical free movement + chain swing impulse.
+        if (obj._onLadder) {
+            var ladder = obj._onLadder;
+            var ladBodyPos = cpBodyGetPosition(ladder._cpBody);
+            var ladCx = ladBodyPos.x - ladder.width * 0.5;
+            if (obj._ladderOffX === undefined) obj._ladderOffX = obj.x - ladCx;
+            var oldX = obj.x, oldY = obj.y;
+            obj._ladderOffX += obj.speedx;
+            obj.y += obj.speedy;
+            obj.x = ladCx + obj._ladderOffX;
+            // Tile collision check
+            var ts = Game.helper.tiles ? Game.helper.tiles.tileSize : 32;
+            var grid = Game.helper.tiles ? Game.helper.tiles.grid : null;
+            if (grid) {
+                var l = Math.floor(obj.x / ts), r = Math.floor((obj.x + obj.width - 0.01) / ts);
+                var tT = Math.floor(obj.y / ts), bT = Math.floor((obj.y + obj.height - 0.01) / ts);
+                var hit = false;
+                for (var r2 = tT; r2 <= bT && !hit; r2++)
+                    for (var c2 = l; c2 <= r && !hit; c2++) {
+                        if (r2<0||c2<0||r2>=Game.helper.tiles.rows||c2>=Game.helper.tiles.cols) continue;
+                        if (Game.helper.tiles.solidMap[r2+'_'+c2]) hit = true;
+                    }
+                if (hit) { obj._ladderOffX -= obj.speedx; obj.x = oldX; obj.y = oldY; obj.speedx = 0; obj.speedy = 0; }
+            }
+            obj.isOnGround = 0;
+            // Chain swing: 90% of climber's speedx → impulse to ladder body
+            if (obj.speedx !== 0 && ladder._cpBody) {
+                var lbt = cpBodyGetType(ladder._cpBody);
+                if (lbt !== CP_BODY_TYPE_STATIC) {
+                    var lm = cpBodyGetMass(ladder._cpBody);
+                    var imp = lm * obj.speedx * 0.9;
+                    cpBodyApplyImpulseAtWorldPoint(ladder._cpBody, cpv(imp, 0), cpv(obj.x + obj.width*0.5, obj.y + obj.height*0.5));
+                }
+            }
+            cpBodySetPosition(obj._cpBody, cpv(obj.x + obj.width*0.5, obj.y + obj.height*0.5));
+            cpBodySetVelocity(obj._cpBody, cpv(0, 0));
+            return;
+        }
+        if (obj._ladderOffX !== undefined) obj._ladderOffX = undefined;
         if (obj.solid === 0) return;
         var pos = cpBodyGetPosition(obj._cpBody);
         var vel = cpBodyGetVelocity(obj._cpBody);
@@ -3480,11 +3522,11 @@ Game.physics = {
         for (var pass = 0; pass < 2; pass++) {
             for (var i = 0; i < objs.length; i++) {
                 var a = objs[i];
-                if (!a || !a._cpBody || a.isStatic || a.solid === 0) continue;
+                if (!a || !a._cpBody || a.isStatic || a.solid === 0 || a.ladder === 1) continue;
                 var aR = getRadius(a);
                 for (var j = i + 1; j < objs.length; j++) {
                     var b = objs[j];
-                    if (!b || !b._cpBody || b.solid === 0) continue;
+                    if (!b || !b._cpBody || b.solid === 0 || b.ladder === 1) continue;
                     // Skip collision push-out between objects in the same chain
                     // group. Chain links should interlock (connected by joints),
                     // not push each other apart. Without this, the collision
@@ -6386,6 +6428,11 @@ Game.addObject = function (name, x, y, width, height, sprite) {
                 collisionShape: 0,
                 collidingTiles: [],
                 local: {},
+                // Ladder: when 1, this object is a ladder. Climbers overlap → gravity off, free movement, follow ladder.
+                ladder: 0,
+                _onLadder: null,
+                _ladderPrevX: 0,
+                _ladderPrevY: 0,
                 persistentContacts: {
                         top: {
                                 count: 0,
@@ -7967,10 +8014,28 @@ function game_loop(timestamp) {
                         o.prev_y = o.y;
                         o._prev_speedx = o.speedx;
                         o._prev_speedy = o.speedy;
+                        if (o.ladder === 1) { o._ladderPrevX = o.x; o._ladderPrevY = o.y; }
                         if (o.onStep) {
                                 try { o.onStep(); }
                                 catch(e) { Game.alert(e.message || String(e), 'onStep Error (' + (o.name||'?') + ')'); }
                         }
+                }
+                // LADDER DETECTION: AABB overlap check BEFORE syncToBody.
+                for (var i = 0; i < Game.allObject.length; i++) {
+                        var o = Game.allObject[i];
+                        if (o.ladder === 1 || o.isStatic) { o._onLadder = null; continue; }
+                        var foundLadder = null;
+                        for (var j = 0; j < Game.allObject.length; j++) {
+                                var lad = Game.allObject[j];
+                                if (lad.ladder !== 1 || lad._removed) continue;
+                                if (lad._cpShape && !cpShapeGetSensor(lad._cpShape)) cpShapeSetSensor(lad._cpShape, true);
+                                var m = 4;
+                                if (o.x < lad.x + lad.width + m && o.x + o.width + m > lad.x &&
+                                    o.y < lad.y + lad.height + m && o.y + o.height + m > lad.y) {
+                                    foundLadder = lad; break;
+                                }
+                        }
+                        o._onLadder = foundLadder;
                 }
                 // 2. Apply gravity + sync to Chipmunk.
                 // Chain links (objects in distance joints with type='distance')

@@ -446,6 +446,7 @@ Blockly.Msg['OBJECT_PARAM_MASS'] = 'mass';
 Blockly.Msg['OBJECT_PARAM_SPRITE'] = 'sprite';
 Blockly.Msg['OBJECT_PARAM_RESTITUTION'] = 'restitution';
 Blockly.Msg['OBJECT_PARAM_ISSTATIC'] = 'static';
+Blockly.Msg['OBJECT_PARAM_LADDER'] = 'ladder';
 Blockly.Msg['OBJECT_PARAM_LOCK_ROTATION'] = 'lock rotation';
 Blockly.Msg['OBJECT_PARAM_ROTATION_SPEED'] = 'rotation speed';
 Blockly.Msg['CREATE_PIVOT_JOINT'] = 'pivot joint';
@@ -494,6 +495,7 @@ Blockly.Msg['PLATFORMER_LABEL'] = 'platformer';
 Blockly.Msg['TDS_LABEL'] = 'TDS';
 Blockly.Msg['JUMP_BUTTON'] = 'jump button';
 Blockly.Msg['DOUBLE_JUMP_LABEL'] = 'double jump';
+Blockly.Msg['LADDER_SPEED_LABEL'] = 'ladder speed';
 Blockly.Msg['PARTICLES_CREATE_X'] = 'X position';
 Blockly.Msg['PARTICLES_CREATE_Y'] = 'Y position';
 Blockly.Msg['PARTICLES_CREATE_COUNT'] = 'count';
@@ -768,6 +770,10 @@ Blockly.Msg['RESET'] = 'Reset game';
 Blockly.Msg['TIMERS'] = 'Timers';
 Blockly.Msg['NO'] = 'NO';
 Blockly.Msg['YES'] = 'YES';
+// Labels and tooltip for the "Yes/No" block (logic_boolean_yesno)
+Blockly.Msg['LOGIC_YESNO_TRUE'] = 'Yes';
+Blockly.Msg['LOGIC_YESNO_FALSE'] = 'No';
+Blockly.Msg['LOGIC_YESNO_TOOLTIP'] = 'Returns 1 (Yes) or 0 (No). Handy for numeric object properties.';
 };
 
 function changeLanguage(selectedValue) {
