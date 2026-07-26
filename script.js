@@ -2350,12 +2350,19 @@ window.addEventListener('beforeunload', function() { saveCode(); });
         return false;
     }
 
-    function evalExpression(expr) {
-        // Replace hex literals ($xx) with decimal for eval
+    function evalExpression(expr, base) {
+        // Замена $hex
         var sanitized = expr.replace(/\$[0-9A-Fa-f]+/g, function(m) {
             return parseInt(m.substring(1), 16);
         });
-        // Only allow safe characters
+        // Замена чисел без префикса в соответствии с текущей базой
+        var numRegex;
+        if (base === 16) numRegex = /[0-9A-Fa-f]+/g;
+        else if (base === 10) numRegex = /\d+/g;
+        else if (base === 2) numRegex = /[01]+/g;
+        sanitized = sanitized.replace(numRegex, function(m) {
+            return parseInt(m, base);
+        });
         if (/[^0-9+\-*/().%\s]/.test(sanitized)) return NaN;
         try {
             return Function('"use strict"; return (' + sanitized + ')')();
@@ -2377,32 +2384,74 @@ window.addEventListener('beforeunload', function() { saveCode(); });
         convBin.textContent = v.toString(2).padStart(16, '0');
     }
 
-    function setBase(base) {
-        currentBase = base;
-        for (var i = 0; i < baseBtns.length; i++) {
-            baseBtns[i].classList.toggle('active', parseInt(baseBtns[i].dataset.base) === base);
-        }
-        // Update button states for digits
-        for (var i = 0; i < numBtns.length; i++) {
-            var btn = numBtns[i];
-            var val = btn.dataset.val;
-            if (val.length === 1 && /^[0-9A-Fa-f]$/.test(val)) {
-                btn.disabled = !isDigitForBase(val, currentBase);
-            }
-        }
-        // Reformat display
-        if (expression) {
-            var val = evalExpression(expression);
-            if (!isNaN(val)) {
-                calcInput.value = formatForBase(val & 0xFFFF, currentBase);
-            }
-        }
-    }
-
     function formatForBase(val, base) {
         if (base === 16) return '$' + val.toString(16).toUpperCase().padStart(4, '0');
         if (base === 2) return '%' + val.toString(2).padStart(8, '0');
         return val.toString();
+    }
+
+    function updateDisplayForExpression() {
+        if (!expression) {
+            calcInput.value = '0';
+            calcResult.textContent = '0';
+            updateConversions(0);
+            return;
+        }
+        var val = evalExpression(expression, currentBase);
+        if (isNaN(val)) {
+            calcInput.value = expression;
+            calcResult.textContent = '?';
+            updateConversions(NaN);
+        } else {
+            var v = val & 0xFFFF;
+            calcInput.value = formatForBase(v, currentBase);
+            calcResult.textContent = formatForBase(v, currentBase);
+            updateConversions(v);
+        }
+    }
+
+    function setBase(base) {
+        // Сохраняем старую базу для вычисления текущего значения
+        var oldBase = currentBase;
+        // Если есть выражение, вычисляем его значение в старой базе
+        var currentValue = null;
+        if (expression) {
+            var val = evalExpression(expression, oldBase);
+            if (!isNaN(val)) {
+                currentValue = val & 0xFFFF;
+            }
+        }
+        // Устанавливаем новую базу
+        currentBase = base;
+        // Обновляем активные кнопки
+        for (var i = 0; i < baseBtns.length; i++) {
+            baseBtns[i].classList.toggle('active', parseInt(baseBtns[i].dataset.base) === base);
+        }
+        // Обновляем доступность цифр
+        for (var i = 0; i < numBtns.length; i++) {
+            var btn = numBtns[i];
+            var val = btn.dataset.val;
+            if (val.length === 1 && /^[0-9A-Fa-f]$/.test(val) && val !== 'C') {
+                btn.disabled = !isDigitForBase(val, currentBase);
+            }
+        }
+        lastResult = null;
+        // Если было вычислено значение, отображаем его в новой базе и устанавливаем выражение
+        if (currentValue !== null) {
+            var formatted = formatForBase(currentValue, currentBase);
+            // Убираем префиксы для хранения в expression
+            var clean = formatted.replace(/^[$%]/, '');
+            expression = clean;
+            calcInput.value = formatted;
+            calcResult.textContent = formatted;
+            updateConversions(currentValue);
+        } else {
+            // Если выражения не было или оно невалидно, показываем 0
+            expression = '';
+            calcInput.value = '0';
+            calcResult.textContent = '0';
+            updateConversions(0);
+        }
     }
 
     function handleButton(val) {
@@ -2411,11 +2460,12 @@ window.addEventListener('beforeunload', function() { saveCode(); });
             calcInput.value = '0';
             calcResult.textContent = '0';
             updateConversions(0);
+            lastResult = null;
             return;
         }
         if (val === '=') {
             if (!expression) return;
-            var result = evalExpression(expression);
+            var result = evalExpression(expression, currentBase);
             if (isNaN(result)) {
                 calcInput.value = 'Error';
                 calcResult.textContent = 'Error';
@@ -2444,33 +2494,33 @@ window.addEventListener('beforeunload', function() { saveCode(); });
             lastResult = null;
             return;
         }
-        // Digit
+        // Цифра или буква (для HEX)
         if (currentBase === 16) {
             expression += val.toUpperCase();
         } else {
             expression += val;
         }
         calcInput.value = expression;
-        // Live conversion
-        var liveVal = evalExpression(expression);
+        // Live‑конверсия
+        var liveVal = evalExpression(expression, currentBase);
         if (!isNaN(liveVal)) updateConversions(liveVal);
     }
 
-    // Base buttons
+    // Обработчики кнопок выбора базы
     for (var i = 0; i < baseBtns.length; i++) {
         baseBtns[i].addEventListener('click', function() {
             setBase(parseInt(this.dataset.base));
         });
     }
 
-    // Number/operator buttons
+    // Обработчики цифр и операторов
     for (var i = 0; i < numBtns.length; i++) {
         numBtns[i].addEventListener('click', function() {
             handleButton(this.dataset.val);
         });
     }
 
-    // Keyboard support
+    // Клавиатура
     calcInput.addEventListener('keydown', function(e) {
         e.preventDefault();
         var key = e.key;
@@ -2488,13 +2538,24 @@ window.addEventListener('beforeunload', function() { saveCode(); });
         }
     });
 
+    // Открытие калькулятора
     calcBtn.addEventListener('click', function() {
         openModal('calcModal');
-        setBase(currentBase);
+        var activeBtn = document.querySelector('.calc-base.active');
+        if (activeBtn) {
+            setBase(parseInt(activeBtn.dataset.base));
+        } else {
+            setBase(16);
+        }
         calcInput.value = expression || '0';
         calcInput.focus();
     });
 
-    // Init
-    setBase(16);
+    // Инициализация: берём базу из активной кнопки при загрузке
+    var initialActive = document.querySelector('.calc-base.active');
+    if (initialActive) {
+        setBase(parseInt(initialActive.dataset.base));
+    } else {
+        setBase(16);
+    }
 })();
