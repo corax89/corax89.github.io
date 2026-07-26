@@ -1,62 +1,211 @@
 <!DOCTYPE html>
-<html>
-<title>8086test</title>
+<html lang="ru" id="htmlRoot">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#7CCD7C">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Easy6502</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="editor.js"></script>
 </head>
-<link rel="stylesheet" type="text/css" href="style.css" />
-<body onkeypress="handle(event)">
-	<div id="menu">
-		<input type="file" id="file" />
-		<button onclick="loadFromTextArea()">load from memory</button>
-		<button onclick="compiletocom();">compile</button>
-		<button onclick="savecom();">save</button>
-		<button onclick="run();">play</button>
-		<button onclick="stop();">stop</button>
-		<button onclick="stop();exec86(1);debug();">step</button>
-		<button onclick="stop();init86();clearScreen();">reset</button>
-	</div>
-	<div id="container">
-		<div id="wrap-left">
-			<div class="header">memory</div>
-			<textarea id="ram"></textarea>
-			<div class="header">monitor</div>
-			<div id="monitor">
-				<div id="debug"></div>
-				<canvas id="output" width="640" height="400"></canvas>
-				<div id="codePreviev"></div>
-			</div>
-		</div>
-		<div id="wrap-right">
-			<div class="header">source</div>
-			<textarea id="input">
-print("hello world\n\r");
-a=10+12*(6-1);
-print(a);
-print(" ");
-printc(10+12*5);
-if(3>2){
- print(" true\n\r");
-}
-b=1;
-while(1){
- b=b+1;
- print(b);
- if(b>10){goto(end);}
-}			
-end:	
-b=input();		
-			</textarea>
-			<div id="hint">:</div>
-		</div>
-	</div>
-	<div class="header">information</div>
-	<div id="alert"></div>
-	<script type="text/javascript" src="FileSaver.js"></script>
-	<script type="text/javascript" src="compil2.js"></script>
-	<script type="text/javascript" src="script.js"></script>
-	<script type="text/javascript" src="cpu.js"></script>	
+<body>
+
+<!-- ПАНЕЛЬ СПРАВКИ (скрыта по умолчанию) -->
+<div id="helpPanel" class="hidden">
+    <h2>📖 Справочник 6502</h2>
+    <h3>Регистры и флаги</h3>
+    <ul>
+        <li><code>A</code> – аккумулятор, <code>X,Y</code> – индексные</li>
+        <li><code>SP</code> – стек, <code>PC</code> – счётчик</li>
+        <li>Флаги: <code>N V B D I Z C</code></li>
+    </ul>
+    <h3>Все мнемоники</h3>
+    <div class="instr-grid">
+        <span>ADC – сложение</span><span>AND – И</span><span>ASL – сдвиг влево</span>
+        <span>BCC – C=0</span><span>BCS – C=1</span><span>BEQ – Z=1</span>
+        <span>BIT – тест</span><span>BMI – N=1</span><span>BNE – Z=0</span>
+        <span>BPL – N=0</span><span>BRK – прерывание</span><span>BVC – V=0</span>
+        <span>BVS – V=1</span><span>CLC – C=0</span><span>CLD – D=0</span>
+        <span>CLI – I=0</span><span>CLV – V=0</span><span>CMP – сравнить A</span>
+        <span>CPX – сравнить X</span><span>CPY – сравнить Y</span><span>DEC – декремент</span>
+        <span>DEX – X--</span><span>DEY – Y--</span><span>EOR – XOR</span>
+        <span>INC – инкремент</span><span>INX – X++</span><span>INY – Y++</span>
+        <span>JMP – прыжок</span><span>JSR – подпрограмма</span><span>LDA – загрузить A</span>
+        <span>LDX – загрузить X</span><span>LDY – загрузить Y</span><span>LSR – сдвиг вправо</span>
+        <span>NOP – нет</span><span>ORA – ИЛИ</span><span>PHA – push A</span>
+        <span>PHP – push флаги</span><span>PLA – pop A</span><span>PLP – pop флаги</span>
+        <span>ROL – циклический влево</span><span>ROR – циклический вправо</span><span>RTI – возврат из IRQ</span>
+        <span>RTS – возврат</span><span>SBC – вычитание</span><span>SEC – C=1</span>
+        <span>SED – D=1</span><span>SEI – I=1</span><span>STA – записать A</span>
+        <span>STX – записать X</span><span>STY – записать Y</span><span>TAX – A→X</span>
+        <span>TAY – A→Y</span><span>TSX – SP→X</span><span>TXA – X→A</span>
+        <span>TXS – X→SP</span><span>TYA – Y→A</span>
+    </div>
+    <h3>Точки останова</h3>
+    <ul>
+        <li>Нажмите на номер строки в gutter чтобы поставить/убрать точку</li>
+        <li>При Run программа остановится перед выполнением строки с точкой</li>
+        <li>Кнопка &#128308; Clear BPs убирает все точки</li>
+    </ul>
+    <p style="font-size:11px; color:var(--text-muted); margin-top:10px;">Основано на <a href="https://skilldrick.github.io/easy6502/" target="_blank" style="color:var(--accent);">Easy6502</a>.</p>
+</div>
+
+<!-- ОСНОВНАЯ ОБЛАСТЬ -->
+<div id="main">
+
+    <div id="toolbar">
+        <button id="assembleBtn">Assemble</button>
+        <button id="runBtn" disabled>Run</button>
+        <button id="resetBtn" disabled>Reset</button>
+        <button id="stepBtn" disabled>Step</button>
+        <div class="sep"></div>
+        <button id="hexdumpBtn" disabled>Hexdump</button>
+        <button id="disasmBtn" disabled>Disasm</button>
+        <button id="clearBpBtn" title="Clear all breakpoints">&#128308; Clear BPs</button>
+        <div class="sep"></div>
+        <label id="speedLabel" title="Ticks per frame (30 fps)">Speed:</label>
+        <input type="range" id="speedSlider" min="0" max="7" value="3" step="1">
+        <span id="speedValue">10 ticks</span>
+        <button id="calcBtn" title="Calculator"> Calc</button>
+        <div class="sep"></div>
+        <button id="toggleTheme">&#9728;&#65039;</button>
+        <button id="langBtn" title="Switch language">EN</button>
+        <button id="toggleHelp">&#128218; Справка</button>
+        <div class="sep"></div>
+        <button id="resetLayoutBtn" title="Reset panel sizes to defaults">&#8634; Reset Layout</button>
+    </div>
+
+    <!-- Mobile: hamburger + floating run bar -->
+    <button id="mobileMenuBtn" class="mobile-only" onclick="document.getElementById('toolbar').classList.toggle('mobile-open')">&#9776;</button>
+    <div id="mobileRunBar" class="mobile-only">
+        <button id="mAssembleBtn">Assemble</button>
+        <button id="mRunBtn" disabled>Run</button>
+        <button id="mStepBtn" disabled>Step</button>
+        <button id="mResetBtn" disabled>Reset</button>
+    </div>
+
+    <div id="workspace">
+        <div id="editorRow">
+            <div id="editorWrap">
+                <div id="mobileScreen" class="mobile-only">
+                    <canvas id="screenMobile"></canvas>
+                    <div id="keyOverlayMobile" class="key-overlay"></div>
+                </div>
+                <textarea id="codeArea">LDA #$c0
+TAX
+INX
+ADC #$c4
+STA $0600
+BRK</textarea>
+            </div>
+            <div class="resize-handle h" id="h-editor-canvas"></div>
+            <div id="canvasWrap">
+                <canvas id="screen"></canvas>
+                <div id="keyOverlay" class="key-overlay"></div>
+            </div>
+        </div>
+        <div class="resize-handle v" id="h-rows"></div>
+        <div id="infoRow">
+            <canvas id="infoCanvas" width="1000" height="280"></canvas>
+            <div id="infoTooltip" class="info-tooltip" style="display:none"></div>
+            <div class="resize-handle h" id="h-info-defines"></div>
+            <div id="definesPanel">
+                <div class="defines-header">Defines</div>
+                <div class="defines-col-header">
+                    <span>Name</span>
+                    <span>Addr</span>
+                    <span>Val</span>
+                    <span>Dec</span>
+                    <span>Bin</span>
+                    <span>Color</span>
+                </div>
+                <div id="definesList" class="defines-list" data-empty-text="Нет определений"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="messages">✨ Готово. Напишите код и нажмите Assemble.</div>
+</div>
+
+<!-- Modal: Calculator -->
+<div id="calcModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Calculator</span>
+            <button class="modal-close" onclick="closeModal('calcModal')">&times;</button>
+        </div>
+        <div id="calcBody" class="modal-body">
+            <div class="calc-display">
+                <input type="text" id="calcInput" class="calc-input" value="0" readonly>
+                <div id="calcResult" class="calc-result">0</div>
+            </div>
+            <div class="calc-base-row">
+                <button class="calc-base active" data-base="16">HEX</button>
+                <button class="calc-base" data-base="10">DEC</button>
+                <button class="calc-base" data-base="2">BIN</button>
+            </div>
+            <div class="calc-buttons">
+                <button class="calc-btn calc-op" data-val="C">C</button>
+                <button class="calc-btn calc-op" data-val="(">(</button>
+                <button class="calc-btn calc-op" data-val=")">)</button>
+                <button class="calc-btn calc-op calc-op-main" data-val="/">/</button>
+                <button class="calc-btn calc-num" data-val="A">A</button>
+                <button class="calc-btn calc-num" data-val="B">B</button>
+                <button class="calc-btn calc-num" data-val="*">*</button>
+                <button class="calc-btn calc-op calc-op-main" data-val="-">-</button>
+                <button class="calc-btn calc-num" data-val="C">C</button>
+                <button class="calc-btn calc-num" data-val="D">D</button>
+                <button class="calc-btn calc-num" data-val="E">E</button>
+                <button class="calc-btn calc-op calc-op-main" data-val="+">+</button>
+                <button class="calc-btn calc-num" data-val="F">F</button>
+                <button class="calc-btn calc-num" data-val="0">0</button>
+                <button class="calc-btn calc-num" data-val="1">1</button>
+                <button class="calc-btn calc-op calc-eq" data-val="=">=</button>
+                <button class="calc-btn calc-num" data-val="2">2</button>
+                <button class="calc-btn calc-num" data-val="3">3</button>
+                <button class="calc-btn calc-num" data-val="4">4</button>
+                <button class="calc-btn calc-num" data-val="5">5</button>
+                <button class="calc-btn calc-num" data-val="6">6</button>
+                <button class="calc-btn calc-num" data-val="7">7</button>
+                <button class="calc-btn calc-num" data-val="8">8</button>
+                <button class="calc-btn calc-num" data-val="9">9</button>
+            </div>
+            <div class="calc-conversions" id="calcConversions">
+                <div class="calc-conv-line">HEX: <span id="convHex">0</span></div>
+                <div class="calc-conv-line">DEC: <span id="convDec">0</span></div>
+                <div class="calc-conv-line">BIN: <span id="convBin">0</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assembler.js"></script>
+<script src="cpu.js"></script>
+<script src="script.js"></script>
+
+<!-- Modal: Hexdump -->
+<div id="hexdumpModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Hexdump</span>
+            <button class="modal-close" onclick="closeModal('hexdumpModal')">&times;</button>
+        </div>
+        <pre id="hexdumpBody" class="modal-body"></pre>
+    </div>
+</div>
+
+<!-- Modal: Disasm -->
+<div id="disasmModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Disassembly</span>
+            <button class="modal-close" onclick="closeModal('disasmModal')">&times;</button>
+        </div>
+        <div id="disasmBody" class="modal-body"></div>
+    </div>
+</div>
+
+
 </body>
 </html>
