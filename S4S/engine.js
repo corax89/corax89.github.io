@@ -2807,6 +2807,22 @@ Game.physics = {
             cpBodySetAngularVelocity(obj._cpBody, 0);
             return;
         }
+        // FIX: When user explicitly sets obj.x/y via the "change position" block
+        // (flagged by _posOverride), zero the velocity on those axes so the
+        // physics step does NOT move the body away from the new position.
+        // Without this, cpSpaceStep integrates velocity → new body.p →
+        // syncFromBody overwrites obj.x/y → manual position is lost.
+        if (obj._posOverride) {
+            if (obj._posOverride.x) {
+                vx = 0;
+                obj.speedx = 0;
+            }
+            if (obj._posOverride.y) {
+                vy = 0;
+                obj.speedy = 0;
+            }
+            obj._posOverride = null;
+        }
         if (obj.solid !== 0) {
             if (obj._blockedRight && vx > 0) vx = 0;
             if (obj._blockedLeft && vx < 0) vx = 0;
@@ -8214,6 +8230,10 @@ function game_loop(timestamp) {
                 for (var i = 0; i < Game.allObject.length; i++) {
                         var o = Game.allObject[i];
                         Game.physics.syncFromBody(o);
+                        // Clean up _posOverride flag for objects that skip
+                        // syncToBody (e.g. native chain links) so it doesn't
+                        // persist and cause stale velocity-zeroing later.
+                        if (o._posOverride) o._posOverride = null;
                 }
                 // HARD clamp native chain joints — forcefully prevent links
                 // from separating beyond max distance. The solver's soft

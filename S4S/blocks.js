@@ -4814,6 +4814,10 @@ javascript.javascriptGenerator.forBlock['change_object_var'] = function(block, g
     Game.alert(msg, ru ? 'ошибка' : 'error');
   } else {
     obj[propName] = value;
+    if (propName === 'x' || propName === 'y') {
+      if (!obj._posOverride) obj._posOverride = {};
+      obj._posOverride[propName] = true;
+    }
   }
 }`;
   }
