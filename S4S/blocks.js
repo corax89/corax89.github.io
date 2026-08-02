@@ -4996,6 +4996,13 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
   if (!obj.local) obj.local = {};
   var loc = obj.local;
 
+  // Если объект только что телепортировали (блок object_teleport или
+  // change_object_var установил _posOverride), не перезаписываем
+  // скорость по геймпаду — иначе физический движок уведёт объект
+  // от новой позиции. Флаг будет очищен в syncToBody после обнуления
+  // скорости на затронутых осях.
+  if (obj._posOverride) return;
+
   // Базовая физика (только для topdown)
   if (gameType === 0) {
     obj.speedx *= 0.95;
@@ -5154,16 +5161,18 @@ javascript.javascriptGenerator.forBlock['object_control'] = function(block, gene
 javascript.javascriptGenerator.forBlock['object_teleport'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('OBJECT'));
   const mode = block.getFieldValue('MODE');
-  
+
   if (mode === 'COORDS') {
     // Режим перемещения по координатам
     const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
     const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
-    return `${obj}.x = ${x};\n${obj}.y = ${y};\n`;
+    // Устанавливаем _posOverride, чтобы syncToBody обнулил скорость
+    // на обеих осях и физический движок не уводил тело от новой позиции.
+    return `${obj}.x = ${x};\n${obj}.y = ${y};\n${obj}._posOverride = {x: true, y: true};\n`;
   } else {
     // Режим перемещения к другому объекту
     const targetObj = generator.getVariableName(block.getFieldValue('TARGET_OBJECT'));
-    return `${obj}.x = ${targetObj}.x;\n${obj}.y = ${targetObj}.y;\n`;
+    return `${obj}.x = ${targetObj}.x;\n${obj}.y = ${targetObj}.y;\n${obj}._posOverride = {x: true, y: true};\n`;
   }
 };
 
