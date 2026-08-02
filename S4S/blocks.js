@@ -758,6 +758,35 @@ Blockly.Blocks['get_axes'] = {
   }
 };
 
+// Блок "Движение (наклон)" — датчик движения Joy-Con / геймпада.
+Blockly.Blocks['get_motion'] = {
+  init: function() {
+    this.setColour(60);
+    this.setInputsInline(true);
+    this.setOutput(true, 'Number');
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['MOTION_LABEL'] || 'движение')
+        .appendField(new Blockly.FieldDropdown([
+          [Blockly.Msg['MOTION_ACCEL_X'] || 'наклон X', '0'],
+          [Blockly.Msg['MOTION_ACCEL_Y'] || 'наклон Y', '1'],
+          [Blockly.Msg['MOTION_ACCEL_Z'] || 'наклон Z', '2'],
+          [Blockly.Msg['MOTION_GYRO_X'] || 'вращение X', '3'],
+          [Blockly.Msg['MOTION_GYRO_Y'] || 'вращение Y', '4'],
+          [Blockly.Msg['MOTION_GYRO_Z'] || 'вращение Z', '5']
+        ]), 'AXIS');
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['GAMEPAD_NUM'] || 'геймпад')
+        .appendField(new Blockly.FieldDropdown([
+          ["0", "0"], ["1", "1"], ["2", "2"], ["3", "3"]
+        ]), "JOY_ID");
+    this.setHelpUrl(Blockly.Msg['HELP_A'] + '#game');
+    this.setTooltip(function() {
+      var ru = typeof savedLanguage !== 'undefined' && savedLanguage === 'ru';
+      return ru ? 'Датчик движения Joy-Con (акселерометр/гироскоп). Наклон: -1 до 1 (1 = земная гравитация).' : 'Joy-Con motion sensor (accelerometer/gyroscope). Tilt: -1 to 1 (1 = Earth gravity).';
+    }.bind(this));
+  }
+};
+
 Blockly.Blocks['camera_follow'] = {
   init: function() {
     this.setInputsInline(true);
@@ -2104,6 +2133,234 @@ Blockly.Blocks['raycast_tiles'] = {
   }
 };
 
+// ===== ПАТРУЛИРОВАНИЕ =====
+Blockly.Blocks['enemy_patrol'] = {
+  init: function() {
+    this.setColour(190); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['PATROL_LABEL'] || 'Патрулировать');
+    var modeField = new Blockly.FieldDropdown([
+      [Blockly.Msg['OBJECT_BY_VAR_LABEL'] || 'конкретного', 'VAR'],
+      [Blockly.Msg['THIS_OBJECT_LABEL'] || 'этого объекта', 'THIS']
+    ], (newMode) => this.updateShape_(newMode));
+    this.appendDummyInput('MODE_INPUT').appendField(modeField, 'MODE');
+    this.appendDummyInput('VAR_INPUT').appendField(new Blockly.FieldVariable('obj1'), 'Object');
+    this.appendValueInput("X1").setCheck("Number").appendField('X1');
+    this.appendValueInput("Y1").setCheck("Number").appendField('Y1');
+    this.appendValueInput("X2").setCheck("Number").appendField('X2');
+    this.appendValueInput("Y2").setCheck("Number").appendField('Y2');
+    this.appendValueInput("SPEED").setCheck("Number").appendField(Blockly.Msg['SPEED_LABEL'] || 'скорость');
+    var sx = this.workspace.newBlock('math_number'); sx.setFieldValue('0','NUM'); sx.setShadow(true); sx.initSvg();
+    this.getInput('X1').connection.connect(sx.outputConnection); sx.render();
+    var sy = this.workspace.newBlock('math_number'); sy.setFieldValue('0','NUM'); sy.setShadow(true); sy.initSvg();
+    this.getInput('Y1').connection.connect(sy.outputConnection); sy.render();
+    var sx2 = this.workspace.newBlock('math_number'); sx2.setFieldValue('100','NUM'); sx2.setShadow(true); sx2.initSvg();
+    this.getInput('X2').connection.connect(sx2.outputConnection); sx2.render();
+    var sy2 = this.workspace.newBlock('math_number'); sy2.setFieldValue('0','NUM'); sy2.setShadow(true); sy2.initSvg();
+    this.getInput('Y2').connection.connect(sy2.outputConnection); sy2.render();
+    var ss = this.workspace.newBlock('math_number'); ss.setFieldValue('3','NUM'); ss.setShadow(true); ss.initSvg();
+    this.getInput('SPEED').connection.connect(ss.outputConnection); ss.render();
+    this.setTooltip(function(){var ru=typeof savedLanguage!=='undefined'&&savedLanguage==='ru';return ru?'Патрулирует между двумя точками с разворотом спрайта.':'Patrols between two points with sprite flip.';}.bind(this));
+    this.updateShape_(this.getFieldValue('MODE') || 'VAR');
+  },
+  updateShape_: function(newMode) { var vi = this.getInput('VAR_INPUT'); if (vi) vi.setVisible(newMode === 'VAR'); },
+  saveExtraState: function() { return { mode: this.getFieldValue('MODE') }; },
+  loadExtraState: function(state) { if (state && state.mode) { this.setFieldValue(state.mode, 'MODE'); this.updateShape_(state.mode); } }
+};
+
+// ===== ЗДОРОВЬЕ =====
+// Общий миксин для выбора объекта (this / object / collided)
+var _objSelectDropdown = function(onChange) {
+  return new Blockly.FieldDropdown([
+    [Blockly.Msg['OBJECT_TYPE_THIS'] || 'этот объект', 'this'],
+    [Blockly.Msg['OBJECT_TYPE_COLLIDED'] || 'столкнувшийся объект', ' object'],
+    [Blockly.Msg['OBJECT_TYPE_ITERATED'] || 'полученный при переборе', 'object']
+  ], onChange);
+};
+
+Blockly.Blocks['object_health'] = {
+  init: function() {
+    this.setColour(340); this.setInputsInline(true);
+    this.setOutput(true, 'Number');
+    this.appendDummyInput().appendField(Blockly.Msg['HEALTH_LABEL'] || 'здоровье')
+      .appendField(new Blockly.FieldDropdown([
+        [Blockly.Msg['HEALTH_GET'] || 'получить', 'GET'],
+        [Blockly.Msg['HEALTH_SET'] || 'установить', 'SET'],
+        [Blockly.Msg['HEALTH_ADD'] || 'изменить', 'ADD']
+      ], (newMode) => this.updateShape_(newMode)), 'MODE');
+    this.appendDummyInput().appendField(_objSelectDropdown(null), 'OBJ_TYPE');
+    this.appendValueInput("VALUE").setCheck("Number").appendField(Blockly.Msg['VALUE_LABEL'] || 'значение');
+    this.getInput('VALUE').setVisible(false);
+  },
+  updateShape_: function(mode) { this.getInput('VALUE').setVisible(mode !== 'GET'); },
+  saveExtraState: function() { return { mode: this.getFieldValue('MODE'), objType: this.getFieldValue('OBJ_TYPE') }; },
+  loadExtraState: function(state) {
+    if (!state) return;
+    if (state.mode) { this.setFieldValue(state.mode, 'MODE'); this.updateShape_(state.mode); }
+    if (state.objType) this.setFieldValue(state.objType, 'OBJ_TYPE');
+  }
+};
+Blockly.Blocks['object_take_damage'] = {
+  init: function() {
+    this.setColour(340); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['TAKE_DAMAGE_LABEL'] || 'получить урон')
+      .appendField(_objSelectDropdown(null), 'OBJ_TYPE');
+    this.appendValueInput("DAMAGE").setCheck("Number").appendField(Blockly.Msg['DAMAGE_LABEL'] || 'урон');
+    this.appendValueInput("IFRAMES").setCheck("Number").appendField(Blockly.Msg['IFRAMES_LABEL'] || 'неуязвимость');
+    var sd = this.workspace.newBlock('math_number'); sd.setFieldValue('10','NUM'); sd.setShadow(true); sd.initSvg();
+    this.getInput('DAMAGE').connection.connect(sd.outputConnection); sd.render();
+    var si = this.workspace.newBlock('math_number'); si.setFieldValue('30','NUM'); si.setShadow(true); si.initSvg();
+    this.getInput('IFRAMES').connection.connect(si.outputConnection); si.render();
+  }
+};
+Blockly.Blocks['object_heal'] = {
+  init: function() {
+    this.setColour(340); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['HEAL_LABEL'] || 'вылечить')
+      .appendField(_objSelectDropdown(null), 'OBJ_TYPE');
+    this.appendValueInput("AMOUNT").setCheck("Number").appendField(Blockly.Msg['AMOUNT_LABEL'] || 'количество');
+    var sa = this.workspace.newBlock('math_number'); sa.setFieldValue('10','NUM'); sa.setShadow(true); sa.initSvg();
+    this.getInput('AMOUNT').connection.connect(sa.outputConnection); sa.render();
+  }
+};
+Blockly.Blocks['object_is_alive'] = {
+  init: function() {
+    this.setColour(210); this.setInputsInline(true);
+    this.setOutput(true, 'Boolean');
+    this.appendDummyInput().appendField(Blockly.Msg['IS_ALIVE_LABEL'] || 'жив')
+      .appendField(_objSelectDropdown(null), 'OBJ_TYPE');
+  }
+};
+
+// ===== ДВИГАТЬСЯ В НАПРАВЛЕНИИ =====
+Blockly.Blocks['move_in_direction'] = {
+  init: function() {
+    this.setColour(190); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['MOVE_DIR_LABEL'] || 'двигаться в направлении');
+    this.appendDummyInput().appendField(_objSelectDropdown(null), 'OBJ_TYPE');
+    this.appendValueInput("ANGLE").setCheck("Number").appendField(Blockly.Msg['ANGLE_LABEL'] || 'угол');
+    this.appendValueInput("SPEED").setCheck("Number").appendField(Blockly.Msg['SPEED_LABEL'] || 'скорость');
+    var sa = this.workspace.newBlock('math_number'); sa.setFieldValue('0','NUM'); sa.setShadow(true); sa.initSvg();
+    this.getInput('ANGLE').connection.connect(sa.outputConnection); sa.render();
+    var ss = this.workspace.newBlock('math_number'); ss.setFieldValue('3','NUM'); ss.setShadow(true); ss.initSvg();
+    this.getInput('SPEED').connection.connect(ss.outputConnection); ss.render();
+  }
+};
+
+// ===== МЕНЮ ПАУЗЫ =====
+Blockly.Blocks['pause_menu'] = {
+  init: function() {
+    this.setColour(30); this.setInputsInline(true);
+    this.setOutput(true, 'Number');
+    this.appendDummyInput().appendField(Blockly.Msg['PAUSE_MENU_LABEL'] || 'меню паузы');
+    this.appendValueInput("TITLE").setCheck("String").appendField(Blockly.Msg['TITLE_LABEL'] || 'заголовок');
+    this.appendValueInput("ITEMS").setCheck(null).appendField(Blockly.Msg['ITEMS_LABEL'] || 'пункты (список)');
+    this.appendValueInput("COLOR").setCheck(null).appendField(Blockly.Msg['MENU_COLOR_LABEL'] || 'цвет');
+    this.appendValueInput("WIDTH").setCheck("Number").appendField(Blockly.Msg['MENU_WIDTH_LABEL'] || 'ширина');
+    this.appendValueInput("FSIZE").setCheck("Number").appendField(Blockly.Msg['MENU_FSIZE_LABEL'] || 'шрифт');
+    var st = this.workspace.newBlock('text'); st.setFieldValue('Пауза','TEXT'); st.setShadow(true); st.initSvg();
+    this.getInput('TITLE').connection.connect(st.outputConnection); st.render();
+    var sc = this.workspace.newBlock('field_colour'); sc.setFieldValue('#1a1a3e','FIELDCOLOUR'); sc.setShadow(true); sc.initSvg();
+    this.getInput('COLOR').connection.connect(sc.outputConnection); sc.render();
+    var sw = this.workspace.newBlock('math_number'); sw.setFieldValue('400','NUM'); sw.setShadow(true); sw.initSvg();
+    this.getInput('WIDTH').connection.connect(sw.outputConnection); sw.render();
+    var sf = this.workspace.newBlock('math_number'); sf.setFieldValue('18','NUM'); sf.setShadow(true); sf.initSvg();
+    this.getInput('FSIZE').connection.connect(sf.outputConnection); sf.render();
+  }
+};
+
+// ===== СНАРЯДЫ =====
+Blockly.Blocks['spawn_projectile'] = {
+  init: function() {
+    this.setColour(340); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['PROJECTILE_LABEL'] || 'создать снаряд');
+    this.appendDummyInput().appendField(Blockly.Msg['PROJECTILE_PROTO'] || 'прототип')
+      .appendField(new Blockly.FieldVariable('proj'), 'PROTO');
+    this.appendValueInput("X").setCheck("Number").appendField('X');
+    this.appendValueInput("Y").setCheck("Number").appendField('Y');
+    this.appendValueInput("ANGLE").setCheck("Number").appendField(Blockly.Msg['ANGLE_LABEL'] || 'угол');
+    this.appendValueInput("SPEED").setCheck("Number").appendField(Blockly.Msg['SPEED_LABEL'] || 'скорость');
+    this.appendValueInput("DAMAGE").setCheck("Number").appendField(Blockly.Msg['DAMAGE_LABEL'] || 'урон');
+    var sx = this.workspace.newBlock('math_number'); sx.setFieldValue('0','NUM'); sx.setShadow(true); sx.initSvg();
+    this.getInput('X').connection.connect(sx.outputConnection); sx.render();
+    var sy = this.workspace.newBlock('math_number'); sy.setFieldValue('0','NUM'); sy.setShadow(true); sy.initSvg();
+    this.getInput('Y').connection.connect(sy.outputConnection); sy.render();
+    var sa = this.workspace.newBlock('math_number'); sa.setFieldValue('0','NUM'); sa.setShadow(true); sa.initSvg();
+    this.getInput('ANGLE').connection.connect(sa.outputConnection); sa.render();
+    var ss = this.workspace.newBlock('math_number'); ss.setFieldValue('5','NUM'); ss.setShadow(true); ss.initSvg();
+    this.getInput('SPEED').connection.connect(ss.outputConnection); ss.render();
+    var sd = this.workspace.newBlock('math_number'); sd.setFieldValue('10','NUM'); sd.setShadow(true); sd.initSvg();
+    this.getInput('DAMAGE').connection.connect(sd.outputConnection); sd.render();
+  }
+};
+
+// ===== UI =====
+Blockly.Blocks['ui_button'] = {
+  init: function() {
+    this.setColour(30); this.setInputsInline(true);
+    this.setOutput(true, 'Boolean');
+    this.appendDummyInput().appendField(Blockly.Msg['UI_BUTTON_LABEL'] || 'кнопка');
+    this.appendValueInput("TEXT").setCheck("String").appendField(Blockly.Msg['TEXT_LABEL'] || 'текст');
+    this.appendValueInput("X").setCheck("Number").appendField('X');
+    this.appendValueInput("Y").setCheck("Number").appendField('Y');
+    this.appendValueInput("W").setCheck("Number").appendField('W');
+    this.appendValueInput("H").setCheck("Number").appendField('H');
+    this.appendValueInput("KEY").setCheck("String").appendField(Blockly.Msg['KEY_LABEL'] || 'клавиша');
+    var st = this.workspace.newBlock('text'); st.setFieldValue('OK','TEXT'); st.setShadow(true); st.initSvg();
+    this.getInput('TEXT').connection.connect(st.outputConnection); st.render();
+    var sx = this.workspace.newBlock('math_number'); sx.setFieldValue('100','NUM'); sx.setShadow(true); sx.initSvg();
+    this.getInput('X').connection.connect(sx.outputConnection); sx.render();
+    var sy = this.workspace.newBlock('math_number'); sy.setFieldValue('100','NUM'); sy.setShadow(true); sy.initSvg();
+    this.getInput('Y').connection.connect(sy.outputConnection); sy.render();
+    var sw = this.workspace.newBlock('math_number'); sw.setFieldValue('80','NUM'); sw.setShadow(true); sw.initSvg();
+    this.getInput('W').connection.connect(sw.outputConnection); sw.render();
+    var sh = this.workspace.newBlock('math_number'); sh.setFieldValue('30','NUM'); sh.setShadow(true); sh.initSvg();
+    this.getInput('H').connection.connect(sh.outputConnection); sh.render();
+    var sk = this.workspace.newBlock('text'); sk.setFieldValue('KeyA','TEXT'); sk.setShadow(true); sk.initSvg();
+    this.getInput('KEY').connection.connect(sk.outputConnection); sk.render();
+  }
+};
+Blockly.Blocks['draw_health_bar'] = {
+  init: function() {
+    this.setColour(30); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['HEALTH_BAR_LABEL'] || 'полоса здоровья');
+    this.appendValueInput("X").setCheck("Number").appendField('X');
+    this.appendValueInput("Y").setCheck("Number").appendField('Y');
+    this.appendValueInput("W").setCheck("Number").appendField('W');
+    this.appendValueInput("CURRENT").setCheck("Number").appendField(Blockly.Msg['CURRENT_LABEL'] || 'текущее');
+    this.appendValueInput("MAX").setCheck("Number").appendField(Blockly.Msg['MAX_LABEL'] || 'максимум');
+    var sx = this.workspace.newBlock('math_number'); sx.setFieldValue('10','NUM'); sx.setShadow(true); sx.initSvg();
+    this.getInput('X').connection.connect(sx.outputConnection); sx.render();
+    var sy = this.workspace.newBlock('math_number'); sy.setFieldValue('10','NUM'); sy.setShadow(true); sy.initSvg();
+    this.getInput('Y').connection.connect(sy.outputConnection); sy.render();
+    var sw = this.workspace.newBlock('math_number'); sw.setFieldValue('60','NUM'); sw.setShadow(true); sw.initSvg();
+    this.getInput('W').connection.connect(sw.outputConnection); sw.render();
+    var sc = this.workspace.newBlock('math_number'); sc.setFieldValue('50','NUM'); sc.setShadow(true); sc.initSvg();
+    this.getInput('CURRENT').connection.connect(sc.outputConnection); sc.render();
+    var sm = this.workspace.newBlock('math_number'); sm.setFieldValue('100','NUM'); sm.setShadow(true); sm.initSvg();
+    this.getInput('MAX').connection.connect(sm.outputConnection); sm.render();
+  }
+};
+
+// ===== СПЛИТ СКРИН =====
+Blockly.Blocks['split_screen'] = {
+  init: function() {
+    this.setColour(190); this.setInputsInline(true);
+    this.setPreviousStatement(true, "Array"); this.setNextStatement(true, "Array");
+    this.appendDummyInput().appendField(Blockly.Msg['SPLIT_SCREEN_LABEL'] || 'сплит скрин')
+      .appendField(new Blockly.FieldCheckbox("FALSE"), "ENABLE");
+    this.appendDummyInput().appendField(Blockly.Msg['PLAYER1_LABEL'] || 'игрок 1');
+    this.appendDummyInput().appendField(new Blockly.FieldVariable('obj1'), 'P1');
+    this.appendDummyInput().appendField(Blockly.Msg['PLAYER2_LABEL'] || 'игрок 2');
+    this.appendDummyInput().appendField(new Blockly.FieldVariable('obj2'), 'P2');
+  }
+};
+
 Blockly.Blocks['clone_object'] = {
   init: function() {
     this.setColour(340);
@@ -2631,6 +2888,23 @@ Blockly.Blocks['object_onstep'] = {
         this.setInputsInline(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg['EACH_FRAME_LABEL']);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldVariable('obj1'), 'Object')
+        .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
+    this.appendStatementInput("BODY")
+        .setCheck(null)
+        .appendField(Blockly.Msg['EXECUTE_LABEL']);
+    this.setPreviousStatement(true, "Array");
+    this.setNextStatement(true, "Array");
+    this.setColour(340);
+  }
+};
+
+Blockly.Blocks['object_ondraw'] = {
+  init: function() {
+        this.setInputsInline(true);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['ON_DRAW_LABEL'] || 'при отрисовке');
     this.appendDummyInput()
         .appendField(new Blockly.FieldVariable('obj1'), 'Object')
         .appendField(Blockly.Msg['OBJECT_NAME_LABEL']);
@@ -3785,6 +4059,13 @@ javascript.javascriptGenerator.forBlock['get_axes'] = function(block, generator)
   return [`Game.getAxes(${axis}, ${joyId})`, generator.ORDER_ATOMIC];
 };
 
+// Генератор для блока "Движение (наклон)"
+javascript.javascriptGenerator.forBlock['get_motion'] = function(block, generator) {
+  const axis = block.getFieldValue('AXIS');
+  const joyId = block.getFieldValue('JOY_ID');
+  return [`Game.getMotion(${joyId}, ${axis})`, generator.ORDER_ATOMIC];
+};
+
 // Генератор для рисования точки
 javascript.javascriptGenerator.forBlock['draw_point'] = function(block, generator) {
   const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC);
@@ -4600,6 +4881,14 @@ javascript.javascriptGenerator.forBlock['object_onstep'] = function(block, gener
   return `${obj}.onStep=function(){\n${body}};\n`;
 };
 
+// Генератор для блока "при отрисовке" (onDraw)
+javascript.javascriptGenerator.forBlock['object_ondraw'] = function(block, generator) {
+  const obj = generator.getVariableName(block.getFieldValue('Object'));
+  if (!obj || obj === 'undefined' || obj === '') return '';
+  const body = generator.statementToCode(block, 'BODY');
+  return `if(${obj}){${obj}.onDraw=function(){\n${body}};}\n`;
+};
+
 // Генератор для обработки столкновений
 javascript.javascriptGenerator.forBlock['object_oncollision'] = function(block, generator) {
   const obj = generator.getVariableName(block.getFieldValue('Object'));
@@ -5274,31 +5563,47 @@ var __sg_drawDebug_src =
 `var __sg_debugEnabled = true;
 function __sg_drawDebug(dbg) {
   if (!__sg_debugEnabled) return;
-  if (typeof g_ctx === 'undefined' || !g_ctx) return;
+  if (typeof Draw === 'undefined') return;
   if (typeof Game === 'undefined' || !Game) return;
   var sx = Game.screenx || 0, sy = Game.screeny || 0;
   var ts = dbg.window ? dbg.window.ts : 32;
-  g_ctx.save(); g_ctx.lineWidth = 2;
   if (dbg.window) {
     var w = dbg.window, wx = w.cMin * ts - sx, wy = w.rMin * ts - sy;
     var ww = (w.cMax - w.cMin + 1) * ts, wh = (w.rMax - w.rMin + 1) * ts;
-    g_ctx.strokeStyle = 'rgba(255,255,0,0.6)'; g_ctx.strokeRect(wx, wy, ww, wh);
+    Draw.rect(wx, wy, ww, wh, '#ffff00');
     var _t = (Game.helper && Game.helper.tiles) ? Game.helper.tiles : null;
     if (_t && _t.solidMap) for (var r = w.rMin; r <= w.rMax; r++) for (var c = w.cMin; c <= w.cMax; c++) {
-      if (_t.solidMap[r + '_' + c]) { var tx = c * ts - sx, ty = r * ts - sy; g_ctx.fillStyle = 'rgba(255,0,0,0.5)'; g_ctx.fillRect(tx, ty, ts, ts); g_ctx.strokeStyle = 'rgba(255,255,0,0.9)'; g_ctx.lineWidth = 2; g_ctx.strokeRect(tx + 2, ty + 2, ts - 4, ts - 4); }
+      if (_t.solidMap[r + '_' + c]) { var tx = c * ts - sx, ty = r * ts - sy; Draw.filledRect(tx, ty, ts, ts, '#ff0000'); Draw.rect(tx + 2, ty + 2, ts - 4, ts - 4, '#ffff00'); }
     }
-    if (dbg.bfsDist) for (var bk in dbg.bfsDist) { if (!dbg.bfsDist.hasOwnProperty(bk)) continue; var bp = bk.split('_'), br = parseInt(bp[0], 10), bc2 = parseInt(bp[1], 10), bd = dbg.bfsDist[bk]; var hue = Math.max(0, 240 - bd * 20); g_ctx.fillStyle = 'hsla(' + hue + ',100%,50%,0.3)'; g_ctx.fillRect(bc2 * ts - sx, br * ts - sy, ts, ts); }
-    if (dbg.fScore && ts >= 16) { g_ctx.fillStyle = 'rgba(255,255,255,0.95)'; g_ctx.font = '8px monospace'; g_ctx.textAlign = 'center'; g_ctx.textBaseline = 'middle'; for (var fk in dbg.fScore) { if (!dbg.fScore.hasOwnProperty(fk)) continue; var fp = fk.split('_'), fr = parseInt(fp[0], 10), fc = parseInt(fp[1], 10); g_ctx.fillText(dbg.fScore[fk].toFixed(1), fc * ts + ts / 2 - sx, fr * ts + ts / 2 - sy); } g_ctx.textAlign = 'start'; g_ctx.textBaseline = 'alphabetic'; }
+    if (dbg.fScore && ts >= 16) { for (var fk in dbg.fScore) { if (!dbg.fScore.hasOwnProperty(fk)) continue; var fp = fk.split('_'), fr = parseInt(fp[0], 10), fc = parseInt(fp[1], 10); Draw.text(fc * ts + ts / 2 - sx - 8, fr * ts + ts / 2 - sy - 4, 8, '#ffffff', dbg.fScore[fk].toFixed(1)); } }
   }
-  if (dbg.startTile) { g_ctx.strokeStyle = 'rgba(0,255,0,0.8)'; g_ctx.strokeRect(dbg.startTile.c * ts - sx, dbg.startTile.r * ts - sy, ts, ts); }
-  if (dbg.goal) { g_ctx.strokeStyle = 'rgba(0,150,255,0.8)'; g_ctx.strokeRect(dbg.goal.c * ts - sx, dbg.goal.r * ts - sy, ts, ts); }
-  if (dbg.path && dbg.path.length > 0) { g_ctx.strokeStyle = 'rgba(0,255,0,0.9)'; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); for (var pi = 0; pi < dbg.path.length; pi++) g_ctx.lineTo(dbg.path[pi].c * ts + ts / 2 - sx, dbg.path[pi].r * ts + ts / 2 - sy); g_ctx.stroke(); g_ctx.fillStyle = 'rgba(0,255,0,1)'; for (var pi2 = 0; pi2 < dbg.path.length; pi2++) { g_ctx.beginPath(); g_ctx.arc(dbg.path[pi2].c * ts + ts / 2 - sx, dbg.path[pi2].r * ts + ts / 2 - sy, 3, 0, Math.PI * 2); g_ctx.fill(); } }
-  if (dbg.stepTarget) { g_ctx.fillStyle = 'rgba(255,0,255,1)'; g_ctx.beginPath(); g_ctx.arc(dbg.stepTarget.x - sx, dbg.stepTarget.y - sy, 5, 0, Math.PI * 2); g_ctx.fill(); g_ctx.strokeStyle = 'rgba(255,0,255,0.6)'; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); g_ctx.lineTo(dbg.stepTarget.x - sx, dbg.stepTarget.y - sy); g_ctx.stroke(); }
-  g_ctx.strokeStyle = 'rgba(255,255,0,0.4)'; g_ctx.setLineDash([5, 5]); g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); g_ctx.lineTo(dbg.targetX - sx, dbg.targetY - sy); g_ctx.stroke(); g_ctx.setLineDash([]);
-  if (dbg.velocity && (dbg.velocity.x !== 0 || dbg.velocity.y !== 0)) { g_ctx.strokeStyle = 'rgba(255,255,0,1)'; g_ctx.lineWidth = 3; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - sx, dbg.cy - sy); g_ctx.lineTo(dbg.cx + dbg.velocity.x * 5 - sx, dbg.cy + dbg.velocity.y * 5 - sy); g_ctx.stroke(); }
-  g_ctx.strokeStyle = 'rgba(255,255,255,0.9)'; g_ctx.lineWidth = 1; g_ctx.beginPath(); g_ctx.moveTo(dbg.cx - 6 - sx, dbg.cy - sy); g_ctx.lineTo(dbg.cx + 6 - sx, dbg.cy - sy); g_ctx.moveTo(dbg.cx - sx, dbg.cy - 6 - sy); g_ctx.lineTo(dbg.cx - sx, dbg.cy + 6 - sy); g_ctx.stroke();
-  if (dbg.window) { g_ctx.fillStyle = dbg.found ? 'rgba(0,255,0,1)' : 'rgba(255,100,100,1)'; g_ctx.font = '12px monospace'; var st = dbg.found ? 'PATH FOUND' : 'NO PATH'; if (dbg.iterations !== undefined) st += ' (iter=' + dbg.iterations + ' bfs=' + (dbg.bfsReached || 0) + ')'; g_ctx.fillText(st, dbg.cx - sx + 10, dbg.cy - sy - 10); }
-  g_ctx.restore();
+  if (dbg.startTile) { Draw.rect(dbg.startTile.c * ts - sx, dbg.startTile.r * ts - sy, ts, ts, '#00ff00'); }
+  if (dbg.goal) { Draw.rect(dbg.goal.c * ts - sx, dbg.goal.r * ts - sy, ts, ts, '#0096ff'); }
+  if (dbg.path && dbg.path.length > 0) {
+    var px0 = dbg.cx - sx, py0 = dbg.cy - sy;
+    for (var pi = 0; pi < dbg.path.length; pi++) {
+      var px = dbg.path[pi].c * ts + ts / 2 - sx, py = dbg.path[pi].r * ts + ts / 2 - sy;
+      Draw.line(px0, py0, px, py, '#00ff00');
+      Draw.filledRect(px - 2, py - 2, 5, 5, '#00ff00');
+      px0 = px; py0 = py;
+    }
+  }
+  if (dbg.stepTarget) {
+    Draw.filledRect(dbg.stepTarget.x - sx - 3, dbg.stepTarget.y - sy - 3, 7, 7, '#ff00ff');
+    Draw.line(dbg.cx - sx, dbg.cy - sy, dbg.stepTarget.x - sx, dbg.stepTarget.y - sy, '#ff00ff');
+  }
+  Draw.line(dbg.cx - sx, dbg.cy - sy, dbg.targetX - sx, dbg.targetY - sy, '#ffff66');
+  if (dbg.velocity && (dbg.velocity.x !== 0 || dbg.velocity.y !== 0)) {
+    Draw.line(dbg.cx - sx, dbg.cy - sy, dbg.cx + dbg.velocity.x * 5 - sx, dbg.cy + dbg.velocity.y * 5 - sy, '#ffff00');
+  }
+  Draw.line(dbg.cx - 6 - sx, dbg.cy - sy, dbg.cx + 6 - sx, dbg.cy - sy, '#ffffff');
+  Draw.line(dbg.cx - sx, dbg.cy - 6 - sy, dbg.cx - sx, dbg.cy + 6 - sy, '#ffffff');
+  if (dbg.window) {
+    var st = dbg.found ? 'PATH FOUND' : 'NO PATH';
+    if (dbg.iterations !== undefined) st += ' (iter=' + dbg.iterations + ' bfs=' + (dbg.bfsReached || 0) + ')';
+    var col = dbg.found ? '#00ff00' : '#ff6464';
+    Draw.text(dbg.cx - sx + 10, dbg.cy - sy - 16, 12, col, st);
+  }
 }`;
 
 
@@ -5452,6 +5757,286 @@ javascript.javascriptGenerator.forBlock['raycast_tiles'] = function(block, gener
   } else {
     return [`__sg_raycastTiles(${ax}, ${ay}, ${bx}, ${by}).y`, javascript.Order.ATOMIC];
   }
+};
+
+// ===== ГЕНЕРАТОРЫ НОВЫХ БЛОКОВ =====
+
+// --- Патрулирование ---
+javascript.javascriptGenerator.forBlock['enemy_patrol'] = function(block, generator) {
+  const mode = block.getFieldValue('MODE');
+  let obj;
+  if (mode === 'VAR') { obj = generator.getVariableName(block.getFieldValue('Object')); } else { obj = 'this'; }
+  const x1 = generator.valueToCode(block, 'X1', generator.ORDER_ATOMIC) || '0';
+  const y1 = generator.valueToCode(block, 'Y1', generator.ORDER_ATOMIC) || '0';
+  const x2 = generator.valueToCode(block, 'X2', generator.ORDER_ATOMIC) || '0';
+  const y2 = generator.valueToCode(block, 'Y2', generator.ORDER_ATOMIC) || '0';
+  const speed = generator.valueToCode(block, 'SPEED', generator.ORDER_ATOMIC) || '3';
+  if (!Blockly.JavaScript.definitions_['__sg_patrol']) {
+    Blockly.JavaScript.definitions_['__sg_patrol'] =
+`function __sg_patrol(obj,x1,y1,x2,y2,speed){
+if(!obj||typeof __sg_moveToward!=='function')return;
+if(!obj.local)obj.local={};
+var hw=(obj.width||16)/2,hh=(obj.height||16)/2;
+var t=obj.local._pt||0;
+// Целевые точки — центр тайла + половина объекта (чтобы объект не врезался в стену)
+var tx=t===0?x1+hw:x2+hw,ty=t===0?y1+hh:y2+hh;
+var cx=obj.x+hw,cy=obj.y+hh;
+var dx=tx-cx,dy=ty-cy,d=Math.sqrt(dx*dx+dy*dy);
+// Порог переключения: скорость * 1.5 (учитывает погрешность)
+if(d<speed*1.5+4){
+obj.local._pt=t===0?1:0;
+obj._sgTarget=null;
+obj.speedx=0;obj.speedy=0;
+}else{
+__sg_moveToward(obj,tx,ty,speed,15);
+if(obj.speedx<0)obj.flip=1;else if(obj.speedx>0)obj.flip=0;
+}
+}`;
+  }
+  return `__sg_patrol(${obj},${x1},${y1},${x2},${y2},${speed});\n`;
+};
+
+// --- Здоровье ---
+javascript.javascriptGenerator.forBlock['object_health'] = function(block, generator) {
+  const mode = block.getFieldValue('MODE');
+  const obj = block.getFieldValue('OBJ_TYPE');
+  const val = generator.valueToCode(block, 'VALUE', generator.ORDER_ATOMIC) || '0';
+  if (!Blockly.JavaScript.definitions_['__sg_hp']) {
+    Blockly.JavaScript.definitions_['__sg_hp'] =
+`function __sg_getHp(o){if(!o)return 0;if(o.hp===undefined)o.hp=100;return o.hp;}
+function __sg_setHp(o,v){if(!o)return;if(o.maxHp===undefined)o.maxHp=100;o.hp=Math.max(0,Math.min(v,o.maxHp));}
+function __sg_addHp(o,v){if(!o)return;if(o.hp===undefined)o.hp=100;if(o.maxHp===undefined)o.maxHp=100;o.hp=Math.max(0,Math.min(o.hp+v,o.maxHp));}`;
+  }
+  if (mode === 'GET') return [`__sg_getHp(${obj})`, javascript.Order.ATOMIC];
+  if (mode === 'SET') return `__sg_setHp(${obj},${val});\n`;
+  return `__sg_addHp(${obj},${val});\n`;
+};
+javascript.javascriptGenerator.forBlock['object_take_damage'] = function(block, generator) {
+  const obj = block.getFieldValue('OBJ_TYPE');
+  const dmg = generator.valueToCode(block, 'DAMAGE', generator.ORDER_ATOMIC) || '0';
+  const ifr = generator.valueToCode(block, 'IFRAMES', generator.ORDER_ATOMIC) || '30';
+  if (!Blockly.JavaScript.definitions_['__sg_dmg']) {
+    Blockly.JavaScript.definitions_['__sg_dmg'] =
+`function __sg_takeDamage(o,d,if){if(!o)return;if(o.hp===undefined)o.hp=100;if(o.maxHp===undefined)o.maxHp=100;if(o.invuln>0)return;o.hp=Math.max(0,o.hp-d);o.invuln=if||0;}`;
+  }
+  return `__sg_takeDamage(${obj},${dmg},${ifr});\n`;
+};
+javascript.javascriptGenerator.forBlock['object_heal'] = function(block, generator) {
+  const obj = block.getFieldValue('OBJ_TYPE');
+  const amt = generator.valueToCode(block, 'AMOUNT', generator.ORDER_ATOMIC) || '0';
+  if (!Blockly.JavaScript.definitions_['__sg_hp']) {
+    Blockly.JavaScript.definitions_['__sg_hp'] =
+`function __sg_getHp(o){if(!o)return 0;if(o.hp===undefined)o.hp=100;return o.hp;}
+function __sg_setHp(o,v){if(!o)return;if(o.maxHp===undefined)o.maxHp=100;o.hp=Math.max(0,Math.min(v,o.maxHp));}
+function __sg_addHp(o,v){if(!o)return;if(o.hp===undefined)o.hp=100;if(o.maxHp===undefined)o.maxHp=100;o.hp=Math.max(0,Math.min(o.hp+v,o.maxHp));}`;
+  }
+  return `__sg_addHp(${obj},${amt});\n`;
+};
+javascript.javascriptGenerator.forBlock['object_is_alive'] = function(block, generator) {
+  const obj = block.getFieldValue('OBJ_TYPE');
+  if (!Blockly.JavaScript.definitions_['__sg_hp']) {
+    Blockly.JavaScript.definitions_['__sg_hp'] =
+`function __sg_getHp(o){if(!o)return 0;if(o.hp===undefined)o.hp=100;return o.hp;}`;
+  }
+  return [`__sg_getHp(${obj})>0`, javascript.Order.ATOMIC];
+};
+
+// --- Двигаться в направлении ---
+javascript.javascriptGenerator.forBlock['move_in_direction'] = function(block, generator) {
+  const obj = block.getFieldValue('OBJ_TYPE');
+  const angle = generator.valueToCode(block, 'ANGLE', generator.ORDER_ATOMIC) || '0';
+  const speed = generator.valueToCode(block, 'SPEED', generator.ORDER_ATOMIC) || '3';
+  if (!Blockly.JavaScript.definitions_['__sg_moveDir']) {
+    Blockly.JavaScript.definitions_['__sg_moveDir'] =
+`function __sg_moveInDirection(obj,angle,speed){
+if(!obj)return;
+var rad=angle*Math.PI/180;
+obj.speedx=Math.cos(rad)*speed;
+obj.speedy=Math.sin(rad)*speed;
+}`;
+  }
+  return `__sg_moveInDirection(${obj},${angle},${speed});\n`;
+};
+
+// --- Снаряды ---
+javascript.javascriptGenerator.forBlock['spawn_projectile'] = function(block, generator) {
+  const protoVar = generator.getVariableName(block.getFieldValue('PROTO'));
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+  const angle = generator.valueToCode(block, 'ANGLE', generator.ORDER_ATOMIC) || '0';
+  const speed = generator.valueToCode(block, 'SPEED', generator.ORDER_ATOMIC) || '5';
+  const damage = generator.valueToCode(block, 'DAMAGE', generator.ORDER_ATOMIC) || '10';
+  if (!Blockly.JavaScript.definitions_['__sg_proj']) {
+    Blockly.JavaScript.definitions_['__sg_proj'] =
+`function __sg_spawnProjectile(proto,x,y,angle,speed,damage){
+if(!proto)return null;
+var w=proto.width||8,h=proto.height||8,sp=proto.sprite||0;
+var p=Game.addObject(proto.name||'projectile',x,y,w,h,sp);
+p.speedx=Math.cos(angle*Math.PI/180)*speed;
+p.speedy=Math.sin(angle*Math.PI/180)*speed;
+p._dmg=damage;p.solid=0;
+p.onCollision=function(o){
+if(!o||o===this||o===proto)return;
+if(o.hp!==undefined&&o.hp>0){
+if(o.invuln>0)return;
+o.hp=Math.max(0,o.hp-this._dmg);o.invuln=30;
+}
+if(Game.removeObject)Game.removeObject(this);
+};
+return p;
+}`;
+  }
+  return `__sg_spawnProjectile(${protoVar},${x},${y},${angle},${speed},${damage});\n`;
+};
+
+// --- Меню паузы ---
+javascript.javascriptGenerator.forBlock['pause_menu'] = function(block, generator) {
+  const title = generator.valueToCode(block, 'TITLE', generator.ORDER_ATOMIC) || '"Меню"';
+  const items = generator.valueToCode(block, 'ITEMS', generator.ORDER_ATOMIC) || '[]';
+  const color = generator.valueToCode(block, 'COLOR', generator.ORDER_ATOMIC) || '"#1a1a3e"';
+  const width = generator.valueToCode(block, 'WIDTH', generator.ORDER_ATOMIC) || '400';
+  const fsize = generator.valueToCode(block, 'FSIZE', generator.ORDER_ATOMIC) || '18';
+  if (!Blockly.JavaScript.definitions_['__sg_pmenu']) {
+    Blockly.JavaScript.definitions_['__sg_pmenu'] =
+`function __sg_pauseMenu(title,items,bgColor,cw,fs){
+if(!Game._pmState)Game._pmState={sel:0,prevUp:false,prevDown:false,prevA:false,prevStickY:0,touchActive:false,result:-1};
+var s=Game._pmState;
+if(!items||!items.length)return -1;
+var lh=fs+16;
+var ch=items.length*lh+lh+30;
+var cx=Math.floor((1280-cw)/2),cy=Math.floor((720-ch)/2);
+var up=false,down=false,a=false;
+if(typeof Game!=='undefined'){
+if(typeof Game.getKey==='function'){
+up=Game.getKey('ArrowUp',0);
+down=Game.getKey('ArrowDown',0);
+a=Game.getKey('KeyA',0);
+}
+if(typeof Game.getAxes==='function'){
+var sy=Game.getAxes(1,0);
+if(sy<-0.4&&!s.prevStickUp){up=true;}
+if(sy>0.4&&!s.prevStickDown){down=true;}
+s.prevStickUp=sy<-0.4;
+s.prevStickDown=sy>0.4;
+}
+if(Game.getTouch&&Game.getTouch.istouch){
+var tx=Game.getTouch.x,ty=Game.getTouch.y;
+for(var ti=0;ti<items.length;ti++){
+var tiy=cy+fs+30+ti*lh;
+if(tx>=cx&&tx<=cx+cw&&ty>=tiy&&ty<=tiy+lh){
+if(s.sel!==ti){s.sel=ti;s.touchActive=true;}
+if(!s.prevTouch){a=true;s.prevTouch=true;}
+break;
+}
+}
+if(!Game.getTouch.istouch){s.prevTouch=false;}
+}else{s.prevTouch=false;}
+}
+var _D=(typeof Draw!=='undefined');
+if(_D){
+Draw.filledRect(cx-10,cy-10,cw+20,ch+20,'#000000');
+Draw.filledRect(cx,cy,cw,ch,bgColor||'#1a1a3e');
+Draw.rect(cx,cy,cw,ch,'#6486c8');
+Draw.text(cx+cw/2-(title.length*(fs+4)/4),cy+10,fs+4,'#ffffff',title);
+for(var i=0;i<items.length;i++){
+var isSelected=i===s.sel;
+var iy=cy+fs+30+i*lh;
+if(isSelected){
+Draw.filledRect(cx+10,iy,cw-20,lh,'#5078c8');
+Draw.text(cx+cw/2-(items[i].length*fs/4),iy+lh/2-fs/2,fs,'#ffffff',items[i]);
+Draw.text(cx+20,iy+lh/2-fs/2,fs,'#ffdd44','>');
+}else{
+Draw.text(cx+cw/2-(items[i].length*fs/4),iy+lh/2-fs/2,fs,'#b4b4c8',items[i]);
+}
+}
+}
+if(up&&!s.prevUp){s.sel=(s.sel-1+items.length)%items.length;}
+if(down&&!s.prevDown){s.sel=(s.sel+1)%items.length;}
+s.prevUp=up;s.prevDown=down;
+if(a&&!s.prevA){
+s.prevA=a;
+var r=s.sel;
+Game._pmState={sel:0,prevUp:false,prevDown:false,prevA:false,prevStickUp:false,prevStickDown:false,prevTouch:false,result:-1};
+return r;
+}
+s.prevA=a;
+return -1;
+}`;
+  }
+  return [`__sg_pauseMenu(${title},${items},${color},${width},${fsize})`, javascript.Order.ATOMIC];
+};
+
+// --- UI: кнопка ---
+javascript.javascriptGenerator.forBlock['ui_button'] = function(block, generator) {
+  const text = generator.valueToCode(block, 'TEXT', generator.ORDER_ATOMIC) || '"OK"';
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+  const w = generator.valueToCode(block, 'W', generator.ORDER_ATOMIC) || '80';
+  const h = generator.valueToCode(block, 'H', generator.ORDER_ATOMIC) || '30';
+  const key = generator.valueToCode(block, 'KEY', generator.ORDER_ATOMIC) || '"KeyA"';
+  if (!Blockly.JavaScript.definitions_['__sg_ui']) {
+    Blockly.JavaScript.definitions_['__sg_ui'] =
+`function __sg_uiButton(text,x,y,w,h,key){
+var pressed=false;
+if(key&&typeof Game!=='undefined'&&typeof Game.getKey==='function'&&Game.getKey(key,0))pressed=true;
+if(typeof Game!=='undefined'&&Game.getTouch&&Game.getTouch.istouch){
+var tx=Game.getTouch.x,ty=Game.getTouch.y;
+if(tx>=x&&tx<=x+w&&ty>=y&&ty<=y+h)pressed=true;
+}
+if(typeof Draw!=='undefined'){
+var bg=pressed?'#6464a0':'#323246';
+var border=pressed?'#c8c8ff':'#b4b4c8';
+Draw.filledRect(x,y,w,h,bg);
+Draw.rect(x,y,w,h,border);
+Draw.text(x+w/2-(String(text).length*4),y+h/2-7,14,'#ffffff',String(text));
+}
+return pressed;
+}`;
+  }
+  return [`__sg_uiButton(${text},${x},${y},${w},${h},${key})`, javascript.Order.ATOMIC];
+};
+
+// --- UI: полоса здоровья ---
+javascript.javascriptGenerator.forBlock['draw_health_bar'] = function(block, generator) {
+  const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
+  const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+  const w = generator.valueToCode(block, 'W', generator.ORDER_ATOMIC) || '60';
+  const cur = generator.valueToCode(block, 'CURRENT', generator.ORDER_ATOMIC) || '50';
+  const max = generator.valueToCode(block, 'MAX', generator.ORDER_ATOMIC) || '100';
+  if (!Blockly.JavaScript.definitions_['__sg_hb']) {
+    Blockly.JavaScript.definitions_['__sg_hb'] =
+`function __sg_drawHealthBar(x,y,w,cur,max){
+var h=8;
+var pct=max>0?Math.max(0,Math.min(1,cur/max)):0;
+var col=pct>0.5?'#00dd00':(pct>0.25?'#dddd00':'#dd0000');
+if(typeof Draw!=='undefined'){
+Draw.filledRect(x-1,y-1,w+2,h+2,'#000000');
+Draw.filledRect(x,y,w,h,'#333333');
+Draw.filledRect(x,y,Math.ceil(w*pct),h,col);
+}
+}`;
+  }
+  return `__sg_drawHealthBar(${x},${y},${w},${cur},${max});\n`;
+};
+
+// --- Сплит скрин ---
+javascript.javascriptGenerator.forBlock['split_screen'] = function(block, generator) {
+  const enable = block.getFieldValue('ENABLE') === 'TRUE';
+  const p1 = generator.getVariableName(block.getFieldValue('P1'));
+  const p2 = generator.getVariableName(block.getFieldValue('P2'));
+  if (!Blockly.JavaScript.definitions_['__sg_split']) {
+    Blockly.JavaScript.definitions_['__sg_split'] =
+`function __sg_splitScreen(en,p1,p2){
+if(en&&p1&&p2){Game._splitP1=p1;Game._splitP2=p2;
+if(typeof _duc_helper_native_set_split==='function'){
+_duc_helper_native_set_split(p1.x+p1.width/2,p1.y+p1.height/2,p2.x+p2.width/2,p2.y+p2.height/2);
+}
+}else{Game._splitP1=null;Game._splitP2=null;
+if(typeof _duc_helper_native_set_split==='function'){_duc_helper_native_set_split(0,0,0,0);}
+}
+}`;
+  }
+  return `__sg_splitScreen(${enable?'true':'false'},${p1},${p2});\n`;
 };
 
 // Генератор для получения расстояния

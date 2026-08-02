@@ -50,6 +50,7 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="get_key_down"></block>
                         <block type="get_joy_count"></block>
             <block type="get_axes"></block>
+                        <block type="get_motion"></block>
                         <block type="game_pause"></block>
             <block type="get_time"></block>
             <block type="get_memory"></block>
@@ -103,10 +104,15 @@ const workspace = Blockly.inject('blocklyDiv', {
                 </value>
             </block>
             <block type="addto_object_var"></block>
+            <block type="object_health"></block>
+            <block type="object_take_damage"></block>
+            <block type="object_heal"></block>
+                        <block type="spawn_projectile"></block>
                         <block type="get_object"></block>
             <block type="get_object_var"></block>
                         <block type="get_colliding_tile_info"></block>
                         <block type="object_onstep"></block>
+                        <block type="object_ondraw"></block>
                         <block type="object_oncollision"></block>
                         <block type="object_iterate"></block>
         </category>
@@ -115,7 +121,10 @@ const workspace = Blockly.inject('blocklyDiv', {
                         <block type="set_object_bounding"></block>
                         <block type="object_control"></block>
             <block type="object_velocity"></block>
+            <block type="move_in_direction"></block>
             <block type="object_move_to_target"></block>
+            <block type="enemy_patrol"></block>
+            <block type="split_screen"></block>
                         <block type="object_teleport"></block>
             <block type="object_distance"></block>
                         <block type="collision_detect"></block>
@@ -143,6 +152,7 @@ const workspace = Blockly.inject('blocklyDiv', {
                         <block type="is_colliding_with_tile"></block>
                         <block type="is_paused"></block>
             <block type="raycast_tiles"></block>
+            <block type="object_is_alive"></block>
         </category>
         <category name="${Blockly.Msg['LOOPS']}" colour="120">
             <block type="controls_repeat_ext">
@@ -328,6 +338,9 @@ const workspace = Blockly.inject('blocklyDiv', {
             <block type="draw_object"></block>
             <block type="draw_image"></block>
             <block type="clear_screen"></block>
+                        <block type="ui_button"></block>
+                        <block type="draw_health_bar"></block>
+                        <block type="pause_menu"></block>
             <block type="field_png"></block>
                         <block type="object_animation"></block>
                         <block type="particles_create"></block>

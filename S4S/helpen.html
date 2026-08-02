@@ -322,6 +322,28 @@
             Visual editor for creating and editing object sprites.
         </div>
         
+        <h3 style="color: #674ea7;">Health and Projectiles</h3>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Health</strong><br>
+            Get / set / add HP for an object. Defaults: HP = 100, maxHp = 100. When setting HP, it is clamped to maxHp. Object is selected from a dropdown.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Damage health</strong><br>
+            Deals damage to an object. The "invuln (frames)" parameter sets the number of frames the object is immune to further damage (60 frames = 1 second). Object is selected from a dropdown.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Heal</strong><br>
+            Restores HP to an object by the specified amount, not exceeding maxHp. Object is selected from a dropdown.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #674ea7;">
+            <strong>Spawn projectile</strong><br>
+            Creates a projectile from a prototype object. Parameters: prototype variable, X, Y, angle (degrees), speed, and damage. The projectile flies in the angle direction, deals damage on collision, and is removed. Size and sprite are taken from the prototype.
+        </div>
+        
         <a href="#" class="back-to-top">↑ Back to top</a>
     </div>
 
@@ -382,6 +404,23 @@
             Checks intersection of two rectangular areas. Returns true if areas intersect. Doesn't account for rotation.
         </div>
         
+        <h3 style="color: #bf9000;">Pathfinding and Patrol</h3>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Move to target with avoidance</strong><br>
+            Moves an object toward a target (point or another object), steering around solid tiles. Uses local A* (4-directional) on a tile window. Object moves strictly through tile centers. The "search size" parameter sets the tile square side for A* (default 15). When the "debug" checkbox is on, path visualization is drawn on canvas.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Patrol</strong><br>
+            Patrols between two points with sprite flip. Uses A* pathfinding (same as "Move to target") to navigate around walls. Automatically switches direction upon reaching a point. Object can be: specific / this object.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #bf9000;">
+            <strong>Split screen</strong><br>
+            Enables/disables split-screen mode for two players. Left half (640x720) shows the world around Player 1, right half around Player 2. Works on both Web and Nintendo Switch.
+        </div>
+        
         <a href="#" class="back-to-top">↑ Back to top</a>
     </div>
 
@@ -434,6 +473,21 @@
         <div class="block-desc" style="border-left-color: #cc0000;">
             <strong>Get tile info</strong><br>
             Returns information about tile the object collided with (coordinates, ID and other parameters).
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #27ae60;">
+            <strong>Yes/No</strong><br>
+            Like the "true/false" block but with "Yes/No" labels. Generates 1 (Yes) or 0 (No) instead of true/false. Handy for numeric object properties (flip, visible, solid).
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #7f8c8d;">
+            <strong>Tiles between</strong><br>
+            Checks the line between two points or objects for solid tiles using Bresenham's algorithm. Returns: true/false (wall exists) or X/Y of the first wall tile.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #cc0000;">
+            <strong>Object alive?</strong><br>
+            Checks if an object is alive (HP > 0). Returns true/false. Object is selected from a dropdown: this / collided / iterated.
         </div>
         
         <a href="#" class="back-to-top">↑ Back to top</a>
@@ -732,6 +786,18 @@
         <div class="block-desc" style="border-left-color: #1e8449;">
             <strong>Clear particles</strong><br>
             Removes all active particles from screen. Useful when changing levels or restarting game.
+        </div>
+        
+        <h3 style="color: #1e8449;">User Interface</h3>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Button</strong><br>
+            Draws a button on the canvas and checks for press. Works with touch screen and gamepad. The button visually reacts when pressed (brightens). Returns true/false.
+        </div>
+        
+        <div class="block-desc" style="border-left-color: #1e8449;">
+            <strong>Health bar</strong><br>
+            Draws a health bar on the canvas. Color changes based on percentage: green (>50%), yellow (25-50%), red (<25%).
         </div>
         
         <a href="#" class="back-to-top">↑ Back to top</a>

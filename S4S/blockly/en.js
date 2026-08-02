@@ -788,6 +788,160 @@ Blockly.Msg['RAYCAST_MODE_Y'] = 'wall Y';
 Blockly.Msg['RAYCAST_POINT'] = 'point';
 Blockly.Msg['RAYCAST_OBJECT'] = 'object';
 Blockly.Msg['RAYCAST_THIS'] = 'this object';
+// New blocks labels
+Blockly.Msg['PATROL_LABEL'] = 'Patrol';
+Blockly.Msg['HEALTH_LABEL'] = 'health';
+Blockly.Msg['HEALTH_GET'] = 'get';
+Blockly.Msg['HEALTH_SET'] = 'set';
+Blockly.Msg['HEALTH_ADD'] = 'add';
+Blockly.Msg['TAKE_DAMAGE_LABEL'] = 'take damage';
+Blockly.Msg['DAMAGE_LABEL'] = 'damage';
+Blockly.Msg['IFRAMES_LABEL'] = 'invuln frames';
+Blockly.Msg['HEAL_LABEL'] = 'heal';
+Blockly.Msg['AMOUNT_LABEL'] = 'amount';
+Blockly.Msg['IS_ALIVE_LABEL'] = 'alive';
+Blockly.Msg['PROJECTILE_LABEL'] = 'spawn projectile';
+Blockly.Msg['ANGLE_LABEL'] = 'angle';
+Blockly.Msg['UI_BUTTON_LABEL'] = 'button';
+Blockly.Msg['TEXT_LABEL'] = 'text';
+Blockly.Msg['KEY_LABEL'] = 'key';
+Blockly.Msg['HEALTH_BAR_LABEL'] = 'health bar';
+Blockly.Msg['CURRENT_LABEL'] = 'current';
+Blockly.Msg['MAX_LABEL'] = 'max';
+Blockly.Msg['SPLIT_SCREEN_LABEL'] = 'split screen';
+Blockly.Msg['PLAYER1_LABEL'] = 'player 1';
+Blockly.Msg['PLAYER2_LABEL'] = 'player 2';
+// Missing translations
+Blockly.Msg['AND_LABEL'] = 'and';
+Blockly.Msg['ANIMATION_FRAMES_LABEL'] = 'frames';
+Blockly.Msg['ANIMATION_LOOP_LABEL'] = 'loop';
+Blockly.Msg['ANIMATION_SPEED_LABEL'] = 'animation speed';
+Blockly.Msg['ANIMATION_TOOLTIP'] = 'Controls sprite animation for the object.';
+Blockly.Msg['DEFAULT_VARIABLE_NAME'] = 'item';
+Blockly.Msg['GAMEPAD_NUM'] = 'gamepad';
+Blockly.Msg['GET_TILE_AT_TOOLTIP'] = 'Returns the tile ID at the specified grid coordinates.';
+Blockly.Msg['MUSIC_LABEL'] = 'music';
+Blockly.Msg['OBJECT_ANIMATION_LABEL'] = 'animation';
+Blockly.Msg['OBJECT_VELOCITY_LABEL'] = 'object';
+Blockly.Msg['SET_TILE_AT_TOOLTIP'] = 'Sets a tile at the specified grid coordinates.';
+Blockly.Msg['THIS_DISTANCE_LABEL'] = 'distance from this object';
+Blockly.Msg['THIS_VELOCITY_LABEL'] = 'this object';
+  if (typeof applyInterface === 'function' && typeof enTexts !== 'undefined') {
+    applyInterface(enTexts);
+  }
+};
+
+
+function applyInterface(t) {
+  if (!t || typeof t !== 'object') return;
+  function set(id, val) {
+    var el = document.getElementById(id);
+    if (el && val != null) el.textContent = val;
+  }
+  function setAttr(id, attr, val) {
+    var el = document.getElementById(id);
+    if (el && val != null) el.setAttribute(attr, val);
+  }
+  // Toolbar dropdowns
+  set('project-actions',  t.PROJECT_ACTIONS);
+  set('project-build',    t.PROJECT_BUILD);
+  set('examples-name',    t.EXAMPLES);
+  set('project-help',     t.PROJECT_HELP);
+  set('settingsBtn',      t.SETTINGS_BTN);
+  // Project Actions menu
+  set('save-project-btn', t.SAVE_PROJECT_BTN);
+  set('load-project-btn', t.LOAD_PROJECT_BTN);
+  // Build Options menu
+  set('build-html-btn',   t.BUILD_HTML_BTN);
+  set('build-switch-btn', t.BUILD_SWITCH_BTN);
+  // Help dropdown
+  set('help-author', t.HELP_AUTHOR);
+  set('help-powered', t.HELP_POWERED);
+  set('help-help',    t.HELP_HELP);
+  setAttr('help-help', 'href', t.HELP_HELP_HREF);
+  // Tabs
+  setTab('tab-1', t.CODE_TAB);
+  setTab('tab-2', t.JS_TAB);
+  setTab('tab-3', t.SCREEN_TAB);
+  // Screen-tab debug checkboxes
+  set('drawGeympadtxt',         t.DRAW_GEYMPAD_BTN);
+  set('drawGeympadPreview',     t.DRAW_GEYMPAD_PRESS_BTN);
+  set('viewBoundingBoxtxt',     t.VIEW_BOX_BTN);
+  set('viewPhysicsShapestxt',   t.VIEW_PHYSICS_SHAPES_BTN);
+  set('viewObjectstxt',         t.VIEW_OBJECTS_BTN);
+  // Code output placeholder
+  var co = document.getElementById('codeOutput');
+  if (co && t.CODE_OUTPUT_PLACEHOLDER != null) {
+    var isEmpty = co.textContent.trim() === '';
+    var isPlaceholder = co.dataset && co.dataset.placeholder === '1';
+    if (isEmpty || isPlaceholder) {
+      co.textContent = t.CODE_OUTPUT_PLACEHOLDER;
+      if (co.dataset) co.dataset.placeholder = '1';
+    }
+  }
+  // Settings modal
+  set('projectSettings',         t.SETTINGS_TITTLE);
+  set('projectName',             t.PROJECT_NAME_LABEL);
+  set('projectAuthor',           t.PROJECT_AUTHOR_LABEL);
+  set('settingsIconLabel',       t.SET_ICON);
+  set('chose-icon',              t.BUTTON_ICON);
+  set('labelEnableVirtualGamepad', t.GAMEPAD_LABEL);
+  set('keyRedefLable',           t.KEY_DEF);
+  set('buttonKeyReset',          t.BUTTON_RESET);
+  set('buttonSave',              t.BUTTON_SAVE);
+  set('buttonCancel',            t.BUTTON_CANCEL);
+  // Modal default strings (modal is recreated at runtime, but initial state)
+  set('modalTitle',              t.MODAL_TITLE);
+  set('modalMessage',            t.MODAL_MESSAGE);
+  set('modalPrimaryBtn',         t.MODAL_OK);
+  set('modalSecondaryBtn',       t.MODAL_CANCEL);
+  function setTab(tabId, label) {
+    var btn = document.querySelector('.tabs__btn[data-tab="' + tabId + '"]');
+    if (btn && label != null) {
+      // Preserve onclick behavior — just replace the visible text node.
+      btn.textContent = label;
+    }
+  }
+}
+
+const enTexts = {
+  'INTERFACE_TITLE':         'Blockly with JavaScript',
+  'PROJECT_ACTIONS':         'Project Actions',
+  'PROJECT_BUILD':           'Build Options',
+  'EXAMPLES':                'Examples',
+  'PROJECT_HELP':            '?',
+  'SETTINGS_BTN':            'Settings',
+  'SAVE_PROJECT_BTN':        'Save Project',
+  'LOAD_PROJECT_BTN':        'Load Project',
+  'BUILD_HTML_BTN':          'Build HTML Version',
+  'BUILD_SWITCH_BTN':        'Build Switch Version',
+  'HELP_AUTHOR':             'Author Corax89',
+  'HELP_POWERED':            'Powered by Blockly',
+  'HELP_HELP':               'Help',
+  'HELP_HELP_HREF':          'helpen.html',
+  'CODE_TAB':                'Code',
+  'JS_TAB':                  'JS',
+  'SCREEN_TAB':              'Screen',
+  'DRAW_GEYMPAD_BTN':        'draw gamepad',
+  'DRAW_GEYMPAD_PRESS_BTN':  'draw gamepad preview',
+  'VIEW_BOX_BTN':            'view bounding box',
+  'VIEW_PHYSICS_SHAPES_BTN': 'view physics shapes',
+  'VIEW_OBJECTS_BTN':        'view objects',
+  'CODE_OUTPUT_PLACEHOLDER': '// Generated code will appear here',
+  'SETTINGS_TITTLE':         'Project Settings',
+  'PROJECT_NAME_LABEL':      'Project Name:',
+  'PROJECT_AUTHOR_LABEL':    'Author:',
+  'SET_ICON':                'Icon:',
+  'BUTTON_ICON':             'Choose Icon',
+  'GAMEPAD_LABEL':           'Enable Virtual Gamepad (HTML)',
+  'KEY_DEF':                 'Reassigning buttons (HTML)',
+  'BUTTON_RESET':            'Reset key',
+  'BUTTON_SAVE':             'Save',
+  'BUTTON_CANCEL':           'Cancel',
+  'MODAL_TITLE':             'System Notification',
+  'MODAL_MESSAGE':           'Message',
+  'MODAL_OK':                'OK',
+  'MODAL_CANCEL':            'Cancel',
 };
 
 function changeLanguage(selectedValue) {
@@ -800,7 +954,7 @@ function changeLanguage(selectedValue) {
         localStorage.setItem('selectedLanguage', selectedValue);
         location.reload();
 };
-const savedLanguage = localStorage.getItem('selectedLanguage');
+var savedLanguage = localStorage.getItem('selectedLanguage');
 if (savedLanguage) {
         if (savedLanguage === 'ru') {
                 setLocaleRu();
@@ -810,3 +964,22 @@ if (savedLanguage) {
 }
 else
         setLocaleEn();
+Blockly.Msg['TAKE_DAMAGE_LABEL'] = 'damage health';
+Blockly.Msg['IFRAMES_LABEL'] = 'invuln (frames)';
+Blockly.Msg['IS_ALIVE_LABEL'] = 'object alive?';
+Blockly.Msg['PROJECTILE_PROTO'] = 'prototype';
+Blockly.Msg['MOVE_DIR_LABEL'] = 'move in direction';
+Blockly.Msg['PAUSE_MENU_LABEL'] = 'pause menu';
+Blockly.Msg['TITLE_LABEL'] = 'title';
+Blockly.Msg['ITEMS_LABEL'] = 'items (list)';
+Blockly.Msg['MENU_COLOR_LABEL'] = 'color';
+Blockly.Msg['MENU_WIDTH_LABEL'] = 'width';
+Blockly.Msg['MENU_FSIZE_LABEL'] = 'font size';
+Blockly.Msg['MOTION_LABEL'] = 'motion';
+Blockly.Msg['MOTION_ACCEL_X'] = 'tilt X';
+Blockly.Msg['MOTION_ACCEL_Y'] = 'tilt Y';
+Blockly.Msg['MOTION_ACCEL_Z'] = 'tilt Z';
+Blockly.Msg['MOTION_GYRO_X'] = 'rotation X';
+Blockly.Msg['MOTION_GYRO_Y'] = 'rotation Y';
+Blockly.Msg['MOTION_GYRO_Z'] = 'rotation Z';
+Blockly.Msg['ON_DRAW_LABEL'] = 'on draw';

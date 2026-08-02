@@ -621,7 +621,7 @@ Blockly.Msg['CHANGE_BOUNDING_LABEL'] = 'Изменить рамку для ст�
 Blockly.Msg['GET_PARAM_LABEL'] = 'Получить параметр';
 Blockly.Msg['ADD_TO_PARAM_LABEL'] = 'Добавить к параметру';
 Blockly.Msg['VALUE_LABEL'] = 'значение';
-Blockly.Msg['EACH_FRAME_LABEL'] = 'Делать каждый кадр для';
+Blockly.Msg['EACH_FRAME_LABEL'] = 'Делать каждый шаг для';
 Blockly.Msg['ON_COLLISION_LABEL'] = 'Делать при столкновении';
 Blockly.Msg['DELETE_OBJECT_LABEL'] = 'Удаление';
 Blockly.Msg['OBJECT_OFFSCREEN_LABEL'] = 'Если выход за экран';
@@ -808,6 +808,48 @@ Blockly.Msg['RAYCAST_MODE_Y'] = 'Y стены';
 Blockly.Msg['RAYCAST_POINT'] = 'точка';
 Blockly.Msg['RAYCAST_OBJECT'] = 'объект';
 Blockly.Msg['RAYCAST_THIS'] = 'этот объект';
+document.getElementById('help-help').href = Blockly.Msg['HELP_A'];
+// Подписи для новых блоков
+Blockly.Msg['PATROL_LABEL'] = 'Патрулировать';
+Blockly.Msg['HEALTH_LABEL'] = 'здоровье';
+Blockly.Msg['HEALTH_GET'] = 'получить';
+Blockly.Msg['HEALTH_SET'] = 'установить';
+Blockly.Msg['HEALTH_ADD'] = 'изменить';
+Blockly.Msg['TAKE_DAMAGE_LABEL'] = 'получить урон';
+Blockly.Msg['DAMAGE_LABEL'] = 'урон';
+Blockly.Msg['IFRAMES_LABEL'] = 'неуязвимость';
+Blockly.Msg['HEAL_LABEL'] = 'вылечить';
+Blockly.Msg['AMOUNT_LABEL'] = 'количество';
+Blockly.Msg['IS_ALIVE_LABEL'] = 'жив';
+Blockly.Msg['PROJECTILE_LABEL'] = 'создать снаряд';
+Blockly.Msg['ANGLE_LABEL'] = 'угол';
+Blockly.Msg['UI_BUTTON_LABEL'] = 'кнопка';
+Blockly.Msg['TEXT_LABEL'] = 'текст';
+Blockly.Msg['KEY_LABEL'] = 'клавиша';
+Blockly.Msg['HEALTH_BAR_LABEL'] = 'полоса здоровья';
+Blockly.Msg['CURRENT_LABEL'] = 'текущее';
+Blockly.Msg['MAX_LABEL'] = 'максимум';
+Blockly.Msg['SPLIT_SCREEN_LABEL'] = 'сплит скрин';
+Blockly.Msg['PLAYER1_LABEL'] = 'игрок 1';
+Blockly.Msg['PLAYER2_LABEL'] = 'игрок 2';
+// Дополнение недостающих переводов
+Blockly.Msg['AND_LABEL'] = 'и';
+Blockly.Msg['ANIMATION_FRAMES_LABEL'] = 'кадры';
+Blockly.Msg['ANIMATION_LOOP_LABEL'] = 'зациклить';
+Blockly.Msg['ANIMATION_SPEED_LABEL'] = 'скорость анимации';
+Blockly.Msg['ANIMATION_TOOLTIP'] = 'Управляет анимацией спрайтов объекта.';
+Blockly.Msg['GAMEPAD_NUM'] = 'геймпад';
+Blockly.Msg['GET_TILE_AT_TOOLTIP'] = 'Возвращает ID тайла в указанных координатах сетки.';
+Blockly.Msg['MUSIC_LABEL'] = 'музыка';
+Blockly.Msg['OBJECT_ANIMATION_LABEL'] = 'анимация';
+Blockly.Msg['OBJECT_VELOCITY_LABEL'] = 'объект';
+Blockly.Msg['SET_TILE_AT_TOOLTIP'] = 'Устанавливает тайл в указанных координатах сетки.';
+Blockly.Msg['THIS_DISTANCE_LABEL'] = 'расстояние от этого объекта';
+Blockly.Msg['THIS_VELOCITY_LABEL'] = 'этот объект';
+  if (typeof applyInterface === 'function' && typeof ruTexts !== 'undefined') {
+    applyInterface(ruTexts);
+  }
+};
 
 const ruTexts = {
         'INTERFACE_TITLE': 'Blockly с JavaScript',
@@ -825,7 +867,7 @@ const ruTexts = {
         'GAME_AUTHOR_PLACEHOLDER': 'Автор',
         'SET_ICON': 'Иконка игры',
         'GAMEPAD_LABEL': 'Виртуальный геймпад (для HTML)',
-        'BUILD_GAME_BTN': 'Собрать игру для Switch',
+        'BUILD_SWITCH_BTN': 'Собрать игру для Switch',
         'BUILD_HTML_BTN': 'Собрать игру для Web',
         'CODE_TAB': 'Код',
         'JS_TAB': 'JS',
@@ -851,35 +893,34 @@ const ruTexts = {
         'BUTTON_RESET': 'Сбросить кнопки',
         'BUTTON_SAVE': 'Сохранить',
         'BUTTON_CANCEL': 'Отменить',
-        'BUTTON_ICON': 'Загрузить новую иконку'
+        'BUTTON_ICON': 'Загрузить новую иконку',
+  'PROJECT_HELP': '?',
+  'HELP_HELP_HREF': 'helpru.html',
+  'VIEW_PHYSICS_SHAPES_BTN': 'физические формы',
+  'PROJECT_NAME_LABEL': 'Название проекта:',
+  'PROJECT_AUTHOR_LABEL': 'Автор:',
+  'MODAL_TITLE': 'Уведомление системы',
+  'MODAL_MESSAGE': 'Сообщение',
+  'MODAL_OK': 'OK',
+  'MODAL_CANCEL': 'Отмена'
 };
-document.getElementById('project-actions').textContent = ruTexts.PROJECT_ACTIONS;
-document.getElementById('project-build').textContent = ruTexts.PROJECT_BUILD;
-document.getElementById('help-author').textContent = ruTexts.HELP_AUTHOR;
-document.getElementById('help-powered').textContent = ruTexts.HELP_POWERED;
-document.getElementById('help-help').textContent = ruTexts.HELP_HELP;;
-document.getElementById('help-help').href = Blockly.Msg['HELP_A'];
-document.getElementById('examples-name').textContent = ruTexts.EXAMPLES;;
-document.getElementById('save-project-btn').textContent = ruTexts.SAVE_PROJECT_BTN;
-document.getElementById('load-project-btn').textContent = ruTexts.LOAD_PROJECT_BTN;
-document.getElementById('settingsBtn').textContent = ruTexts.SETTINGS_BTN;
-document.getElementById('projectSettings').textContent = ruTexts.SETTINGS_TITTLE;
-document.getElementById('projectName').textContent = ruTexts.GAME_NAME_PLACEHOLDER;
-document.getElementById('projectAuthor').textContent = ruTexts.GAME_AUTHOR_PLACEHOLDER;
-document.getElementById('settingsIconLabel').textContent = ruTexts.SET_ICON;
-document.getElementById('labelEnableVirtualGamepad').textContent = ruTexts.GAMEPAD_LABEL;
-document.getElementById('build-html-btn').textContent = ruTexts.BUILD_HTML_BTN;
-document.getElementById('build-switch-btn').textContent = ruTexts.BUILD_GAME_BTN;
-document.getElementById('drawGeympadtxt').textContent = ruTexts.DRAW_GEYMPAD_BTN;
-document.getElementById('drawGeympadPreview').textContent = ruTexts.DRAW_GEYMPAD_PRESS_BTN;
-document.getElementById('viewBoundingBoxtxt').textContent = ruTexts.VIEW_BOX_BTN;
-document.getElementById('viewObjectstxt').textContent = ruTexts.VIEW_OBJECTS_BTN;
-document.querySelector('[data-tab="tab-1"]').textContent = ruTexts.CODE_TAB;
-document.querySelector('[data-tab="tab-2"]').textContent = ruTexts.JS_TAB;
-document.querySelector('[data-tab="tab-3"]').textContent = ruTexts.SCREEN_TAB;
-document.getElementById('keyRedefLable').textContent = ruTexts.KEY_DEF;
-document.getElementById('buttonKeyReset').textContent = ruTexts.BUTTON_RESET;
-document.getElementById('buttonSave').textContent = ruTexts.BUTTON_SAVE;
-document.getElementById('buttonCancel').textContent = ruTexts.BUTTON_CANCEL;
-document.getElementById('chose-icon').textContent = ruTexts.BUTTON_ICON;
-};
+
+Blockly.Msg['TAKE_DAMAGE_LABEL'] = 'отнять здоровье';
+Blockly.Msg['IFRAMES_LABEL'] = 'неуязвимость (кадры)';
+Blockly.Msg['IS_ALIVE_LABEL'] = 'объект жив?';
+Blockly.Msg['PROJECTILE_PROTO'] = 'прототип';
+Blockly.Msg['MOVE_DIR_LABEL'] = 'двигаться в направлении';
+Blockly.Msg['PAUSE_MENU_LABEL'] = 'меню паузы';
+Blockly.Msg['TITLE_LABEL'] = 'заголовок';
+Blockly.Msg['ITEMS_LABEL'] = 'пункты (список)';
+Blockly.Msg['MENU_COLOR_LABEL'] = 'цвет';
+Blockly.Msg['MENU_WIDTH_LABEL'] = 'ширина';
+Blockly.Msg['MENU_FSIZE_LABEL'] = 'шрифт';
+Blockly.Msg['MOTION_LABEL'] = 'движение';
+Blockly.Msg['MOTION_ACCEL_X'] = 'наклон X';
+Blockly.Msg['MOTION_ACCEL_Y'] = 'наклон Y';
+Blockly.Msg['MOTION_ACCEL_Z'] = 'наклон Z';
+Blockly.Msg['MOTION_GYRO_X'] = 'вращение X';
+Blockly.Msg['MOTION_GYRO_Y'] = 'вращение Y';
+Blockly.Msg['MOTION_GYRO_Z'] = 'вращение Z';
+Blockly.Msg['ON_DRAW_LABEL'] = 'при отрисовке';

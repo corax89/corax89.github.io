@@ -2782,10 +2782,6 @@ Game.physics = {
             cpBodySetPosition(obj._cpBody, cpv(cx, cy));
             obj._bodyFresh = false;
         }
-        // DEBUG
-        if ((obj.name === 'ball' || obj.name === 'knight') && window._sbDbg <= 30) {
-            console.log('[st ' + obj.name + '] obj.x=' + obj.x.toFixed(1) + ' prev_x=' + (obj.prev_x||0).toFixed(1) + ' bodyPos=(' + pos.x.toFixed(1) + ',' + pos.y.toFixed(1) + ') posChanged=' + (obj.x !== obj.prev_x || obj.y !== obj.prev_y) + ' speedx=' + obj.speedx.toFixed(2) + ' speedy=' + obj.speedy.toFixed(2));
-        }
         // Always set body angle from obj.angle. For chain links, obj.angle
         // is updated in applyDistanceJoints post-step to point along the
         // chain direction. With lock_rotation=1 (moment=Infinity), Chipmunk
@@ -2937,13 +2933,6 @@ Game.physics = {
         obj.speedy = vel.y / 60;
         obj.angle = cpBodyGetAngle(obj._cpBody) * 180 / Math.PI;
         // DEBUG
-        if ((obj.name === 'ball' || obj.name === 'knight') && typeof window._sbDbg === 'undefined') window._sbDbg = 0;
-        if ((obj.name === 'ball' || obj.name === 'knight')) {
-            window._sbDbg++;
-            if (window._sbDbg <= 30) {
-                console.log('[sb ' + obj.name + '] pos=(' + pos.x.toFixed(1) + ',' + pos.y.toFixed(1) + ') vel=(' + vel.x.toFixed(1) + ',' + vel.y.toFixed(1) + ') obj.x=' + obj.x.toFixed(1) + ' obj.y=' + obj.y.toFixed(1) + ' speedx=' + obj.speedx.toFixed(2) + ' speedy=' + obj.speedy.toFixed(2) + ' isOnGround=' + obj.isOnGround);
-            }
-        }
         var ts = Game.helper.tiles ? Game.helper.tiles.tileSize : 32;
         var grid = Game.helper.tiles ? Game.helper.tiles.grid : null;
         if (!grid) { obj.isOnGround = 0; return; }
@@ -5896,6 +5885,10 @@ Game.initEngine = function () {
                                                 o[key] = Game.helper.deepCopy(objectRef[key]);
                                         }
                                 }
+                                // Functions are not copied by deepCopy — copy manually
+                                o.onStep = objectRef.onStep;
+                                o.onCollision = objectRef.onCollision;
+                                o.onDraw = objectRef.onDraw;
 
                                 // Ensure local is a unique object (not shared reference).
                                 if (!o.local || typeof o.local !== 'object') o.local = {};
@@ -6349,6 +6342,33 @@ Game.setScreenX = function (x) {
 Game.setScreenY = function (y) {
         Game.screeny = y
 };
+// Game.getMotion(joyId, axis) — датчик движения (акселерометр/гироскоп).
+// axis: 0=accelX, 1=accelY, 2=accelZ, 3=gyroX, 4=gyroY, 5=gyroZ
+// На Switch: через hidSixAxisSensor (нативный C).
+// На Web: через Gamepad API (если геймпад поддерживает датчики).
+Game.getMotion = function (joyId, axis) {
+        joyId = joyId || 0;
+        axis = axis || 0;
+        // Попытка через нативный API (Switch)
+        if (typeof _duc_helper_native_get_motion === 'function') {
+                return _duc_helper_native_get_motion(joyId, axis);
+        }
+        // Web fallback: Gamepad API
+        if (navigator.getGamepads) {
+                var pads = navigator.getGamepads();
+                var pad = pads[joyId];
+                if (pad) {
+                        // Браузеры: axes 0-3 = стики, но некоторые геймпады
+                        // сообщают акселерометр через buttons[].value
+                        // Дуём простой fallback: для axis 0,1 возвращаем стик
+                        if (axis === 0 && pad.axes.length > 0) return pad.axes[0];
+                        if (axis === 1 && pad.axes.length > 1) return pad.axes[1];
+                        // DualSense/DualShock: датчики в buttons[23+] (ненадёжно)
+                        return 0;
+                }
+        }
+        return 0;
+};
 Game.getScreenX = function () {
         return Game.screenx
 };
@@ -6577,6 +6597,7 @@ Game.mirrorObject = function (o) {
         var no = JSON.parse(JSON.stringify(o));
         no.onCollision = o.onCollision;
         no.onStep = o.onStep;
+        no.onDraw = o.onDraw;
         Game.allObject.push(no);
         return no
 };
@@ -6593,6 +6614,17 @@ Game.setVelocityTowards = function (obj1, x, y, speed) {
         }
 };
 Game.exitScreen = function (o) {
+        // При split-screen: объект считается "вышедшим" только если его не видно
+        // НИ на одном из двух экранов.
+        if (Game._splitP1 && Game._splitP2) {
+                var sx1 = Math.round(Game._splitP1.x + Game._splitP1.width / 2 - 320);
+                var sy1 = Math.round(Game._splitP1.y + Game._splitP1.height / 2 - 360);
+                var sx2 = Math.round(Game._splitP2.x + Game._splitP2.width / 2 - 320);
+                var sy2 = Math.round(Game._splitP2.y + Game._splitP2.height / 2 - 360);
+                var vis1 = o.x + o.width - sx1 >= 0 && o.y + o.height - sy1 >= 0 && o.x - sx1 <= 640 && o.y - sy1 <= 720;
+                var vis2 = o.x + o.width - sx2 >= 0 && o.y + o.height - sy2 >= 0 && o.x - sx2 <= 640 && o.y - sy2 <= 720;
+                return !vis1 && !vis2;
+        }
         return o.x + o.width - Game.screenx < 0 || o.y + o.height - Game.screeny < 0 || o.x - Game.screenx > 1280 || o.y - Game.screeny > 720
 };
 Game.distance = function (x1, y1, x2, y2) {
@@ -7987,10 +8019,14 @@ function game_loop(timestamp) {
                 if (typeof objectsDebugPanel !== "undefined")
                         objectsDebugPanel.update();
                 Game.updateGamepadKey();
+                // 1. gameLoop FIRST — user's Draw.* calls (clear_screen, UI, text)
                 try { Game.gameLoop(); }
                 catch(e) { Game.alert(e.message || String(e), 'Game Loop Error'); }
-                Game.drawBackground();
-                Game.helper.drawTiles();
+                // 2. Then tiles ON TOP of gameLoop
+                if (!(Game._splitP1 && Game._splitP2)) {
+                        Game.drawBackground();
+                        Game.helper.drawTiles();
+                }
                 Game.Particles.update();
                 //твймеры
                 var now = Date.now();
@@ -8049,16 +8085,23 @@ function game_loop(timestamp) {
                 pending.length = 0;
                 //конец таймеров
                 // ═══ Chipmunk2D Physics Step ═══
-                // 1. Call onStep BEFORE physics — JS code sets speedx/speedy here.
+                // 1. Save prev state + decrement invuln (but DON'T call onStep yet).
+                //    onStep will be called AFTER sprite rendering so its Draw.* calls
+                //    appear on top of sprites (correct layering: gameLoop -> tiles -> sprites -> onStep Draw).
                 for (var i = 0; i < Game.allObject.length; i++) {
                         var o = Game.allObject[i];
                         o._collisions = [];
-                        o._collisionSet = new Set();  // per-frame dedup set for beginFunc
+                        o._collisionSet = new Set();
                         o.prev_x = o.x;
                         o.prev_y = o.y;
                         o._prev_speedx = o.speedx;
                         o._prev_speedy = o.speedy;
                         if (o.ladder === 1) { o._ladderPrevX = o.x; o._ladderPrevY = o.y; }
+                        if (o.invuln > 0) o.invuln--;
+                }
+                // Call onStep BEFORE physics (logic: sets speedx/speedy, movement, etc.)
+                for (var i = 0; i < Game.allObject.length; i++) {
+                        var o = Game.allObject[i];
                         if (o.onStep) {
                                 try { o.onStep(); }
                                 catch(e) { Game.alert(e.message || String(e), 'onStep Error (' + (o.name||'?') + ')'); }
@@ -8354,10 +8397,11 @@ function game_loop(timestamp) {
                         }
                 }
                 const sortedArray = sortObjectsByY();
+                // Animation update (once, regardless of split-screen)
                 for (var i = 0; i < sortedArray.length; i++) {
                         var o = sortedArray[i];
                         if (o.visible && o.isAnimationPlaying && Array.isArray(o.sprite)) {
-                                o.frameTime += Game.helper.deltaTime; // Используем helper.deltaTime вместо фиксированного значения
+                                o.frameTime += Game.helper.deltaTime;
                                 const frameDuration = 1 / o.animationSpeed;
                                 while (o.frameTime >= frameDuration) {
                                         o.frameTime -= frameDuration;
@@ -8373,7 +8417,13 @@ function game_loop(timestamp) {
                                         }
                                 }
                         }
-                        if (o.visible) {
+                }
+                // Sprite rendering function (used for both normal and split modes)
+                var _renderSprites = function() {
+                        for (var i = 0; i < sortedArray.length; i++) {
+                                var o = sortedArray[i];
+                                if (!o.visible) continue;
+                                // Draw sprite first
                                 g_ctx.save();
                                 g_ctx.translate(o.x + o.width / 2 - Game.screenx, o.y + o.height / 2 - Game.screeny);
                                 g_ctx.rotate(o.angle * Math.PI / 180);
@@ -8389,7 +8439,6 @@ function game_loop(timestamp) {
                                 }
                                 const spriteToDraw = Array.isArray(o.sprite) ? o.sprite[o.currentFrame] : o.sprite;
                                 Draw.image(spriteToDraw, -o.width / 2, -o.height / 2, o.width, o.height, o.visible);
-                                // Отрисовка зеленой рамки для раскрытых объектов
                                 if (debugShowExpandedObjectsBorder && objectsDebugPanel && objectsDebugPanel.isObjectExpanded(o)) {
                                         g_ctx.save();
                                         g_ctx.strokeStyle = "#0f0";
@@ -8405,7 +8454,60 @@ function game_loop(timestamp) {
                                         g_ctx.restore()
                                 }
                                 g_ctx.restore();
+                                // Then call onDraw (Draw.* renders on top of this sprite)
+                                if (o.onDraw) {
+                                        try { o.onDraw(); }
+                                        catch(e) { Game.alert(e.message || String(e), 'onDraw Error (' + (o.name||'?') + ')'); }
+                                }
                         }
+                };
+
+                if (Game._splitP1 && Game._splitP2) {
+                        // ===== SPLIT-SCREEN: gameLoop already called above =====
+                        // Now render bg+tiles+sprites to offscreen canvases, then blit on top
+                        var _savedSx = Game.screenx, _savedSy = Game.screeny;
+                        if (!Game._splitCanvas1) {
+                                Game._splitCanvas1 = document.createElement('canvas');
+                                Game._splitCanvas1.width = 640; Game._splitCanvas1.height = 720;
+                                Game._splitCtx1 = Game._splitCanvas1.getContext('2d');
+                                Game._splitCanvas2 = document.createElement('canvas');
+                                Game._splitCanvas2.width = 640; Game._splitCanvas2.height = 720;
+                                Game._splitCtx2 = Game._splitCanvas2.getContext('2d');
+                        }
+                        // --- Left half: Player 1 → splitCtx1 ---
+                        var _origCtx = g_ctx;
+                        g_ctx = Game._splitCtx1;
+                        Game._splitCtx1.clearRect(0, 0, 640, 720);
+                        Game.screenx = Math.round(Game._splitP1.x + Game._splitP1.width / 2 - 320);
+                        Game.screeny = Math.round(Game._splitP1.y + Game._splitP1.height / 2 - 360);
+                        Game.drawBackground();
+                        Game.helper.drawTiles();
+                        _renderSprites();
+                        // --- Right half: Player 2 → splitCtx2 ---
+                        g_ctx = Game._splitCtx2;
+                        Game._splitCtx2.clearRect(0, 0, 640, 720);
+                        Game.screenx = Math.round(Game._splitP2.x + Game._splitP2.width / 2 - 320);
+                        Game.screeny = Math.round(Game._splitP2.y + Game._splitP2.height / 2 - 360);
+                        Game.drawBackground();
+                        Game.helper.drawTiles();
+                        _renderSprites();
+                        // --- Restore + blit both halves to main canvas ---
+                        g_ctx = _origCtx;
+                        Game.screenx = _savedSx;
+                        Game.screeny = _savedSy;
+                        // Рисуем обе половины поверх gameLoop
+                        g_ctx.drawImage(Game._splitCanvas1, 0, 0);
+                        g_ctx.drawImage(Game._splitCanvas2, 640, 0);
+                        // Divider line
+                        g_ctx.strokeStyle = '#333';
+                        g_ctx.lineWidth = 2;
+                        g_ctx.beginPath();
+                        g_ctx.moveTo(640, 0);
+                        g_ctx.lineTo(640, 720);
+                        g_ctx.stroke();
+                } else {
+                        // ===== NORMAL: single render =====
+                        _renderSprites();
                 }
                 // FIX: Draw ALL debug overlay shapes AFTER all sprites are rendered.
                 // Previously, debug shapes were drawn inside the sprite loop, so later
