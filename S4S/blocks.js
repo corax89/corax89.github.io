@@ -371,7 +371,23 @@ Blockly.Blocks['particles_create'] = {
     this.appendValueInput('LIFE')
         .setCheck('Number')
         .appendField(Blockly.Msg['PARTICLES_CREATE_LIFE']);
-    
+
+    // FIX: ранее блок НЕ выводил gravity / fade / randomColor в опциях,
+    // хотя движок (engine.js Game.Particles.create) их поддерживает.
+    // Из-за этого пользователь не мог через блоки создать эффект огня/дыма
+    // с подъёмом вверх (gravity < 0) или с затуханием (fade). По умолчанию
+    // берём те же значения, что и в engine.js, чтобы старые проекты вели себя идентично.
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_CREATE_GRAVITY'] || 'gravity (up = negative)');
+    this.appendValueInput('GRAVITY')
+        .setCheck('Number');
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_CREATE_FADE'] || 'fade out')
+        .appendField(new Blockly.FieldCheckbox('TRUE'), 'FADE');
+    this.appendDummyInput()
+        .appendField(Blockly.Msg['PARTICLES_CREATE_RANDOM_COLOR'] || 'random color')
+        .appendField(new Blockly.FieldCheckbox('FALSE'), 'RANDOM_COLOR');
+
     this.setInputsInline(false);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -4438,21 +4454,31 @@ javascript.javascriptGenerator.forBlock['particles_create'] = function(block, ge
   const x = generator.valueToCode(block, 'X', javascript.Order.ATOMIC) || '0';
   const y = generator.valueToCode(block, 'Y', javascript.Order.ATOMIC) || '0';
   const count = generator.valueToCode(block, 'COUNT', javascript.Order.ATOMIC) || '10';
-  
+
   const color = generator.valueToCode(block, 'COLOR', javascript.Order.ATOMIC) || '"#ffffff"';
   const size = generator.valueToCode(block, 'SIZE', javascript.Order.ATOMIC) || '2';
   const speed = generator.valueToCode(block, 'SPEED', javascript.Order.ATOMIC) || '1';
   const direction = generator.valueToCode(block, 'DIRECTION', javascript.Order.ATOMIC) || '0';
   const spread = generator.valueToCode(block, 'SPREAD', javascript.Order.ATOMIC) || '30';
   const life = generator.valueToCode(block, 'LIFE', javascript.Order.ATOMIC) || '60';
-  
+
+  // FIX: читаем новые поля. FieldCheckbox возвращает 'TRUE'/'FALSE'.
+  // gravity по умолчанию = 0.05 (как в engine.js), fade = true, randomColor = false.
+  const gravityRaw = generator.valueToCode(block, 'GRAVITY', javascript.Order.ATOMIC);
+  const gravity = (gravityRaw && gravityRaw !== '') ? gravityRaw : '0.05';
+  const fade = block.getFieldValue('FADE') === 'TRUE';
+  const randomColor = block.getFieldValue('RANDOM_COLOR') === 'TRUE';
+
   return `Game.Particles.create(${x}, ${y}, ${count}, {
     color: ${color},
     size: ${size},
     speed: ${speed},
     direction: ${direction},
     spread: ${spread},
-    life: ${life}
+    life: ${life},
+    gravity: ${gravity},
+    fade: ${fade},
+    randomColor: ${randomColor}
   });\n`;
 };
 

@@ -8503,6 +8503,8 @@ function game_loop(timestamp) {
                         Game.drawBackground();
                         Game.helper.drawTiles();
                         _renderSprites();
+                        // FIX: draw particles into Player 1's half using P1's screen offset
+                        Game.Particles.draw();
                         // --- Right half: Player 2 → splitCtx2 ---
                         g_ctx = Game._splitCtx2;
                         Game._splitCtx2.clearRect(0, 0, 640, 720);
@@ -8511,6 +8513,8 @@ function game_loop(timestamp) {
                         Game.drawBackground();
                         Game.helper.drawTiles();
                         _renderSprites();
+                        // FIX: draw particles into Player 2's half using P2's screen offset
+                        Game.Particles.draw();
                         // --- Restore + blit both halves to main canvas ---
                         g_ctx = _origCtx;
                         Game.screenx = _savedSx;
@@ -8525,6 +8529,8 @@ function game_loop(timestamp) {
                         g_ctx.moveTo(640, 0);
                         g_ctx.lineTo(640, 720);
                         g_ctx.stroke();
+                        // FIX: particles already drawn per-half above; skip the global draw below
+                        Game._particlesDrawnThisFrame = true;
                 } else {
                         // ===== NORMAL: single render =====
                         _renderSprites();
@@ -8556,7 +8562,13 @@ function game_loop(timestamp) {
                                 }
                         }
                 }
-                Game.Particles.draw();
+                // FIX: in split-screen mode, particles were already drawn into each
+                // player's half above (using per-player screenx/screeny). Skip the
+                // global draw to avoid re-drawing them at the wrong (restored) offset.
+                if (!Game._particlesDrawnThisFrame) {
+                        Game.Particles.draw();
+                }
+                Game._particlesDrawnThisFrame = false;
                 if (Game.helper.enableTouchInput) {
                         Game.updateSensorKey()
                 }
