@@ -3,224 +3,499 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>nojme — J2ME в браузере (WebAssembly)</title>
+<title>nojme — J2ME эмулятор онлайн - Microsoft Internet Explorer</title>
 <style>
-  :root {
-    --bg: #10141c; --panel: #181e29; --panel2: #1e2635;
-    --text: #d7dde8; --dim: #8b95a7; --accent: #4da3ff;
-    --ok: #3fd68f; --warn: #ffb44d; --err: #ff6b6b; --border: #2a3345;
-  }
+  /* ============ nojme — дизайн «интернет 2000-х» ============
+   * Win98-окно, teal-рабочий стол, серебро, marquee, счётчик,
+   * бейджи 88x31, «сайт на ремонте». Шрифты: MS Sans Serif/Tahoma. */
+
   * { box-sizing: border-box; }
+  html { background: #008080; }
   body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font: 14px/1.45 "Segoe UI", system-ui, sans-serif;
+    margin: 0; padding: 10px 6px 30px;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 1px, transparent 1px 28px),
+      #008080;
+    font: 12px/1.45 "MS Sans Serif", Tahoma, Verdana, Arial, sans-serif;
+    color: #000;
+    -webkit-text-size-adjust: 100%;
   }
-  header {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--border);
-  }
-  header h1 { font-size: 17px; margin: 0; font-weight: 600; }
-  header h1 small { color: var(--dim); font-weight: 400; }
-  #isoBadge {
-    font-size: 12px; padding: 3px 10px; border-radius: 12px; font-weight: 600;
-  }
-  #isoBadge.ok { background: rgba(63,214,143,.15); color: var(--ok); }
-  #isoBadge.wait { background: rgba(77,163,255,.15); color: var(--accent); }
-  #isoBadge.bad { background: rgba(255,107,107,.15); color: var(--err); }
-  #buildId { margin-left: auto; color: var(--dim); font-size: 12px; font-family: ui-monospace, monospace; }
+  a { color: #0000EE; text-decoration: underline; }
+  a:visited { color: #551A8B; }
+  a:active { color: #FF0000; }
 
-  .warnbox {
-    display: none; margin: 12px 16px; padding: 12px 14px; border-radius: 8px;
-    background: rgba(255,180,77,.1); border: 1px solid rgba(255,180,77,.4); color: #ffd9a0;
+  /* ---------- главное окно (Win98) ---------- */
+  .win {
+    width: 940px; max-width: 100%;
+    margin: 0 auto 14px;
+    background: #C0C0C0;
+    border: 1px solid;
+    border-color: #dfdfdf #404040 #404040 #dfdfdf;
+    box-shadow: 1px 1px 0 #000, inset 1px 1px 0 #fff;
   }
-  .warnbox code { background: #0003; padding: 1px 6px; border-radius: 4px; font-size: 12.5px; }
-  .warnbox ul { margin: 6px 0 0 18px; padding: 0; }
-  .warnbox li { margin: 2px 0; }
+  .titlebar {
+    display: flex; align-items: center; gap: 6px;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff; font: bold 12px Tahoma, Verdana, sans-serif;
+    padding: 3px 4px 3px 8px;
+  }
+  .titlebar .t { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tbtn {
+    width: 18px; height: 16px; flex: 0 0 auto;
+    background: #C0C0C0; color: #000;
+    font: bold 10px Tahoma, sans-serif; line-height: 14px; text-align: center;
+    border: 1px solid; border-color: #fff #404040 #404040 #fff;
+    cursor: default; user-select: none;
+  }
+  .menubar {
+    display: flex; gap: 2px; padding: 2px 4px;
+    font: 11px Tahoma, Verdana, sans-serif;
+    border-bottom: 1px solid #808080;
+  }
+  .menubar a {
+    color: #000; text-decoration: none; padding: 2px 7px;
+  }
+  .menubar a:hover { background: #000080; color: #fff; }
+  .addrbar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 6px; border-bottom: 1px solid #808080;
+    font: 11px Tahoma, Verdana, sans-serif;
+  }
+  .addrbar input {
+    flex: 1; min-width: 60px;
+    font: 11px Tahoma, Verdana, sans-serif;
+    background: #fff; padding: 2px 4px;
+    border: 1px solid #808080; box-shadow: inset 1px 1px 0 #404040;
+  }
 
-  main { padding: 12px 16px; max-width: 1120px; margin: 0 auto; }
+  marquee {
+    display: block;
+    background: #000080; color: #FFFF00;
+    font: bold 12px "Courier New", monospace;
+    padding: 3px 0; border-bottom: 1px solid #808080;
+  }
 
-  .controls {
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;
+  /* ---------- «поднятые» и «утопленные» панели ---------- */
+  .raised {
+    background: #C0C0C0;
+    border: 1px solid; border-color: #fff #404040 #404040 #fff;
+    box-shadow: inset 1px 1px 0 #dfdfdf;
   }
-  .btn {
-    background: var(--panel2); color: var(--text); border: 1px solid var(--border);
-    border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 14px;
+  .sunken {
+    border: 1px solid; border-color: #808080 #fff #fff #808080;
+    box-shadow: inset 1px 1px 0 #404040, 1px 1px 0 #dfdfdf;
   }
-  .btn:hover { border-color: var(--accent); }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #08121f; font-weight: 600; }
-  .btn.primary:disabled { opacity: .45; cursor: default; }
-  .btn.danger { border-color: var(--err); color: var(--err); }
-  .btn:disabled { opacity: .45; cursor: default; }
+  .btn98 {
+    font: 11px Tahoma, Verdana, sans-serif;
+    background: #C0C0C0; color: #000;
+    padding: 4px 14px; cursor: pointer;
+    border: 1px solid; border-color: #fff #404040 #404040 #fff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+    user-select: none;
+  }
+  .btn98:hover { color: #000; }
+  .btn98:active, .btn98.pressed {
+    border-color: #404040 #fff #fff #404040;
+    box-shadow: inset 1px 1px 0 #808080;
+    padding: 5px 13px 3px 15px;
+  }
+  .btn98:disabled { color: #808080; cursor: default; text-shadow: 1px 1px 0 #fff; }
+
   select, input[type=text] {
-    background: var(--panel2); color: var(--text); border: 1px solid var(--border);
-    border-radius: 8px; padding: 6px 8px; font-size: 13px;
+    font: 11px Tahoma, Verdana, sans-serif;
+    background: #fff; color: #000;
+    border: 1px solid #808080;
+    padding: 2px;
   }
-  .ctl-group { display: flex; align-items: center; gap: 6px; }
-  .ctl-group label { color: var(--dim); font-size: 12.5px; }
-  #customRes { width: 86px; }
+  input[type=file] { font: 11px Tahoma, Verdana, sans-serif; max-width: 240px; }
 
-  #stage {
-    display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;
+  /* ---------- контент: 2 колонки ---------- */
+  .layout { display: flex; align-items: stretch; }
+  .navcol {
+    flex: 0 0 190px;
+    background: #FFFFFF;
+    border-right: 1px solid #808080;
+    padding: 8px;
+    font-size: 11px;
   }
-  #screenWrap {
-    background: #000; border: 1px solid var(--border); border-radius: 10px;
-    padding: 10px; flex: 1 1 380px; display: flex; justify-content: center;
+  .navcol h4 {
+    margin: 12px 0 4px; font: bold 11px Tahoma, Verdana, sans-serif;
+    color: #000080; text-transform: uppercase; letter-spacing: .4px;
+  }
+  .navcol h4:first-child { margin-top: 0; }
+  .navcol ul { margin: 0; padding-left: 16px; list-style: square; }
+  .navcol li { margin: 3px 0; }
+  .navcol .kv { display: flex; justify-content: space-between; gap: 6px; padding: 1px 0; }
+  .navcol .kv b { font-weight: normal; color: #444; }
+  .content { flex: 1; padding: 10px 12px; background: #C0C0C0; min-width: 0; }
+
+  h2.page {
+    margin: 0 0 8px;
+    font: bold 16px "Times New Roman", serif;
+    color: #800000; text-align: center;
+  }
+  h2.page u { text-decoration: underline; }
+
+  /* ---------- экран телефона ---------- */
+  .screenbox {
+    width: fit-content; margin: 0 auto;
+    background: #808080;
+    padding: 6px;
+    border: 2px solid; border-color: #dfdfdf #404040 #404040 #dfdfdf;
+  }
+  .screeninner {
+    border: 2px solid; border-color: #404040 #dfdfdf #dfdfdf #404040;
+    background: #000; line-height: 0;
   }
   canvas#screen {
-    max-width: 100%; max-height: 68vh; image-rendering: pixelated;
-    background: #05070b; border-radius: 4px;
+    image-rendering: pixelated;
+    display: block; margin: 0 auto;
+    max-width: 100%;
   }
-  #side { flex: 0 1 300px; display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
-  .card {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
-  }
-  .card h3 { margin: 0 0 8px; font-size: 13px; color: var(--dim); text-transform: uppercase; letter-spacing: .4px; }
-  #statusChip { font-weight: 600; font-size: 15px; }
-  .kv { display: flex; justify-content: space-between; font-size: 13px; padding: 2px 0; }
-  .kv span:first-child { color: var(--dim); }
-  kbd {
-    background: var(--panel2); border: 1px solid var(--border); border-bottom-width: 2px;
-    border-radius: 4px; padding: 0 5px; font-size: 12px; font-family: ui-monospace, monospace;
-  }
-  .keys table { border-collapse: collapse; font-size: 12.5px; width: 100%; }
-  .keys td { padding: 2px 4px; vertical-align: top; }
-  .keys td:first-child { white-space: nowrap; }
 
-  #logCard { margin-top: 12px; }
-  #logCard .logtools { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-  #logCard .logtools h3 { flex: 1; margin: 0; font-size: 13px; color: var(--dim); text-transform: uppercase; }
-  pre#log {
-    margin: 0; max-height: 260px; overflow: auto; background: #0b0e14;
-    border: 1px solid var(--border); border-radius: 8px; padding: 10px;
-    font: 12px/1.5 ui-monospace, "Cascadia Mono", monospace; color: #b9c4d6;
-    white-space: pre-wrap; word-break: break-all;
+  /* ---------- статус-бар окна ---------- */
+  .statusbar {
+    display: flex; gap: 3px; padding: 3px 4px;
+    border-top: 1px solid #dfdfdf;
+    font: 11px Tahoma, Verdana, sans-serif;
   }
-  footer { color: var(--dim); font-size: 12px; padding: 8px 16px 24px; text-align: center; }
+  .seg {
+    border: 1px solid; border-color: #808080 #fff #fff #808080;
+    padding: 2px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .seg.grow { flex: 1; }
+
+  /* ---------- таблицы ---------- */
+  table.grid { border-collapse: collapse; font-size: 11px; background: #fff; }
+  table.grid th, table.grid td {
+    border: 1px solid #808080; padding: 3px 7px; text-align: left;
+  }
+  table.grid th { background: #C0C0C0; font-weight: bold; }
+  kbd {
+    font: bold 10px "Courier New", monospace;
+    background: #C0C0C0; padding: 0 4px;
+    border: 1px solid; border-color: #fff #404040 #404040 #fff;
+    color: #000;
+  }
+
+  /* ---------- fieldset ---------- */
+  fieldset {
+    border: 2px groove #dfdfdf;
+    background: #C0C0C0;
+    margin: 12px 0 0; padding: 8px 10px 10px;
+  }
+  legend {
+    font: bold 11px Tahoma, Verdana, sans-serif; color: #000080;
+    padding: 0 6px;
+  }
+  .optrow { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+  .optrow label { font-size: 11px; }
+  .hint { font-size: 10px; color: #404040; margin: 6px 0 0; }
+
+  /* ---------- «на ремонте» и мелочи 2000-х ---------- */
+  .construction {
+    height: 14px; margin: 14px 0 0;
+    background: repeating-linear-gradient(45deg, #ffdf00 0 12px, #000 12px 24px);
+    border: 1px solid #404040;
+  }
+  .blink { animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { visibility: hidden; } }
+  .new {
+    color: #FF0000; font: bold 10px Verdana, sans-serif;
+    vertical-align: super;
+  }
+  .counter { display: inline-flex; gap: 1px; margin-top: 2px; }
+  .counter .digit {
+    background: #000; color: #00FF00;
+    font: bold 13px "Courier New", monospace;
+    padding: 1px 3px; border: 1px solid #00FF00;
+  }
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 88px; height: 31px; margin: 2px;
+    border: 1px solid #000;
+    font: bold 9px Tahoma, Verdana, sans-serif;
+    text-align: center; text-decoration: none; line-height: 1.15;
+    overflow: hidden; cursor: default;
+  }
+  .badge.b1 { background: #000080; color: #fff; }
+  .badge.b2 { background: #000; color: #00FF00; }
+  .badge.b3 { background: #fff; color: #000; }
+  .badge.b4 { background: #E8630A; color: #fff; }
+  .badge.b5 { background: #800080; color: #FFD700; }
+
+  .sitefoot {
+    width: 940px; max-width: 100%;
+    margin: 0 auto; text-align: center;
+    font: 11px Tahoma, Verdana, sans-serif; color: #fff;
+    text-shadow: 1px 1px 0 #004040;
+  }
+  .sitefoot a { color: #FFFF66; }
+  hr.retro { border: none; border-top: 1px solid #004040; border-bottom: 1px solid #66CCCC; margin: 8px auto; width: 60%; }
+
+  /* ---------- предупреждение об изоляции (только если всё плохо) ---------- */
+  #isoNote {
+    display: none; margin: 10px 0 0; padding: 8px 10px;
+    background: #FFFFE1; border: 1px solid #808080;
+    font-size: 11px;
+  }
+  #isoNote b { color: #A00000; }
+
+  /* ---------- диалог ошибки (Win98 msgbox) ---------- */
+  #errBox {
+    display: none; position: fixed; z-index: 99;
+    left: 50%; top: 38%; transform: translate(-50%, -50%);
+    width: 440px; max-width: calc(100vw - 24px);
+    background: #C0C0C0;
+    border: 2px solid; border-color: #dfdfdf #404040 #404040 #dfdfdf;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.5);
+  }
+  #errBox .titlebar { cursor: default; }
+  #errBox .body { display: flex; gap: 12px; padding: 14px 12px 10px; }
+  #errBox .icon {
+    flex: 0 0 32px; height: 32px; border-radius: 50%;
+    background: #E00000; color: #fff;
+    font: bold 22px Tahoma, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #errBox .msg { font: 11px Tahoma, Verdana, sans-serif; }
+  #errLogWrap { display: none; margin: 0 12px 8px 56px; }
+  #errLog {
+    max-height: 140px; overflow: auto; background: #fff;
+    border: 1px solid #808080; padding: 4px;
+    font: 10px "Courier New", monospace; white-space: pre; color: #333;
+  }
+  #errBox .btns { display: flex; justify-content: center; gap: 10px; padding: 4px 0 12px; }
+
+  @media (max-width: 720px) {
+    .layout { flex-direction: column; }
+    .navcol { border-right: none; border-bottom: 1px solid #808080; }
+    .win { width: 100%; }
+  }
 </style>
 <script src="coi-serviceworker.js"></script>
 </head>
 <body>
-<header>
-  <h1>nojme <small>— J2ME-эмулятор (libretro → WebAssembly)</small></h1>
-  <span id="isoBadge" class="ok">проверка…</span>
-  <span id="buildId"></span>
-</header>
 
-<div class="warnbox" id="isoWarn">
-  <b>Страница не изолирована (cross-origin isolation отсутствует).</b>
-  Ядро nojme использует настоящие потоки (pthreads → WebAssembly workers),
-  которым нужен <b>SharedArrayBuffer</b> — браузер даёт его только
-  cross-origin isolated страницам (COOP/COEP заголовки). Service Worker
-  не смог включить изоляцию: это Safari (он не применяет SW-заголовки),
-  незащищённый адрес (не HTTPS) или запрещённые Service Worker'ы.
-  Варианты:
-  <ul>
-    <li>открыть сайт в <b>Chrome / Edge / Firefox</b>;</li>
-    <li>локально: <code>python3 serve_web.py</code> → <code>http://localhost:8765/</code>;</li>
-    <li>разместить на хостинге с COOP/COEP: Netlify / Cloudflare Pages / Vercel.</li>
-  </ul>
-</div>
+<!-- ================= ГЛАВНОЕ ОКНО ================= -->
+<div class="win">
 
-<main>
-  <div class="controls">
-    <button class="btn primary" id="btnStart">▶ Запустить</button>
-    <button class="btn danger" id="btnStop" disabled>■ Стоп</button>
-    <span class="ctl-group">
-      <label for="selSource">JAR:</label>
-      <select id="selSource">
-        <option value="/games/M3GTest.jar">M3GTest (встроенный)</option>
-        <option value="/games/Stalker.jar">Stalker (352×416)</option>
-        <option value="/games/3DFerrariExperience.jar">3D Ferrari Experience</option>
-        <option value="/games/Roboros.jar">Roboros</option>
-        <option value="/games/TestAudio.jar">TestAudio (звук)</option>
-        <option value="__upload">⬆ Свой файл…</option>
-      </select>
-    </span>
-    <input type="file" id="fileInput" accept=".jar,.jad" style="display:none">
-    <span class="ctl-group">
-      <label for="selRes">Экран:</label>
-      <select id="selRes">
-        <option value="auto">auto (из манифеста)</option>
-        <option value="240x320">240×320</option>
-        <option value="352x416">352×416 (E61/Stalker)</option>
-        <option value="176x220">176×220</option>
-        <option value="128x160">128×160</option>
-        <option value="320x240">320×240</option>
-        <option value="480x800">480×800</option>
-        <option value="__custom">своё…</option>
-      </select>
-      <input type="text" id="customRes" placeholder="WxH" style="display:none">
-    </span>
-    <span class="ctl-group">
-      <label for="selSpeed">VM:</label>
-      <select id="selSpeed">
-        <option value="fast">fast (телефон)</option>
-        <option value="turbo">turbo (без лимита)</option>
-        <option value="normal">normal</option>
-        <option value="original">original</option>
-      </select>
-    </span>
-    <span class="ctl-group">
-      <label for="selFps">FPS:</label>
-      <select id="selFps">
-        <option>30</option><option>60</option><option>20</option><option>15</option>
-      </select>
-    </span>
-    <span class="ctl-group">
-      <label for="selAudio">Аудио:</label>
-      <select id="selAudio"><option>22050</option><option>44100</option></select>
-    </span>
-    <span class="ctl-group">
-      <label for="selHeap">Куча:</label>
-      <select id="selHeap"><option>64</option><option>128</option><option>32</option><option>16</option></select>
-      <label>МБ</label>
-    </span>
+  <!-- заголовок -->
+  <div class="titlebar">
+    <span class="t">nojme — J2ME эмулятор онлайн — Java 2 Micro Edition в браузере</span>
+    <span class="tbtn" title="Свернуть">_</span>
+    <span class="tbtn" title="Развернуть">□</span>
+    <span class="tbtn" title="Закрыть">×</span>
   </div>
 
-  <div id="stage">
-    <div id="screenWrap"><canvas id="screen" width="240" height="320"></canvas></div>
+  <!-- меню -->
+  <div class="menubar">
+    <a href="#emu">Файл</a>
+    <a href="#emu">Правка</a>
+    <a href="#emu">Вид</a>
+    <a href="#params">Настройки</a>
+    <a href="#keys">Управление</a>
+    <a href="#foot">Справка</a>
+  </div>
 
-    <div id="side">
-      <div class="card">
-        <h3>Состояние</h3>
-        <div class="kv"><span>Статус</span><span id="statusChip">загрузка модуля…</span></div>
-        <div class="kv"><span>Кадров (ядро)</span><span id="coreFrames">—</span></div>
-        <div class="kv"><span>FPS ядра / вывода</span><span id="fpsOut">— / —</span></div>
-        <div class="kv"><span>Разрешение</span><span id="resOut">—</span></div>
-        <div class="kv"><span>Потоков Java</span><span id="thrOut">—</span></div>
+  <!-- «адресная строка» -->
+  <div class="addrbar">
+    <span>Адрес:</span>
+    <input type="text" id="addrBar" readonly value="http://www.nojme.narod.ru/games/M3GTest.jar" spellcheck="false">
+    <button class="btn98" onclick="alert('Переход по адресу возможен только в Internet Explorer 5.0')">Переход</button>
+  </div>
+
+  <!-- бегущая строка -->
+  <marquee scrollamount="4" behavior="scroll" direction="left">
+    *** ДОБРО ПОЖАЛОВАТЬ НА ОФИЦИАЛЬНУЮ СТРАНИЦУ ЭМУЛЯТОРА nojme *** J2ME-ИГРЫ ПРЯМО В ВАШЕМ БРАУЗЕРЕ *** БЕЗ УСТАНОВКИ *** БЕЗ SMS *** ОБНОВЛЕНО 19.09.2026 ***
+  </marquee>
+
+  <div class="layout">
+    <!-- ============ ЛЕВОЕ МЕНЮ ============ -->
+    <div class="navcol">
+      <h4>Разделы</h4>
+      <ul>
+        <li><a href="#emu">Эмулятор</a></li>
+        <li><a href="#params">Параметры</a> <span class="new blink">NEW!</span></li>
+        <li><a href="#keys">Управление</a></li>
+        <li><a href="#foot" title="Извините, раздел в разработке">Гостевая книга</a></li>
+        <li><a href="#foot" title="Извините, раздел в разработке">Ссылки</a></li>
+      </ul>
+
+      <h4>Состояние</h4>
+      <div class="kv"><b>Ядро:</b><span id="navBuild">v34.83</span></div>
+      <div class="kv"><b>Статус:</b><span id="navState">загрузка…</span></div>
+      <div class="kv"><b>Дата:</b><span id="todayLine">—</span></div>
+
+      <h4>Счётчик</h4>
+      <div>Вы посетитель №:</div>
+      <div class="counter" id="counter"></div>
+
+      <h4>Голосование</h4>
+      <div>Вам нравится сайт?</div>
+      <form onsubmit="alert('Спасибо! Ваш голос учтён (нет)'); return false;">
+        <label><input type="radio" name="poll" checked> Да, очень!</label><br>
+        <label><input type="radio" name="poll"> Лучший в рунете</label><br>
+        <button class="btn98" style="margin-top:4px; padding:2px 10px;">Голосовать</button>
+      </form>
+    </div>
+
+    <!-- ============ ОСНОВНОЙ КОНТЕНТ ============ -->
+    <div class="content">
+
+      <h2 class="page" id="emu"><u>::&nbsp; ЭМУЛЯТОР J2ME &nbsp;::</u></h2>
+
+      <!-- экран -->
+      <div class="screenbox">
+        <div class="screeninner">
+          <canvas id="screen" width="240" height="320"></canvas>
+        </div>
       </div>
-      <div class="card keys">
-        <h3>Клавиши</h3>
-        <table>
-          <tr><td><kbd>←↑↓→</kbd></td><td>джойстик</td></tr>
-          <tr><td><kbd>Enter</kbd>/<kbd>Пробел</kbd>/<kbd>Z</kbd></td><td>Огонь (FIRE)</td></tr>
+
+      <!-- статус-бар эмулятора -->
+      <div class="statusbar" style="padding:0; margin-top:8px; border:none;">
+        <span class="seg grow" id="stStatus">загрузка ядра…</span>
+        <span class="seg" id="stFps">— к/с</span>
+        <span class="seg" id="stRes">—</span>
+        <span class="seg" id="stFrames">0</span>
+      </div>
+
+      <!-- кнопки управления -->
+      <div class="optrow" style="justify-content:center; margin-top:10px;">
+        <button class="btn98" id="btnStop" disabled>■ Стоп</button>
+        <button class="btn98" id="btnRestart">Перезапустить M3G</button>
+        <label class="btn98" for="fileInput" style="cursor:pointer;">Загрузить свой мидлет (.jar)…</label>
+        <input type="file" id="fileInput" accept=".jar,.jad" style="display:none;">
+        <button class="btn98" id="btnApply" title="Применить параметры и перезапустить мидлет">Применить</button>
+      </div>
+
+      <div class="hint" style="text-align:center;">
+        При загрузке страницы автоматически запускается тестовый мидлет <b>M3GTest</b>
+        (JSR-184, вращающийся куб). Чтобы запустить свою игру — кнопка «Загрузить свой мидлет».
+        Рекорды и сохранения (RMS) хранятся в браузере.
+      </div>
+
+      <!-- предупреждение про изоляцию (показывается только на Safari/без SW) -->
+      <div id="isoNote">
+        <b>Страница не изолирована (cross-origin isolation отсутствует).</b>
+        Ядру нужны настоящие потоки (SharedArrayBuffer), которые браузер даёт
+        только изолированным страницам. Откройте сайт в <b>Chrome / Edge / Firefox</b>,
+        локально: <code>python3 serve_web.py</code>, или хостинг с COOP/COEP
+        (Netlify / Cloudflare Pages / Vercel).
+      </div>
+
+      <div class="construction" title="Раздел сайта находится в разработке"></div>
+
+      <!-- ---------- ПАРАМЕТРЫ ---------- -->
+      <fieldset id="params">
+        <legend>Параметры (действуют при следующем запуске)</legend>
+        <div class="optrow">
+          <label>Экран:
+            <select id="selRes">
+              <option value="auto" selected>auto (из манифеста)</option>
+              <option value="240x320">240×320</option>
+              <option value="352x416">352×416</option>
+              <option value="176x220">176×220</option>
+              <option value="128x160">128×160</option>
+              <option value="320x240">320×240</option>
+              <option value="480x800">480×800</option>
+              <option value="__custom">своё…</option>
+            </select>
+          </label>
+          <input type="text" id="customRes" placeholder="WxH" style="display:none; width:70px;">
+          <label>Скорость VM:
+            <select id="selSpeed">
+              <option value="fast" selected>fast (телефон)</option>
+              <option value="turbo">turbo (без лимита)</option>
+              <option value="normal">normal</option>
+              <option value="original">original</option>
+            </select>
+          </label>
+          <label>FPS:
+            <select id="selFps"><option selected>30</option><option>60</option><option>20</option><option>15</option></select>
+          </label>
+          <label>Аудио:
+            <select id="selAudio"><option selected>22050</option><option>44100</option></select> Гц
+          </label>
+          <label>Куча:
+            <select id="selHeap"><option selected>64</option><option>128</option><option>32</option><option>16</option></select> МБ
+          </label>
+          <label>Масштаб:
+            <select id="selScale">
+              <option value="1">100%</option>
+              <option value="1.5" selected>150%</option>
+              <option value="2">200%</option>
+              <option value="fit">по окну</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint">
+          Нажмите «Применить» — мидлет перезапустится с новыми параметрами.
+          Масштаб меняется на лету и перезапуска не требует.
+        </p>
+      </fieldset>
+
+      <!-- ---------- УПРАВЛЕНИЕ ---------- -->
+      <fieldset id="keys">
+        <legend>Управление (клавиатура / мышь / джойстик)</legend>
+        <table class="grid" width="100%">
+          <tr><th width="45%">Клавиша</th><th>Действие в игре</th></tr>
+          <tr><td><kbd>←</kbd> <kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd></td><td>джойстик телефона</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Пробел</kbd> / <kbd>Z</kbd></td><td>Огонь (FIRE)</td></tr>
           <tr><td><kbd>Q</kbd> / <kbd>E</kbd></td><td>левый / правый софт-ключ</td></tr>
-          <tr><td><kbd>1</kbd>..<kbd>5</kbd></td><td>клавиши 1..5 телефона</td></tr>
-          <tr><td><kbd>0 6 7 8 9 * #</kbd></td><td>остальные клавиши телефона</td></tr>
+          <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd></td><td>клавиши 1–5</td></tr>
+          <tr><td><kbd>0</kbd> <kbd>6</kbd> <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>*</kbd> <kbd>#</kbd></td><td>остальные клавиши телефона</td></tr>
           <tr><td><kbd>X</kbd> / <kbd>C</kbd></td><td>Game C / Game D</td></tr>
-          <tr><td>мышь / палец</td><td>тач-указатель (стилус)</td></tr>
+          <tr><td>мышь / палец по экрану</td><td>тач-указатель (стилус)</td></tr>
           <tr><td>геймпад</td><td>подключается автоматически</td></tr>
         </table>
-      </div>
-    </div>
-  </div>
+      </fieldset>
 
-  <div class="card" id="logCard">
-    <div class="logtools">
-      <h3>Лог ядра</h3>
-      <button class="btn" id="btnLogCopy">Скачать лог</button>
-      <button class="btn" id="btnLogClear">Очистить</button>
-    </div>
-    <pre id="log">…</pre>
-  </div>
-</main>
+    </div><!-- /content -->
+  </div><!-- /layout -->
 
-<footer>
-  nojme web build — сборка ядра целиком в WebAssembly; Java-потоки —
-  настоящие pthread-воркеры; главный поток браузера только выводит кадры.
-</footer>
+  <!-- нижний статус-бар окна -->
+  <div class="statusbar">
+    <span class="seg grow">Готово</span>
+    <span class="seg" id="isoSeg">изоляция…</span>
+    <span class="seg">Интернет</span>
+  </div>
+</div>
+
+<!-- ================= ДИАЛОГ ОШИБКИ ================= -->
+<div id="errBox">
+  <div class="titlebar"><span class="t" id="errTitle">nojme</span><span class="tbtn">×</span></div>
+  <div class="body">
+    <div class="icon">×</div>
+    <div class="msg" id="errMsg">Ошибка.</div>
+  </div>
+  <div id="errLogWrap"><div id="errLog"></div></div>
+  <div class="btns">
+    <button class="btn98" id="errReload">Перезагрузить страницу</button>
+    <button class="btn98" id="errOk">OK</button>
+  </div>
+</div>
+
+<!-- ================= НИЖНИЙ КОЛОНТИТУЛ ================= -->
+<div class="sitefoot" id="foot">
+  <div>
+    <span class="badge b1">BEST VIEWED<br>IN 800×600</span><span class="badge b2">NOJME<br>POWERED</span><span class="badge b3">MADE WITH<br>БЛОКНОТОМ</span><span class="badge b4">Java<br>INSIDE</span><span class="badge b5">WAP-ВЕРСИЯ<br>СКОРО</span>
+  </div>
+  <hr class="retro">
+  <div>
+    © 2001—2026 nojme team &nbsp;|&nbsp;
+    <a href="mailto:webmaster@nojme.narod.ru">webmaster@nojme.narod.ru</a> &nbsp;|&nbsp;
+    <a href="#" onclick="alert('Работает только в Internet Explorer 5.0'); return false;">Добавить в избранное</a> &nbsp;|&nbsp;
+    <a href="#" onclick="alert('Работает только в Internet Explorer 5.0'); return false;">Сделать стартовой</a>
+  </div>
+  <div style="margin-top:4px;">
+    Сайт оптимизирован под Internet Explorer 5.0 и Netscape Navigator 4.7. Требуется JavaScript.
+  </div>
+  <div style="margin-top:4px;">
+    Хостинг предоставлен <a href="https://pages.github.com/" target="_blank" rel="noreferrer">GitHub Pages</a>. Счётчик предоставлен <span style="color:#FF8080;">HotLog</span>.
+  </div>
+</div>
 
 <script src="nojme.js"></script>
 <script src="nojme_app.js"></script>

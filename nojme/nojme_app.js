@@ -1,14 +1,20 @@
 /*
- * nojme_app.js — фронтенд web-сборки nojme (сессия 81).
+ * nojme_app.js — фронтенд web-сборки nojme (сессия 82, редизайн «интернет-2000»).
  *
  * Главный JS-поток НЕ вызывает retro_run (это делает web_glue.c на своём
  * pthread-воркере — Atomics.wait на main thread запрещён). Здесь только:
  *   - загрузка модуля, IDBFS (/rms — персистентность RecordStore);
- *   - старт/стоп + опции ядра (web_set_option / NOJME_HEAP_MB);
+ *   - АВТОЗАПУСК M3GTest при загрузке страницы;
+ *   - надёжный перезапуск: launchGame() ставит игру в очередь, если старая
+ *     ещё останавливается; как только раннер умирает (терминальный статус
+ *     от web_glue, v34.82 публикует статус ПОСЛЕ чистки ядра) — стартуем.
+ *     Лечит «после остановки следующий мидлет не всегда запускается»;
  *   - вывод кадров на canvas (requestAnimationFrame);
- *   - аудио (ScriptProcessorNode тянет из wasm-кольца web_audio_pull);
+ *   - аудио — ОДИН AudioContext на всё время жизни страницы (создание нового
+ *     на каждый старт упиралось в лимит браузера ~6 контекстов);
  *   - ввод (клавиатура/мышь/тач/геймпад -> атомарные маски web_glue);
- *   - опрос лога ядра (web_log_take) в панель на странице.
+ *   - лог ядра НЕ отображается: кольцо web_log_take читается в скрытый
+ *     буфер только для версии ядра и хвоста сообщений при ошибке.
  */
 "use strict";
 
@@ -18,133 +24,180 @@
 const $ = (id) => document.getElementById(id);
 const canvas = $("screen");
 const ctx2d = canvas.getContext("2d");
-const statusChip = $("statusChip");
-const coreFramesEl = $("coreFrames");
-const fpsOutEl = $("fpsOut");
-const resOutEl = $("resOut");
-const thrOutEl = $("thrOut");
-const logEl = $("log");
-const buildEl = $("buildId");
-const btnStart = $("btnStart");
+const stStatus = $("stStatus");   /* сегменты статус-бара */
+const stFps = $("stFps");
+const stRes = $("stRes");
+const stFrames = $("stFrames");
+const navBuild = $("navBuild");
+const navState = $("navState");
 const btnStop = $("btnStop");
+const btnRestart = $("btnRestart");
+const addrBar = $("addrBar");
 
 /* ---------- статусы web_glue ---------- */
 const ST = {
-  0: ["ожидание", "#8b95a7"],
-  1: ["загрузка игры…", "#ffb44d"],
-  2: ["работает", "#3fd68f"],
-  3: ["мидлет завершён", "#4da3ff"],
-  4: ["ошибка загрузки (см. лог)", "#ff6b6b"],
-  5: ["остановлено", "#8b95a7"],
-  6: ["ошибка", "#ff6b6b"],
+  0: "ожидание",
+  1: "загрузка игры…",
+  2: "РАБОТАЕТ",
+  3: "мидлет завершён",
+  4: "ошибка загрузки",
+  5: "остановлено",
+  6: "ошибка ядра",
 };
 
 /* ---------- state ---------- */
 let Module = null;
-let running = false;
-let cSetOption = null, cSetEnv = null, cStart = null;
-let imgData = null, imgPixels = null, lastW = 0, lastH = 0;
-let audioCtx = null, scriptNode = null, audioScratch = null, audioCoreRate = 22050;
-let audioFrac = 0, audioPrev = null;
-let logScratch = null;
-let blitFrames = 0, lastFpsT = performance.now(), lastFpsFrames = 0;
-let logShown = 0;
+let running = false;        /* запущено (в т.ч. останавливается сейчас) */
+let stopRequested = false;  /* web_stop() уже отправлен */
+let stopRequestedAt = 0;
+let pendingStart = null;    /* { path } — стартовать сразу после смерти раннера */
+let startRetryTimer = null;
+let moduleReady = false;
 
+let imgData = null, imgPixels = null, lastW = 0, lastH = 0;
+let audioCtx = null, scriptNode = null, audioScratch = null;
+let audioFrac = 0;
+let blitFrames = 0, lastFpsT = performance.now(), lastFpsFrames = 0;
+
+/* скрытый буфер лога — только для ошибок и версии ядра */
+
+/* отладочная ручка: window.__nojmeDebug.logTail() — последние строки лога
+ * ядра (для поддержки/диагностики из консоли, в UI лог не показывается) */
+window.__nojmeDebug = {
+  logTail: () => logTail.slice(-80).join("\n"),
+  state: () => ({
+    running: running, stopRequested: stopRequested,
+    pendingStart: pendingStart && pendingStart.path,
+    status: Module ? Module._web_get_status() : null,
+    frames: Module ? Module._web_get_frames() : 0,
+  }),
+  events: () => dbgEvents.slice(-40).join("\n"),
+};
+const dbgEvents = [];
+const dbgEv = (msg) => {
+  dbgEvents.push(performance.now().toFixed(0) + "мс " + msg +
+    " [running=" + running + " stop=" + stopRequested +
+    " pend=" + (pendingStart && pendingStart.path) +
+    " st=" + (Module ? Module._web_get_status() : "-") +
+    " fr=" + (Module ? Module._web_get_frames() : 0) + "]");
+  if (dbgEvents.length > 200) dbgEvents.shift();
+};
+let logScratch = null;
 const logDecoder = new TextDecoder("utf-8", { fatal: false });
-const logLines = [];
-let logPending = "";   /* хвост неполной строки между чанками кольца */
+let logTail = [];           /* последние строки */
+let logPending = "";
+
+const DEFAULT_JAR = "/games/M3GTest.jar";
 
 /* ---------- утилиты ---------- */
-function log(msg) {
-  logLines.push(msg);
-  if (logLines.length > 500) logLines.splice(0, logLines.length - 500);
-  renderLog();
+function statusText() {
+  if (running && stopRequested) return "останавливаю…";
+  const st = Module ? Module._web_get_status() : 0;
+  return ST[st] || "?";
 }
-function renderLog() {
-  logEl.textContent = logLines.join("\n");
-  logEl.scrollTop = logEl.scrollHeight;
+function refreshStatus() {
+  const t = statusText();
+  stStatus.textContent = t;
+  navState.textContent = t;
+  btnStop.disabled = !(running && !stopRequested);
 }
-function setStatus(code) {
-  const s = ST[code] || ["?", "#8b95a7"];
-  statusChip.textContent = s[0];
-  statusChip.style.color = s[1];
+function showError(title, text, withLog) {
+  $("errTitle").textContent = title;
+  $("errMsg").textContent = text;
+  $("errLogWrap").style.display = withLog ? "block" : "none";
+  if (withLog) $("errLog").textContent = logTail.slice(-40).join("\n");
+  $("errBox").style.display = "block";
 }
+function hideError() { $("errBox").style.display = "none"; }
 
-/* ---------- изоляция ---------- */
-const isolated = typeof SharedArrayBuffer !== "undefined" && crossOriginIsolated;
-{
-  const badge = $("isoBadge");
-  if (isolated) {
-    badge.textContent = "cross-origin isolated ✓";
-    badge.className = "ok";
-  } else if (window.__coiPending) {
-    /* coi-serviceworker.js прямо сейчас регистрирует Service Worker и
-       перезагрузит страницу — изоляция появится после перезагрузки */
-    badge.textContent = "включаю изоляцию…";
-    badge.className = "wait";
-  } else {
-    badge.textContent = "БЕЗ изоляции — потоки не заработают";
-    badge.className = "bad";
-    $("isoWarn").style.display = "block";
-  }
-}
+/* ---------- запуск/остановка (ядро надёжного перезапуска) ---------- */
 
-/* ---------- запуск/остановка ---------- */
+let lastPath = DEFAULT_JAR;
 
 function applyOptions() {
-  /* разрешение */
+  /* параметры читаются ядром при retro_load_game — применяются к СЛЕДУЮЩЕМУ запуску */
   let res = $("selRes").value;
   if (res === "__custom") {
     res = $("customRes").value.trim();
-    if (!/^[0-9]{1,4}x[0-9]{1,4}$/.test(res)) {
-      log("[web] свой формат разрешения должен быть WxH (например 352x416), подставляю auto");
-      res = "auto";
-    }
+    if (!/^[0-9]{1,4}x[0-9]{1,4}$/.test(res)) res = "auto";
   }
-  cSetOption("j2me_resolution", res);
-  cSetOption("j2me_vm_speed", $("selSpeed").value);
-  cSetOption("j2me_fps", $("selFps").value);
-  cSetOption("j2me_audio_rate", $("selAudio").value);
-  cSetOption("j2me_pixel_format", "RGB565");
-  cSetOption("j2me_rotation", "off");
-  cSetOption("j2me_touch_input", "on");
-  cSetOption("j2me_neon", "on");
-  cSetOption("j2me_scaling", "Aspect");
-  cSetEnv("NOJME_HEAP_MB", $("selHeap").value);
-  log("[web] опции: res=" + res + " vm=" + $("selSpeed").value +
-      " fps=" + $("selFps").value + " audio=" + $("selAudio").value +
-      " heap=" + $("selHeap").value + "MB");
+  const set = Module.cwrap("web_set_option", "number", ["string", "string"]);
+  const setEnv = Module.cwrap("web_set_envvar", "number", ["string", "string"]);
+  set("j2me_resolution", res);
+  set("j2me_vm_speed", $("selSpeed").value);
+  set("j2me_fps", $("selFps").value);
+  set("j2me_audio_rate", $("selAudio").value);
+  set("j2me_pixel_format", "RGB565");
+  set("j2me_rotation", "off");
+  set("j2me_touch_input", "on");
+  set("j2me_neon", "on");
+  set("j2me_scaling", "Aspect");
+  setEnv("NOJME_HEAP_MB", $("selHeap").value);
 }
 
-async function startGame(path) {
-  if (running || !Module) return;
-  applyOptions();
-  try { initAudio(); } catch (e) { log("[web] аудио недоступно: " + e); }
-  const rc = cStart(path);
-  if (rc !== 0) {
-    log("[web] web_start вернул " + rc + " (" + Module.UTF8ToString(Module._web_get_error()) + ")");
-    setStatus(6);
+/* Запустить игру. Если старая ещё работает/останавливается — сначала
+ * остановим её и поставим новую в очередь (старый код молча терял клик). */
+function launchGame(path) {
+  if (!moduleReady) return;
+  lastPath = path || DEFAULT_JAR;
+  dbgEv("launchGame(" + lastPath + ")");
+  hideError();
+  if (running) {
+    pendingStart = { path: path };
+    if (!stopRequested) {
+      stopRequested = true;
+      stopRequestedAt = performance.now();
+      Module._web_stop();
+    }
+    refreshStatus();
     return;
   }
-  running = true;
-  btnStart.disabled = true;
-  btnStop.disabled = false;
+  tryStart(path, 0);
 }
 
-async function stopGame() {
-  if (!running) return;
+/* web_start с ретраями: -2 = раннер прошлого запуска ещё не умер
+ * (окно в пару инструкций; при v34.82 практически исключено, но
+ * подстрахуемся — ретрай раз в 250 мс до 10 с). */
+function tryStart(path, attempt) {
+  if (!moduleReady) return;
+  applyOptions();
+  ensureAudio(parseInt($("selAudio").value, 10) || 22050);
+
+  const start = Module.cwrap("web_start", "number", ["string"]);
+  TRACE.enter("web_start " + path);
+  const rc = start(path);
+  TRACE.exit("web_start rc=" + rc);
+  dbgEv("web_start rc=" + rc);
+  if (rc === 0) {
+    running = true;
+    stopRequested = false;
+    pendingStart = null;
+    refreshStatus();
+    return;
+  }
+  if (rc === -2 && attempt < 40) {
+    startRetryTimer = setTimeout(() => tryStart(path, attempt + 1), 250);
+    return;
+  }
+  const err = Module.UTF8ToString(Module._web_get_error());
+  showError("Ошибка запуска",
+    "Не удалось запустить мидлет (код " + rc + (err ? ": " + err : "") + ").", true);
+}
+
+function stopGame() {
+  if (!running || stopRequested) return;
+  dbgEv("stopGame (кнопка)");
+  stopRequested = true;
+  stopRequestedAt = performance.now();
+  pendingStart = null;      /* явный «Стоп» отменяет отложенный запуск */
   Module._web_stop();
-  log("[web] запрошена остановка…");
-  /* статус дойдёт до STOPPED через поллинг; там же syncfs */
+  refreshStatus();
 }
 
 /* ---------- модуль ---------- */
 
 function initModuleApi() {
   window.__nojme = Module; /* debug/testing handle */
-  cSetOption = Module.cwrap("web_set_option", "number", ["string", "string"]);
-  cSetEnv = Module.cwrap("web_set_envvar", "number", ["string", "string"]);
-  cStart = Module.cwrap("web_start", "number", ["string"]);
   Module.ccall("web_boot");
 
   /* /rms — персистентные RecordStore (IDBFS) */
@@ -152,46 +205,63 @@ function initModuleApi() {
     Module.FS.mkdir("/rms");
     Module.FS.mount(Module.IDBFS, {}, "/rms");
     Module.FS.syncfs(true, (err) => {
-      if (err) log("[web] syncfs(load): " + err);
-      else log("[web] /rms (RecordStore) подключён к IndexedDB");
+      if (err) logTail.push("[web] syncfs(load): " + err);
     });
-  } catch (e) {
-    log("[web] IDBFS: " + e);
-  }
+  } catch (e) { /* повторный mount при перезагрузке страницы — не страшно */ }
 
   logScratch = Module._malloc(65536);
-  audioScratch = Module._malloc(4096 * 4); /* int16 стерео-кадры */
+  audioScratch = Module._malloc(4096 * 4);
 
-  setStatus(0);
-  btnStart.disabled = false;
-  log("[web] ядро готово к запуску");
+  moduleReady = true;
+
+  /* автозапуск: обычный — встроенный M3GTest; тестовый (?autostart=1) —
+   * параметры и jar из URL (для автотестов и проверки других игр) */
+  if (TEST_MODE) {
+    if (params.get("res")) $("selRes").value = params.get("res");
+    if (params.get("speed")) $("selSpeed").value = params.get("speed");
+    if (params.get("heap")) $("selHeap").value = params.get("heap");
+  }
+  /* ?diag=1 — диагностика ядра в браузере: TLAB выкл + GC debug
+   * (разбор проблем кучи; сильно медленнее, только для отладки) */
+  if (params.get("diag")) {
+    Module.ccall("web_set_option", "number", ["string", "string"],
+                 ["j2me_diag", "1"]);
+  }
+  setTimeout(() => launchGame(AUTO_JAR), 300);
 }
 
 async function boot() {
-  if (!isolated && window.__coiPending) {
-    /* Ждём Service Worker (coi-serviceworker.js): он добавит COOP/COEP
-       и перезагрузит страницу. Стартовать модуль сейчас нельзя —
-       postMessage(SharedArrayBuffer) без изоляции бросит DataCloneError
-       ещё в preRun (пул pthread-воркеров). */
-    statusChip.textContent = "включаю изоляцию (страница перезагрузится)…";
-    setTimeout(boot, 1500); /* если SW не справится — стартуем как есть */
+  const isolated = typeof SharedArrayBuffer !== "undefined" && crossOriginIsolated;
+  const isoSeg = $("isoSeg");
+  if (isolated) {
+    if (isoSeg) isoSeg.textContent = "cross-origin isolated";
+  } else if (window.__coiPending) {
+    /* coi-serviceworker.js прямо сейчас включает изоляцию и перезагрузит
+     * страницу; стартовать модуль нельзя — postMessage(SAB) без изоляции
+     * бросит DataCloneError ещё в preRun. */
+    if (isoSeg) isoSeg.textContent = "включаю изоляцию…";
+    setTimeout(boot, 1500);
     return;
+  } else {
+    if (isoSeg) isoSeg.textContent = "БЕЗ изоляции — потоки не стартуют";
+    const note = $("isoNote");
+    if (note) note.style.display = "block";
   }
   try {
     const factory = window.NojmeFactory;
     Module = await factory({
       locateFile: (p) => p,
-      print: (t) => { /* stdout ядра дублируется в лог-кольце web_glue */ },
+      print: () => {},
       printErr: (t) => {
         if (String(t).indexOf("wasm streaming") >= 0) return;
       },
     });
     initModuleApi();
   } catch (e) {
-    statusChip.textContent = "не удалось загрузить модуль";
-    statusChip.style.color = "#ff6b6b";
-    log("[web] ОШИБКА загрузки модуля: " + e + (isolated ? "" :
-        " — вероятно, нет cross-origin isolation (см. предупреждение выше)"));
+    navState.textContent = "модуль не загрузился";
+    showError("Ошибка",
+      "Не удалось загрузить ядро nojme: " + e +
+      (isolated ? "" : " (нет cross-origin isolation — см. подсказку внизу страницы)"), false);
   }
 }
 
@@ -199,7 +269,7 @@ async function boot() {
 
 function blit() {
   if (Module && running) {
-    const idx = Module._web_get_frame_index();
+    const idx = traceSync("frame_index", () => Module._web_get_frame_index());
     if (idx >= 0) {
       const w = Module._web_get_frame_w(idx), h = Module._web_get_frame_h(idx);
       if (w > 0 && h > 0) {
@@ -208,7 +278,8 @@ function blit() {
           canvas.width = w; canvas.height = h;
           imgData = ctx2d.createImageData(w, h);
           imgPixels = new Uint32Array(imgData.data.buffer);
-          resOutEl.textContent = w + "×" + h;
+          stRes.textContent = w + "×" + h;
+          applyScale();
         }
         const buf = Module._web_get_frame_buf(idx);
         if (buf) {
@@ -223,115 +294,184 @@ function blit() {
 }
 requestAnimationFrame(blit);
 
-/* ---------- аудио ---------- */
+/* масштаб канваса (чистый CSS, перезапуск не нужен) */
+function applyScale() {
+  const s = $("selScale").value;
+  if (s === "fit") {
+    canvas.style.width = "";
+    canvas.style.height = "";
+    canvas.style.maxWidth = "100%";
+    canvas.style.maxHeight = "70vh";
+  } else {
+    canvas.style.maxWidth = "none";
+    canvas.style.maxHeight = "none";
+    canvas.style.width = Math.round(lastW * parseFloat(s)) + "px";
+    canvas.style.height = "";
+  }
+}
 
-function initAudio() {
-  const wanted = parseInt($("selAudio").value, 10) || 22050;
+/* ---------- аудио (один AudioContext на страницу) ---------- */
+
+function ensureAudio(wantedRate) {
+  if (audioCtx && audioCtx.sampleRate === wantedRate) {
+    audioCtx.resume();
+    return;
+  }
+  if (audioCtx) {
+    try { scriptNode.disconnect(); } catch (e) {}
+    try { audioCtx.close(); } catch (e) {}
+  }
   try {
-    audioCtx = new AudioContext({ sampleRate: wanted });
+    audioCtx = new AudioContext({ sampleRate: wantedRate });
   } catch (e) {
     audioCtx = new AudioContext();
   }
-  audioCtx.resume();
-  audioCoreRate = wanted;
   audioFrac = 0;
-  audioPrev = null;
-  if (scriptNode) { try { scriptNode.disconnect(); } catch (e) {} }
   scriptNode = audioCtx.createScriptProcessor(2048, 0, 2);
-  scriptNode.onaudioprocess = (ev) => {
-    const L = ev.outputBuffer.getChannelData(0);
-    const R = ev.outputBuffer.getChannelData(1);
-    const n = L.length;
-    if (!Module || !running) { L.fill(0); R.fill(0); return; }
-    const coreRate = Module._web_get_sample_rate();
-    if (coreRate !== audioCoreRate) audioCoreRate = coreRate;
-    const outRate = audioCtx.sampleRate;
-    /* тянем из wasm-кольца с учётом ресемплинга coreRate -> outRate */
-    const need = Math.ceil(n * audioCoreRate / outRate) + 4;
-    const got = Module._web_audio_pull(audioScratch, Math.min(need, 2048));
-    const src = new Int16Array(Module.HEAPU16.buffer, audioScratch, got * 2);
-    if (outRate === audioCoreRate) {
-      for (let i = 0; i < n; i++) {
-        if (i < got) { L[i] = src[i * 2] / 32768; R[i] = src[i * 2 + 1] / 32768; }
-        else { L[i] = 0; R[i] = 0; }
-      }
-    } else {
-      /* линейная интерполяция с непрерывной фазой между блоками */
-      for (let i = 0; i < n; i++) {
-        const pos = audioFrac + i * audioCoreRate / outRate;
-        const i0 = Math.floor(pos), i1 = i0 + 1;
-        const t = pos - i0;
-        if (i1 < got) {
-          L[i] = (src[i0 * 2] + (src[i1 * 2] - src[i0 * 2]) * t) / 32768;
-          R[i] = (src[i0 * 2 + 1] + (src[i1 * 2 + 1] - src[i0 * 2 + 1]) * t) / 32768;
-        } else if (i0 < got) {
-          L[i] = src[i0 * 2] / 32768; R[i] = src[i0 * 2 + 1] / 32768;
-        } else { L[i] = 0; R[i] = 0; }
-      }
-      audioFrac += n * audioCoreRate / outRate - got; /* сколько не дотянули */
-      if (audioFrac < 0) audioFrac = 0;
-    }
-  };
+  scriptNode.onaudioprocess = onAudio;
   scriptNode.connect(audioCtx.destination);
+  audioCtx.resume();
 }
 
-/* ---------- лог ---------- */
+/* политика автовоспроизведения: контекст, созданный без жеста, спит —
+ * будим его первым кликом/клавишей */
+function wakeAudio() {
+  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+}
+window.addEventListener("pointerdown", wakeAudio);
+window.addEventListener("keydown", wakeAudio);
+
+function onAudio(ev) {
+  const L = ev.outputBuffer.getChannelData(0);
+  const R = ev.outputBuffer.getChannelData(1);
+  const n = L.length;
+  if (!Module || !running) { L.fill(0); R.fill(0); return; }
+  const coreRate = traceSync("get_sample_rate", () => Module._web_get_sample_rate());
+  const outRate = audioCtx.sampleRate;
+  const need = Math.ceil(n * coreRate / outRate) + 4;
+  const got = traceSync("audio_pull", () => Module._web_audio_pull(audioScratch, Math.min(need, 2048)));
+  const src = new Int16Array(Module.HEAPU16.buffer, audioScratch, got * 2);
+  if (outRate === coreRate) {
+    for (let i = 0; i < n; i++) {
+      if (i < got) { L[i] = src[i * 2] / 32768; R[i] = src[i * 2 + 1] / 32768; }
+      else { L[i] = 0; R[i] = 0; }
+    }
+  } else {
+    /* линейная интерполяция с непрерывной фазой между блоками */
+    for (let i = 0; i < n; i++) {
+      const pos = audioFrac + i * coreRate / outRate;
+      const i0 = Math.floor(pos), i1 = i0 + 1;
+      const t = pos - i0;
+      if (i1 < got) {
+        L[i] = (src[i0 * 2] + (src[i1 * 2] - src[i0 * 2]) * t) / 32768;
+        R[i] = (src[i0 * 2 + 1] + (src[i1 * 2 + 1] - src[i0 * 2 + 1]) * t) / 32768;
+      } else if (i0 < got) {
+        L[i] = src[i0 * 2] / 32768; R[i] = src[i0 * 2 + 1] / 32768;
+      } else { L[i] = 0; R[i] = 0; }
+    }
+    audioFrac += n * coreRate / outRate - got;
+    if (audioFrac < 0) audioFrac = 0;
+  }
+}
+
+/* ---------- лог (скрытый): версия ядра + хвост для диалога ошибок ---------- */
+
+/* ---------- служебная трассировка: кольцевой буфер маркеров wasm-вызовов.
+ * В UI не показывается. window.__nojmeTrace.dump() из консоли — последние
+ * 60 событий (последний «>» без «<» = вызов завис); !SLOW — дольше 150 мс. ---------- */
+const TRACE = window.__nojmeTrace = {
+  buf: [],
+  enter: (name) => { TRACE.buf.push(performance.now().toFixed(0) + " >" + name); if (TRACE.buf.length > 400) TRACE.buf.shift(); },
+  exit: (name) => { TRACE.buf.push(performance.now().toFixed(0) + " <" + name); if (TRACE.buf.length > 400) TRACE.buf.shift(); },
+  slow: (name, dt) => { TRACE.buf.push("!SLOW " + name + " " + dt.toFixed(0) + "ms"); },
+  dump: () => TRACE.buf.slice(-60).join("\n"),
+};
+const traceSync = (name, fn) => {
+  const t0 = performance.now();
+  TRACE.enter(name);
+  try { return fn(); }
+  finally {
+    TRACE.exit(name);
+    const dt = performance.now() - t0;
+    if (dt > 150) TRACE.slow(name, dt);
+  }
+};
 
 function pollLog() {
   if (!Module || !logScratch) return;
-  const n = Module._web_log_take(logScratch, 65536 - 1);
+  const n = traceSync("log_take", () => Module._web_log_take(logScratch, 65536 - 1));
   if (n > 0) {
-    /* HEAPU8 в браузере — view на SharedArrayBuffer; TextDecoder
-     * отказывается декодировать shared-память — копируем в обычный буфер */
+    /* HEAPU8 — view на SharedArrayBuffer; TextDecoder такое не декодирует */
     const copy = new Uint8Array(n);
     copy.set(new Uint8Array(Module.HEAPU8.buffer, logScratch, n));
-    /* склеиваем с хвостом прошлого чанка — обрабатываем строки целиком */
     const text = logPending + logDecoder.decode(copy);
     const lines = text.split("\n");
-    logPending = lines.pop() || "";   /* последний элемент — неполная строка */
+    logPending = lines.pop() || "";
     for (const ln of lines) {
       if (ln.length) {
-        logLines.push(ln);
-        /* версия ядра из баннера */
+        logTail.push(ln);
         const m = ln.match(/core BUILD: (v[\d.]+)/);
-        if (m) buildEl.textContent = "ядро " + m[1];
+        if (m) navBuild.textContent = m[1];
       }
     }
-    if (logLines.length > 500) logLines.splice(0, logLines.length - 500);
-    renderLog();
+    if (logTail.length > 200) logTail.splice(0, logTail.length - 200);
   }
 }
 setInterval(pollLog, 350);
 
-/* ---------- статус ---------- */
+/* ---------- статус: авто-продолжение очереди ---------- */
 
+const TERMINAL = { 3: 1, 4: 1, 5: 1, 6: 1 };
 let lastStatT = performance.now(), lastStatFrames = 0;
+
 function pollStatus() {
   if (!Module) return;
-  const st = Module._web_get_status();
-  setStatus(st);
-  if (running && (st === 5 || st === 3 || st === 4 || st === 6)) {
-    /* STOPPED / FINISHED / LOAD_FAILED / ERROR — цикл завершён */
+  const st = traceSync("get_status", () => Module._web_get_status());
+
+  if (running && TERMINAL[st]) {
+    /* раннер мёртв (v34.82: терминальный статус гарантирует это) */
+    dbgEv("terminal st=" + st);
     running = false;
-    btnStart.disabled = false;
-    btnStop.disabled = true;
+    const wasStopping = stopRequested;
+    stopRequested = false;
     Module._web_input_clear();
-    try { Module.FS.syncfs(false, (e) => { if (e) log("[web] syncfs(save): " + e); }); }
-    catch (e) { /* noop */ }
+    try { Module.FS.syncfs(false, () => {}); } catch (e) {}
+    refreshStatus();
+
+    if (wasStopping && pendingStart) {
+      /* отложенный запуск следующего мидлета */
+      const p = pendingStart;
+      pendingStart = null;
+      dbgEv("auto-continue -> " + p.path);
+      setTimeout(() => tryStart(p.path, 0), 150);
+    }
+  } else if (running && stopRequested) {
+    /* сторожевой таймер: ядро обязано остановиться (jvm_destroy ждёт
+     * Java-потоки до 3 с; 15 с — запас на самый тяжёлый случай) */
+    if (performance.now() - stopRequestedAt > 15000) {
+      stopRequested = false;
+      refreshStatus();
+      showError("Ядро не остановилось",
+        "Мидлет не ответил на команду остановки за 15 секунд " +
+        "(вероятно, завис в нативном коде). Нажмите «Перезагрузить страницу».", true);
+    }
   }
+
   const frames = Module._web_get_frames();
   const now = performance.now();
   const dt = (now - lastStatT) / 1000;
   if (dt >= 1.0) {
+    /* при перезапуске счётчик кадров ядра сбрасывается в 0 — не даём
+     * отрицательного FPS в статус-баре */
+    if (frames < lastStatFrames) lastStatFrames = frames;
     const coreFps = Math.round((frames - lastStatFrames) / dt);
-    const blitFps = Math.round((blitFrames - lastFpsFrames) /
-        ((now - lastFpsT) / 1000));
     lastStatT = now; lastStatFrames = frames;
+    stFrames.textContent = String(frames);
+    stFps.textContent = coreFps + " к/с";
+    const blitFps = Math.round((blitFrames - lastFpsFrames) / ((now - lastFpsT) / 1000));
     lastFpsT = now; lastFpsFrames = blitFrames;
-    coreFramesEl.textContent = String(frames);
-    fpsOutEl.textContent = coreFps + " / " + blitFps;
-    /* число Java-потоков — из лога THREAD-строк не надёжно; считаем по [THREAD] стартам */
   }
+  refreshStatus();
 }
 setInterval(pollStatus, 300);
 
@@ -349,7 +489,6 @@ const JOY = {
   A: 8, X: 9, L: 10, R: 11, L2: 12, R2: 13,
 };
 
-/* клавиша -> [joypad id] или [retrok ascii] */
 const KEYMAP = {
   ArrowUp: ["j", JOY.UP], ArrowDown: ["j", JOY.DOWN],
   ArrowLeft: ["j", JOY.LEFT], ArrowRight: ["j", JOY.RIGHT],
@@ -358,7 +497,6 @@ const KEYMAP = {
   KeyQ: ["j", JOY.SELECT], KeyE: ["j", JOY.START],
   Digit1: ["j", JOY.Y], Digit2: ["j", JOY.L], Digit3: ["j", JOY.R],
   Digit4: ["j", JOY.L2], Digit5: ["j", JOY.R2],
-  /* 0,6,7,8,9,*,# — напрямую как RETROK (ascii-коды) */
   Digit0: ["k", 48], Digit6: ["k", 54], Digit7: ["k", 55],
   Digit8: ["k", 56], Digit9: ["k", 57],
   "*": ["k", 42], "#": ["k", 35],
@@ -372,7 +510,6 @@ function keyEvent(e, down) {
   let m = KEYMAP[e.key];
   if (!m && e.code) m = KEYMAP[e.code];
   if (!m) {
-    /* запасной путь по e.key для цифр */
     if (/^[0-9]$/.test(e.key)) m = ["k", e.key.charCodeAt(0)];
     else if (e.key === "*" || e.key === "#") m = ["k", e.key.charCodeAt(0)];
   }
@@ -389,15 +526,15 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", (e) => keyEvent(e, false));
 window.addEventListener("blur", () => { if (Module) Module._web_input_clear(); });
 
-/* --- тач/мышь: абсолютный указатель + дельты мыши --- */
+/* --- тач/мышь --- */
 
 function canvasPos(ev) {
   const r = canvas.getBoundingClientRect();
-  const x = (ev.clientX - r.left) / r.width;   /* 0..1 */
+  const x = (ev.clientX - r.left) / r.width;
   const y = (ev.clientY - r.top) / r.height;
   return [x, y];
 }
-function toRange(v) { /* 0..1 -> int16 диапазон libretro POINTER */
+function toRange(v) {
   let n = Math.round(v * 65536) - 32768;
   if (n > 32767) n = 32767; if (n < -32768) n = -32768;
   return n;
@@ -454,23 +591,19 @@ setInterval(pollGamepad, 50);
 
 /* ---------- обработчики UI ---------- */
 
-btnStart.addEventListener("click", () => {
-  const sel = $("selSource").value;
-  if (sel === "__upload") { $("fileInput").click(); return; }
-  startGame(sel);
-});
 btnStop.addEventListener("click", stopGame);
+btnRestart.addEventListener("click", () => launchGame(DEFAULT_JAR));
 
 $("fileInput").addEventListener("change", async (ev) => {
   const f = ev.target.files[0];
-  if (!f || !Module) return;
-  log("[web] читаю " + f.name + " (" + f.size + " байт)…");
+  if (!f || !moduleReady) return;
   const buf = new Uint8Array(await f.arrayBuffer());
   try {
     Module.FS.mkdir("/upload");
   } catch (e) { /* уже есть */ }
   Module.FS.writeFile("/upload/game.jar", buf);
-  startGame("/upload/game.jar");
+  addrBar.value = "file://C:/Мои документы/" + f.name;
+  launchGame("/upload/game.jar");
   ev.target.value = "";
 });
 
@@ -479,34 +612,43 @@ $("selRes").addEventListener("change", () => {
   $("customRes").style.display = custom ? "inline-block" : "none";
   if (custom) $("customRes").focus();
 });
+$("selScale").addEventListener("change", applyScale);
 
-$("btnLogClear").addEventListener("click", () => { logLines.length = 0; renderLog(); });
-$("btnLogCopy").addEventListener("click", () => {
-  const blob = new Blob([logLines.join("\n")], { type: "text/plain" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "nojme-web-log.txt";
-  a.click();
-  URL.revokeObjectURL(a.href);
+$("btnApply").addEventListener("click", () => {
+  /* параметры читаются при загрузке — перезапускаем текущую игру */
+  launchGame(lastPath);
 });
 
-/* ---------- автозапуск (для автоматизированных тестов) ---------- */
+$("errOk").addEventListener("click", hideError);
+$("errReload").addEventListener("click", () => location.reload());
+
+/* ---------- параметры URL (?autostart=1&jar=… — для автотестов) ---------- */
 
 const params = new URLSearchParams(location.search);
-if (params.get("autostart")) {
-  const jar = params.get("jar") || "/games/M3GTest.jar";
-  const res = params.get("res");
-  const speed = params.get("speed");
-  const boot = () => {
-    if (Module) {
-      if (res) $("selRes").value = res;
-      if (speed) $("selSpeed").value = speed;
-      if (params.get("heap")) $("selHeap").value = params.get("heap");
-      startGame(jar);
-    } else setTimeout(boot, 200);
-  };
-  setTimeout(boot, 400);
-}
+const TEST_MODE = !!params.get("autostart");
+const AUTO_JAR = TEST_MODE ? (params.get("jar") || DEFAULT_JAR) : DEFAULT_JAR;
+
+/* ---------- дата и счётчик посещений (дух 2000-х) ---------- */
+(function retroExtras() {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const el = $("todayLine");
+  if (el) el.textContent = "Сегодня: " + dd + "." + mm + "." + d.getFullYear();
+  const cEl = $("counter");
+  if (cEl) {
+    /* «счётчик посещений»: дни с 01.01.2001, умноженные на 3, плюс 1024 */
+    const days = Math.floor((d - new Date(2001, 0, 1)) / 86400000);
+    const n = String(1024 + days * 3).padStart(8, "0");
+    cEl.innerHTML = "";
+    for (const ch of n) {
+      const s = document.createElement("span");
+      s.className = "digit";
+      s.textContent = ch;
+      cEl.appendChild(s);
+    }
+  }
+})();
 
 /* ---------- поехали ---------- */
 boot();
