@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>nojme Web — J2ME эмулятор (WebAssembly)</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#2d3646;
+  --text:#e6edf3; --muted:#8b98a9; --accent:#4f9cf9; --accent2:#30c46a;
+  --danger:#f0705a; --radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+a{color:var(--accent)}
+header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding:14px 18px;border-bottom:1px solid var(--border)}
+header h1{font-size:19px;margin:0;letter-spacing:.3px}
+header .ver{color:var(--muted);font-size:12px;font-family:ui-monospace,monospace}
+header .spacer{flex:1}
+header .sab{font-size:11px;padding:3px 8px;border-radius:99px;border:1px solid var(--border)}
+.sab.ok{color:var(--accent2);border-color:var(--accent2)}
+.sab.bad{color:var(--danger);border-color:var(--danger)}
+main{display:flex;gap:16px;padding:16px 18px;flex-wrap:wrap;align-items:flex-start}
+#stage{position:relative;background:#000;border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;flex:0 1 auto;
+  display:flex;align-items:center;justify-content:center;
+  width:min(92vw,430px);min-height:340px;order:1}
+#screen{image-rendering:pixelated;image-rendering:crisp-edges;display:block;
+  max-width:100%;max-height:72vh;background:#000;touch-action:none}
+#overlay{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;
+  align-items:center;justify-content:center;background:rgba(5,8,12,.82);
+  color:var(--muted);text-align:center;padding:20px;font-size:13px}
+#overlay.hidden{display:none}
+#overlay .big{font-size:16px;color:var(--text)}
+#overlay.error{color:var(--danger)}
+#panel{flex:1 1 320px;min-width:300px;order:2;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{background:var(--panel2);color:var(--text);border:1px solid var(--border);
+  border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:#04101f;font-weight:600}
+button.primary:hover{filter:brightness(1.1)}
+label.btn input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.field select,.field input[type=text]{background:var(--panel2);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px}
+#status{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted);
+  display:flex;gap:14px;flex-wrap:wrap}
+#status b{color:var(--text);font-weight:600}
+details{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+details summary{cursor:pointer;color:var(--muted);font-size:13px;user-select:none}
+kbd{background:var(--panel2);border:1px solid var(--border);border-bottom-width:2px;
+  border-radius:5px;padding:1px 6px;font:11px ui-monospace,monospace}
+table.keys{border-collapse:collapse;font-size:12px;margin-top:6px}
+table.keys td{padding:3px 10px 3px 0;color:var(--muted)}
+table.keys td:first-child{color:var(--text)}
+#log{max-height:180px;overflow:auto;font:11px/1.5 ui-monospace,monospace;
+  color:var(--muted);white-space:pre-wrap;margin-top:6px}
+#banner{display:none;background:#3a2b12;color:#ffd98a;border-bottom:1px solid #6b5320;
+  padding:8px 18px;font-size:12.5px}
+/* --- экранные тач-кнопки --- */
+#touch{position:fixed;inset:0;pointer-events:none;display:none;z-index:50}
+#touch.on{display:block}
+.tbtn{position:absolute;pointer-events:auto;background:rgba(50,62,84,.55);
+  border:1px solid rgba(140,160,200,.5);border-radius:12px;color:#dfe9f5;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  font-weight:600;user-select:none;-webkit-user-select:none;touch-action:none}
+.tbtn:active,.tbtn.held{background:rgba(95,140,220,.75)}
+.tbtn.dpad{width:56px;height:56px;border-radius:10px}
+footer{color:var(--muted);font-size:11.5px;padding:10px 18px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div id="banner"></div>
+<header>
+  <h1>nojme <span style="color:var(--accent)">Web</span></h1>
+  <span class="ver" id="core-ver">J2ME · libretro → WebAssembly</span>
+  <span class="spacer"></span>
+  <span class="sab" id="sab-badge" title="SharedArrayBuffer / потоки Java">…</span>
+</header>
+
+<main>
+  <div id="stage">
+    <canvas id="screen" width="240" height="320"></canvas>
+    <div id="overlay">
+      <div class="big">nojme — эмулятор J2ME (WebAssembly)</div>
+      <div>Запустите <b>M3GTest.jar</b> или выберите свой <b>.jar</b></div>
+    </div>
+  </div>
+
+  <div id="panel">
+    <div class="row">
+      <button id="btn-m3g" class="primary">▶ Запустить M3GTest.jar</button>
+      <label class="btn">📂 Выбрать свой .jar…
+        <input type="file" id="file" accept=".jar,.JAR">
+      </label>
+      <button id="btn-pause" disabled>⏸ Пауза</button>
+      <button id="btn-reset" disabled>⟳ Сброс</button>
+      <button id="btn-stop" disabled>⏹ Стоп</button>
+    </div>
+
+    <div class="grid2">
+      <div class="field">Разрешение экрана
+        <select id="opt-resolution">
+          <option value="auto" selected>auto (из манифеста)</option>
+          <option>240x320</option><option>352x416</option><option>176x208</option>
+          <option>176x220</option><option>128x160</option><option>128x128</option>
+          <option>320x240</option><option>640x480</option><option>480x800</option>
+          <option value="__custom">своё WxH…</option>
+        </select>
+      </div>
+      <div class="field">Своё WxH (96–1024)
+        <input type="text" id="opt-wh" placeholder="напр. 400x300" disabled>
+      </div>
+      <div class="field">Частота кадров
+        <select id="opt-fps"><option>30</option><option>60</option><option>20</option><option>15</option></select>
+      </div>
+      <div class="field">Скорость VM
+        <select id="opt-speed">
+          <option value="fast" selected>fast (телефон)</option>
+          <option value="original">original</option>
+          <option value="normal">normal</option>
+          <option value="turbo">turbo</option>
+        </select>
+      </div>
+      <div class="field">Пиксельный формат
+        <select id="opt-pixfmt"><option value="RGB565">RGB565</option><option value="RGB888">RGB888</option></select>
+      </div>
+      <div class="field">Поворот экрана
+        <select id="opt-rotation"><option value="off">выкл</option><option value="90 right">90° вправо</option><option value="90 left">90° влево</option></select>
+      </div>
+      <div class="field">Звук
+        <select id="opt-sound"><option value="on" selected>вкл</option><option value="off">выкл</option></select>
+      </div>
+      <div class="field">Тач-кнопки на экране
+        <select id="opt-touch"><option value="off">скрыть</option><option value="on">показать</option></select>
+      </div>
+    </div>
+
+    <div id="status">
+      <span>Состояние: <b id="st-state">ожидание</b></span>
+      <span>FPS: <b id="st-fps">—</b></span>
+      <span>Кадров: <b id="st-frames">0</b></span>
+      <span>Экран: <b id="st-size">—</b></span>
+    </div>
+
+    <details>
+      <summary>Клавиши управления</summary>
+      <table class="keys">
+        <tr><td>← ↑ → ↓</td><td>джойстик (вверх/вниз/влево/вправо)</td></tr>
+        <tr><td><kbd>X</kbd></td><td>FIRE (клавиша 5 / огонь)</td></tr>
+        <tr><td><kbd>Z</kbd> / <kbd>A</kbd> / <kbd>S</kbd></td><td>B (Game C) / X (Game D) / Y (клавиша 1)</td></tr>
+        <tr><td><kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> <kbd>R</kbd></td><td>клавиши 2 / 3 / 4 / 5</td></tr>
+        <tr><td><kbd>Shift</kbd> / <kbd>Enter</kbd></td><td>левая софт-клавиша / правая софт-клавиша</td></tr>
+        <tr><td><kbd>0</kbd> <kbd>6</kbd>–<kbd>9</kbd> <kbd>*</kbd> <kbd>#</kbd></td><td>цифровые клавиши телефона</td></tr>
+        <tr><td>мышь / палец на экране</td><td>тач-ввод (стилусные игры)</td></tr>
+        <tr><td>геймпад</td><td>подключается автоматически (стандартный маппинг)</td></tr>
+        <tr><td><kbd>P</kbd></td><td>пауза / продолжить</td></tr>
+      </table>
+    </details>
+
+    <details>
+      <summary>Лог ядра</summary>
+      <div id="log"></div>
+    </details>
+
+    <details>
+      <summary>О сборке</summary>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px">
+        Ядро nojme (J2ME/KVM + JSR-184 M3G на C, libretro-интерфейс) скомпилировано
+        в WebAssembly через emscripten. Java-потоки (<code>Thread.start()</code>)
+        работают как настоящие рабочие потоки — странице нужен SharedArrayBuffer
+        (cross-origin isolation). Файлы JAR обрабатываются локально в браузере,
+        ничего никуда не отправляется; сохранения (RMS) хранятся в IndexedDB.
+      </div>
+    </details>
+  </div>
+</main>
+
+<div id="touch">
+  <div class="tbtn dpad" data-btn="4"  style="left:18px;  bottom:84px">↑</div>
+  <div class="tbtn dpad" data-btn="5"  style="left:18px;  bottom:16px">↓</div>
+  <div class="tbtn dpad" data-btn="6"  style="left:-46px; bottom:50px">←</div>
+  <div class="tbtn dpad" data-btn="7"  style="left:82px;  bottom:50px">→</div>
+  <div class="tbtn" data-btn="8"  style="right:18px; bottom:60px; width:64px;height:64px;border-radius:50%">FIRE</div>
+  <div class="tbtn" data-btn="0"  style="right:96px; bottom:96px; width:48px;height:48px;border-radius:50%">B</div>
+  <div class="tbtn" data-btn="9"  style="right:96px; bottom:28px; width:48px;height:48px;border-radius:50%">X</div>
+  <div class="tbtn" data-btn="1"  style="right:18px; bottom:140px; width:44px;height:44px">1</div>
+  <div class="tbtn" data-btn="10" style="right:18px; bottom:196px; width:44px;height:44px">2</div>
+  <div class="tbtn" data-btn="11" style="right:18px; bottom:252px; width:44px;height:44px">3</div>
+  <div class="tbtn" data-btn="12" style="right:70px; bottom:222px; width:44px;height:44px">4</div>
+  <div class="tbtn" data-btn="13" style="right:122px;bottom:196px; width:44px;height:44px">5</div>
+  <div class="tbtn" data-btn="2"  style="left:18px;  top:16px;  width:64px;height:40px">LSK</div>
+  <div class="tbtn" data-btn="3"  style="right:18px; top:16px; width:64px;height:40px">RSK</div>
+</div>
+
+<footer>
+  nojme Web · ядро nojme libretro (C) → WebAssembly · jar-файлы не покидают браузер
+</footer>
+
+<script src="coi-serviceworker.js"></script>
+<script src="nojme.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
