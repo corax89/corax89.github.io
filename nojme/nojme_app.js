@@ -77,6 +77,11 @@ const isolated = typeof SharedArrayBuffer !== "undefined" && crossOriginIsolated
   if (isolated) {
     badge.textContent = "cross-origin isolated ✓";
     badge.className = "ok";
+  } else if (window.__coiPending) {
+    /* coi-serviceworker.js прямо сейчас регистрирует Service Worker и
+       перезагрузит страницу — изоляция появится после перезагрузки */
+    badge.textContent = "включаю изоляцию…";
+    badge.className = "wait";
   } else {
     badge.textContent = "БЕЗ изоляции — потоки не заработают";
     badge.className = "bad";
@@ -163,6 +168,15 @@ function initModuleApi() {
 }
 
 async function boot() {
+  if (!isolated && window.__coiPending) {
+    /* Ждём Service Worker (coi-serviceworker.js): он добавит COOP/COEP
+       и перезагрузит страницу. Стартовать модуль сейчас нельзя —
+       postMessage(SharedArrayBuffer) без изоляции бросит DataCloneError
+       ещё в preRun (пул pthread-воркеров). */
+    statusChip.textContent = "включаю изоляцию (страница перезагрузится)…";
+    setTimeout(boot, 1500); /* если SW не справится — стартуем как есть */
+    return;
+  }
   try {
     const factory = window.NojmeFactory;
     Module = await factory({
