@@ -1,0 +1,1217 @@
+0 nojme v36.46-yetifix3-2026-09-29 trace start
+15 [RND] renderer=opengles2
+23 [PAD] slot=0 inst=0 type=standard name=Switch Controller
+25 [PAD] slot=1 inst=1 type=standard name=Switch Controller
+27 [PAD] slot=2 inst=2 type=standard name=Switch Controller
+28 [PAD] slot=3 inst=3 type=standard name=Switch Controller
+30 menu: session start
+447 [KEYIN] SDL joy down btn=15 which=0
+862 [KEYIN] SDL joy down btn=0 which=0
+864 settings: screen
+1410 [KEYIN] SDL joy down btn=13 which=0
+1939 [KEYIN] SDL joy down btn=13 which=0
+2030 alive: [KEYIN] SDL joy down btn=13 which=0
+2218 [KEYIN] SDL joy down btn=13 which=0
+3967 [KEYIN] SDL joy down btn=13 which=0
+4030 alive: [KEYIN] SDL joy down btn=13 which=0
+4140 [KEYIN] SDL joy down btn=13 which=0
+4328 [KEYIN] SDL joy down btn=13 which=0
+4552 [KEYIN] SDL joy down btn=13 which=0
+4770 [KEYIN] SDL joy down btn=13 which=0
+5068 [KEYIN] SDL joy down btn=0 which=0
+5468 [KEYIN] SDL joy down btn=1 which=0
+5470 settings: exit without save (reverted)
+6027 [KEYIN] SDL joy down btn=13 which=0
+6030 alive: [KEYIN] SDL joy down btn=13 which=0
+6223 [KEYIN] SDL joy down btn=0 which=0
+6225 browse: root
+6228 scan: sdmc:/switch/j2me/games
+6237 scan: sdmc:/switch/j2me/games -> 9 entries (3 ms)
+6755 [KEYIN] SDL joy down btn=13 which=0
+7207 [KEYIN] SDL joy down btn=0 which=0
+7209 game: sdmc:/switch/j2me/games/Yeti Sports (00.02.51)[240x320].jar
+7212 menu: session end (1)
+7215 jar: peek
+7226 init: jvm_create
+7228 init: jvm_init
+7244 init: sdl_init
+7247 game: begin 240x320 build=v36.46-yetifix3-2026-09-29
+7250 init: native_init
+7254 init: midp_init
+7255 init: opcodes_init
+7257 audio: open 44100 Hz stereo
+7262 jar: load
+7273 jar: manifest
+7275 class: find
+7277 class: load yetisports/YetiSports
+7279 midlet: start
+7287 frame: first
+7291 [RMS] open 'YetiSports_opt' create=0 -> DISK h=0 records=1 next_id=2
+7292 [RMS] getNumRecords 'YetiSports_opt' -> 1
+7294 [RMS] getRecord 'YetiSports_opt' id=1 size=144 (records=1)
+7305 [KEYIN] dispatch btn=0 -> key=53 midp=53
+7309 [RMS] open 'YetiSports_his' create=0 -> DISK h=1 records=1 next_id=2
+70,0 540x720 canvas=240x320
+7311 keyhint: shown (8s or until first game key)
+13 [RMS] getRecord 'YetiSports_his' id=1 size=185 (records=1)
+7325 [RESOURCE] 'res/text.lng' -> 21117 bytes
+7328 battery: overlay icon 93% charging=1 src=psm
+7339 [RESOURCE] 'res/res.bin' -> 460810 bytes
+8030 td m: nat=java/lang/Math.abs age=17
+8033 td t2: run nat=java/lang/System.arraycopy age=30 stm=460810/460810/460810 r=464364
+8035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+8037 alive: [RESOURCE] 'res/res.bin' -> 460810 bytes
+9030 td m: nat=java/lang/Math.abs age=18
+9032 td t2: run nat=java/lang/Thread.sleep age=1 stm=460810/460810/460810 r=464364
+9034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+10030 td m: nat=java/lang/Math.abs age=52
+10033 td t2: run nat=java/lang/System.currentTimeMillis age=15 stm=460810/460810/460810 r=464364
+10035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+10037 alive: [RESOURCE] 'res/res.bin' -> 460810 bytes
+10660 [KEYIN] SDL joy down btn=0 which=0
+10665 [KEYIN] dispatch btn=0 -> key=53 midp=53
+11030 td m: nat=java/lang/Math.abs age=19
+11032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+11034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+11427 [KEYIN] SDL joy down btn=0 which=0
+11429 [KEYIN] dispatch btn=0 -> key=53 midp=53
+12030 td m: nat=java/lang/Math.abs age=26
+12033 td t2: run nat=javax/microedition/lcdui/Font.getSize age=0 stm=460810/460810/460810 r=464364
+12035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+12037 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+12348 diag: loop=302 pr=302 stl=230 vs=302 gc=0 heap=1144312 top=1088440 skip=194 pump=1628 sr=0 fl=108 sb=0 bn=0 bd=0 tn=1 ta=33/t2 tw=0 ma=0 pv=3330 pk=21 pw=30 mx=52 pp=286 psk=0 cs=0 lvc=14 dset=0 gms=0 gxm=0 tj=0 rj=11 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=1 chb=1
+13030 td m: nat=java/lang/Math.abs age=24
+13033 td t2: run nat=java/lang/String.charAt age=0 stm=460810/460810/460810 r=464364
+13063 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+13498 [KEYIN] SDL joy down btn=2 which=0
+13501 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+13502 [KEYIN] soft press 0 -> keyPressed(-6) to game
+13527 [KEYQ-SOFT] keyPressed(-6) via fallback pump, waited 24ms
+13549 [RMS] open 'YetiSports_opt' create=1 -> RAM reuse h=0 refs=1 records=1 next_id=2
+13552 [RMS] getNumRecords 'YetiSports_opt' -> 1
+13645 [KEYQ-SOFT] keyReleased(-6) via game-thread drain, waited 1ms
+14030 td m: nat=java/lang/Math.abs age=18
+14033 td t2: run nat=java/lang/System.currentTimeMillis age=31 stm=460810/460810/460810 r=464364
+14034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+14036 alive: [KEYQ-SOFT] keyReleased(-6) via game-thread drain, waited 1ms
+15030 td m: nat=java/lang/Math.abs age=18
+15033 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+15034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+15111 [KEYIN] SDL joy down btn=2 which=0
+15114 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+15115 [KEYIN] soft press 0 -> keyPressed(-6) to game
+15144 [KEYQ-SOFT] keyPressed(-6) via fallback pump, waited 27ms
+15262 [KEYQ-SOFT] keyReleased(-6) via game-thread drain, waited 0ms
+15560 [KEYIN] SDL joy down btn=0 which=0
+15564 [KEYIN] dispatch btn=0 -> key=53 midp=53
+16030 td m: nat=java/lang/Math.abs age=43
+16034 td t2: run nat=java/lang/System.currentTimeMillis age=13 stm=460810/460810/460810 r=464364
+16035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+16038 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+16810 [KEYIN] SDL joy down btn=0 which=0
+16813 [KEYIN] dispatch btn=0 -> key=53 midp=53
+17030 td m: nat=javax/microedition/lcdui/Graphics.drawLine age=0
+17032 td t2: run nat=java/lang/System.currentTimeMillis age=5 stm=460810/460810/460810 r=464364
+17034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+17349 diag: loop=300 pr=300 stl=143 vs=300 gc=0 heap=1236216 top=1236216 skip=191 pump=300 sr=0 fl=109 sb=12720 bn=0 bd=0 tn=1 ta=29/t2 tw=0 ma=0 pv=2988 pk=19 pw=22 mx=24 pp=278 psk=0 cs=0 lvc=60 dset=0 gms=0 gxm=0 tj=2 rj=13 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=1 chb=1
+17827 [KEYIN] SDL joy down btn=0 which=0
+17829 [KEYIN] dispatch btn=0 -> key=53 midp=53
+18030 td m: nat=java/lang/Math.abs age=30
+18033 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+18035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+18037 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+19030 td m: nat=java/lang/Math.abs age=13
+19032 td t2: run nat=java/lang/Thread.sleep age=1 stm=460810/460810/460810 r=464364
+19034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+20030 td m: nat=java/lang/Math.abs age=46
+20033 td t2: run nat=java/lang/String.length age=18 stm=460810/460810/460810 r=464364
+20035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+20036 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+21030 td m: nat=javax/microedition/lcdui/Graphics.drawLine age=0
+21032 td t2: run nat=java/lang/String.length age=9 stm=460810/460810/460810 r=464364
+21033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+21577 [KEYIN] SDL joy down btn=2 which=0
+21580 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+21581 [KEYIN] soft press 0 -> keyPressed(-6) to game
+21582 [KEYQ-SOFT] keyPressed(-6) via game-thread drain, waited 0ms
+21682 [RMS] open 'YetiSports_his' create=1 -> RAM reuse h=1 refs=1 records=1 next_id=2
+21684 [RMS] getNumRecords 'YetiSports_his' -> 1
+21763 [KEYQ-SOFT] keyReleased(-6) via fallback pump, waited 36ms
+22030 td m: nat=java/lang/String.charAt age=0
+22032 td t2: run nat=java/lang/System.currentTimeMillis age=32 stm=460810/460810/460810 r=464364
+22033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+22035 alive: [KEYQ-SOFT] keyReleased(-6) via fallback pump, waited 36ms
+22351 diag: loop=289 pr=289 stl=295 vs=289 gc=0 heap=1392984 top=1361160 skip=176 pump=289 sr=0 fl=113 sb=11984 bn=0 bd=0 tn=1 ta=52/t2 tw=0 ma=0 pv=2747 pk=18 pw=21 mx=39 pp=279 psk=0 cs=0 lvc=113 dset=0 gms=0 gxm=0 tj=3 rj=30 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=1 chb=1
+23030 td m: nat=java/lang/String.charAt age=0
+23033 td t2: run nat=java/lang/System.currentTimeMillis age=32 stm=460810/460810/460810 r=464364
+23034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+23261 [KEYIN] SDL joy down btn=3 which=0
+23264 [KEYIN] dispatch btn=3 -> key=99 midp=-8
+23995 [KEYIN] SDL joy down btn=2 which=0
+23998 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+23999 [KEYIN] soft press 0 -> keyPressed(-6) to game
+24000 [KEYQ-SOFT] keyPressed(-6) via game-thread drain, waited 0ms
+24030 td m: nat=java/lang/String.charAt age=0
+24032 td t2: run nat=java/lang/System.currentTimeMillis age=32 stm=460810/460810/460810 r=464364
+24034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+24037 alive: [KEYQ-SOFT] keyPressed(-6) via game-thread drain, waited 0ms
+24111 [RMS] open 'YetiSports_opt' create=1 -> RAM reuse h=0 refs=1 records=1 next_id=2
+24115 [RMS] getNumRecords 'YetiSports_opt' -> 1
+24210 [KEYQ-SOFT] keyReleased(-6) via fallback pump, waited 33ms
+25030 td m: nat=java/lang/Math.abs age=16
+25033 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+25034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+25644 [KEYIN] SDL joy down btn=0 which=0
+25646 [KEYIN] dispatch btn=0 -> key=53 midp=53
+26030 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+26032 td t2: run nat=java/lang/System.currentTimeMillis age=15 stm=460810/460810/460810 r=464364
+26034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+26035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+26395 [KEYIN] SDL joy down btn=0 which=0
+26397 [KEYIN] dispatch btn=0 -> key=53 midp=53
+27030 td m: nat=java/lang/String.charAt age=0
+27032 td t2: run nat=java/lang/System.currentTimeMillis age=7 stm=460810/460810/460810 r=464364
+27033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+27195 [KEYIN] SDL joy down btn=0 which=0
+27197 [KEYIN] dispatch btn=0 -> key=53 midp=53
+27366 diag: loop=267 pr=267 stl=616 vs=267 gc=0 heap=1531768 top=1528568 skip=157 pump=267 sr=0 fl=110 sb=10364 bn=0 bd=0 tn=1 ta=7/t2 tw=0 ma=0 pv=2693 pk=17 pw=21 mx=40 pp=265 psk=0 cs=0 lvc=82 dset=0 gms=0 gxm=0 tj=4 rj=31 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+27728 [KEYIN] SDL joy down btn=0 which=0
+27730 [KEYIN] dispatch btn=0 -> key=53 midp=53
+28030 td m: nat=java/lang/Math.abs age=31
+28033 td t2: run nat=java/lang/Thread.sleep age=18 stm=460810/460810/460810 r=464364
+28034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+28035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+29030 td m: nat=java/lang/Math.abs age=16
+29032 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+29033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+30030 td m: nat=java/lang/Math.abs age=15
+30032 td t2: run nat=java/lang/Thread.sleep age=1 stm=460810/460810/460810 r=464364
+30033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+30034 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+31030 td m: nat=java/lang/String.charAt age=0
+31033 td t2: run nat=java/lang/System.currentTimeMillis age=12 stm=460810/460810/460810 r=464364
+31035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+32030 td m: nat=java/lang/Math.abs age=31
+32032 td t2: run nat=java/lang/System.currentTimeMillis age=3 stm=460810/460810/460810 r=464364
+32034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+32035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+32379 diag: loop=301 pr=301 stl=46 vs=301 gc=0 heap=1731208 top=1696936 skip=181 pump=301 sr=0 fl=120 sb=11396 bn=0 bd=0 tn=1 ta=15/t2 tw=0 ma=0 pv=3497 pk=18 pw=20 mx=21 pp=299 psk=0 cs=0 lvc=86 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+32610 [KEYIN] SDL joy down btn=0 which=0
+32613 [KEYIN] dispatch btn=0 -> key=53 midp=53
+33030 td m: nat=java/lang/Math.abs age=15
+33032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+33033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+33960 [KEYIN] SDL joy down btn=0 which=0
+33963 [KEYIN] dispatch btn=0 -> key=53 midp=53
+34030 td m: nat=java/lang/Math.abs age=13
+34032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+34033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+34034 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+34560 [KEYIN] SDL joy down btn=0 which=0
+34564 [KEYIN] dispatch btn=0 -> key=53 midp=53
+35030 td m: nat=javax/microedition/lcdui/Graphics.drawImage age=0
+35032 td t2: run nat=java/lang/System.currentTimeMillis age=19 stm=460810/460810/460810 r=464364
+35033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+35877 [KEYIN] SDL joy down btn=0 which=0
+35880 [KEYIN] dispatch btn=0 -> key=53 midp=53
+36030 td m: nat=java/lang/String.charAt age=0
+36032 td t2: run nat=java/lang/System.currentTimeMillis age=10 stm=460810/460810/460810 r=464364
+36034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+36035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+36544 [KEYIN] SDL joy down btn=0 which=0
+36546 [KEYIN] dispatch btn=0 -> key=53 midp=53
+37027 [KEYIN] SDL joy down btn=0 which=0
+37029 [KEYIN] dispatch btn=0 -> key=53 midp=53
+37030 td m: nat=java/lang/Math.abs age=31
+37031 td t2: run nat=java/lang/Thread.sleep age=18 stm=460810/460810/460810 r=464364
+37032 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+37394 diag: loop=301 pr=301 stl=58 vs=301 gc=0 heap=1932544 top=1910616 skip=182 pump=301 sr=0 fl=119 sb=8892 bn=0 bd=0 tn=1 ta=28/t2 tw=0 ma=0 pv=3441 pk=18 pw=21 mx=28 pp=297 psk=0 cs=0 lvc=73 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+38030 td m: nat=java/lang/Math.abs age=14
+38032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+38033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+38035 alive: diag: loop=301 pr=301 stl=58 vs=301 gc=0 heap=1932544 top=1910616 skip=182 pump=301 sr=0 fl=119 sb=8
+39030 td m: nat=java/lang/Math.abs age=14
+39032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+39033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+40030 td m: nat=javax/microedition/lcdui/Graphics.getClipY age=0
+40032 td t2: run nat=java/lang/System.currentTimeMillis age=14 stm=460810/460810/460810 r=464364
+40034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+40035 alive: diag: loop=301 pr=301 stl=58 vs=301 gc=0 heap=1932544 top=1910616 skip=182 pump=301 sr=0 fl=119 sb=8
+41030 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+41032 td t2: run nat=java/lang/System.currentTimeMillis age=4 stm=460810/460810/460810 r=464364
+41033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+42030 td m: nat=java/lang/Math.abs age=31
+42032 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+42034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+42035 alive: diag: loop=301 pr=301 stl=58 vs=301 gc=0 heap=1932544 top=1910616 skip=182 pump=301 sr=0 fl=119 sb=8
+42077 [KEYIN] SDL joy down btn=0 which=0
+42080 [KEYIN] dispatch btn=0 -> key=53 midp=53
+42394 diag: loop=300 pr=300 stl=42 vs=300 gc=0 heap=2132224 top=2124104 skip=181 pump=300 sr=0 fl=119 sb=7272 bn=0 bd=0 tn=1 ta=23/t2 tw=0 ma=0 pv=3467 pk=16 pw=18 mx=20 pp=299 psk=0 cs=0 lvc=86 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+42710 [KEYIN] SDL joy down btn=0 which=0
+42713 [KEYIN] dispatch btn=0 -> key=53 midp=53
+43030 td m: nat=java/lang/Math.abs age=14
+43032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+43033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+43260 [KEYIN] SDL joy down btn=0 which=0
+43263 [KEYIN] dispatch btn=0 -> key=53 midp=53
+44030 td m: nat=java/lang/Math.abs age=13
+44032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+44033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+44035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+44809 [RMS] open 'YetiSports_his' create=1 -> RAM reuse h=1 refs=1 records=1 next_id=2
+44812 [RMS] getNumRecords 'YetiSports_his' -> 1
+45030 td m: nat=java/lang/Math.abs age=28
+45032 td t2: run nat=java/lang/Thread.sleep age=17 stm=460810/460810/460810 r=464364
+45033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+45865 [KEYIN] SDL joy down btn=0 which=0
+45868 [KEYIN] dispatch btn=0 -> key=53 midp=53
+46030 td m: nat=java/lang/Math.abs age=8
+46032 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+46034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+46035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+46512 [KEYIN] SDL joy down btn=0 which=0
+46515 [KEYIN] dispatch btn=0 -> key=53 midp=53
+47030 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+47033 td t2: run nat=java/lang/System.currentTimeMillis age=14 stm=460810/460810/460810 r=464364
+47035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+47061 [KEYIN] SDL joy down btn=0 which=0
+47064 [KEYIN] dispatch btn=0 -> key=53 midp=53
+47394 diag: loop=300 pr=300 stl=66 vs=300 gc=0 heap=2336456 top=2301808 skip=183 pump=300 sr=0 fl=117 sb=12960 bn=0 bd=0 tn=1 ta=10/t2 tw=0 ma=0 pv=3206 pk=17 pw=19 mx=21 pp=289 psk=0 cs=0 lvc=88 dset=0 gms=0 gxm=0 tj=0 rj=16 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+47644 [KEYIN] SDL joy down btn=0 which=0
+47646 [KEYIN] dispatch btn=0 -> key=53 midp=53
+48030 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+48032 td t2: run nat=java/lang/System.currentTimeMillis age=5 stm=460810/460810/460810 r=464364
+48033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+48035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+49030 td m: nat=java/lang/Math.abs age=31
+49032 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+49033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+50030 td m: nat=java/lang/Math.abs age=13
+50032 td t2: run nat=java/lang/Thread.sleep age=1 stm=460810/460810/460810 r=464364
+50033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+50034 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+50677 [KEYIN] SDL joy down btn=1 which=0
+50680 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+50681 [KEYIN] soft press 1 -> keyPressed(-7) to game
+50683 [KEYQ-SOFT] keyPressed(-7) via game-thread drain, waited 0ms
+50844 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 17ms
+51030 td m: nat=java/lang/Math.abs age=14
+51032 td t2: run nat=java/lang/Thread.sleep age=1 stm=460810/460810/460810 r=464364
+51033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+51144 [KEYIN] SDL joy down btn=10 which=0
+51146 pause: open
+52030 td m: nat=java/lang/Math.abs age=932
+52033 td t2: run nat=java/lang/Thread.sleep age=393 why=fe-pause stm=460810/460810/460810 r=464364
+52034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+52035 alive: pause: open
+52159 [KEYIN] SDL joy down btn=0 which=0
+52161 pause: close
+52400 diag: loop=240 pr=240 stl=1041 vs=240 gc=0 heap=2491688 top=2464488 skip=144 pump=295 sr=0 fl=96 sb=9572 bn=0 bd=0 tn=1 ta=24/t2 tw=0 ma=0 pv=2755 pk=16 pw=18 mx=1021 pp=239 psk=0 cs=0 lvc=41 dset=0 gms=0 gxm=0 tj=0 rj=7 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+53030 td m: nat=java/lang/Math.abs age=13
+53032 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+53033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+53310 [KEYIN] SDL joy down btn=10 which=0
+53314 pause: open
+53863 [KEYIN] SDL joy down btn=13 which=0
+54030 td m: nat=java/lang/Math.abs age=765
+54032 td t2: run nat=java/lang/Thread.sleep age=225 why=fe-pause stm=460810/460810/460810 r=464364
+54034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+54036 alive: [KEYIN] SDL joy down btn=13 which=0
+54365 [KEYIN] SDL joy down btn=13 which=0
+55030 td m: nat=java/lang/Math.abs age=1765
+55033 td t2: run nat=java/lang/Thread.sleep age=1225 why=fe-pause stm=460810/460810/460810 r=464364
+55034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+55348 [KEYIN] SDL joy down btn=15 which=0
+55739 [KEYIN] SDL joy down btn=13 which=0
+55963 [KEYIN] SDL joy down btn=1 which=0
+55966 pause: close
+56030 td m: nat=javax/microedition/lcdui/Graphics.setClip age=0
+56033 td t2: run nat=java/lang/System.currentTimeMillis age=5 stm=460810/460810/460810 r=464364
+56035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+56037 alive: pause: close
+56113 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 0ms
+56494 [KEYIN] SDL joy down btn=10 which=0
+56496 pause: open
+56862 [KEYIN] SDL joy down btn=13 which=0
+57031 td m: nat=java/lang/Math.abs age=566
+57033 td t2: run nat=java/lang/Thread.sleep age=39 why=fe-pause stm=460810/460810/460810 r=464364
+57035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+57105 [KEYIN] SDL joy down btn=13 which=0
+57311 [KEYIN] SDL joy down btn=13 which=0
+57480 [KEYIN] SDL joy down btn=13 which=0
+57667 [KEYIN] SDL joy down btn=13 which=0
+58031 td m: nat=java/lang/Math.abs age=1566
+58034 td t2: run nat=java/lang/Thread.sleep age=1039 why=fe-pause stm=460810/460810/460810 r=464364
+58035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+58037 alive: [KEYIN] SDL joy down btn=13 which=0
+58039 [KEYIN] SDL joy down btn=15 which=0
+58393 [KEYIN] SDL joy down btn=14 which=0
+58728 [KEYIN] SDL joy down btn=12 which=0
+59031 td m: nat=java/lang/Math.abs age=2566
+59033 td t2: run nat=java/lang/Thread.sleep age=2039 why=fe-pause stm=460810/460810/460810 r=464364
+59035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+59045 [KEYIN] SDL joy down btn=1 which=0
+59047 pause: close
+59056 diag: loop=89 pr=89 stl=5200 vs=89 gc=0 heap=2547688 top=2546088 skip=54 pump=369 sr=0 fl=35 sb=12952 bn=0 bd=0 tn=1 ta=6/t2 tw=0 ma=0 pv=994 pk=16 pw=19 mx=2660 pp=89 psk=0 cs=0 lvc=12 dset=0 gms=0 gxm=0 tj=0 rj=7 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+59194 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 17ms
+59510 [KEYIN] SDL joy down btn=13 which=0
+59513 [KEYIN] dispatch btn=13 -> key=1073741906 midp=-1
+60031 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+60034 td t2: run nat=java/lang/System.currentTimeMillis age=12 stm=460810/460810/460810 r=464364
+60035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+60037 alive: [KEYIN] dispatch btn=13 -> key=1073741906 midp=-1
+60228 [KEYIN] SDL joy down btn=11 which=0
+60230 pause: open
+60834 [KEYIN] SDL joy down btn=15 which=0
+61031 td m: nat=java/lang/Math.abs age=833
+61034 td t2: run nat=java/lang/Thread.sleep age=296 why=fe-pause stm=460810/460810/460810 r=464364
+61035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+61170 [KEYIN] SDL joy down btn=13 which=0
+61431 [KEYIN] SDL joy down btn=13 which=0
+61766 [KEYIN] SDL joy down btn=1 which=0
+61797 pause: close
+61944 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+62031 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+62034 td t2: run nat=java/lang/System.currentTimeMillis age=19 stm=460810/460810/460810 r=464364
+62035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+62036 alive: [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+62261 [KEYIN] SDL joy down btn=11 which=0
+62264 pause: open
+62886 [KEYIN] SDL joy down btn=1 which=0
+62888 pause: close
+63027 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 0ms
+63031 td m: nat=javax/microedition/lcdui/Graphics.drawImage age=0
+63032 td t2: run nat=java/lang/System.currentTimeMillis age=12 stm=460810/460810/460810 r=464364
+63034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+63360 [KEYIN] SDL joy down btn=1 which=0
+63363 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+63364 [KEYIN] soft press 1 -> keyPressed(-7) to game
+63366 [KEYQ-SOFT] keyPressed(-7) via game-thread drain, waited 1ms
+63529 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 19ms
+63710 [KEYIN] SDL joy down btn=13 which=0
+63713 [KEYIN] dispatch btn=13 -> key=1073741906 midp=-1
+64031 td m: nat=javax/microedition/lcdui/Graphics.getClipY age=0
+64034 td t2: run nat=java/lang/System.currentTimeMillis age=5 stm=460810/460810/460810 r=464364
+64035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+64036 alive: [KEYIN] dispatch btn=13 -> key=1073741906 midp=-1
+64062 diag: loop=171 pr=171 stl=2192 vs=171 gc=0 heap=2659688 top=2630888 skip=101 pump=288 sr=0 fl=70 sb=13100 bn=0 bd=0 tn=1 ta=18/t2 tw=0 ma=0 pv=1918 pk=16 pw=18 mx=1573 pp=168 psk=0 cs=0 lvc=24 dset=0 gms=0 gxm=0 tj=2 rj=7 sj=0 utf=0 rcf=0 ch=0 chf=0 chg=0 chb=0
+64160 [KEYIN] SDL joy down btn=0 which=0
+64163 [KEYIN] dispatch btn=0 -> key=53 midp=53
+64660 [KEYIN] SDL joy down btn=0 which=0
+64663 [KEYIN] dispatch btn=0 -> key=53 midp=53
+65031 td m: nat=java/lang/Math.abs age=29
+65033 td t2: run nat=java/lang/Thread.sleep age=18 stm=460810/460810/460810 r=464364
+65034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+65094 [KEYIN] SDL joy down btn=0 which=0
+65096 [KEYIN] dispatch btn=0 -> key=53 midp=53
+65796 [KEYIN] SDL joy down btn=10 which=0
+65798 pause: open
+66031 td m: nat=java/lang/Math.abs age=266
+66033 td t2: run nat=java/lang/System.currentTimeMillis age=238 stm=460810/460810/460810 r=464364
+66034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+66036 alive: pause: open
+66567 [KEYIN] SDL joy down btn=15 which=0
+67031 td m: nat=java/lang/Math.abs age=1267
+67034 td t2: run nat=java/lang/Thread.sleep age=734 why=fe-pause stm=460810/460810/460810 r=464364
+67035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+67069 [KEYIN] SDL joy down btn=13 which=0
+67497 [KEYIN] SDL joy down btn=13 which=0
+67813 [KEYIN] SDL joy down btn=13 which=0
+68031 td m: nat=java/lang/Math.abs age=2267
+68033 td t2: run nat=java/lang/Thread.sleep age=1734 why=fe-pause stm=460810/460810/460810 r=464364
+68035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+68036 alive: [KEYIN] SDL joy down btn=13 which=0
+68037 [KEYIN] SDL joy down btn=13 which=0
+68224 [KEYIN] SDL joy down btn=13 which=0
+68929 [KEYIN] SDL joy down btn=1 which=0
+68931 pause: close
+69031 td m: nat=java/lang/String.charAt age=0
+69034 td t2: run nat=java/lang/System.currentTimeMillis age=6 stm=460810/460810/460810 r=464364
+69035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+69079 diag: loop=114 pr=114 stl=3138 vs=114 gc=0 heap=2735824 top=2715960 skip=69 pump=283 sr=0 fl=45 sb=12364 bn=0 bd=0 tn=1 ta=12/t2 tw=0 ma=0 pv=1286 pk=16 pw=19 mx=3140 pp=113 psk=0 cs=0 lvc=36 dset=0 gms=0 gxm=0 tj=0 rj=4 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+69082 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 22ms
+69613 [KEYIN] SDL joy down btn=10 which=0
+69615 pause: open
+70031 td m: nat=java/lang/Math.abs age=449
+70033 td t2: run nat=java/lang/Math.abs age=162 stm=460810/460810/460810 r=464364
+70034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+70035 alive: pause: open
+71031 td m: nat=java/lang/Math.abs age=1449
+71033 td t2: run nat=java/lang/Thread.sleep age=911 why=fe-pause stm=460810/460810/460810 r=464364
+71034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+72031 td m: nat=java/lang/Math.abs age=2449
+72033 td t2: run nat=java/lang/Thread.sleep age=1911 why=fe-pause stm=460810/460810/460810 r=464364
+72037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+72038 alive: pause: open
+73031 td m: nat=java/lang/Math.abs age=3450
+73033 td t2: run nat=java/lang/Thread.sleep age=2912 why=fe-pause stm=460810/460810/460810 r=464364
+73035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+74031 td m: nat=java/lang/Math.abs age=4449
+74033 td t2: run nat=java/lang/Thread.sleep age=3911 why=fe-pause stm=460810/460810/460810 r=464364
+74035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+74036 alive: pause: open
+75031 STUCK: stage=events[pause-menu] idle=5418 ms sp=0 sb=4904 pause=3 seq=1175 seqage=5163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+75033 td m: nat=java/lang/Math.abs age=5452
+75035 td t2: run nat=java/lang/Thread.sleep age=4914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+75037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+76031 STUCK: stage=events[pause-menu] idle=6418 ms sp=0 sb=9672 pause=3 seq=1175 seqage=6162 ms m3g=0x0 bn=0 bd=0 last=pause: open
+76033 td m: nat=java/lang/Math.abs age=6452
+76034 td t2: run nat=java/lang/Thread.sleep age=5914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+76036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+77031 STUCK: stage=events[pause-menu] idle=7418 ms sp=0 sb=4480 pause=3 seq=1175 seqage=7163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+77034 td m: nat=java/lang/Math.abs age=7453
+77035 td t2: run nat=java/lang/Thread.sleep age=6915 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+77036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+78031 STUCK: stage=events[pause-menu] idle=8418 ms sp=0 sb=10132 pause=3 seq=1175 seqage=8163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+78034 td m: nat=java/lang/Math.abs age=8452
+78035 td t2: run nat=java/lang/Thread.sleep age=7914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+78036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+79031 STUCK: stage=events[pause-menu] idle=9418 ms sp=0 sb=4940 pause=3 seq=1175 seqage=9163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+79034 td m: nat=java/lang/Math.abs age=9452
+79035 td t2: run nat=java/lang/Thread.sleep age=8914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+79036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+80031 STUCK: stage=events[pause-menu] idle=10418 ms sp=0 sb=10592 pause=3 seq=1175 seqage=10163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+80034 td m: nat=java/lang/Math.abs age=10453
+80036 td t2: run nat=java/lang/Thread.sleep age=9915 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+80037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+81031 STUCK: stage=events[pause-menu] idle=11418 ms sp=0 sb=6284 pause=3 seq=1175 seqage=11163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+81034 td m: nat=java/lang/Math.abs age=11452
+81035 td t2: run nat=java/lang/Thread.sleep age=10914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+81036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+82031 STUCK: stage=events[pause-menu] idle=12418 ms sp=0 sb=12820 pause=3 seq=1175 seqage=12163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+82034 td m: nat=java/lang/Math.abs age=12452
+82035 td t2: run nat=java/lang/Thread.sleep age=11914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+82036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+83031 STUCK: stage=events[pause-menu] idle=13418 ms sp=0 sb=7628 pause=3 seq=1175 seqage=13163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+83034 td m: nat=java/lang/Math.abs age=13452
+83035 td t2: run nat=java/lang/Thread.sleep age=12914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+83037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+84031 STUCK: stage=events[pause-menu] idle=14418 ms sp=0 sb=12396 pause=3 seq=1175 seqage=14163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+84033 td m: nat=java/lang/Math.abs age=14452
+84034 td t2: run nat=java/lang/Thread.sleep age=13914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+84036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+85031 STUCK: stage=events[pause-menu] idle=15418 ms sp=0 sb=8088 pause=3 seq=1175 seqage=15163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+85033 td m: nat=java/lang/Math.abs age=15452
+85034 td t2: run nat=java/lang/Thread.sleep age=14914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+85036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+86031 STUCK: stage=events[pause-menu] idle=16418 ms sp=0 sb=12856 pause=3 seq=1175 seqage=16163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+86034 td m: nat=java/lang/Math.abs age=16452
+86035 td t2: run nat=java/lang/Thread.sleep age=15914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+86036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+87031 STUCK: stage=events[pause-menu] idle=17418 ms sp=0 sb=7664 pause=3 seq=1175 seqage=17163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+87034 td m: nat=java/lang/Math.abs age=17452
+87035 td t2: run nat=java/lang/Thread.sleep age=16914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+87036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+88031 STUCK: stage=events[pause-menu] idle=18418 ms sp=0 sb=12432 pause=3 seq=1175 seqage=18163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+88034 td m: nat=java/lang/Math.abs age=18453
+88035 td t2: run nat=java/lang/Thread.sleep age=17915 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+88037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+89031 STUCK: stage=events[pause-menu] idle=19418 ms sp=0 sb=8124 pause=3 seq=1175 seqage=19163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+89034 td m: nat=java/lang/Math.abs age=19452
+89035 td t2: run nat=java/lang/Thread.sleep age=18914 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+89036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+90031 STUCK: stage=events idle=20418 ms sp=0 sb=12892 pause=0 seq=1175 seqage=20163 ms m3g=0x0 bn=0 bd=0 last=pause: open
+90034 td m: nat=java/lang/Math.abs age=20452
+90035 td t2: run nat=java/lang/System.currentTimeMillis age=61 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+90036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+91031 STUCK: stage=events idle=21418 ms sp=0 sb=8584 pause=0 seq=1177 seqage=295 ms m3g=0x0 bn=0 bd=0 last=pause: open
+91033 td m: nat=java/lang/Math.abs age=21452
+91034 td t2: run nat=java/lang/System.currentTimeMillis age=46 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+91036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+92031 STUCK: stage=events idle=22418 ms sp=0 sb=4276 pause=0 seq=1179 seqage=281 ms m3g=0x0 bn=0 bd=0 last=pause: open
+92034 td m: nat=java/lang/Math.abs age=22452
+92035 td t2: run nat=java/lang/System.currentTimeMillis age=30 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+92036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+93031 STUCK: stage=events idle=23418 ms sp=0 sb=10812 pause=0 seq=1181 seqage=265 ms m3g=0x0 bn=0 bd=0 last=pause: open
+93033 td m: nat=java/lang/Math.abs age=23452
+93034 td t2: run nat=java/lang/System.currentTimeMillis age=15 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+93036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+94031 STUCK: stage=events idle=24418 ms sp=0 sb=5620 pause=0 seq=1183 seqage=249 ms m3g=0x0 bn=0 bd=0 last=pause: open
+94033 td m: nat=java/lang/Math.abs age=24452
+94034 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+94036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+95031 STUCK: stage=events[pause-menu] idle=25418 ms sp=0 sb=11272 pause=3 seq=1185 seqage=235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+95034 td m: nat=java/lang/Math.abs age=25452
+95035 td t2: run nat=java/lang/Math.abs age=237 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+95036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+96031 STUCK: stage=events[pause-menu] idle=26418 ms sp=0 sb=6964 pause=3 seq=1185 seqage=1235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+96033 td m: nat=java/lang/Math.abs age=26452
+96035 td t2: run nat=java/lang/Thread.sleep age=987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+96036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+97030 STUCK: stage=events[pause-menu] idle=27417 ms sp=0 sb=10848 pause=3 seq=1185 seqage=2234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+97033 td m: nat=java/lang/Math.abs age=27452
+97034 td t2: run nat=java/lang/Thread.sleep age=1987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+97035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+98031 STUCK: stage=events[pause-menu] idle=28418 ms sp=0 sb=7424 pause=3 seq=1185 seqage=3235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+98033 td m: nat=java/lang/Math.abs age=28452
+98034 td t2: run nat=java/lang/Thread.sleep age=2987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+98037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+99031 STUCK: stage=events[pause-menu] idle=29418 ms sp=0 sb=11308 pause=3 seq=1185 seqage=4235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+99033 td m: nat=java/lang/Math.abs age=29452
+99035 td t2: run nat=java/lang/Thread.sleep age=3987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+99037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+100031 STUCK: stage=events[pause-menu] idle=30418 ms sp=0 sb=7000 pause=3 seq=1185 seqage=5235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+100033 td m: nat=java/lang/Math.abs age=30452
+100035 td t2: run nat=java/lang/Thread.sleep age=4987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+100036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+101031 STUCK: stage=events[pause-menu] idle=31418 ms sp=0 sb=12652 pause=3 seq=1185 seqage=6235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+101034 td m: nat=java/lang/Math.abs age=31453
+101036 td t2: run nat=java/lang/Thread.sleep age=5988 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+101037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+102031 STUCK: stage=events[pause-menu] idle=32418 ms sp=0 sb=8344 pause=3 seq=1185 seqage=7235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+102033 td m: nat=java/lang/Math.abs age=32452
+102035 td t2: run nat=java/lang/Thread.sleep age=6987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+102036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+103031 STUCK: stage=events[pause-menu] idle=33418 ms sp=0 sb=13112 pause=3 seq=1185 seqage=8234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+103033 td m: nat=java/lang/Math.abs age=33452
+103035 td t2: run nat=java/lang/Thread.sleep age=7987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+103036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+104031 STUCK: stage=events[pause-menu] idle=34418 ms sp=0 sb=8804 pause=3 seq=1185 seqage=9234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+104034 td m: nat=java/lang/Math.abs age=34452
+104035 td t2: run nat=java/lang/Thread.sleep age=8987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+104036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+105031 STUCK: stage=events[pause-menu] idle=35418 ms sp=0 sb=4496 pause=3 seq=1185 seqage=10235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+105034 td m: nat=java/lang/Math.abs age=35452
+105035 td t2: run nat=java/lang/Thread.sleep age=9987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+105036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+106031 STUCK: stage=events[pause-menu] idle=36418 ms sp=0 sb=11032 pause=3 seq=1185 seqage=11234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+106033 td m: nat=java/lang/Math.abs age=36452
+106034 td t2: run nat=java/lang/Thread.sleep age=10987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+106036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+107031 STUCK: stage=events[pause-menu] idle=37418 ms sp=0 sb=13148 pause=3 seq=1185 seqage=12234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+107034 td m: nat=java/lang/Math.abs age=37453
+107035 td t2: run nat=java/lang/Thread.sleep age=11988 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+107036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+108031 STUCK: stage=events[pause-menu] idle=38418 ms sp=0 sb=8840 pause=3 seq=1185 seqage=13234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+108034 td m: nat=java/lang/Math.abs age=38452
+108035 td t2: run nat=java/lang/Thread.sleep age=12987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+108036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+109031 STUCK: stage=events[pause-menu] idle=39418 ms sp=0 sb=5416 pause=3 seq=1185 seqage=14235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+109034 td m: nat=java/lang/Math.abs age=39452
+109035 td t2: run nat=java/lang/Thread.sleep age=13987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+109036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+110031 STUCK: stage=events[pause-menu] idle=40418 ms sp=0 sb=11068 pause=3 seq=1185 seqage=15234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+110033 td m: nat=java/lang/Math.abs age=40452
+110034 td t2: run nat=java/lang/Thread.sleep age=14987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+110035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+111031 STUCK: stage=events[pause-menu] idle=41418 ms sp=0 sb=4992 pause=3 seq=1185 seqage=16234 ms m3g=0x0 bn=0 bd=0 last=pause: open
+111062 td m: nat=java/lang/Math.abs age=41480
+111063 td t2: run nat=java/lang/Thread.sleep age=16015 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+111064 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+112031 STUCK: stage=events[pause-menu] idle=42418 ms sp=0 sb=11528 pause=3 seq=1185 seqage=17235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+112033 td m: nat=java/lang/Math.abs age=42452
+112035 td t2: run nat=java/lang/Thread.sleep age=16987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+112036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+113031 STUCK: stage=events[pause-menu] idle=43418 ms sp=0 sb=6336 pause=3 seq=1185 seqage=18235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+113033 td m: nat=java/lang/Math.abs age=43452
+113034 td t2: run nat=java/lang/Thread.sleep age=17987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+113035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+114031 STUCK: stage=events[pause-menu] idle=44418 ms sp=0 sb=12872 pause=3 seq=1185 seqage=19235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+114033 td m: nat=java/lang/Math.abs age=44452
+114035 td t2: run nat=java/lang/Thread.sleep age=18987 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+114036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+115031 STUCK: stage=events idle=45418 ms sp=0 sb=7680 pause=0 seq=1185 seqage=20235 ms m3g=0x0 bn=0 bd=0 last=pause: open
+115033 td m: nat=java/lang/Math.abs age=45452
+115034 td t2: run nat=java/lang/System.currentTimeMillis age=59 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+115036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+116031 STUCK: stage=events idle=46418 ms sp=0 sb=12448 pause=0 seq=1187 seqage=294 ms m3g=0x0 bn=0 bd=0 last=pause: open
+116033 td m: nat=java/lang/Math.abs age=46452
+116034 td t2: run nat=java/lang/System.currentTimeMillis age=43 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+116035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+117031 STUCK: stage=events idle=47418 ms sp=0 sb=7256 pause=0 seq=1189 seqage=278 ms m3g=0x0 bn=0 bd=0 last=pause: open
+117033 td m: nat=java/lang/Math.abs age=47451
+117034 td t2: run nat=java/lang/System.currentTimeMillis age=27 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+117035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+118031 STUCK: stage=events idle=48418 ms sp=0 sb=12908 pause=0 seq=1191 seqage=263 ms m3g=0x0 bn=0 bd=0 last=pause: open
+118034 td m: nat=java/lang/Math.abs age=48452
+118035 td t2: run nat=java/lang/System.currentTimeMillis age=13 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+118036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+118522 [KEYIN] SDL joy down btn=13 which=0
+118932 [KEYIN] SDL joy down btn=13 which=0
+119031 STUCK: stage=events idle=49418 ms sp=0 sb=8600 pause=0 seq=1193 seqage=248 ms m3g=0x0 bn=0 bd=0 last=[KEYIN] SDL joy down btn
+119033 td m: nat=java/lang/Math.abs age=49452
+119034 td t2: run nat=java/lang/Math.abs age=250 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+119035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+119767 [KEYIN] SDL joy down btn=10 which=0
+119768 pause: pgset
+119770 pgset: open Yeti Sports (00.02.51)[240x320].jar
+120031 STUCK: stage=events[pause-menu] idle=50418 ms sp=0 sb=12484 pause=3 seq=1195 seqage=232 ms m3g=0x0 bn=0 bd=0 last=pgset: open Yeti Sports 
+120033 td m: nat=java/lang/Math.abs age=50452
+120034 td t2: run nat=java/lang/Math.abs age=235 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+120035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+121031 STUCK: stage=events[pause-menu] idle=51418 ms sp=0 sb=9060 pause=3 seq=1195 seqage=1233 ms m3g=0x0 bn=0 bd=0 last=pgset: open Yeti Sports 
+121034 td m: nat=java/lang/Math.abs age=51453
+121035 td t2: run nat=java/lang/Thread.sleep age=985 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+121037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+121174 [KEYIN] SDL joy down btn=11 which=0
+121177 settings: save
+121185 lang: English
+121749 [KEYIN] SDL joy down btn=1 which=0
+121752 pgset: close
+122031 STUCK: stage=events[pause-menu] idle=52418 ms sp=0 sb=4752 pause=3 seq=1195 seqage=2233 ms m3g=0x0 bn=0 bd=0 last=pgset: close
+122033 td m: nat=java/lang/Math.abs age=52452
+122034 td t2: run nat=java/lang/Thread.sleep age=1984 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+122036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+122202 [KEYIN] SDL joy down btn=1 which=0
+122204 pause: close
+122213 diag: loop=33 pr=33 stl=52588 vs=33 gc=0 heap=2791376 top=2715960 skip=19 pump=2875 sr=0 fl=14 sb=12884 bn=0 bd=0 tn=1 ta=0/t2 tw=0 ma=0 pv=360 pk=16 pw=18 mx=52601 pp=53 psk=0 cs=0 lvc=14 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=2 chf=0 chg=0 chb=2
+122396 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 1ms
+122710 [KEYIN] SDL joy down btn=1 which=0
+122713 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+122714 [KEYIN] soft press 1 -> keyPressed(-7) to game
+122727 [KEYQ-SOFT] keyPressed(-7) via game-thread drain, waited 12ms
+122894 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 17ms
+123031 td m: nat=javax/microedition/lcdui/Graphics.drawImage age=0
+123033 td t2: run nat=java/lang/System.currentTimeMillis age=21 stm=460810/460810/460810 r=464364
+123035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+123094 [KEYIN] SDL joy down btn=1 which=0
+123097 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+123099 [KEYIN] soft press 1 -> keyPressed(-7) to game
+123100 [KEYQ-SOFT] keyPressed(-7) via game-thread drain, waited 0ms
+123277 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 0ms
+123627 [KEYIN] SDL joy down btn=0 which=0
+123629 [KEYIN] dispatch btn=0 -> key=53 midp=53
+124011 [KEYIN] SDL joy down btn=0 which=0
+124014 [KEYIN] dispatch btn=0 -> key=53 midp=53
+124031 td m: nat=java/lang/String.charAt age=0
+124033 td t2: run nat=java/lang/System.currentTimeMillis age=11 stm=460810/460810/460810 r=464364
+124036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+124037 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+124278 [KEYIN] SDL joy down btn=0 which=0
+124280 [KEYIN] dispatch btn=0 -> key=53 midp=53
+125031 td m: nat=java/lang/Math.abs age=32
+125033 td t2: run nat=java/lang/System.currentTimeMillis age=3 stm=460810/460810/460810 r=464364
+125034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+126031 td m: nat=java/lang/Math.abs age=30
+126033 td t2: run nat=java/lang/Thread.sleep age=18 stm=460810/460810/460810 r=464364
+126035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+126036 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+127031 td m: nat=java/lang/Math.abs age=16
+127034 td t2: run nat=java/lang/Thread.sleep age=4 stm=460810/460810/460810 r=464364
+127035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+127231 diag: loop=301 pr=301 stl=42 vs=301 gc=0 heap=2990200 top=2962592 skip=182 pump=301 sr=0 fl=119 sb=13032 bn=0 bd=0 tn=1 ta=20/t2 tw=0 ma=0 pv=3455 pk=17 pw=19 mx=20 pp=297 psk=0 cs=0 lvc=64 dset=0 gms=0 gxm=0 tj=0 rj=7 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+128031 td m: nat=java/lang/Math.abs age=14
+128033 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+128034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+128036 alive: diag: loop=301 pr=301 stl=42 vs=301 gc=0 heap=2990200 top=2962592 skip=182 pump=301 sr=0 fl=119 sb=1
+129031 td m: nat=javax/microedition/lcdui/Graphics.getClipY age=0
+129034 td t2: run nat=java/lang/System.currentTimeMillis age=14 stm=460810/460810/460810 r=464364
+129035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+130031 td m: nat=java/lang/StringBuffer.append age=0
+130034 td t2: run nat=java/lang/System.currentTimeMillis age=5 stm=460810/460810/460810 r=464364
+130036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+130038 alive: diag: loop=301 pr=301 stl=42 vs=301 gc=0 heap=2990200 top=2962592 skip=182 pump=301 sr=0 fl=119 sb=1
+131031 td m: nat=java/lang/Math.abs age=32
+131033 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+131035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+132031 td m: nat=java/lang/Math.abs age=15
+132033 td t2: run nat=java/lang/Thread.sleep age=4 stm=460810/460810/460810 r=464364
+132035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+132037 alive: diag: loop=301 pr=301 stl=42 vs=301 gc=0 heap=2990200 top=2962592 skip=182 pump=301 sr=0 fl=119 sb=1
+132248 diag: loop=301 pr=301 stl=46 vs=301 gc=0 heap=3185080 top=3168840 skip=181 pump=301 sr=0 fl=120 sb=4988 bn=0 bd=0 tn=1 ta=37/t2 tw=0 ma=0 pv=3483 pk=18 pw=20 mx=21 pp=299 psk=0 cs=0 lvc=15 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+133031 td m: nat=java/lang/Math.abs age=16
+133033 td t2: run nat=java/lang/Thread.sleep age=4 stm=460810/460810/460810 r=464364
+133034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+134031 td m: nat=javax/microedition/lcdui/Graphics.setClip age=0
+134033 td t2: run nat=java/lang/System.currentTimeMillis age=13 stm=460810/460810/460810 r=464364
+134035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+134037 alive: diag: loop=301 pr=301 stl=46 vs=301 gc=0 heap=3185080 top=3168840 skip=181 pump=301 sr=0 fl=120 sb=4
+135031 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+135033 td t2: run nat=java/lang/System.currentTimeMillis age=6 stm=460810/460810/460810 r=464364
+135035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+136031 td m: nat=java/lang/Math.abs age=30
+136033 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+136035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+136036 alive: diag: loop=301 pr=301 stl=46 vs=301 gc=0 heap=3185080 top=3168840 skip=181 pump=301 sr=0 fl=120 sb=4
+137031 td m: nat=java/lang/Math.abs age=15
+137033 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+137035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+137248 diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3378336 top=3375088 skip=181 pump=300 sr=0 fl=119 sb=11560 bn=0 bd=0 tn=1 ta=37/t2 tw=0 ma=0 pv=3472 pk=17 pw=19 mx=21 pp=294 psk=0 cs=0 lvc=19 dset=0 gms=0 gxm=0 tj=0 rj=6 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+138031 td m: nat=java/lang/Math.abs age=14
+138033 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+138034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+138036 alive: diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3378336 top=3375088 skip=181 pump=300 sr=0 fl=119 sb=1
+139031 td m: nat=java/lang/String.charAt age=0
+139034 td t2: run nat=java/lang/System.currentTimeMillis age=14 stm=460810/460810/460810 r=464364
+139035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+140031 td m: nat=java/lang/Math.abs age=30
+140033 td t2: run nat=java/lang/System.currentTimeMillis age=3 stm=460810/460810/460810 r=464364
+140034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+140036 alive: diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3378336 top=3375088 skip=181 pump=300 sr=0 fl=119 sb=1
+141031 td m: nat=java/lang/Math.abs age=16
+141033 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+141035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+142031 td m: nat=java/lang/Math.abs age=15
+142033 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+142035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+142036 alive: diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3378336 top=3375088 skip=181 pump=300 sr=0 fl=119 sb=1
+142248 diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3571592 top=3539112 skip=181 pump=300 sr=0 fl=119 sb=8172 bn=0 bd=0 tn=1 ta=33/t2 tw=0 ma=0 pv=3466 pk=17 pw=20 mx=21 pp=294 psk=0 cs=0 lvc=17 dset=0 gms=0 gxm=0 tj=0 rj=6 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+143031 td m: nat=java/lang/String.charAt age=0
+143033 td t2: run nat=java/lang/System.currentTimeMillis age=17 stm=460810/460810/460810 r=464364
+143035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+144031 td m: nat=java/lang/StringBuffer.toString age=0
+144033 td t2: run nat=java/lang/System.currentTimeMillis age=7 stm=460810/460810/460810 r=464364
+144035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+144036 alive: diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3571592 top=3539112 skip=181 pump=300 sr=0 fl=119 sb=8
+145031 td m: nat=java/lang/Math.abs age=32
+145033 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+145034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+146031 td m: nat=java/lang/Math.abs age=14
+146033 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+146034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+146035 alive: diag: loop=300 pr=300 stl=44 vs=300 gc=0 heap=3571592 top=3539112 skip=181 pump=300 sr=0 fl=119 sb=8
+147031 td m: nat=java/lang/Math.abs age=15
+147033 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+147034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+147265 diag: loop=301 pr=301 stl=45 vs=301 gc=0 heap=3764848 top=3745360 skip=182 pump=301 sr=0 fl=119 sb=9204 bn=0 bd=0 tn=1 ta=4/t2 tw=0 ma=0 pv=3469 pk=17 pw=20 mx=21 pp=299 psk=0 cs=0 lvc=27 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+148031 td m: nat=java/lang/String.charAt
+148033 alive: diag: loop=301 pr=301 stl=45 vs=301 gc=0 heap=3764848 top=3745360 skip=182 pump=301 sr=0 fl=119 sb=9
+149031 td m: nat=java/lang/String.length age=0
+149033 td t2: run nat=java/lang/System.currentTimeMillis age=5 stm=460810/460810/460810 r=464364
+149035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+150031 td m: nat=java/lang/Math.abs age=31
+150033 td t2: run nat=java/lang/Thread.sleep age=19 stm=460810/460810/460810 r=464364
+150035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+150036 alive: diag: loop=301 pr=301 stl=45 vs=301 gc=0 heap=3764848 top=3745360 skip=182 pump=301 sr=0 fl=119 sb=9
+151031 td m: nat=java/lang/Math.abs age=16
+151034 td t2: run nat=java/lang/Thread.sleep age=3 stm=460810/460810/460810 r=464364
+151035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+152031 td m: nat=java/lang/Math.abs age=15
+152033 td t2: run nat=java/lang/Thread.sleep age=4 stm=460810/460810/460810 r=464364
+152034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+152035 alive: diag: loop=301 pr=301 stl=45 vs=301 gc=0 heap=3764848 top=3745360 skip=182 pump=301 sr=0 fl=119 sb=9
+152267 diag: loop=300 pr=300 stl=47 vs=300 gc=0 heap=3959728 top=3953232 skip=180 pump=300 sr=0 fl=120 sb=6700 bn=0 bd=0 tn=1 ta=5/t2 tw=0 ma=0 pv=3456 pk=16 pw=22 mx=23 pp=294 psk=0 cs=0 lvc=53 dset=0 gms=0 gxm=0 tj=0 rj=6 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+153031 td m: nat=java/lang/String.length age=0
+153033 td t2: run nat=java/lang/System.currentTimeMillis age=11 stm=460810/460810/460810 r=464364
+153034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+154031 td m: nat=java/lang/Math.abs age=30
+154033 td t2: run nat=java/lang/System.currentTimeMillis age=3 stm=460810/460810/460810 r=464364
+154034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+154036 alive: diag: loop=300 pr=300 stl=47 vs=300 gc=0 heap=3959728 top=3953232 skip=180 pump=300 sr=0 fl=120 sb=6
+155031 td m: nat=java/lang/Math.abs age=33
+155033 td t2: run nat=java/lang/Thread.sleep age=20 stm=460810/460810/460810 r=464364
+155034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+156031 td m: nat=java/lang/Math.abs age=14
+156033 td t2: run nat=java/lang/Thread.sleep age=2 stm=460810/460810/460810 r=464364
+156034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+156035 alive: diag: loop=300 pr=300 stl=47 vs=300 gc=0 heap=3959728 top=3953232 skip=180 pump=300 sr=0 fl=120 sb=6
+157031 td m: nat=java/lang/String.charAt age=0
+157034 td t2: run nat=java/lang/System.currentTimeMillis age=19 stm=460810/460810/460810 r=464364
+157035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+157267 diag: loop=300 pr=300 stl=45 vs=300 gc=0 heap=4152984 top=4118880 skip=181 pump=300 sr=0 fl=119 sb=12388 bn=0 bd=0 tn=1 ta=3/t2 tw=0 ma=0 pv=3459 pk=16 pw=23 mx=23 pp=295 psk=0 cs=0 lvc=39 dset=0 gms=0 gxm=0 tj=0 rj=6 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+157345 [KEYIN] SDL joy down btn=10 which=0
+157347 pause: open
+158031 td m: nat=java/lang/Math.abs age=715
+158033 td t2: run nat=java/lang/Thread.sleep age=177 why=fe-pause stm=460810/460810/460810 r=464364
+158034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+158035 alive: pause: open
+159031 td m: nat=java/lang/Math.abs age=1715
+159033 td t2: run nat=java/lang/Thread.sleep age=1177 why=fe-pause stm=460810/460810/460810 r=464364
+159035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+160031 td m: nat=java/lang/Math.abs age=2714
+160033 td t2: run nat=java/lang/Thread.sleep age=2176 why=fe-pause stm=460810/460810/460810 r=464364
+160034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+160035 alive: pause: open
+161031 td m: nat=java/lang/Math.abs age=3715
+161033 td t2: run nat=java/lang/Thread.sleep age=3177 why=fe-pause stm=460810/460810/460810 r=464364
+161034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+162031 td m: nat=java/lang/Math.abs age=4714
+162033 td t2: run nat=java/lang/Thread.sleep age=4176 why=fe-pause stm=460810/460810/460810 r=464364
+162034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+162035 alive: pause: open
+163031 STUCK: stage=events[pause-menu] idle=5687 ms sp=0 sb=12296 pause=3 seq=2033 seqage=5427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+163033 td m: nat=java/lang/Math.abs age=5717
+163034 td t2: run nat=java/lang/Thread.sleep age=5179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+163035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+164031 STUCK: stage=events[pause-menu] idle=6687 ms sp=0 sb=9756 pause=3 seq=2033 seqage=6427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+164033 td m: nat=java/lang/Math.abs age=6717
+164035 td t2: run nat=java/lang/Thread.sleep age=6179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+164039 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+165031 STUCK: stage=events[pause-menu] idle=7687 ms sp=0 sb=12756 pause=3 seq=2033 seqage=7427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+165033 td m: nat=java/lang/Math.abs age=7717
+165034 td t2: run nat=java/lang/Thread.sleep age=7179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+165036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+166031 STUCK: stage=events[pause-menu] idle=8687 ms sp=0 sb=8448 pause=3 seq=2033 seqage=8427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+166034 td m: nat=java/lang/Math.abs age=8717
+166035 td t2: run nat=java/lang/Thread.sleep age=8179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+166037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+167031 STUCK: stage=events[pause-menu] idle=9687 ms sp=0 sb=4140 pause=3 seq=2033 seqage=9427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+167033 td m: nat=java/lang/Math.abs age=9717
+167035 td t2: run nat=java/lang/Thread.sleep age=9179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+167036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+168031 STUCK: stage=events[pause-menu] idle=10687 ms sp=0 sb=9792 pause=3 seq=2033 seqage=10427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+168034 td m: nat=java/lang/Math.abs age=10717
+168035 td t2: run nat=java/lang/Thread.sleep age=10179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+168036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+169031 STUCK: stage=events[pause-menu] idle=11687 ms sp=0 sb=5484 pause=3 seq=2033 seqage=11426 ms m3g=0x0 bn=0 bd=0 last=pause: open
+169033 td m: nat=java/lang/Math.abs age=11717
+169034 td t2: run nat=java/lang/Thread.sleep age=11179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+169035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+170031 STUCK: stage=events[pause-menu] idle=12687 ms sp=0 sb=10252 pause=3 seq=2033 seqage=12426 ms m3g=0x0 bn=0 bd=0 last=pause: open
+170033 td m: nat=java/lang/Math.abs age=12717
+170034 td t2: run nat=java/lang/Thread.sleep age=12179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+170036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+171031 STUCK: stage=events[pause-menu] idle=13687 ms sp=0 sb=5060 pause=3 seq=2033 seqage=13427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+171033 td m: nat=java/lang/Math.abs age=13717
+171034 td t2: run nat=java/lang/Thread.sleep age=13179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+171036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+172031 STUCK: stage=events[pause-menu] idle=14687 ms sp=0 sb=11596 pause=3 seq=2033 seqage=14427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+172033 td m: nat=java/lang/Math.abs age=14717
+172034 td t2: run nat=java/lang/Thread.sleep age=14179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+172036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+173031 STUCK: stage=events[pause-menu] idle=15687 ms sp=0 sb=7288 pause=3 seq=2033 seqage=15427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+173033 td m: nat=java/lang/Math.abs age=15717
+173034 td t2: run nat=java/lang/Thread.sleep age=15179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+173036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+174031 STUCK: stage=events[pause-menu] idle=16687 ms sp=0 sb=12940 pause=3 seq=2033 seqage=16427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+174033 td m: nat=java/lang/Math.abs age=16717
+174036 td t2: run nat=java/lang/Thread.sleep age=16179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+174037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+175031 STUCK: stage=events[pause-menu] idle=17687 ms sp=0 sb=6864 pause=3 seq=2033 seqage=17426 ms m3g=0x0 bn=0 bd=0 last=pause: open
+175034 td m: nat=java/lang/Math.abs age=17717
+175036 td t2: run nat=java/lang/Thread.sleep age=17179 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+175037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+176031 STUCK: stage=events[pause-menu] idle=18687 ms sp=0 sb=11632 pause=3 seq=2033 seqage=18426 ms m3g=0x0 bn=0 bd=0 last=pause: open
+176034 td m: nat=java/lang/Math.abs age=18718
+176035 td t2: run nat=java/lang/Thread.sleep age=18180 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+176037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+177031 STUCK: stage=events[pause-menu] idle=19687 ms sp=0 sb=8208 pause=3 seq=2033 seqage=19427 ms m3g=0x0 bn=0 bd=0 last=pause: open
+177035 td m: nat=java/lang/Math.abs age=19719
+177037 td t2: run nat=java/lang/Thread.sleep age=19181 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+177038 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+178031 STUCK: stage=events idle=20687 ms sp=0 sb=12976 pause=0 seq=2034 seqage=98 ms m3g=0x0 bn=0 bd=0 last=pause: open
+178034 td m: nat=java/lang/Math.abs age=20717
+178035 td t2: run nat=java/lang/Math.abs age=100 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+178037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+179031 STUCK: stage=events idle=21687 ms sp=0 sb=8668 pause=0 seq=2036 seqage=82 ms m3g=0x0 bn=0 bd=0 last=pause: open
+179034 td m: nat=java/lang/Math.abs age=21718
+179035 td t2: run nat=java/lang/Math.abs age=85 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+179037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+180031 STUCK: stage=events idle=22687 ms sp=0 sb=12552 pause=0 seq=2038 seqage=66 ms m3g=0x0 bn=0 bd=0 last=pause: open
+180033 td m: nat=java/lang/Math.abs age=22717
+180035 td t2: run nat=java/lang/Math.abs age=68 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+180036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+181031 STUCK: stage=events idle=23687 ms sp=0 sb=8244 pause=0 seq=2040 seqage=49 ms m3g=0x0 bn=0 bd=0 last=pause: open
+181034 td m: nat=java/lang/Math.abs age=23717
+181035 td t2: run nat=java/lang/Math.abs age=52 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+181037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+182031 STUCK: stage=events idle=24687 ms sp=0 sb=5704 pause=0 seq=2042 seqage=33 ms m3g=0x0 bn=0 bd=0 last=pause: open
+182034 td m: nat=java/lang/Math.abs age=24718
+182035 td t2: run nat=java/lang/Math.abs age=36 stm=460810/460810/460810 r=464364 | o.d@12 | o.m@12
+182037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+182687 [KEYIN] SDL joy down btn=15 which=0
+183031 STUCK: stage=events[pause-menu] idle=25687 ms sp=0 sb=10472 pause=3 seq=2043 seqage=525 ms m3g=0x0 bn=0 bd=0 last=[KEYIN] SDL joy down btn
+183033 td m: nat=java/lang/Math.abs age=25717
+183034 td t2: run nat=java/lang/Thread.sleep age=276 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+183036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+183041 [KEYIN] SDL joy down btn=0 which=0
+183042 pause: pgset
+183044 pgset: open Yeti Sports (00.02.51)[240x320].jar
+183680 [KEYIN] SDL joy down btn=15 which=0
+183864 [KEYIN] SDL joy down btn=15 which=0
+184031 STUCK: stage=events[pause-menu] idle=26687 ms sp=0 sb=4396 pause=3 seq=2043 seqage=1525 ms m3g=0x0 bn=0 bd=0 last=[KEYIN] SDL joy down btn
+184034 td m: nat=java/lang/Math.abs age=26717
+184038 td t2: run nat=java/lang/Thread.sleep age=1276 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+184040 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+184072 [KEYIN] SDL joy down btn=0 which=0
+184416 [KEYIN] SDL joy down btn=0 which=0
+184480 [KEYIN] SDL joy down btn=1 which=0
+184483 pgset: close
+184898 [KEYIN] SDL joy down btn=3 which=0
+184937 [KEYIN] SDL joy down btn=2 which=0
+185031 STUCK: stage=events[pause-menu] idle=27687 ms sp=0 sb=10932 pause=3 seq=2043 seqage=2525 ms m3g=0x0 bn=0 bd=0 last=[KEYIN] SDL joy down btn
+185033 td m: nat=java/lang/Math.abs age=27717
+185035 td t2: run nat=java/lang/Thread.sleep age=2276 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+185036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+186031 STUCK: stage=events[pause-menu] idle=28687 ms sp=0 sb=5740 pause=3 seq=2043 seqage=3525 ms m3g=0x0 bn=0 bd=0 last=[KEYIN] SDL joy down btn
+186034 td m: nat=java/lang/Math.abs age=28717
+186035 td t2: run nat=java/lang/Thread.sleep age=3276 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+186036 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+186621 [KEYIN] SDL joy down btn=10 which=0
+186625 pause: pgset
+186630 pgset: open Yeti Sports (00.02.51)[240x320].jar
+187031 STUCK: stage=events[pause-menu] idle=29687 ms sp=0 sb=11392 pause=3 seq=2043 seqage=4525 ms m3g=0x0 bn=0 bd=0 last=pgset: open Yeti Sports 
+187034 td m: nat=java/lang/Math.abs age=29718
+187035 td t2: run nat=java/lang/Thread.sleep age=4277 why=fe-pause stm=460810/460810/460810 r=464364 | o.b@4 | o.m@71
+187037 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+187392 [KEYIN] SDL joy down btn=1 which=0
+187395 pgset: close
+187784 [KEYIN] SDL joy down btn=1 which=0
+187786 pause: close
+187796 diag: loop=6 pr=6 stl=30434 vs=6 gc=0 heap=4174096 top=4118880 skip=3 pump=1652 sr=0 fl=3 sb=5612 bn=0 bd=0 tn=1 ta=5039/t2 tw=0 ma=0 pv=45 pk=13 pw=15 mx=30451 pp=16 psk=0 cs=0 lvc=2 dset=0 gms=0 gxm=0 tj=0 rj=5 sj=0 utf=0 rcf=0 ch=1 chf=0 chg=0 chb=1
+187977 [KEYQ-SOFT] keyReleased(-7) via game-thread drain, waited 16ms
+188031 td m: nat=javax/microedition/lcdui/Font.getSize age=0
+188034 td t2: run nat=java/lang/System.currentTimeMillis age=21 stm=460810/460810/460810 r=464364
+188035 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+188327 [KEYIN] SDL joy down btn=1 which=0
+188330 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+188331 [KEYIN] soft press 1 -> keyPressed(-7) to game
+188361 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 28ms
+188527 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+188727 [KEYIN] SDL joy down btn=13 which=0
+188730 [KEYIN] dispatch btn=13 -> key=1073741906 midp=-1
+188994 [KEYIN] SDL joy down btn=10 which=0
+188996 pause: open
+189031 td m: nat=java/lang/Math.abs age=82
+189033 td t2: run nat=java/lang/System.currentTimeMillis age=53 stm=460810/460810/460810 r=464364
+189034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+189036 alive: pause: open
+189639 [KEYIN] SDL joy down btn=13 which=0
+189955 [KEYIN] SDL joy down btn=0 which=0
+190009 pause: close
+190011 [VM-THREAD-DEATH] 'Thread-2' (pthread): run() returned
+190030 game: session end
+190038 mem-T0: arena=261928K uord=248438K ford=13489K
+190045 mem-T1: arena=261928K uord=248434K ford=13493K
+190196 session-reset: settled frame cleared (was seq 2074)
+190223 mem-T2: arena=260816K uord=155905K ford=104910K
+190230 mem-T3: arena=260816K uord=155406K ford=105409K
+190235 mem: sess=1 arena=260816K uord=155406K ford=105409K leakv=0 rss=-1K os_threads=-1
+190237 menu: session start
+191031 alive: menu: session start
+191068 [KEYIN] SDL joy down btn=15 which=0
+192418 [KEYIN] SDL joy down btn=13 which=0
+193031 alive: [KEYIN] SDL joy down btn=13 which=0
+195031 alive: [KEYIN] SDL joy down btn=13 which=0
+197031 alive: [KEYIN] SDL joy down btn=13 which=0
+198989 [KEYIN] SDL joy down btn=0 which=0
+198991 browse: root
+198993 scan: sdmc:/switch/j2me/games
+199005 scan: sdmc:/switch/j2me/games -> 9 entries (2 ms)
+199031 alive: scan: sdmc:/switch/j2me/games -> 9 entries (2 ms)
+199484 [KEYIN] SDL joy down btn=13 which=0
+199913 [KEYIN] SDL joy down btn=0 which=0
+199915 game: sdmc:/switch/j2me/games/Yeti Sports (00.02.51)[240x320].jar
+199916 menu: session end (1)
+199919 jar: peek
+199929 init: jvm_create
+199930 init: jvm_init
+199931 init: heap FAILED — 65792 KB unavailable (process OOM)
+199932 init: heap FAILED (65536 KB + reserve, max 98304 KB)
+199933 init: heap retry at 32 MB
+199940 init: heap OK at 32 MB (reduced)
+199946 init: sdl_init
+199948 game: begin 240x320 build=v36.46-yetifix3-2026-09-29
+199951 init: native_init
+199956 init: midp_init
+199957 init: opcodes_init
+199958 audio: open 44100 Hz stereo
+199963 jar: load
+199974 jar: manifest
+199976 class: find
+199978 class: load yetisports/YetiSports
+199979 midlet: start
+199985 [KEYIN] dispatch btn=0 -> key=53 midp=53
+199989 [PRESENT-MODE] renderer=opengles2 scale=2 filter=1 rot=0 s2x=0 rect=370,0 540x720 canvas=240x320
+199990 keyhint: shown (8s or until first game key)
+200031 td m: nat=java/lang/Math.abs age=43
+200033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+200794 [KEYIN] SDL joy down btn=0 which=0
+200798 [KEYIN] dispatch btn=0 -> key=53 midp=53
+201031 td m: nat=java/lang/Math.abs age=1043
+201034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+201035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+201227 [KEYIN] SDL joy down btn=0 which=0
+201230 [KEYIN] dispatch btn=0 -> key=53 midp=53
+202031 td m: nat=java/lang/Math.abs age=2042
+202033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+202344 [KEYIN] SDL joy down btn=0 which=0
+202346 [KEYIN] dispatch btn=0 -> key=53 midp=53
+203031 td m: nat=java/lang/Math.abs age=3043
+203034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+203035 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+203577 [KEYIN] SDL joy down btn=1 which=0
+203580 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+203581 [KEYIN] soft press 1 -> keyPressed(-7) to game
+203610 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 28ms
+203760 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+204031 td m: nat=java/lang/Math.abs age=4043
+204033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+204110 [KEYIN] SDL joy down btn=2 which=0
+204113 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+204115 [KEYIN] soft press 0 -> keyPressed(-6) to game
+204127 [KEYIN] SDL joy down btn=3 which=0
+204129 [KEYIN] dispatch btn=3 -> key=99 midp=-8
+204144 [KEYQ-SOFT] keyPressed(-6) via fallback pump, waited 28ms
+204444 [KEYQ-SOFT] keyReleased(-6) via fallback pump, waited 33ms
+205015 diag: loop=301 pr=301 stl=109 vs=301 gc=0 heap=13376 top=13376 skip=300 pump=2185 sr=0 fl=1 sb=8988 bn=0 bd=0 tn=0 ta=-1/t-1 tw=0 ma=0 pv=4139 pk=31 pw=33 mx=33 pp=352 psk=0 cs=0 lvc=1 dset=0 gms=0 gxm=0 tj=2 rj=1 sj=0 utf=0 rcf=0 ch=2 chf=0 chg=2 chb=1
+205028 [KEYIN] SDL joy down btn=10 which=0
+205030 pause: open
+205031 td m: nat=java/lang/Math.abs age=5042
+205032 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+205033 alive: pause: open
+205963 [KEYIN] SDL joy down btn=0 which=0
+205965 pause: close
+206031 td m: nat=java/lang/Math.abs age=6043
+206033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+206427 [KEYIN] SDL joy down btn=0 which=0
+206429 [KEYIN] dispatch btn=0 -> key=53 midp=53
+206627 [KEYIN] SDL joy down btn=0 which=0
+206629 [KEYIN] dispatch btn=0 -> key=53 midp=53
+206810 [KEYIN] SDL joy down btn=0 which=0
+206813 [KEYIN] dispatch btn=0 -> key=53 midp=53
+207031 td m: nat=java/lang/Math.abs age=7043
+207034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+207036 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+207244 [KEYIN] SDL joy down btn=1 which=0
+207246 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+207248 [KEYIN] soft press 1 -> keyPressed(-7) to game
+207277 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 28ms
+207460 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+208031 td m: nat=java/lang/Math.abs age=8043
+208033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+208694 [KEYIN] SDL joy down btn=1 which=0
+208697 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+208698 [KEYIN] soft press 1 -> keyPressed(-7) to game
+208727 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 28ms
+208860 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+209031 td m: nat=java/lang/Math.abs age=9043
+209034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+209035 alive: [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+209094 [KEYIN] SDL joy down btn=10 which=0
+209096 pause: open
+209517 [KEYIN] SDL joy down btn=15 which=0
+209770 [KEYIN] SDL joy down btn=15 which=0
+210031 td m: nat=java/lang/Math.abs age=10042
+210034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+210068 [KEYIN] SDL joy down btn=0 which=0
+210070 pause: close
+210079 diag: loop=189 pr=189 stl=1986 vs=189 gc=0 heap=13376 top=13376 skip=189 pump=273 sr=0 fl=0 sb=9784 bn=0 bd=0 tn=0 ta=-1/t-1 tw=0 ma=0 pv=2562 pk=27 pw=29 mx=986 pp=171 psk=0 cs=0 lvc=0 dset=0 gms=0 gxm=0 tj=2 rj=0 sj=0 utf=0 rcf=0 ch=0 chf=0 chg=0 chb=0
+210081 game: session end
+210087 mem-T0: arena=259336K uord=203285K ford=56050K
+210093 mem-T1: arena=259336K uord=203285K ford=56050K
+210220 session-reset: settled frame cleared (was seq 1)
+210246 mem-T2: arena=259336K uord=166591K ford=92744K
+210252 mem-T3: arena=259336K uord=166093K ford=93242K
+210257 mem: sess=2 arena=259336K uord=166093K ford=93242K leakv=0 rss=-1K os_threads=-1
+210258 menu: session start
+211031 alive: menu: session start
+211334 [KEYIN] SDL joy down btn=15 which=0
+212137 [KEYIN] SDL joy down btn=0 which=0
+212140 settings: screen
+212740 [KEYIN] SDL joy down btn=13 which=0
+213031 alive: [KEYIN] SDL joy down btn=13 which=0
+213262 [KEYIN] SDL joy down btn=13 which=0
+213550 [KEYIN] SDL joy down btn=13 which=0
+214650 [KEYIN] SDL joy down btn=13 which=0
+214948 [KEYIN] SDL joy down btn=13 which=0
+215031 alive: [KEYIN] SDL joy down btn=13 which=0
+215494 [KEYIN] SDL joy down btn=13 which=0
+216659 [KEYIN] SDL joy down btn=13 which=0
+216896 [KEYIN] SDL joy down btn=13 which=0
+217031 alive: [KEYIN] SDL joy down btn=13 which=0
+217713 [KEYIN] SDL joy down btn=14 which=0
+219031 alive: [KEYIN] SDL joy down btn=14 which=0
+219119 [KEYIN] SDL joy down btn=14 which=0
+221031 alive: [KEYIN] SDL joy down btn=14 which=0
+221542 [KEYIN] SDL joy down btn=15 which=0
+221767 [KEYIN] SDL joy down btn=15 which=0
+221958 [KEYIN] SDL joy down btn=15 which=0
+222398 [KEYIN] SDL joy down btn=15 which=0
+222602 [KEYIN] SDL joy down btn=15 which=0
+222818 [KEYIN] SDL joy down btn=15 which=0
+223013 [KEYIN] SDL joy down btn=15 which=0
+223031 alive: [KEYIN] SDL joy down btn=15 which=0
+223788 [KEYIN] SDL joy down btn=0 which=0
+223792 settings: save
+223800 settings: logging enabled (build v36.46-yetifix3-2026-09-29)
+224524 [KEYIN] SDL joy down btn=13 which=0
+224718 [KEYIN] SDL joy down btn=0 which=0
+224720 browse: root
+224722 scan: sdmc:/switch/j2me/games
+224735 scan: sdmc:/switch/j2me/games -> 9 entries (2 ms)
+225031 alive: scan: sdmc:/switch/j2me/games -> 9 entries (2 ms)
+225484 [KEYIN] SDL joy down btn=13 which=0
+225797 [KEYIN] SDL joy down btn=0 which=0
+225799 game: sdmc:/switch/j2me/games/Yeti Sports (00.02.51)[240x320].jar
+225800 menu: session end (1)
+225803 jar: peek
+225813 init: jvm_create
+225814 init: jvm_init
+225815 init: heap FAILED — 65792 KB unavailable (process OOM)
+225816 init: heap FAILED (65536 KB + reserve, max 98304 KB)
+225817 init: heap retry at 32 MB
+225824 init: heap OK at 32 MB (reduced)
+225830 init: sdl_init
+225832 game: begin 240x320 build=v36.46-yetifix3-2026-09-29
+225834 init: native_init
+225839 init: midp_init
+225840 init: opcodes_init
+225841 audio: open 44100 Hz stereo
+225846 jar: load
+225857 jar: manifest
+225859 class: find
+225860 class: load yetisports/YetiSports
+225862 midlet: start
+225868 [KEYIN] dispatch btn=0 -> key=53 midp=53
+225871 keyhint: shown (8s or until first game key)
+226031 td m: nat=java/lang/Math.abs age=161
+226034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+226827 [KEYIN] SDL joy down btn=0 which=0
+226830 [KEYIN] dispatch btn=0 -> key=53 midp=53
+227031 td m: nat=java/lang/Math.abs age=1161
+227033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+227034 alive: [KEYIN] dispatch btn=0 -> key=53 midp=53
+227294 [KEYIN] SDL joy down btn=0 which=0
+227296 [KEYIN] dispatch btn=0 -> key=53 midp=53
+227627 [KEYIN] SDL joy down btn=1 which=0
+227630 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+227632 [KEYIN] soft press 1 -> keyPressed(-7) to game
+227660 [KEYIN] SDL joy down btn=0 which=0
+227663 [KEYIN] dispatch btn=0 -> key=53 midp=53
+227664 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 31ms
+227844 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+228027 [KEYIN] SDL joy down btn=2 which=0
+228031 [KEYIN] SDL joy down btn=3 which=0
+60
+228032 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+228034 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+228035 [KEYIN] soft press 0 -> keyPressed(-6) to game
+228037 [KEYIN] dispatch btn=3 -> key=99 midp=-8
+228060 [KEYQ-SOFT] keyPressed(-6) via fallback pump, waited 24ms
+228260 [KEYQ-SOFT] keyReleased(-6) via fallback pump, waited 33ms
+228710 [KEYIN] SDL joy down btn=0 which=0
+228713 [KEYIN] dispatch btn=0 -> key=53 midp=53
+228760 [KEYIN] SDL joy down btn=1 which=0
+228763 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+228765 [KEYIN] soft press 1 -> keyPressed(-7) to game
+228794 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 27ms
+228910 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 33ms
+228994 [KEYIN] SDL joy down btn=1 which=0
+228996 [KEYIN] dispatch btn=1 -> key=1073741883 midp=-7
+228998 [KEYIN] soft press 1 -> keyPressed(-7) to game
+229027 [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 28ms
+229031 td m: nat=java/lang/Math.abs age=3161
+229033 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+229034 alive: [KEYQ-SOFT] keyPressed(-7) via fallback pump, waited 28ms
+229077 [KEYIN] SDL joy down btn=0 which=0
+229080 [KEYIN] dispatch btn=0 -> key=53 midp=53
+229177 [KEYQ-SOFT] keyReleased(-7) via fallback pump, waited 34ms
+229392 [KEYIN] SDL joy down btn=3 which=0
+229395 [KEYIN] dispatch btn=3 -> key=99 midp=-8
+229444 [KEYIN] SDL joy down btn=2 which=0
+229447 [KEYIN] dispatch btn=2 -> key=1073741882 midp=-6
+229448 [KEYIN] soft press 0 -> keyPressed(-6) to game
+229477 [KEYQ-SOFT] keyPressed(-6) via fallback pump, waited 28ms
+229660 [KEYQ-SOFT] keyReleased(-6) via fallback pump, waited 33ms
+229994 [KEYIN] SDL joy down btn=10 which=0
+229998 pause: open
+230031 td m: nat=java/lang/Math.abs age=4160
+230034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+230934 [KEYIN] SDL joy down btn=15 which=0
+231031 td m: nat=java/lang/Math.abs age=5161
+231034 td m3g: ui[locked=0 t-1 held=-1ms ] pipe[locked=0 t-1 held=-1ms ] bind_inflight=0 binds=0 stage=idle
+231037 alive: [KEYIN] SDL joy down btn=15 which=0
+231120 [KEYIN] SDL joy down btn=15 which=0
+231447 [KEYIN] SDL joy down btn=0 which=0
+231449 pause: close
+231457 diag: loop=249 pr=249 stl=1530 vs=249 gc=0 heap=13376 top=13376 skip=249 pump=3254 sr=0 fl=0 sb=9692 bn=0 bd=0 tn=0 ta=-1/t-1 tw=0 ma=0 pv=3367 pk=29 pw=31 mx=1463 pp=217 psk=0 cs=0 lvc=0 dset=0 gms=0 gxm=0 tj=2 rj=1 sj=0 utf=0 rcf=0 ch=2 chf=0 chg=2 chb=0
+231460 game: session end
+231466 mem-T0: arena=259336K uord=198166K ford=61169K
+231472 mem-T1: arena=259336K uord=198166K ford=61169K
+231593 session-reset: settled frame cleared (was seq 1)
+231620 mem-T2: arena=259336K uord=161463K ford=97872K
+231626 mem-T3: arena=259336K uord=160965K ford=98370K
+231631 mem: sess=3 arena=259336K uord=160965K ford=98370K leakv=0 rss=-1K os_threads=-1
+231633 menu: session start
+233031 alive: menu: session start
