@@ -1,0 +1,623 @@
+N2600-OS boot
+multiboot magic=0x2badb002
+mem: RAM 1011 МиБ, куча 512 МиБ
+gma3600: 1024x600, 59 Гц, pipe B, LVDS 18 бит; DPLL: ref 96000 кГц, m2=105 n=3 p1=5 p2=14 (vco 3424 МГц), пиксель 48914 кГц — захват DPLL ок
+gma3600_2d: аппаратный курсор отключён (CURACNTR=00000000, CURBCNTR=00000000) — курсор программный (wm.c)
+gma3600_2d: GTT выключен (PGETBL 3ffc0000)
+gma3600_2d: модуль активен: рендер программный (compose), LFB без WC (см. mtrr)
+[hwinfo] ACPI 2: таблиц 8, OEM ALASKA
+[hwinfo] DSDT: 34 КиБ, устройств 9 (с _HID 0), chk OK
+[hwinfo] DMI: ASUSTeK COMPUTER INC. X101CH (BIOS American Megatrends Inc. X101CH.1203 (07/30)
+mtrr: LFB WC: base=0x3f800000 size=4096 KiB (MTRR#3)
+fb: 1024x600, 32 bpp, pitch 4096
+fb_make_bg...
+IRQ14/15 masked
+ata_init...
+ata: NOT present (return 0)
+ata: HDD не найден (только CD или пустые каналы)
+sata: инициализация AHCI/SATA отложена — фоновая задача после старта
+iso9660_init...
+iso9660: not found (return 0)
+ramfs_init...
+ramfs: ready, 63 МиБ
+ramfs_seed_from_iso...
+ramdisk: ISO/CD не найден — сидинг из ISO пропущен
+timer_init...
+kbd_init...
+mouse_init...
+mouse: present
+smp_init...
+smp: CPU 4 логических, 4 ядер, 1 поток(ов)/ядро (SMT: нет)
+smp: ядро 1 (APIC id 1) онлайн
+smp: ядро 2 (APIC id 2) онлайн
+smp: ядро 3 (APIC id 3) онлайн
+smp: итог: 4 логических ЦП, 4 онлайн (список из MADT)
+usb_init...
+usb: UHCI controller initialized
+wifi: отложено в фоновую задачу (после старта ОС)
+e1000_init...
+virtio_net_init...
+ne2000_init...
+atl1c_init...
+net_init...
+net: 10.0.2.15/24 gw 10.0.2.2 (умолчания до DHCP)
+httpd: listen :80...
+sound: probe...
+[hda] probe: поиск контроллера (класс 0x0403 / PCI-ID Intel)
+[hda] 8086:27d8 mmio=dff00000 @ 00:1b.0
+[hda] кодеки: маска 3
+[hda] кодек @ CAD0 жив (IMM): vendor=0x10ec0269
+[hda] NID 02: амп-капсы=00025757 (ofs 87, шагов 87, шаг 0.75 дБ, mute 0) SetAmp=b057
+[hda] NID 14: амп-капсы=80000000 (ofs 0, шагов 0, шаг 0.25 дБ, mute 1) SetAmp=b000
+[hda] NID 21: амп-капсы=80000000 (ofs 0, шагов 0, шаг 0.25 дБ, mute 1) SetAmp=b000
+[hda] NID 0f: амп-капсы=00000000 (ofs 0, шагов 0, шаг 0.25 дБ, mute 0) SetAmp=b000
+[hda] NID 10: амп-капсы=00000000 (ofs 0, шагов 0, шаг 0.25 дБ, mute 0) SetAmp=b000
+da] DAC 0x02: формат=0011 (ожидал 0011), stream=10 (ожидал 10)
+da] NID 14: pin config = 00000000
+da] NID 21: pin config = 00000000
+da] NID 0f: pin config = 00000000
+da] NID 10: pin config = 00000000
+da] пин 14: conn[0] = 0c
+da] пин 14: conn[1] = 0d
+da] путь: DAC 02 -> 0c (вход 0) -> пин 14 (вх-капсы=80000000: ofs 0, шагов 0, шаг 0.25 дБ, гейн
+da] пин 21: conn[0] = 0c
+da] пин 21: conn[1] = 0d
+da] путь: DAC 02 -> 0c (вход 0) -> пин 21 (вх-капсы=80000000: ofs 0, шагов 0, шаг 0.25 дБ, гейн
+da] NID 1b: pin caps=0040018f pin config=00000000 — выход не заявлен
+da] EAPD чтение: 0x14=0002 0x21=0000 — EAPD НЕ ВСТАЛ!
+[hda] ALC269-конфигурация применена (unmute 0 дБ, EAPD, D0)
+[hda] init занял ~36 мс
+[sound] Intel HDA готов
+task_init...
+ramfs: сервер запущен (задача 1)
+[telnetd] слушает :23
+
+wm_init...
+apps_open(terminal)...
+irq setup...
+irq on, entering main loop
+Загрузка завершена — система готова
+wifi: фоновая инициализация Atheros...
+[wifi] wifi: поиск адаптеров (Atheros PCI, Realtek RTL8192EU USB)...
+[wifi] Atheros AR9285 на шине 2:0.0, MMIO=dfe00000
+[wifi] SREV=c12ff (MAC c0.2)
+[wifi] калибровка задержек: 8 итераций/мк
+[wifi] EEPROM статус 0x407c: 00000000 (бит19=ABSENT, 18=PROT, 16=BUSY)
+[wifi] EEPROM[  0.. 7]: a55a 0000 0003 5000 168c 002b 5008 0001
+[wifi] EEPROM[  8..15]: 0280 502c 1a3b 1089 5064 8cc0 0504 570c
+[wifi] EEPROM[ 16..23]: 3f01 2200 506c 3c11 0003 4084 0001 0000
+[wifi] EEPROM[ 24..31]: 405c 0000 0000 404c 0000 0000 4054 8000
+[wifi] EEPROM[ 64..71]: 0178 5ef6 e00e 0002 0060 0000 db94 a2c9
+[wifi] EEPROM[ 72..79]: c158 0101 0001 0000 0000 1b00 0009 0005
+sata: фоновая инициализация AHCI...
+usb: скан портов EHCI (hot-plug)...
+[wifi] EEPROM: карта @ слово 64 ВАЛИДНА (checksum от базы (эталон), len=188 слов, ver=e00e, 376 байт)
+[wifi] EEPROM: magic ok, карта @ слово 64 (len=0178 chk=5ef6 ver=e00e)
+[wifi] EEPROM custData="...................." opCap=02 maxPwr=0
+[wifi] EEPROM modal[0..3]=0000 0000 0000 0000
+[wifi] EEPROM txGainType=0
+[wifi] MAC 94:db:c9:a2:58:c1 (EEPROM, слова карты+6..8)
+[wifi] EEPROM сырые слова (MAC): db94 a2c9 c158 — сверить с наклейкой
+[wifi] reset ok (RTC status=2)
+[wifi] PLL настроен (0x142c)
+[wifi] ini-массивы записаны (AR9285)
+[wifi] EEPROM board values применены (SWITCH_COM=00000000 antGain=0 settle=44 atten=32 modal_ver=4 txGainType=0)
+[wifi] Тайминги MAC: SIFS=440 такт (10 мкс), SLOT=880 такт (20 мкс), ACK=64 мкс, CTS=48 мкс (AR_TIME_OUT: было 08400b00, стало 08
+[wifi] калибровка ok (AGC=48d20)
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 34/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] TX-мощность записана: RATE1/2=28282828/28282828 RATE3=28282828 MAX=3f
+[wifi] TX-мощность: 15 дБм (до: RATE3=20202020 MAX=0)
+[wifi] RX поднят: SREV=c12ff RXDP=546960 FILT=3f
+[wifi] NF после калибровки: -118 dBm (CCA=18a1cf9c), AGC=48d22
+[wifi] Atheros AR9285 готов к работе (RX+TX)
+[wifi] RX не-маяк: fc=00d4 len=14 DA=ca:02:10:64:59:3f rssi=-102
+[wifi] ch 1: новая сеть "HomeWifi" RSSI -68 dBm [WPA2, группа TKIP]
+[wifi] RX не-маяк: fc=0148 len=28 DA=20:57:af:ad:f7:ae rssi=-73
+[wifi] RX не-маяк: fc=00d4 len=14 DA=10:08:c1:0d:c9:d6 rssi=-66
+[wifi] ch 2: новая сеть "TP-Link_697B" RSSI -95 dBm [WPA2]
+[wifi] ch 1: новая сеть "TP-Link_3A86" RSSI -100 dBm [WPA2]
+[wifi] ch 1: новая сеть "Get-694FC8" RSSI -110 dBm [WPA2]
+[wifi] ch 1: новая сеть "Keenetic-2644" RSSI -110 dBm [WPA2]
+[wifi] RX не-маяк: fc=1148 len=28 DA=20:57:af:ad:f7:ae rssi=-89
+[wifi] профиль не задан — подключение из WiFi/Настроек
+wifi: адаптер готов (фон)
+[wifi] ch 6: новая сеть "esp32test" RSSI -110 dBm [открытая]
+[wifi] ch 1: новая сеть "COMHEM_f39841" RSSI -110 dBm [WPA2]
+usb: скан портов EHCI завершён
+[wifi] ch 1: новая сеть "CARDV-a357" RSSI -20 dBm [WPA2]
+[wifi] ch 1: новая сеть "Hab" RSSI -100 dBm [WPA2, группа TKIP]
+[wifi] ch 1: новая сеть "70mai_Pro Plus+_8478" RSSI -110 dBm [WPA2, группа TKIP]
+[wifi] RX mgmt: fc=0000 len=151 DA=ae:61:75:84:fc:15 SA=e2:41:f5:8b:02:fa BSSID=ae:61:75:84:fc:15 rssi=-110
+sata: AHCI-контроллер найден
+disk: НЖМД через AHCI: KINGSTON SA400S37120G, 114473 МиБ
+fat32_init (фон)...
+fat32: not found
+ntfs_init (фон)...
+[wifi] RX mgmt: fc=00d0 len=37 DA=ae:61:75:84:fc:15 SA=e2:41:f5:8b:02:fa BSSID=ae:61:75:84:fc:15 rssi=-110
+[wifi] ch 1: новая сеть "70mai_Pro Plus+_f4fe" RSSI -110 dBm [WPA2, группа TKIP]
+ntfs: Zarezervirovano sistemoyi
+sata: инициализация дисков завершена
+[wifi] RX не-маяк: fc=1148 len=28 DA=20:57:af:ad:f7:ae rssi=-79
+[wifi] ch 1: новая сеть "Keenetic-2644" RSSI -110 dBm [WPA2]
+[wifi] ch 3: новая сеть "TP-Link_3996" RSSI -110 dBm [WPA2, группа TKIP]
+[wifi] скан: старт (каналы 1-14, 150 мс/канал)
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "Get-694FC8"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -72, "HomeWifi"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "Keenetic-2644"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "COMHEM_f39841"
+[wifi] маяк: dwell ch 1, DS=ch 6, RSSI -97, "esp32test"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "Get-694FC8"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -70, "HomeWifi"
+[wifi] ch 1 (2412 МГц): кадров 11 (в переходе 0), маяков 7, CRC 0, сетей 13
+[wifi] bring-up ch 2: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 2, DS=ch 2, RSSI -109, "TP-Link_9717"
+[wifi] ch 2: новая сеть "TP-Link_9717" RSSI -109 dBm [WPA2]
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -70, "HomeWifi"
+[wifi] маяк: dwell ch 2, DS=ch 6, RSSI -84, "esp32test"
+[wifi] маяк: dwell ch 2, DS=ch 2, RSSI -110, "HUAWEI-H6J6"
+[wifi] ch 2: новая сеть "HUAWEI-H6J6" RSSI -110 dBm [WPA2, группа TKIP]
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -71, "HomeWifi"
+[wifi] ch 2 (2417 МГц): кадров 9 (в переходе 0), маяков 6, CRC 2, сетей 15
+[wifi] bring-up ch 3: ok (NF=-118 dBm)
+[wifi] ch 4: новая сеть "byfly WiFi" RSSI -79 dBm [открытая]
+[wifi] ch 5: новая сеть "byfly WiFi" RSSI -95 dBm [открытая]
+[wifi] ch 4: новая сеть "StarWars" RSSI -110 dBm [WPA2]
+[wifi] ch 4: новая сеть "HUAWEI-97Ym" RSSI -84 dBm [WPA2, группа TKIP]
+[wifi] ch 3: новая сеть "3241" RSSI -110 dBm [WPA2, группа TKIP]
+[wifi] ch 3 (2422 МГц): кадров 57 (в переходе 0), маяков 6, CRC 5, сетей 20
+[wifi] bring-up ch 4: ok (NF=-118 dBm)
+[wifi] ch 5: новая сеть "HUAWEI-5574" RSSI -91 dBm [WPA2, группа TKIP]
+[wifi] ch 4 (2427 МГц): кадров 10 (в переходе 0), маяков 7, CRC 1, сетей 21
+[wifi] bring-up ch 5: ok (NF=-118 dBm)
+[wifi] ch 5: новая сеть "WiFi 57" RSSI -110 dBm [WPA2, группа TKIP]
+[wifi] ch 5: новая сеть "byfly WiFi" RSSI -110 dBm [открытая]
+[wifi] ch 5: новая сеть "HUAWEI-6fKQ" RSSI -109 dBm [WPA2, группа TKIP]
+[wifi] ch 5 (2432 МГц): кадров 12 (в переходе 0), маяков 12, CRC 2, сетей 24
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] ch 6: новая сеть "byfly WIFI" RSSI -101 dBm [открытая]
+[wifi] ch 6: новая сеть "HUAWEI-WhPP" RSSI -108 dBm [WPA2, группа TKIP]
+[wifi] ch 6 (2437 МГц): кадров 7 (в переходе 0), маяков 7, CRC 4, сетей 26
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 7: ok (NF=-118 dBm)
+[wifi] ch 8: новая сеть "A1-FT34-AE6FC8-2.4G" RSSI -93 dBm [WPA2, группа TKIP]
+[wifi] ch 8: новая сеть "TP-LINK_6DC6" RSSI -103 dBm [WPA2]
+[wifi] ch 7: новая сеть "WiFi_2G_1F51" RSSI -20 dBm [WPA2, группа TKIP]
+[wifi] ch 7 (2442 МГц): кадров 8 (в переходе 0), маяков 7, CRC 0, сетей 29
+[wifi] bring-up ch 8: ok (NF=-118 dBm)
+[wifi] ch 9: новая сеть "A1-FT34-A7F718-2.4G" RSSI -92 dBm [WPA2, группа TKIP]
+[wifi] ch 8 (2447 МГц): кадров 3 (в переходе 0), маяков 2, CRC 11, сетей 30
+[wifi] bring-up ch 9: ok (NF=-118 dBm)
+[wifi] ch 10: новая сеть "byfly WiFi" RSSI -98 dBm [открытая]
+[wifi] ch 9 (2452 МГц): кадров 2 (в переходе 0), маяков 2, CRC 109, сетей 31
+[wifi] bring-up ch 10: ok (NF=-118 dBm)
+[wifi] ch 10: новая сеть "Heydude" RSSI -110 dBm [WPA2]
+[wifi] ch 10 (2457 МГц): кадров 63 (в переходе 0), маяков 4, CRC 17, сетей 32
+[wifi] bring-up ch 11: ok (NF=-118 dBm)
+[wifi] ch 11 (2462 МГц): кадров 12 (в переходе 0), маяков 7, CRC 5, сетей 32
+[wifi] bring-up ch 12: ok (NF=-118 dBm)
+[wifi] ch 12 (2467 МГц): кадров 9 (в переходе 0), маяков 9, CRC 0, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/58/58/58, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 13: ok (NF=-118 dBm)
+[wifi] ch 13 (2472 МГц): кадров 7 (в переходе 0), маяков 7, CRC 0, сетей 32
+[wifi] bring-up ch 14: ok (NF=-118 dBm)
+[wifi] ch 14 (2484 МГц): кадров 1 (в переходе 0), маяков 0, CRC 0, сетей 32
+[wifi] скан завершён: 32 сетей, 211 кадров, 156 CRC, 1 прочих
+[wifi] маяки "HomeWifi" (DS ch 1): dwell 1:2 2:2
+[wifi] маяки "Get-694FC8" (DS ch 1): dwell 1:2
+[wifi] маяки "Keenetic-2644" (DS ch 1): dwell 1:1
+[wifi] маяки "esp32test" (DS ch 6): dwell 1:1 2:1 5:2 6:1 7:2 10:1 12:1 13:1
+[wifi] маяки "COMHEM_f39841" (DS ch 1): dwell 1:1
+[wifi] маяки "byfly WiFi" (DS ch 4): dwell 4:1 5:2
+[wifi] маяки "byfly WiFi" (DS ch 5): dwell 4:1 5:1 6:2
+[wifi] маяки "StarWars" (DS ch 4): dwell 4:2
+[wifi] маяки "HUAWEI-97Ym" (DS ch 4): dwell 4:1 5:1
+[wifi] маяки "HUAWEI-5574" (DS ch 5): dwell 5:2 6:2
+[wifi] маяки "WiFi 57" (DS ch 5): dwell 5:1
+[wifi] маяки "A1-FT34-AE6FC8-2.4G" (DS ch 8): dwell 7:1 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "TP-LINK_6DC6" (DS ch 8): dwell 7:1 8:1
+[wifi] маяки "A1-FT34-A7F718-2.4G" (DS ch 9): dwell 9:1 10:1
+[wifi] маяки "byfly WiFi" (DS ch 10): dwell 10:1 11:1
+[wifi] подключение к "esp32test": сеть в свежем скане — AUTH сразу
+[wifi] маяки точки: DS ch 6 — 1, ch 5 — 2 (подключаемся на DS: там точка СЛЫШИТ нас)
+[wifi] точка найдена: 30:ae:a4:45:d1:cd ch 6 (-48 dBm) — проверка канала
+[wifi] точка: TX-рейт mgmt/данных 1M (низший базовый)
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 34/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] PREAUTH: ch 6, 340 мс: маяков точки 3, всего кадров 18 — точка слышима на своём канале
+[wifi] PROBE: DEAUTH-сброс сеанса + направленный запрос к точке
+[wifi] TX: TxDone (st1=1 st9=1)
+[wifi] TX: TxDone (st1=1 st9=1)
+[wifi] RX-зазор после TX: 1 мс
+[wifi] TX: TxDone (st1=1 st9=1)
+[wifi] PROBE: запрос отправлен (ответов 0) — точка НЕ отвечает и на probe: фильтр MAC / бан / глухота к н
+[wifi] AUTH REQ байты (30): b0 00 3a 00 30 ae a4 45 d1 cd 94 db c9 a2 58 c1 30 ae a4 45 d1 cd 30 00 00 00 01 00 00 00
+[wifi] TX: TxDone (st1=1 st9=1)
+[wifi] RX-зазор после TX: 122 мс — ГЛУХОТА после TX?
+[wifi] RX mgmt: fc=00b0 len=34 DA=94:db:c9:a2:58:c1 SA=30:ae:a4:45:d1:cd BSSID=30:ae:a4:45:d1:cd rssi=-55
+[wifi] AUTH ok — посылаем ASSOC REQ
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] RX-зазор после TX: 1 мс
+[wifi] ASSOC: окно 600 мс: кадров 46 (маяков 41, mgmt 2, CRC 8, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 1 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] RX-зазор после TX: 47 мс — ГЛУХОТА после TX?
+[wifi] ASSOC: окно 600 мс: кадров 14 (маяков 53, mgmt 1, CRC 2, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 2 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 16 (маяков 69, mgmt 0, CRC 0, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 3 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] RX не-маяк: fc=00d4 len=14 DA=94:db:c9:a2:58:c1 rssi=-55
+[wifi] RX mgmt: fc=0810 len=131 DA=94:db:c9:a2:58:c1 SA=30:ae:a4:45:d1:cd BSSID=30:ae:a4:45:d1:cd rssi=-57
+[wifi] ASSOC-RSP от точки: len=131 DA=94:db:c9:a2:58:c1 status=0 aid=1 retry=1
+[wifi]   hex[0..35]: 10 08 3a 01 94 db c9 a2 58 c1 30 ae a4 45 d1 cd 30 ae a4 45 d1 cd 40 00 21 04 00 00 01 c0 01 08 8b 96 82 84
+[wifi] ASSOC ok: "esp32test" AID=1 (ch 6) — сеть доступна
+netcfg: DHCP DISCOVER...
+[wifi] RX не-маяк: fc=00d4 len=14 DA=48:d0:1c:78:5e:89 rssi=-110
+[wifi] RX не-маяк: fc=00d4 len=14 DA=8c:6d:77:fa:a5:2d rssi=-95
+[wifi] маяки пропали >6 с — переподключение к "esp32test"
+[wifi] скан: старт (каналы 1-14, 150 мс/канал)
+[wifi] смен канала: 14 (fastcc 0, bring-up 14), время ср 61 мс / макс 64 мс
+[wifi] bring-up ch 1: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "Get-694FC8"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -73, "HomeWifi"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -107, "Keenetic-2644"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "TP-Link_3A86"
+[wifi] маяк: dwell ch 1, DS=ch 1, RSSI -110, "Get-694FC8"
+[wifi] ch 1 (2412 МГц): кадров 9 (в переходе 0), маяков 6, CRC 2, сетей 32
+[wifi] bring-up ch 2: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -73, "HomeWifi"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -110, "Keenetic-2644"
+[wifi] маяк: dwell ch 2, DS=ch 2, RSSI -95, "TP-Link_697B"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -73, "HomeWifi"
+[wifi] ch 2 (2417 МГц): кадров 8 (в переходе 0), маяков 4, CRC 1, сетей 32
+[wifi] bring-up ch 3: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 3, DS=ch 4, RSSI -74, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 3, DS=ch 3, RSSI -107, "3241"
+[wifi] маяк: dwell ch 3, DS=ch 2, RSSI -100, "TP-Link_697B"
+[wifi] ch 3 (2422 МГц): кадров 9 (в переходе 0), маяков 9, CRC 1, сетей 32
+[wifi] bring-up ch 4: ok (NF=-118 dBm)
+[wifi] ch 4 (2427 МГц): кадров 18 (в переходе 0), маяков 7, CRC 3, сетей 32
+[wifi] bring-up ch 5: ok (NF=-118 dBm)
+[wifi] ch 5 (2432 МГц): кадров 9 (в переходе 0), маяков 9, CRC 1, сетей 32
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] ch 6 (2437 МГц): кадров 4 (в переходе 0), маяков 4, CRC 1, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 7: ok (NF=-118 dBm)
+[wifi] ch 7 (2442 МГц): кадров 2 (в переходе 0), маяков 2, CRC 0, сетей 32
+[wifi] bring-up ch 8: ok (NF=-118 dBm)
+[wifi] ch 8 (2447 МГц): кадров 4 (в переходе 0), маяков 3, CRC 1, сетей 32
+[wifi] bring-up ch 9: ok (NF=-118 dBm)
+[wifi] ch 9 (2452 МГц): кадров 8 (в переходе 0), маяков 6, CRC 39, сетей 32
+[wifi] bring-up ch 10: ok (NF=-118 dBm)
+[wifi] ch 10 (2457 МГц): кадров 61 (в переходе 0), маяков 1, CRC 4, сетей 32
+[wifi] bring-up ch 11: ok (NF=-118 dBm)
+[wifi] ch 11 (2462 МГц): кадров 7 (в переходе 0), маяков 5, CRC 53, сетей 32
+[wifi] bring-up ch 12: ok (NF=-118 dBm)
+[wifi] ch 12 (2467 МГц): кадров 6 (в переходе 0), маяков 6, CRC 3, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/58/58/58, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 13: ok (NF=-118 dBm)
+[wifi] ch 13 (2472 МГц): кадров 5 (в переходе 0), маяков 4, CRC 1, сетей 32
+[wifi] bring-up ch 14: ok (NF=-118 dBm)
+[wifi] ch 14 (2484 МГц): кадров 0 (в переходе 0), маяков 0, CRC 2, сетей 32
+[wifi] скан завершён: 32 сетей, 150 кадров, 112 CRC, 5 прочих
+[wifi] маяки "HomeWifi" (DS ch 1): dwell 1:1 2:2
+[wifi] маяки "TP-Link_697B" (DS ch 2): dwell 2:1 3:1
+[wifi] маяки "TP-Link_3A86" (DS ch 1): dwell 1:1
+[wifi] маяки "Get-694FC8" (DS ch 1): dwell 1:2
+[wifi] маяки "Keenetic-2644" (DS ch 1): dwell 1:1 2:1
+[wifi] маяки "byfly WiFi" (DS ch 4): dwell 3:1 5:1 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "byfly WiFi" (DS ch 5): dwell 4:2 5:2 6:1
+[wifi] маяки "HUAWEI-97Ym" (DS ch 4): dwell 3:2 4:1 5:1 6:1
+[wifi] маяки "3241" (DS ch 3): dwell 3:1
+[wifi] маяки "HUAWEI-5574" (DS ch 5): dwell 3:1 4:2 5:2 6:1
+[wifi] маяки "WiFi 57" (DS ch 5): dwell 5:1
+[wifi] маяки "byfly WiFi" (DS ch 5): dwell 5:1
+[wifi] маяки "HUAWEI-6fKQ" (DS ch 5): dwell 5:1
+[wifi] маяки "A1-FT34-AE6FC8-2.4G" (DS ch 8): dwell 7:1 8:1 9:1
+[wifi] маяки "TP-LINK_6DC6" (DS ch 8): dwell 8:1
+[wifi] маяки "A1-FT34-A7F718-2.4G" (DS ch 9): dwell 7:1 8:1 9:2 10:1
+[wifi] маяки "byfly WiFi" (DS ch 10): dwell 9:2 11:1 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] точка найдена: 30:ae:a4:45:d1:cd ch 6 (-48 dBm) — проверка канала
+[wifi] точка: TX-рейт mgmt/данных 1M (низший базовый)
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 34/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] PREAUTH: ch 6, 340 мс: маяков точки 0, всего кадров 11 — ГЛУХО на канале точки (маяк ~102 мс)
+[wifi] PREAUTH: полный bring-up на том же канале — сравнение с fastcc
+[wifi] reset ok (RTC status=2)
+[wifi] PLL настроен (0x142c)
+[wifi] ini-массивы записаны (AR9285)
+[wifi] калибровка ok (AGC=48d20)
+[wifi] TX-мощность записана: RATE1/2=28282828/28282828 RATE3=28282828 MAX=3f
+[wifi] TX-мощность: 15 дБм (до: RATE3=20202020 MAX=0)
+[wifi] RX поднят: SREV=c12ff RXDP=546960 FILT=3f
+[wifi] NF после калибровки: -118 dBm (CCA=18a1cf9c), AGC=48d22
+[wifi] PREAUTH (этап 2): маяков точки 0, кадров 10 — канал точки по-прежнему глух (тракт RX)
+[wifi] PROBE: DEAUTH-сброс сеанса + направленный запрос к точке
+[wifi] RX не-маяк: fc=00d4 len=14 DA=94:db:c9:a2:58:c1 rssi=-56
+[wifi] PROBE: запрос отправлен (ответов 0) — точка НЕ отвечает и на probe: фильтр MAC / бан / глухота к н
+[wifi] RX mgmt: fc=00b0 len=34 DA=94:db:c9:a2:58:c1 SA=30:ae:a4:45:d1:cd BSSID=30:ae:a4:45:d1:cd rssi=-55
+[wifi] AUTH ok — посылаем ASSOC REQ
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 39 (маяков 23, mgmt 14, CRC 9, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 1 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 14 (маяков 37, mgmt 0, CRC 2, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 2 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 14 (маяков 49, mgmt 2, CRC 2, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 3 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 15 (маяков 64, mgmt 0, CRC 1, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 4 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 12 (маяков 76, mgmt 0, CRC 4, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 5 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 13 (маяков 89, mgmt 0, CRC 3, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] ASSOC: нет ответа точки
+[wifi] скан: старт (каналы 1-14, 150 мс/канал)
+[wifi] смен канала: 15 (fastcc 0, bring-up 15), время ср 60 мс / макс 63 мс
+[wifi] ch 1 (2412 МГц): кадров 0 (в переходе 0), маяков 0, CRC 0, сетей 32
+[wifi] bring-up ch 2: ok (NF=-118 dBm)
+[wifi] калибровка ok (AGC=48d22)
+[wifi] TX-мощность записана: RATE1/2=28282828/28282828 RATE3=28282828 MAX=3f
+[wifi] TX-мощность: 15 дБм (до: RATE3=28282828 MAX=3f)
+[wifi] RX поднят: SREV=c12ff RXDP=546960 FILT=3f
+[wifi] NF после калибровки: -118 dBm (CCA=18a1cf9c), AGC=48d22
+[wifi] маяк: dwell ch 2, DS=ch 2, RSSI -91, "TP-Link_697B"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -76, "HomeWifi"
+[wifi] маяк: dwell ch 2, DS=ch 2, RSSI -92, "TP-Link_697B"
+[wifi] маяк: dwell ch 2, DS=ch 6, RSSI -86, "esp32test"
+[wifi] ch 2 (2417 МГц): кадров 9 (в переходе 0), маяков 4, CRC 1, сетей 32
+[wifi] bring-up ch 3: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 3, DS=ch 5, RSSI -100, "HUAWEI-5574"
+[wifi] маяк: dwell ch 3, DS=ch 2, RSSI -85, "TP-Link_697B"
+[wifi] маяк: dwell ch 3, DS=ch 4, RSSI -84, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 3, DS=ch 4, RSSI -84, "byfly WiFi"
+[wifi] маяк: dwell ch 3, DS=ch 2, RSSI -91, "TP-Link_697B"
+[wifi] ch 3 (2422 МГц): кадров 6 (в переходе 0), маяков 5, CRC 0, сетей 32
+[wifi] bring-up ch 4: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 4, DS=ch 6, RSSI -57, "esp32test"
+[wifi] маяк: dwell ch 4, DS=ch 4, RSSI -82, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 4, DS=ch 5, RSSI -92, "HUAWEI-5574"
+[wifi] ch 4 (2427 МГц): кадров 6 (в переходе 0), маяков 6, CRC 4, сетей 32
+[wifi] bring-up ch 5: ok (NF=-118 dBm)
+[wifi] ch 5 (2432 МГц): кадров 11 (в переходе 0), маяков 11, CRC 1, сетей 32
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] ch 6 (2437 МГц): кадров 7 (в переходе 0), маяков 7, CRC 5, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 7: ok (NF=-118 dBm)
+[wifi] ch 7 (2442 МГц): кадров 2 (в переходе 0), маяков 2, CRC 0, сетей 32
+[wifi] bring-up ch 8: ok (NF=-118 dBm)
+[wifi] ch 8 (2447 МГц): кадров 6 (в переходе 0), маяков 5, CRC 0, сетей 32
+[wifi] bring-up ch 9: ok (NF=-118 dBm)
+[wifi] ch 9 (2452 МГц): кадров 4 (в переходе 0), маяков 4, CRC 1, сетей 32
+[wifi] bring-up ch 10: ok (NF=-118 dBm)
+[wifi] ch 10 (2457 МГц): кадров 14 (в переходе 0), маяков 1, CRC 2, сетей 32
+[wifi] bring-up ch 11: ok (NF=-118 dBm)
+[wifi] ch 11 (2462 МГц): кадров 15 (в переходе 0), маяков 12, CRC 1, сетей 32
+[wifi] bring-up ch 12: ok (NF=-118 dBm)
+[wifi] ch 12 (2467 МГц): кадров 6 (в переходе 0), маяков 6, CRC 2, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/58/58/58, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 13: ok (NF=-118 dBm)
+[wifi] ch 13 (2472 МГц): кадров 3 (в переходе 0), маяков 3, CRC 0, сетей 32
+[wifi] bring-up ch 14: ok (NF=-118 dBm)
+[wifi] ch 14 (2484 МГц): кадров 0 (в переходе 0), маяков 0, CRC 1, сетей 32
+[wifi] скан завершён: 32 сетей, 89 кадров, 18 CRC, 0 прочих
+[wifi] маяки "HomeWifi" (DS ch 1): dwell 2:1 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "TP-Link_697B" (DS ch 2): dwell 2:2 3:2
+[wifi] маяки "esp32test" (DS ch 6): dwell 2:1 4:1 5:1 6:1 7:1 11:1
+[wifi] маяки "byfly WiFi" (DS ch 4): dwell 3:1 5:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "byfly WiFi" (DS ch 5): dwell 4:1 5:1 6:1
+[wifi] маяки "HUAWEI-97Ym" (DS ch 4): dwell 3:1 4:2 5:2
+[wifi] маяки "HUAWEI-5574" (DS ch 5): dwell 3:1 4:1 5:1 6:1
+[wifi] маяки "WiFi 57" (DS ch 5): dwell 5:1
+[wifi] маяки "HUAWEI-6fKQ" (DS ch 5): dwell 5:2
+[wifi] маяки "byfly WIFI" (DS ch 6): dwell 6:1
+[wifi] маяки "A1-FT34-AE6FC8-2.4G" (DS ch 8): dwell 7:1 8:2 9:1
+[wifi] маяки "TP-LINK_6DC6" (DS ch 8): dwell 8:1
+[wifi] маяки "WiFi_2G_1F51" (DS ch 7): dwell 11:1 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "A1-FT34-A7F718-2.4G" (DS ch 9): dwell 8:2 9:1 10:1
+[wifi] маяки "byfly WiFi" (DS ch 10): dwell 9:1 11:1 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] Connect: введите пароль WPA2 для "esp32test"
+[wifi] подключение к "esp32test" (WPA2): скан...
+[wifi] скан: старт (каналы 1-14, 150 мс/канал)
+[wifi] ch 1 (2412 МГц): кадров 0 (в переходе 0), маяков 0, CRC 0, сетей 32
+[wifi] смен канала: 14 (fastcc 0, bring-up 14), время ср 64 мс / макс 101 мс
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 34/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 1: ok (NF=-118 dBm)
+[wifi] калибровка ok (AGC=48d20)
+[wifi] TX-мощность записана: RATE1/2=28282828/28282828 RATE3=28282828 MAX=3f
+[wifi] TX-мощность: 15 дБм (до: RATE3=28282828 MAX=3f)
+[wifi] RX поднят: SREV=c12ff RXDP=546994 FILT=3f
+[wifi] NF после калибровки: -118 dBm (CCA=18a1cf9c), AGC=48d22
+[wifi] RX не-маяк: fc=00c4 len=14 DA=10:08:c1:0d:c9:d6 rssi=-76
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -106, "Get-694FC8"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -63, "HomeWifi"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -102, "Keenetic-2644"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -110, "Get-694FC8"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -71, "HomeWifi"
+[wifi] маяк: dwell ch 2, DS=ch 1, RSSI -108, "Keenetic-2644"
+[wifi] ch 2 (2417 МГц): кадров 32 (в переходе 0), маяков 7, CRC 1, сетей 32
+[wifi] bring-up ch 3: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 3, DS=ch 1, RSSI -75, "HomeWifi"
+[wifi] маяк: dwell ch 3, DS=ch 5, RSSI -107, "HUAWEI-5574"
+[wifi] маяк: dwell ch 3, DS=ch 5, RSSI -101, "byfly WiFi"
+[wifi] маяк: dwell ch 3, DS=ch 2, RSSI -93, "TP-Link_697B"
+[wifi] маяк: dwell ch 3, DS=ch 4, RSSI -83, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 3, DS=ch 4, RSSI -81, "byfly WiFi"
+[wifi] ch 3 (2422 МГц): кадров 11 (в переходе 0), маяков 8, CRC 1, сетей 32
+[wifi] bring-up ch 4: ok (NF=-118 dBm)
+[wifi] ch 4 (2427 МГц): кадров 9 (в переходе 0), маяков 9, CRC 2, сетей 32
+[wifi] bring-up ch 5: ok (NF=-118 dBm)
+[wifi] ch 5 (2432 МГц): кадров 14 (в переходе 0), маяков 14, CRC 2, сетей 32
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] ch 6 (2437 МГц): кадров 5 (в переходе 0), маяков 5, CRC 3, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 7: ok (NF=-118 dBm)
+[wifi] ch 7 (2442 МГц): кадров 2 (в переходе 0), маяков 2, CRC 1, сетей 32
+[wifi] bring-up ch 8: ok (NF=-118 dBm)
+[wifi] ch 8 (2447 МГц): кадров 58 (в переходе 0), маяков 3, CRC 21, сетей 32
+[wifi] bring-up ch 9: ok (NF=-118 dBm)
+[wifi] ch 9 (2452 МГц): кадров 30 (в переходе 0), маяков 5, CRC 8, сетей 32
+[wifi] bring-up ch 10: ok (NF=-118 dBm)
+[wifi] ch 10 (2457 МГц): кадров 8 (в переходе 0), маяков 3, CRC 8, сетей 32
+[wifi] bring-up ch 11: ok (NF=-118 dBm)
+[wifi] ch 11 (2462 МГц): кадров 18 (в переходе 0), маяков 7, CRC 41, сетей 32
+[wifi] bring-up ch 12: ok (NF=-118 dBm)
+[wifi] ch 12 (2467 МГц): кадров 8 (в переходе 0), маяков 6, CRC 11, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/58/58/58, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 13: ok (NF=-118 dBm)
+[wifi] ch 13 (2472 МГц): кадров 2 (в переходе 0), маяков 2, CRC 0, сетей 32
+[wifi] bring-up ch 14: ok (NF=-118 dBm)
+[wifi] ch 14 (2484 МГц): кадров 0 (в переходе 0), маяков 0, CRC 2, сетей 32
+[wifi] скан завершён: 32 сетей, 197 кадров, 101 CRC, 0 прочих
+[wifi] маяки "HomeWifi" (DS ch 1): dwell 2:2 3:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "TP-Link_697B" (DS ch 2): dwell 3:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "Get-694FC8" (DS ch 1): dwell 2:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "Keenetic-2644" (DS ch 1): dwell 2:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "esp32test" (DS ch 6): dwell 5:2 6:1 7:1
+[wifi] маяки "byfly WiFi" (DS ch 4): dwell 3:1 4:1 5:2 6:1
+[wifi] маяки "byfly WiFi" (DS ch 5): dwell 3:1 4:2 5:2 6:1
+[wifi] маяки "HUAWEI-97Ym" (DS ch 4): dwell 3:1 4:1 5:2
+[wifi] маяки "HUAWEI-5574" (DS ch 5): dwell 3:1 4:2 5:2 6:1
+[wifi] маяки "WiFi 57" (DS ch 5): dwell 5:1
+[wifi] маяки "HUAWEI-6fKQ" (DS ch 5): dwell 5:2
+[wifi] маяки "byfly WIFI" (DS ch 6): dwell 6:1
+[wifi] маяки "A1-FT34-AE6FC8-2.4G" (DS ch 8): dwell 7:1 9:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "TP-LINK_6DC6" (DS ch 8): dwell 8:1
+[wifi] маяки "A1-FT34-A7F718-2.4G" (DS ch 9): dwell 8:2 9:1 10:1
+[wifi] маяки "byfly WiFi" (DS ch 10): dwell 9:1 10:1 11:1
+[wifi] маяки точки: DS ch 6 — 1, ch 5 — 2 (подключаемся на DS: там точка СЛЫШИТ нас)
+[wifi] точка найдена: 30:ae:a4:45:d1:cd ch 6 (-48 dBm) — проверка канала
+[wifi] точка: группа TKIP, HT(11n), рейтов 12, TX 1M
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 34/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] PREAUTH: ch 6, 340 мс: маяков точки 3, всего кадров 13 — точка слышима на своём канале
+[wifi] PROBE: DEAUTH-сброс сеанса + направленный запрос к точке
+[wifi] PROBE: ответ точки (len=130, rssi-кадр принят) — мы слышим друг друга
+[wifi] PROBE: ответ точки (len=130, rssi-кадр принят) — мы слышим друг друга
+[wifi] PROBE: запрос отправлен (ответов 2) — точка ОТВЕЧАЕТ нам — AUTH обязан пройти
+[wifi] RX mgmt: fc=00b0 len=34 DA=94:db:c9:a2:58:c1 SA=30:ae:a4:45:d1:cd BSSID=30:ae:a4:45:d1:cd rssi=-56
+[wifi] AUTH ok — посылаем ASSOC REQ
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 27 (маяков 23, mgmt 2, CRC 7, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 1 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 12 (маяков 34, mgmt 0, CRC 4, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 2 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] ASSOC: окно 600 мс: кадров 15 (маяков 46, mgmt 2, CRC 1, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 3 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT (cap=0421)
+[wifi] RX mgmt: fc=0810 len=131 DA=94:db:c9:a2:58:c1 SA=30:ae:a4:45:d1:cd BSSID=30:ae:a4:45:d1:cd rssi=-56
+[wifi] ASSOC-RSP от точки: len=131 DA=94:db:c9:a2:58:c1 status=0 aid=1 retry=1
+[wifi]   hex[0..35]: 10 08 3c 00 94 db c9 a2 58 c1 30 ae a4 45 d1 cd 30 ae a4 45 d1 cd 70 00 31 04 00 00 01 c0 01 08 8b 96 82 84
+[wifi] ASSOC ok: "esp32test" AID=1 (ch 6) — WPA2: ждём ключи
+[wifi] PMK посчитан (77 мс)
+[wifi] TX M2: desc=2 ki=0x010a klen=0 kd=22
+[wifi] WPA2: M1 получен, M2 отправлен (PTK выведен)
+[wifi] GTK TKIP (32 б) -> запись 1+MIC
+[wifi] ключи установлены: PTK(CCMP) + GTK(keyid=1, TKIP)
+[wifi] TX M4: desc=2 ki=0x030a klen=0 kd=0 — ждём data-канал
+[wifi] WPA2: рукопожатие завершено — "esp32test" доступна (CCMP)
+netcfg: DHCP не ответил — адреса по умолчанию
+[wifi] Connect: введите пароль WPA2 для "HomeWifi"
+netcfg: DHCP DISCOVER...
+netcfg: DHCP не ответил — адреса по умолчанию
+[wifi] RX не-маяк: fc=00d4 len=14 DA=4c:6b:b8:fc:d4:a2 rssi=-110
+[wifi] отключено
+[wifi] подключение к "HomeWifi" (WPA2): скан...
+[wifi] скан: старт (каналы 1-14, 150 мс/канал)
+[wifi] ch 1 (2412 МГц): кадров 0 (в переходе 0), маяков 0, CRC 0, сетей 32
+[wifi] смен канала: 15 (fastcc 0, bring-up 15), время ср 65 мс / макс 113 мс
+[wifi] bring-up ch 1: ok (NF=-118 dBm)
+[wifi] калибровка ok (AGC=48d22)
+[wifi] TX-мощность записана: RATE1/2=28282828/28282828 RATE3=28282828 MAX=3f
+[wifi] TX-мощность: 15 дБм (до: RATE3=28282828 MAX=3f)
+[wifi] RX поднят: SREV=c12ff RXDP=546a98 FILT=3f
+[wifi] NF после калибровки: -118 dBm (CCA=18a1cf9c), AGC=48d22
+[wifi] ch 2 (2417 МГц): кадров 6 (в переходе 0), маяков 0, CRC 0, сетей 32
+[wifi] bring-up ch 3: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 3, DS=ch 2, RSSI -95, "TP-Link_697B"
+[wifi] маяк: dwell ch 3, DS=ch 4, RSSI -91, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 3, DS=ch 3, RSSI -110, "byfly WiFi"
+[wifi] маяк: dwell ch 3, DS=ch 2, RSSI -92, "TP-Link_697B"
+[wifi] ch 3 (2422 МГц): кадров 7 (в переходе 0), маяков 4, CRC 31, сетей 32
+[wifi] bring-up ch 4: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 4, DS=ch 5, RSSI -87, "HUAWEI-5574"
+[wifi] маяк: dwell ch 4, DS=ch 4, RSSI -88, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 4, DS=ch 4, RSSI -88, "byfly WiFi"
+[wifi] ch 4 (2427 МГц): кадров 113 (в переходе 0), маяков 3, CRC 108, сетей 32
+[wifi] bring-up ch 5: ok (NF=-118 dBm)
+[wifi] маяк: dwell ch 5, DS=ch 5, RSSI -102, "HUAWEI-6fKQ"
+[wifi] маяк: dwell ch 5, DS=ch 4, RSSI -93, "HUAWEI-97Ym"
+[wifi] маяк: dwell ch 5, DS=ch 5, RSSI -110, "byfly WiFi"
+[wifi] маяк: dwell ch 5, DS=ch 5, RSSI -89, "HUAWEI-5574"
+[wifi] маяк: dwell ch 5, DS=ch 5, RSSI -91, "byfly WiFi"
+[wifi] ch 5 (2432 МГц): кадров 14 (в переходе 0), маяков 9, CRC 3, сетей 32
+[wifi] bring-up ch 6: ok (NF=-118 dBm)
+[wifi] ch 6 (2437 МГц): кадров 7 (в переходе 0), маяков 7, CRC 1, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 7: ok (NF=-118 dBm)
+[wifi] ch 7 (2442 МГц): кадров 4 (в переходе 0), маяков 4, CRC 0, сетей 32
+[wifi] bring-up ch 8: ok (NF=-118 dBm)
+[wifi] ch 8 (2447 МГц): кадров 3 (в переходе 0), маяков 3, CRC 2, сетей 32
+[wifi] bring-up ch 9: ok (NF=-118 dBm)
+[wifi] ch 9 (2452 МГц): кадров 4 (в переходе 0), маяков 4, CRC 4, сетей 32
+[wifi] bring-up ch 10: ok (NF=-118 dBm)
+[wifi] ch 10 (2457 МГц): кадров 14 (в переходе 0), маяков 2, CRC 16, сетей 32
+[wifi] bring-up ch 11: ok (NF=-118 dBm)
+[wifi] ch 11 (2462 МГц): кадров 9 (в переходе 0), маяков 8, CRC 0, сетей 32
+[wifi] bring-up ch 12: ok (NF=-118 dBm)
+[wifi] ch 12 (2467 МГц): кадров 5 (в переходе 0), маяков 5, CRC 0, сетей 32
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 35/58/58/58, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 13: ok (NF=-118 dBm)
+[wifi] ch 13 (2472 МГц): кадров 16 (в переходе 0), маяков 3, CRC 0, сетей 32
+[wifi] bring-up ch 14: ok (NF=-118 dBm)
+[wifi] ch 14 (2484 МГц): кадров 0 (в переходе 0), маяков 0, CRC 1, сетей 32
+[wifi] скан завершён: 32 сетей, 202 кадров, 166 CRC, 0 прочих
+[wifi] маяки "TP-Link_697B" (DS ch 2): dwell 3:2 — НА СВОЁМ КАНАЛЕ НОЛЬ
+[wifi] маяки "esp32test" (DS ch 6): dwell 5:1 6:1 7:1
+[wifi] маяки "byfly WiFi" (DS ch 4): dwell 4:1 5:1 6:1
+[wifi] маяки "byfly WiFi" (DS ch 5): dwell 5:1 6:1
+[wifi] маяки "HUAWEI-97Ym" (DS ch 4): dwell 3:1 4:1 5:2
+[wifi] маяки "HUAWEI-5574" (DS ch 5): dwell 4:1 5:1 6:2
+[wifi] маяки "HUAWEI-6fKQ" (DS ch 5): dwell 5:1
+[wifi] маяки "byfly WIFI" (DS ch 6): dwell 6:1
+[wifi] маяки "HUAWEI-WhPP" (DS ch 6): dwell 6:1
+[wifi] маяки "A1-FT34-AE6FC8-2.4G" (DS ch 8): dwell 7:2 8:1 9:1
+[wifi] маяки "TP-LINK_6DC6" (DS ch 8): dwell 7:1 8:1 9:1
+[wifi] маяки "A1-FT34-A7F718-2.4G" (DS ch 9): dwell 8:1 9:1
+[wifi] маяки "byfly WiFi" (DS ch 10): dwell 9:1 10:1 11:1
+[wifi] точка найдена: 20:57:af:ad:f7:ae ch 1 (-63 dBm) — проверка канала
+[wifi] точка: группа TKIP, HT(11n), +WPA(смешанный), рейтов 12, TX 1M
+[wifi] смен канала: 14 (fastcc 0, bring-up 14), время ср 65 мс / макс 112 мс
+[wifi] PDADC: таблица записана @a280 (pdGains=2 overlap=6 границы 34/57/57/57, pdadc[0..3]=0 0 0 0)
+[wifi] bring-up ch 1: ok (NF=-118 dBm)
+[wifi] PREAUTH: ch 1, 340 мс: маяков точки 3, всего кадров 55 — точка слышима на своём канале
+[wifi] PROBE: DEAUTH-сброс сеанса + направленный запрос к точке
+[wifi] PROBE: ответ точки (len=506, rssi-кадр принят) — мы слышим друг друга
+[wifi] PROBE: запрос отправлен (ответов 1) — точка ОТВЕЧАЕТ нам — AUTH обязан пройти
+[wifi] RX mgmt: fc=00b0 len=34 DA=94:db:c9:a2:58:c1 SA=20:57:af:ad:f7:ae BSSID=20:57:af:ad:f7:ae rssi=-75
+[wifi] AUTH ok — посылаем ASSOC REQ
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT WPA (cap=0431)
+[wifi] ASSOC: окно 600 мс: кадров 32 (маяков 24, mgmt 1, CRC 3, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 1 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT WPA (cap=0431)
+[wifi] ASSOC: окно 600 мс: кадров 15 (маяков 37, mgmt 0, CRC 1, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 2 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT WPA (cap=0431)
+[wifi] ASSOC: окно 600 мс: кадров 15 (маяков 51, mgmt 0, CRC 1, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 3 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT WPA (cap=0431)
+[wifi] ASSOC: окно 600 мс: кадров 15 (маяков 61, mgmt 1, CRC 1, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — mgmt только чужи
+[wifi] таймаут — повтор 4 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT WPA (cap=0431)
+[wifi] ASSOC: окно 600 мс: кадров 15 (маяков 73, mgmt 0, CRC 1, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] таймаут — повтор 5 (ASSOC)
+[wifi] ASSOC REQ: rates 12: 82 84 8b 0c 12 96 18 24 30 48 60 6c HT WPA (cap=0431)
+[wifi] ASSOC: окно 600 мс: кадров 16 (маяков 87, mgmt 0, CRC 0, прочих 0, от BSSID 0, нам 0, assoc-rsp 0) — маяки шли, НЕ-м
+[wifi] ASSOC: нет ответа точки
+[wifi] RX mgmt: fc=00c0 len=30 DA=94:db:c9:a2:58:c1 SA=20:57:af:ad:f7:ae BSSID=20:57:af:ad:f7:ae rssi=-73
