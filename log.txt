@@ -1,1157 +1,579 @@
-[P     22.912] rssi=-62 rate=54M DATA/DATA-0x00 len=415 retry=0 wep=1 dir=AP->STA
-  A1=33:33:00:00:83:84 A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3278
-[P     22.913] rssi=-62 rate=54M DATA/DATA-0x00 len=395 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3279
-[P     23.036] rssi=-63 rate=54M DATA/DATA-0x08 len=164 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2452
-[P     23.050] rssi=-63 rate=54M DATA/DATA-0x08 len=157 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2453
-[P     23.143] rssi=-63 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2454
-[P     23.351] rssi=-63 rate=54M DATA/DATA-0x08 len=148 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2456
-[P     23.441] rssi=-61 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2457
-[P     23.541] rssi=-59 rate=54M DATA/DATA-0x08 len=147 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2458
-[P     23.612] rssi=-83 rate=54M DATA/DATA-0x0C len=30 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=4C:63:71:AF:D0:B7 A3=20:57:AF:AD:F7:AE seq=364
-[P     23.841] rssi=-61 rate=54M DATA/DATA-0x08 len=146 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2460
-[P     23.923] rssi=-61 rate=54M DATA/DATA-0x08 len=150 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2461
-[P     24.092] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2462
-[P     24.156] rssi=-59 rate=54M DATA/DATA-0x08 len=157 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2463
-[P     24.347] rssi=-60 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2464
-[P     24.586] rssi=-60 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2465
-[P     24.721] rssi=-59 rate=54M DATA/DATA-0x08 len=171 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2466
-[P     24.837] rssi=-60 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2467
-[P     24.996] rssi=-58 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=E8:5A:8B:C7:A0:D3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4025
+[P     76.949] rssi=-58 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
+  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=672
+[P     77.742] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=86:FC:E6:FA:5D:8C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3970
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     25.006] rssi=-61 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2468
-[P     25.086] rssi=-58 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=E8:5A:8B:C7:A0:D3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4026
+[P     78.271] rssi=-58 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=563
+[P     78.275] rssi=-58 rate=54M DATA/DATA-0x08 len=138 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=563
+[P     78.281] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=564
+[P     78.301] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=EE:42:9C:2D:32:AF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3971
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     25.196] rssi=-62 rate=54M DATA/DATA-0x08 len=156 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2469
-[P     25.411] rssi=-60 rate=54M DATA/DATA-0x08 len=148 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2470
-[P     25.502] rssi=-61 rate=54M DATA/DATA-0x08 len=150 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2471
-[P     25.580] rssi=-60 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2472
-[P     25.580] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2473
-[P     25.583] rssi=-60 rate=54M DATA/DATA-0x08 len=304 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2474
-[P     25.587] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2475
-[P     25.593] rssi=-61 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2476
-[P     25.594] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2477
-[P     25.599] rssi=-60 rate=54M DATA/DATA-0x08 len=148 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2478
-[P     25.676] rssi=-59 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=3280
-[P     25.721] rssi=-61 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2479
-[P     26.026] rssi=-61 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2480
-[P     26.043] rssi=-60 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2481
-[P     26.290] rssi=-59 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3281
-[P     26.339] rssi=-62 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2482
-[P     26.543] rssi=-60 rate=54M DATA/DATA-0x08 len=148 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2484
-[P     26.601] rssi=-62 rate=54M DATA/DATA-0x08 len=155 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2485
-[P     26.675] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2486
-[P     26.678] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2487
-[P     26.678] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2488
-[P     26.678] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2489
-[P     26.685] rssi=-61 rate=54M DATA/DATA-0x08 len=164 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2490
-[P     26.700] rssi=-58 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=3282
-[P     26.748] rssi=-60 rate=54M DATA/DATA-0x08 len=150 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2491
-[P     26.768] rssi=-60 rate=54M DATA/DATA-0x08 len=1554 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2492
-[P     26.777] rssi=-60 rate=54M DATA/DATA-0x08 len=380 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2493
-[P     26.803] rssi=-59 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3283
-[P     26.820] rssi=-61 rate=54M DATA/DATA-0x08 len=108 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2494
-[P     26.823] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2495
-[P     26.832] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2496
-[P     26.832] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2497
-[P     26.832] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2498
-[P     26.833] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2499
-[P     26.833] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2500
-[P     26.833] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2501
-[P     26.833] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2502
-[P     26.943] rssi=-62 rate=54M DATA/DATA-0x08 len=227 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2503
-[P     27.043] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2504
-[P     27.046] rssi=-62 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2505
-[P     27.069] rssi=-62 rate=54M DATA/DATA-0x08 len=146 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2506
-[P     27.135] rssi=-62 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2507
-[P     27.393] rssi=-59 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2510
-[P     27.430] rssi=-60 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2511
-[P     27.449] rssi=-60 rate=54M DATA/DATA-0x08 len=142 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2512
-[P     27.495] rssi=-60 rate=54M DATA/DATA-0x08 len=717 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2513
-[P     27.606] rssi=-61 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2514
-[P     27.610] rssi=-60 rate=54M DATA/DATA-0x08 len=720 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2515
-[P     27.622] rssi=-59 rate=54M DATA/DATA-0x00 len=301 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3284
-[P     27.623] rssi=-59 rate=54M DATA/DATA-0x00 len=292 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3285
-[P     27.724] rssi=-60 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=3286
-[P     27.782] rssi=-65 rate=54M DATA/DATA-0x08 len=146 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2516
-[P     27.782] rssi=-64 rate=54M DATA/DATA-0x08 len=152 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2517
-[P     27.978] rssi=-63 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2518
-[P     28.021] rssi=-62 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2519
-[P     28.241] rssi=-65 rate=54M DATA/DATA-0x08 len=163 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2520
-[P     28.276] rssi=-65 rate=54M DATA/DATA-0x08 len=147 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2521
-[P     28.363] rssi=-66 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2522
-[P     28.425] rssi=-67 rate=54M DATA/DATA-0x08 len=142 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2523
-[P     28.535] rssi=-65 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=44:CB:AD:72:8B:6C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4030
+[P     78.681] rssi=-56 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3578
+[P     79.325] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=565
+[P     79.326] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=566
+[P     79.326] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=567
+[P     79.326] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=568
+[P     79.509] rssi=-59 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=569
+[P     79.666] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=FE:A7:B8:F9:E5:60 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3972
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     28.602] rssi=-66 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2524
-[P     28.615] rssi=-65 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=1E:BE:1F:4F:43:A4 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4031
+[P     79.667] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=FE:A7:B8:F9:E5:60 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3973
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     28.688] rssi=-64 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=1E:BE:1F:4F:43:A4 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4032
+[P     79.717] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=FE:A7:B8:F9:E5:60 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3974
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     28.723] rssi=-66 rate=54M DATA/DATA-0x08 len=148 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2526
-[P     28.799] rssi=-65 rate=54M DATA/DATA-0x08 len=148 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2527
-[P     28.802] rssi=-65 rate=54M DATA/DATA-0x08 len=148 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2527
-[P     28.983] rssi=-65 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2528
-[P     29.057] rssi=-65 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2529
-[P     29.202] rssi=-65 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2530
-[P     29.203] rssi=-65 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2531
-[P     29.292] rssi=-65 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2532
-[P     29.465] rssi=-64 rate=54M DATA/DATA-0x08 len=145 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2533
-[P     29.465] rssi=-64 rate=54M DATA/DATA-0x08 len=139 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2534
-[P     29.556] rssi=-64 rate=54M DATA/DATA-0x08 len=142 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2535
-[P     29.883] rssi=-64 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2536
-[P     29.883] rssi=-64 rate=54M DATA/DATA-0x08 len=161 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2537
-[P     29.932] rssi=-64 rate=54M DATA/DATA-0x08 len=140 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2538
-[P     29.932] rssi=-64 rate=54M DATA/DATA-0x08 len=148 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2539
-[P     30.053] rssi=-63 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2540
-[P     30.190] rssi=-64 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2541
-[P     30.276] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=86:FC:E6:FA:5D:8C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4033
+[P     80.362] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=B0:4A:39:01:F1:9C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3975
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     30.276] rssi=-64 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2542
-[P     30.329] rssi=-63 rate=54M DATA/DATA-0x08 len=142 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2543
-[P     30.428] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2544
-[P     30.509] rssi=-63 rate=54M DATA/DATA-0x08 len=127 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2545
-[P     30.509] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2546
-[P     30.514] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2547
-[P     30.519] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2548
-[P     30.519] rssi=-63 rate=54M DATA/DATA-0x08 len=127 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2549
-[P     30.520] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2550
-[P     30.614] rssi=-63 rate=54M DATA/DATA-0x08 len=145 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2551
-[P     30.642] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2785
-[P     30.707] rssi=-64 rate=54M DATA/DATA-0x08 len=155 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2552
-[P     30.709] rssi=-64 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2553
-[P     30.709] rssi=-64 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2554
-[P     30.714] rssi=-63 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2555
-[P     30.720] rssi=-64 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2556
-[P     30.720] rssi=-63 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2557
-[P     30.862] rssi=-64 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2558
-[P     30.877] rssi=-61 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=AC:C3:58:52:51:56 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4034
+[P     80.486] rssi=-59 rate=54M DATA/DATA-0x08 len=723 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=570
+[P     81.224] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=CA:1A:DF:7C:5A:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3976
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     30.919] rssi=-61 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=AC:C3:58:52:51:56 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4035
+[P     81.967] rssi=-56 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
+  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=673
+[P     83.518] rssi=-58 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=571
+[P     83.518] rssi=-58 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=572
+[P     83.528] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=573
+[P     83.536] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=574
+[P     83.537] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=575
+[P     84.231] rssi=-58 rate=54M DATA/DATA-0x08 len=106 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=576
+[P     84.592] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=577
+[P     84.592] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=578
+[P     84.592] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=579
+[P     84.592] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=580
+[P     84.763] rssi=-58 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=581
+[P     84.912] rssi=-55 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=E2:8C:C8:61:19:18 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3977
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     30.937] rssi=-64 rate=54M DATA/DATA-0x08 len=145 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2559
-[P     31.015] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2560
-[P     31.106] rssi=-63 rate=54M DATA/DATA-0x08 len=149 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2561
-[P     31.151] rssi=-63 rate=54M DATA/DATA-0x08 len=141 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2562
-[P     31.593] rssi=-62 rate=54M DATA/DATA-0x08 len=148 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2564
-[P     31.646] rssi=-62 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2565
-[P     31.732] rssi=-62 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2566
-[P     31.787] rssi=-62 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2567
-[P     31.820] rssi=-62 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3287
-[P     31.866] rssi=-63 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2568
-[P     31.867] rssi=-63 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2569
-[P     31.867] rssi=-63 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2570
-[P     31.867] rssi=-63 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2571
-[P     31.925] rssi=-63 rate=54M DATA/DATA-0x08 len=147 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2572
-[P     32.040] rssi=-63 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2573
-[P     32.040] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2574
-[P     32.040] rssi=-63 rate=54M DATA/DATA-0x08 len=1554 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2575
-[P     32.046] rssi=-63 rate=54M DATA/DATA-0x08 len=380 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2576
-[P     32.087] rssi=-63 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2577
-[P     32.088] rssi=-63 rate=54M DATA/DATA-0x08 len=108 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2578
-[P     32.089] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2579
-[P     32.157] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2580
-[P     32.160] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2581
-[P     32.160] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2582
-[P     32.161] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2583
-[P     32.161] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2584
-[P     32.161] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2585
-[P     32.161] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2586
-[P     32.161] rssi=-63 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2587
-[P     32.263] rssi=-63 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2588
-[P     32.311] rssi=-63 rate=54M DATA/DATA-0x08 len=145 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2589
-[P     32.376] rssi=-63 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2590
-[P     32.381] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2591
-[P     32.450] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2592
-[P     32.565] rssi=-63 rate=54M DATA/DATA-0x08 len=720 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2593
-[P     32.592] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2594
-[P     32.786] rssi=-63 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2595
-[P     32.956] rssi=-63 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2596
-[P     33.040] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=E2:28:07:1B:DF:88 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4037
+[P     85.550] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=D2:60:FA:65:AE:11 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3978
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     33.215] rssi=-66 rate=54M DATA/DATA-0x08 len=146 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2597
-[P     33.215] rssi=-65 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2598
-[P     33.341] rssi=-64 rate=54M DATA/DATA-0x08 len=725 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2599
-[P     33.779] rssi=-64 rate=54M DATA/DATA-0x08 len=142 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2602
-[P     33.780] rssi=-63 rate=54M DATA/DATA-0x08 len=144 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2603
-[P     34.095] rssi=-64 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2604
-[P     34.201] rssi=-64 rate=54M DATA/DATA-0x08 len=136 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2605
-[P     34.269] rssi=-65 rate=54M DATA/DATA-0x08 len=147 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2606
-[P     34.380] rssi=-64 rate=54M DATA/DATA-0x08 len=146 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2607
-[P     34.380] rssi=-64 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2608
-[P     34.527] rssi=-63 rate=54M DATA/DATA-0x08 len=143 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2609
-[P     34.971] rssi=-63 rate=54M DATA/DATA-0x08 len=152 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2611
-[P     35.000] rssi=-63 rate=54M DATA/DATA-0x08 len=145 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2612
-[P     35.063] rssi=-63 rate=54M DATA/DATA-0x08 len=141 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2613
-[P     35.104] rssi=-63 rate=54M DATA/DATA-0x08 len=161 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2614
-[P     35.177] rssi=-63 rate=54M DATA/DATA-0x08 len=139 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2615
-[P     35.247] rssi=-63 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2616
-[P     35.335] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2617
-[P     35.440] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2618
-[P     35.521] rssi=-65 rate=54M DATA/DATA-0x08 len=139 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2619
-[P     35.595] rssi=-66 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2620
-[P     35.674] rssi=-64 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2622
-[P     35.732] rssi=-63 rate=54M DATA/DATA-0x08 len=140 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2623
-[P     35.892] rssi=-64 rate=54M DATA/DATA-0x08 len=166 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2624
-[P     35.892] rssi=-64 rate=54M DATA/DATA-0x08 len=142 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2625
-[P     36.004] rssi=-62 rate=54M DATA/DATA-0x08 len=82 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2786
-[P     36.158] rssi=-61 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=78:32:1B:FE:62:C9 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4038
+[P     85.590] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=D2:60:FA:65:AE:11 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3979
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     36.363] rssi=-64 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2626
-[P     36.364] rssi=-64 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2627
-[P     36.370] rssi=-64 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2628
-[P     36.376] rssi=-64 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2629
-[P     36.378] rssi=-64 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2630
-[P     36.838] rssi=-66 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3288
-[P     37.315] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2631
-[P     37.328] rssi=-68 rate=54M DATA/DATA-0x08 len=1554 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2632
-[P     37.334] rssi=-67 rate=54M DATA/DATA-0x08 len=380 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2633
-[P     37.369] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2634
-[P     37.370] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2635
-[P     37.372] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2636
-[P     37.372] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2637
-[P     37.372] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2638
-[P     37.372] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2639
-[P     37.373] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2640
-[P     37.373] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2641
-[P     37.412] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2644
-[P     37.412] rssi=-68 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2645
-[P     37.591] rssi=-63 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=32:62:F2:A2:8B:C3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4040
+[P     85.625] rssi=-58 rate=54M DATA/DATA-0x08 len=722 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=582
+[P     86.881] rssi=-56 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
+  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=674
+[P     87.940] rssi=-55 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=14:9D:09:5C:4F:1A A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3980
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     37.853] rssi=-61 rate=54M DATA/DATA-0x08 len=542 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2669
-[P     37.938] rssi=-63 rate=54M DATA/DATA-0x08 len=723 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2670
-[P     37.939] rssi=-63 rate=54M DATA/DATA-0x08 len=190 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2671
-[P     38.124] rssi=-62 rate=54M DATA/DATA-0x08 len=1040 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2673
-[P     38.126] rssi=-62 rate=54M DATA/DATA-0x08 len=579 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2676
-[P     38.126] rssi=-62 rate=54M DATA/DATA-0x08 len=121 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2677
-[P     38.900] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2678
-[P     38.903] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2679
-[P     38.903] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2680
-[P     38.903] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2681
-[P     38.968] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2682
-[P     38.969] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2683
-[P     38.969] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2684
-[P     38.969] rssi=-67 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2685
-[P     39.112] rssi=-66 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2686
-[P     39.196] rssi=-65 rate=54M DATA/DATA-0x08 len=471 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2687
-[P     39.255] rssi=-63 rate=54M DATA/DATA-0x08 len=106 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2688
-[P     39.621] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2689
-[P     39.622] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2690
-[P     39.622] rssi=-61 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2691
-[P     39.623] rssi=-62 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2692
-[P     39.733] rssi=-63 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2693
-[P     39.810] rssi=-62 rate=54M DATA/DATA-0x08 len=717 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2694
-[P     39.842] rssi=-60 rate=54M DATA/DATA-0x08 len=720 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2695
-[P     39.889] rssi=-62 rate=54M DATA/DATA-0x08 len=560 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2696
-[P     40.021] rssi=-61 rate=54M DATA/DATA-0x08 len=106 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2697
-------------------------------------------------
-[P     41.106] rssi=-33 rate=1M MGMT/DEAUTH len=30 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=3(STA-LEAVING)
-------------------------------------------------
-[P     41.108] rssi=-37 rate=1M MGMT/PROBE-REQ len=44 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=1
-  PROBE-REQ ssid="HomeWifi" chan=-1 rsn=0 wpa1=0 wps=0 ht40=0 vht=0
-[P     41.109] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4041
+[P     88.395] rssi=-55 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=60:F1:8A:40:13:40 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3981
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     41.230] rssi=-59 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4042
+[P     88.396] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=60:F1:8A:40:13:40 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3982
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-------------------------------------------------
-[P     41.361] rssi=-37 rate=1M MGMT/AUTH len=34 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=3
-  AUTH alg=0(open) txn=1 status=0(SUCCESS)
-[P     41.366] rssi=-63 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
+[P     88.531] rssi=-57 rate=54M DATA/DATA-0x00 len=301 retry=0 wep=1 dir=AP->STA
+  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=675
+[P     88.532] rssi=-57 rate=54M DATA/DATA-0x00 len=292 retry=0 wep=1 dir=AP->STA
+  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=676
+[P     88.533] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=60:F1:8A:40:13:40 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3983
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P     88.534] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=60:F1:8A:40:13:40 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3984
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P     88.579] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=E8:5A:8B:C7:A0:D3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3985
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P     88.592] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=E8:5A:8B:C7:A0:D3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3986
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P     88.641] rssi=-60 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=583
+[P     88.642] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=584
+[P     88.647] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=585
+[P     88.656] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=587
+[P     88.750] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=E8:5A:8B:C7:A0:D3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3987
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P     89.134] rssi=-57 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
+  A1=33:33:FF:5A:28:6E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=677
+[P     89.712] rssi=-60 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=588
+[P     89.718] rssi=-60 rate=54M DATA/DATA-0x08 len=94 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=589
+[P     89.718] rssi=-60 rate=54M DATA/DATA-0x08 len=94 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=590
+[P     89.718] rssi=-60 rate=54M DATA/DATA-0x08 len=94 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=591
+[P     89.883] rssi=-61 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=592
+[P     90.245] rssi=-58 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=86:FC:E6:FA:5D:8C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3988
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P     90.891] rssi=-59 rate=54M DATA/DATA-0x08 len=722 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=593
+[P     91.015] rssi=-57 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
   A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
   AUTH alg=0(open) txn=2 status=0(SUCCESS)
-------------------------------------------------
-[P     41.412] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=4
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     41.416] rssi=-64 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     41.534] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
+[P     91.015] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
   A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     41.856] rssi=-62 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3289
-------------------------------------------------
-[P     42.033] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=5
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     42.037] rssi=-58 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     42.153] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-------------------------------------------------
-[P     42.659] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=6
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     42.664] rssi=-58 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     42.785] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     43.129] rssi=-62 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2698
-[P     43.129] rssi=-62 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2699
-[P     43.143] rssi=-62 rate=54M DATA/DATA-0x08 len=154 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2700
-[P     43.152] rssi=-62 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2701
-[P     43.152] rssi=-62 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2702
-------------------------------------------------
-[P     43.306] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=7
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     43.310] rssi=-62 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     43.424] rssi=-62 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-------------------------------------------------
-[P     43.950] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=8
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     43.954] rssi=-60 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     43.956] rssi=-60 rate=54M MGMT/ASSOC-RESP len=279 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     44.074] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     44.195] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2703
-[P     44.195] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2704
-[P     44.195] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2705
-[P     44.197] rssi=-60 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2706
-[P     44.416] rssi=-62 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2707
-------------------------------------------------
-[P     44.595] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=9
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     44.620] rssi=-57 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3290
-[P     44.714] rssi=-58 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     44.988] rssi=-63 rate=54M DATA/DATA-0x08 len=717 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2708
-------------------------------------------------
-[P     45.239] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=10
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     45.243] rssi=-62 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     45.364] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     45.644] rssi=-60 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3291
-------------------------------------------------
-[P     45.886] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=11
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     45.890] rssi=-60 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     46.006] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     46.188] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=AA:7A:AA:4A:D3:1A A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4043
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-------------------------------------------------
-[P     46.533] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=94:DB:C9:A2:58:C1 A3=20:57:AF:AD:F7:AE seq=12
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     46.537] rssi=-61 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC00E
-[P     46.566] rssi=-61 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3292
-[P     46.654] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     46.773] rssi=-62 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3293
-[P     46.873] rssi=-64 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3294
-[P     47.053] rssi=-62 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=CC:73:14:11:BC:15 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4044
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     47.105] rssi=-62 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=CC:73:14:11:BC:15 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4045
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     47.425] rssi=-59 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=76:DD:20:BB:49:C3 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4046
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-------------------------------------------------
-[P     47.522] rssi=-38 rate=1M MGMT/DEAUTH len=30 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=13
-  DEAUTH reason=3(STA-LEAVING)
-------------------------------------------------
-[P     47.524] rssi=-37 rate=1M MGMT/PROBE-REQ len=44 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=14
-  PROBE-REQ ssid="HomeWifi" chan=-1 rsn=0 wpa1=0 wps=0 ht40=0 vht=0
-[P     47.525] rssi=-58 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4047
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     47.640] rssi=-89 rate=54M DATA/DATA-0x04 len=28 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=68:C4:4D:A6:50:3F A3=20:57:AF:AD:F7:AE seq=2377
-[P     47.646] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4048
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     47.660] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.660] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.661] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.661] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.661] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.662] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.662] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.663] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.663] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.666] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.666] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.667] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.667] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.668] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.668] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     47.797] rssi=-64 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3295
-------------------------------------------------
-[P     47.797] rssi=-37 rate=1M MGMT/AUTH len=34 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=16
-  AUTH alg=0(open) txn=1 status=0(SUCCESS)
-[P     47.804] rssi=-60 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
   AUTH alg=0(open) txn=2 status=0(SUCCESS)
-[P     48.005] rssi=-61 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2709
-[P     48.006] rssi=-61 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2710
-[P     48.008] rssi=-60 rate=54M DATA/DATA-0x08 len=304 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2711
-[P     48.012] rssi=-61 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2712
-[P     48.018] rssi=-62 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2713
-[P     48.018] rssi=-62 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2714
-[P     48.101] rssi=-58 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=3296
-[P     48.198] rssi=-57 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2787
-------------------------------------------------
-[P     48.414] rssi=-38 rate=11M MGMT/AUTH len=34 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=17
-  AUTH alg=0(open) txn=1 status=0(SUCCESS)
-[P     48.418] rssi=-56 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+[P     91.015] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
   AUTH alg=0(open) txn=2 status=0(SUCCESS)
-[P     48.620] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=AA:9F:0F:C9:7E:63 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4049
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     48.659] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.659] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.660] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.660] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.660] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.661] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.661] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.662] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.662] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.662] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.664] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.665] rssi=-62 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=AA:9F:0F:C9:7E:63 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4050
-  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
-  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     48.665] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.665] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.666] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     48.819] rssi=-63 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3297
-[P     48.883] rssi=-65 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2715
-[P     48.883] rssi=-65 rate=54M DATA/DATA-0x08 len=125 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2716
-------------------------------------------------
-[P     49.015] rssi=-39 rate=2M MGMT/AUTH len=34 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=18
-  AUTH alg=0(open) txn=1 status=0(SUCCESS)
-[P     49.024] rssi=-60 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+[P     91.015] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
   AUTH alg=0(open) txn=2 status=0(SUCCESS)
-------------------------------------------------
-[P     49.030] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=19
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     49.036] rssi=-60 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     49.054] rssi=-63 rate=54M DATA/DATA-0x08 len=94 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2717
-[P     49.055] rssi=-63 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2718
-[P     49.055] rssi=-63 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2719
-[P     49.055] rssi=-63 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2720
-[P     49.126] rssi=-60 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=3298
-[P     49.143] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=40:08:77:FB:4B:2A A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4051
+[P     91.015] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.015] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.016] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.016] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.016] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.016] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.016] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.017] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.017] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.017] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.017] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     91.899] rssi=-58 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
+  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=678
+[P     92.434] rssi=-57 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.434] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.434] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.435] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.435] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.435] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.435] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.436] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.436] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.436] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.436] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.436] rssi=-58 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.437] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.437] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     92.437] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     93.906] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=594
+[P     93.906] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=595
+[P     93.914] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=596
+[P     93.919] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=597
+[P     93.920] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=598
+[P     94.959] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=599
+[P     94.960] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=600
+[P     94.960] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=601
+[P     94.960] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=602
+[P     94.993] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=5E:69:E2:DF:34:51 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3991
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     49.154] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-!! буфер переполнен, потеряно 1 кадров
-[P     49.232] rssi=-62 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2721
-[P     49.273] rssi=-61 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2722
-[P     49.538] rssi=-56 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3299
-------------------------------------------------
-[P     49.647] rssi=-39 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=20
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     49.651] rssi=-55 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     49.678] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.678] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.678] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.679] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.679] rssi=-60 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.680] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.680] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.682] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.683] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.683] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.684] rssi=-60 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.684] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.684] rssi=-60 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.685] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.685] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=4 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     49.741] rssi=-59 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3300
-[P     49.765] rssi=-59 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.152] rssi=-61 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=3301
-------------------------------------------------
-[P     50.272] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=21
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     50.278] rssi=-63 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     50.394] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.457] rssi=-60 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3302
-[P     50.677] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.677] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.681] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.681] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.682] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.682] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.682] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.683] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.683] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.683] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.684] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.684] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.685] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.685] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     50.767] rssi=-62 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3303
-------------------------------------------------
-[P     50.919] rssi=-39 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=22
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     50.925] rssi=-60 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     50.926] rssi=-60 rate=54M MGMT/ASSOC-RESP len=279 retry=1 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     51.046] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     51.483] rssi=-60 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3304
-------------------------------------------------
-[P     51.565] rssi=-39 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=23
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-------------------------------------------------
-[P     51.569] rssi=-37 rate=1M MGMT/ASSOC-REQ len=117 retry=1 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=23
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     51.573] rssi=-59 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     51.673] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=0 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.673] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.673] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.673] rssi=-60 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.674] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.675] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.675] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.675] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.675] rssi=-59 rate=54M MGMT/DEAUTH len=30 retry=1 wep=0 dir=AP->STA
-  A1=94:DB:C9:A2:58:C1 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     51.686] rssi=-64 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     51.788] rssi=-64 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3305
-[P     51.891] rssi=-63 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3306
-------------------------------------------------
-[P     52.207] rssi=-39 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=24
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     52.211] rssi=-59 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     52.326] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     52.812] rssi=-65 rate=54M DATA/DATA-0x00 len=128 retry=0 wep=1 dir=AP->STA
-  A1=33:33:FF:E9:8C:5F A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3307
-------------------------------------------------
-[P     52.852] rssi=-39 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=25
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     52.856] rssi=-59 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     52.917] rssi=-65 rate=54M DATA/DATA-0x00 len=415 retry=0 wep=1 dir=AP->STA
-  A1=33:33:00:00:83:84 A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3308
-[P     52.918] rssi=-64 rate=54M DATA/DATA-0x00 len=395 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3309
-[P     52.974] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     53.043] rssi=-57 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2788
-[P     53.312] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2724
-[P     53.312] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2725
-[P     53.328] rssi=-61 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2727
-[P     53.329] rssi=-62 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2728
-------------------------------------------------
-[P     53.496] rssi=-39 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=26
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     53.500] rssi=-58 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     53.610] rssi=-68 rate=54M DATA/DATA-0x0C len=30 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=4C:63:71:AF:D0:B7 A3=20:57:AF:AD:F7:AE seq=365
-[P     53.615] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-------------------------------------------------
-[P     54.147] rssi=-38 rate=1M MGMT/ASSOC-REQ len=117 retry=0 wep=0 dir=STA->AP
-  A1=20:57:AF:AD:F7:AE A2=02:F2:67:48:EC:34 A3=20:57:AF:AD:F7:AE seq=27
-  ASSOC-REQ caps=0x0431 ssid="" rsn=1 wpa1=0 wps=0 ht40=0
-[P     54.152] rssi=-59 rate=54M MGMT/ASSOC-RESP len=279 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  ASSOC-RESP status=0(SUCCESS) aid=0xC010
-[P     54.265] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=1 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     54.376] rssi=-62 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2729
-[P     54.377] rssi=-62 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2730
-[P     54.377] rssi=-62 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2731
-[P     54.378] rssi=-61 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2732
-[P     54.594] rssi=-61 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2733
-[P     54.760] rssi=-59 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3310
-[P     55.140] rssi=-62 rate=54M DATA/DATA-0x08 len=717 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2734
-[P     55.264] rssi=-65 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=2 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     55.274] rssi=-59 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=86:FC:E6:FA:5D:8C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4052
+[P     95.131] rssi=-59 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=603
+[P     95.265] rssi=-59 rate=54M DATA/DATA-0x08 len=713 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=604
+[P     95.783] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=A6:CC:B3:A4:12:D4 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3992
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     55.303] rssi=-59 rate=54M DATA/DATA-0x08 len=82 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2789
-[P     55.782] rssi=-59 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
-  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3311
-[P     56.264] rssi=-66 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=3 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     56.908] rssi=-65 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3312
-[P     56.935] rssi=-60 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=06:CD:D6:2D:17:2D A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4053
+[P     96.139] rssi=-56 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.139] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.139] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.140] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.140] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.140] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.141] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.141] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.141] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.142] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.142] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.142] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.143] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.143] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.143] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.874] rssi=-57 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.875] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.875] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.876] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.876] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.876] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.876] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.876] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.877] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.877] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.877] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.877] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.877] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.877] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.878] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=1
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     96.916] rssi=-57 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
+  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=679
+[P     98.217] rssi=-57 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.221] rssi=-56 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.221] rssi=-56 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.221] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.225] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.225] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.225] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.225] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.225] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.225] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.226] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.226] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.226] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.227] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.228] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=2
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.283] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=605
+[P     98.285] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=606
+[P     98.285] rssi=-59 rate=54M DATA/DATA-0x08 len=304 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=607
+[P     98.293] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=608
+[P     98.293] rssi=-59 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=609
+[P     98.350] rssi=-57 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
+  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=680
+[P     98.635] rssi=-59 rate=54M DATA/DATA-0x08 len=193 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=610
+[P     98.636] rssi=-59 rate=54M DATA/DATA-0x08 len=239 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=611
+[P     98.669] rssi=-59 rate=54M DATA/DATA-0x08 len=122 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=612
+[P     98.669] rssi=-59 rate=54M DATA/DATA-0x08 len=122 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=613
+[P     98.673] rssi=-59 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=614
+[P     98.674] rssi=-59 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=615
+[P     98.674] rssi=-59 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=616
+[P     98.680] rssi=-59 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=617
+[P     98.680] rssi=-59 rate=54M DATA/DATA-0x08 len=666 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=618
+[P     98.711] rssi=-59 rate=54M DATA/DATA-0x08 len=1035 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=619
+[P     98.711] rssi=-59 rate=54M DATA/DATA-0x08 len=203 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=620
+[P     98.714] rssi=-59 rate=54M DATA/DATA-0x08 len=109 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=621
+[P     98.714] rssi=-59 rate=54M DATA/DATA-0x08 len=105 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=622
+[P     98.724] rssi=-59 rate=54M DATA/DATA-0x08 len=605 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=623
+[P     98.777] rssi=-59 rate=54M DATA/DATA-0x08 len=106 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=624
+[P     98.846] rssi=-59 rate=54M DATA/DATA-0x08 len=122 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=625
+[P     98.846] rssi=-59 rate=54M DATA/DATA-0x08 len=122 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=626
+[P     98.847] rssi=-59 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=627
+[P     98.847] rssi=-59 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=628
+[P     98.863] rssi=-57 rate=54M MGMT/AUTH len=34 retry=0 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.863] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.863] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.863] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.863] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.864] rssi=-58 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.864] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.865] rssi=-60 rate=54M DATA/DATA-0x08 len=1332 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=629
+[P     98.865] rssi=-60 rate=54M DATA/DATA-0x08 len=391 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=630
+[P     98.865] rssi=-60 rate=54M DATA/DATA-0x08 len=1023 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=631
+[P     98.865] rssi=-60 rate=54M DATA/DATA-0x08 len=168 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=632
+[P     98.865] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.865] rssi=-57 rate=54M MGMT/AUTH len=34 retry=1 wep=0 dir=AP->STA
+  A1=02:3A:B9:8F:CB:8B A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3
+  AUTH alg=0(open) txn=2 status=0(SUCCESS)
+[P     98.885] rssi=-59 rate=54M DATA/DATA-0x08 len=202 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=635
+[P     98.891] rssi=-59 rate=54M DATA/DATA-0x08 len=107 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=649
+[P     98.951] rssi=-59 rate=54M DATA/DATA-0x08 len=574 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=658
+[P     98.951] rssi=-59 rate=54M DATA/DATA-0x08 len=261 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=659
+[P     98.988] rssi=-59 rate=54M DATA/DATA-0x08 len=106 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=660
+[P     99.333] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=661
+[P     99.334] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=662
+[P     99.334] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=663
+[P     99.334] rssi=-59 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=664
+[P     99.374] rssi=-57 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
+  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=681
+[P     99.504] rssi=-59 rate=54M DATA/DATA-0x08 len=471 retry=1 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=665
+!! буфер переполнен, потеряно 29 кадров
+[P    100.103] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=2A:B5:ED:90:B4:4C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3993
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     58.164] rssi=-60 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2735
-[P     58.165] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2736
-[P     58.173] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2737
-[P     58.173] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=1 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2737
-[P     58.181] rssi=-60 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2738
-[P     58.182] rssi=-60 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=2739
-[P     58.265] rssi=-63 rate=54M DATA/DATA-0x08 len=137 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4
-  EAPOL-Key AP->STA GTK-? ver=1 desc=2 KDV=0 keylen=16 replay=5 ki=0x8A00 [pair=0 ack=0 mic=0 sec=1 encr=0]
-[P     59.215] rssi=-62 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2740
-[P     59.265] rssi=-60 rate=54M MGMT/DEAUTH len=30 retry=0 wep=0 dir=AP->STA
-  A1=02:F2:67:48:EC:34 A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=0
-  DEAUTH reason=15(4WAY-TIMEOUT)
-[P     59.366] rssi=-62 rate=54M DATA/DATA-0x08 len=82 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2790
-[P     59.610] rssi=-66 rate=54M DATA/DATA-0x08 len=718 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2744
-[P     60.279] rssi=-64 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
-  A1=7C:49:EB:A0:A3:9A A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=4054
+[P    100.141] rssi=-59 rate=54M DATA/DATA-0x08 len=714 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=666
+[P    100.399] rssi=-57 rate=54M DATA/DATA-0x00 len=84 retry=0 wep=1 dir=AP->STA
+  A1=FF:FF:FF:FF:FF:FF A2=20:57:AF:AD:F7:AE A3=64:66:B3:74:62:4E seq=682
+[P    101.308] rssi=-55 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=F6:DC:46:60:A2:FF A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3994
   PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
   RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
-[P     61.450] rssi=-61 rate=54M DATA/DATA-0x08 len=106 retry=0 wep=1 dir=AP->STA
-  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=2746
-[P     61.928] rssi=-60 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
-  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=3313
+[P    101.934] rssi=-55 rate=54M DATA/DATA-0x00 len=133 retry=0 wep=1 dir=AP->STA
+  A1=01:00:5E:00:00:FB A2=20:57:AF:AD:F7:AE A3=20:2B:20:4A:23:27 seq=683
+[P    102.742] rssi=-54 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=86:FC:E6:FA:5D:8C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3995
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P    102.772] rssi=-54 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=E6:85:68:CC:FF:6E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3996
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P    102.793] rssi=-54 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=E6:85:68:CC:FF:6E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3997
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P    102.893] rssi=-56 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=86:FC:E6:FA:5D:8C A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3998
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
+[P    103.171] rssi=-59 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=667
+[P    103.171] rssi=-58 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=668
+[P    103.178] rssi=-58 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=669
+[P    103.184] rssi=-58 rate=54M DATA/DATA-0x08 len=138 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=670
+[P    103.185] rssi=-58 rate=54M DATA/DATA-0x08 len=154 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=671
+[P    103.347] rssi=-56 rate=54M DATA/DATA-0x08 len=82 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=3579
+[P    103.351] rssi=-56 rate=54M DATA/DATA-0x08 len=100 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=02:00:5A:33:30:47 seq=3580
+[P    104.221] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=672
+[P    104.223] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=673
+[P    104.223] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=674
+[P    104.223] rssi=-58 rate=54M DATA/DATA-0x08 len=94 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=675
+[P    104.393] rssi=-58 rate=54M DATA/DATA-0x08 len=471 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=676
+[P    104.537] rssi=-58 rate=54M DATA/DATA-0x08 len=714 retry=0 wep=1 dir=AP->STA
+  A1=64:66:B3:74:62:4E A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:A8 seq=677
+[P    104.837] rssi=-57 rate=54M MGMT/PROBE-RESP len=506 retry=0 wep=0 dir=AP->STA
+  A1=7C:49:EB:A0:A3:9A A2=20:57:AF:AD:F7:AE A3=20:57:AF:AD:F7:AE seq=3999
+  PROBE-RESP ssid="" chan=1 rsn=1 wpa1=1 wps=1 ht40=0 vht=1
+  RSN ver=1 group=TKIP pairwise=[TKIP,CCMP] AKM=[PSK] MFPR=0 MFPC=0
